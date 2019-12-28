@@ -1,0 +1,6 @@
+framework module Pods_DoubleXPUITests {
+  umbrella header "Pods-DoubleXPUITests-umbrella.h"
+
+  export *
+  module * { export * }
+}

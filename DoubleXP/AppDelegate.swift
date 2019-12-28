@@ -8,15 +8,28 @@
 
 import UIKit
 import CoreData
+import Firebase
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
+    var appProperties: NSDictionary = [:]
+    var gcGames: [GamerConnectGame]!
+    var freeAgentProfiles: [FreeAgentObject]!
+    var selectedGCGame: GamerConnectGame?
+    var currentUser: User?
+    var currentLanding: LandingActivity?
+    var currentFrag: String = ""
+    var interviewManager = InterviewManager()
+    var navStack = [UIViewController]()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        gcGames = [GamerConnectGame]()
+        freeAgentProfiles = [FreeAgentObject]()
         // Override point for customization after application launch.
+        
+        FirebaseApp.configure()
         return true
     }
 

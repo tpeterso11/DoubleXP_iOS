@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>582166005754-c9g354o6q7j0vp7580vjckmbjei0per4.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.582166005754-c9g354o6q7j0vp7580vjckmbjei0per4</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>582166005754-3dsmfqeha1rg8aa0hd5b6cvu6cp87kc4.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAyjFRqU4u2fx7_Ik5dEiDuNbXb9F0Ykjc</string>
+	<key>GCM_SENDER_ID</key>
+	<string>582166005754</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.encryptedcachellc.doublexp</string>
+	<key>PROJECT_ID</key>
+	<string>gameterminal-767f7</string>
+	<key>STORAGE_BUCKET</key>
+	<string>gameterminal-767f7.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:582166005754:ios:1b7f25f1d80328d2</string>
+	<key>DATABASE_URL</key>
+	<string>https://gameterminal-767f7.firebaseio.com</string>
+</dict>
+</plist>
