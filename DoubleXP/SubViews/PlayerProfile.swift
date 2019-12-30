@@ -11,12 +11,15 @@ import Firebase
 import ImageLoader
 import moa
 import MSPeekCollectionViewDelegateImplementation
+import FoldingCell
 
-class PlayerProfile: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate {
+class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource {
     var uid: String = ""
     var userForProfile: User? = nil
     
     var keys = [String]()
+    var objects = [StatObject]()
+    var cellHeights: [CGFloat] = []
     
     @IBOutlet weak var gamerTag: UILabel!
     @IBOutlet weak var profileLine2: UILabel!
@@ -27,9 +30,18 @@ class PlayerProfile: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
     @IBOutlet weak var consoleTwo: UILabel!
     @IBOutlet weak var headerView: UIView!
     @IBOutlet weak var connectButton: UIImageView!
+    @IBOutlet weak var table: UITableView!
+    @IBOutlet weak var statEmpty: UIView!
+    @IBOutlet weak var userStatusText: UILabel!
     
     var sections = [Section]()
     var nav: NavigationPageController?
+    
+     enum Const {
+           static let closeCellHeight: CGFloat = 150
+           static let openCellHeight: CGFloat = 300
+           static let rowsCount = 1
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -151,7 +163,7 @@ class PlayerProfile: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
                 currentStat.mostUsedDefender = mostUsedDefender
                 currentStat.gearScore = gearScore
                 
-                currentStats.append(currentStat)
+                self.objects.append(currentStat)
             }
             
             let consoleArray = snapshot.childSnapshot(forPath: "consoles")
@@ -164,7 +176,7 @@ class PlayerProfile: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
             let user = User(uId: uId)
             user.gamerTags = gamerTags
             user.teams = teams
-            user.stats = currentStats
+            user.stats = self.objects
             user.games = games
             user.gamerTag = gamerTag
             user.pc = pc
@@ -202,13 +214,7 @@ class PlayerProfile: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
         //self.profileLine2.text = String(consoleString)
         
         if(!user.stats.isEmpty){
-            for stat in user.stats {
-                let section = Section(name: stat.gameName, items: stat, collapsed: false)
-                self.sections.append(section)
-            }
-            
-            statsCollection.delegate = self
-            statsCollection.dataSource = self
+            self.setup()
         }
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -224,11 +230,14 @@ class PlayerProfile: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
                 let singleTap = UITapGestureRecognizer(target: self, action: #selector(messagingButtonClicked))
                 connectButton.isUserInteractionEnabled = true
                 connectButton.addGestureRecognizer(singleTap)
+                
+                userStatusText.text = "This user is your friend. Tap here to chat."
             }
             
             for request in currentUser!.sentRequests{
                 if(request.uid == user.uId){
                     connectButton.image = UIImage(named: "pending_button")
+                    userStatusText.text = "Your request has been sent. Just waiting for a response..."
                     break
                 }
             }
@@ -236,6 +245,7 @@ class PlayerProfile: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
             for request in currentUser!.pendingRequests{
                 if(request.uid == user.uId){
                     connectButton.image = UIImage(named: "pending_button")
+                    userStatusText.text = "Your request has been sent. Just waiting for a response..."
                     break
                 }
             }
@@ -244,6 +254,8 @@ class PlayerProfile: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
             let singleTap = UITapGestureRecognizer(target: self, action: #selector(connectButtonClicked))
             connectButton.isUserInteractionEnabled = true
             connectButton.addGestureRecognizer(singleTap)
+            
+            userStatusText.text = "Tap to send a friend request to this user."
         }
         
         guard !user.bio.isEmpty else{
@@ -254,166 +266,120 @@ class PlayerProfile: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
         self.bio.text = user.bio
     }
     
+    private func setup() {
+        cellHeights = Array(repeating: Const.closeCellHeight, count: self.objects.count)
+        table.estimatedRowHeight = Const.closeCellHeight
+        table.rowHeight = UITableView.automaticDimension
+        table.backgroundColor = UIColor.white
+        
+        if #available(iOS 10.0, *) {
+            table.refreshControl = UIRefreshControl()
+            table.refreshControl?.addTarget(self, action: #selector(refreshHandler), for: .valueChanged)
+        }
+        
+        statEmpty.isHidden = true
+        self.table.dataSource = self
+        self.table.delegate = self
+    }
+    
+    @objc func refreshHandler() {
+        let deadlineTime = DispatchTime.now() + .seconds(1)
+        DispatchQueue.main.asyncAfter(deadline: deadlineTime, execute: { [weak self] in
+            if #available(iOS 10.0, *) {
+                self?.table.refreshControl?.endRefreshing()
+            }
+            self?.table.reloadData()
+        })
+    }
+    
     @objc func connectButtonClicked(_ sender: AnyObject?) {
         let friendsManager = FriendsManager()
         
         if(self.userForProfile != nil){
-            let delegate = UIApplication.shared.delegate as! AppDelegate!
-            let currentUser = delegate?.currentUser
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            let currentUser = delegate.currentUser
             friendsManager.sendRequestFromProfile(currentUser: currentUser!, otherUser: userForProfile!)
         }
     }
     
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return sections.count
+    func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
+        return self.objects.count
     }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return sections[section].getCount()
+
+    func tableView(_: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        guard case let cell as FoldingCellCell = cell else {
+            return
+        }
+
+        cell.backgroundColor = .clear
+
+        if cellHeights[indexPath.row] == Const.closeCellHeight {
+            cell.unfold(false, animated: false, completion: nil)
+        } else {
+            cell.unfold(true, animated: false, completion: nil)
+        }
+
+        //cell.number = indexPath.row
     }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "statCell", for: indexPath) as! StatsCell
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! FoldingCellCell
+        let durations: [TimeInterval] = [0.26, 0.2, 0.2]
+        cell.durationsForExpandedState = durations
+        cell.durationsForCollapsedState = durations
         
-        let current = self.sections[indexPath.section]
-        if(!keys.contains(current.items.gameName + "playerLevelGame") && !current.items.playerLevelGame.isEmpty){
-            keys.append(current.items.gameName + "playerLevelGame")
-            
-            cell.statLabel.text = "Player Level Game"
-            cell.statHeader.text = current.items.playerLevelGame
-            
-            return cell
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let games = appDelegate.gcGames!
+        let current = self.objects[indexPath.item]
+        
+        for game in games{
+            if(game.gameName == current.gameName){
+                cell.gameBack.moa.url = game.imageUrl
+                cell.gameBack.contentMode = .scaleAspectFill
+                cell.gameBack.clipsToBounds = true
+            }
         }
         
-        if(!keys.contains(current.items.gameName + "playerLevelPVP") && !current.items.playerLevelPVP.isEmpty){
-            keys.append(current.items.gameName + "playerLevelPVP")
-            
-            cell.statLabel.text = "Player Level PVP"
-            cell.statHeader.text = current.items.playerLevelPVP
-            
-            return cell
-        }
+        cell.setCollectionView(stat: current)
         
-        if(!keys.contains(current.items.gameName + "killsPVE") && !current.items.killsPVE.isEmpty){
-            keys.append(current.items.gameName + "killsPVE")
-            
-            cell.statLabel.text = "Kills PVE"
-            cell.statHeader.text = current.items.killsPVE
-            
-            return cell
-        }
-        
-        if(!keys.contains(current.items.gameName + "killsPVP") && !current.items.killsPVP.isEmpty){
-            keys.append(current.items.gameName + "killsPVP")
-            
-            cell.statLabel.text = "Kills PVP"
-            cell.statHeader.text = current.items.killsPVP
-            
-            return cell
-        }
-        
-        if(!keys.contains(current.items.gameName + "currentRank") && !current.items.currentRank.isEmpty){
-            keys.append(current.items.gameName + "currentRank")
-            
-            cell.statLabel.text = "Current Rank"
-            cell.statHeader.text = current.items.currentRank
-            
-            return cell
-        }
-        
-        if(!keys.contains(current.items.gameName + "gearScore") && !current.items.gearScore.isEmpty){
-            keys.append(current.items.gameName + "gearScore")
-            
-            cell.statLabel.text = "Gear Score"
-            cell.statHeader.text = current.items.gearScore
-            
-            return cell
-        }
-        
-        if(!keys.contains(current.items.gameName + "totalRankedKills") && !current.items.totalRankedKills.isEmpty){
-            keys.append(current.items.gameName + "totalRankedKills")
-            
-            cell.statLabel.text = "Total Ranked Kills"
-            cell.statHeader.text = current.items.totalRankedKills
-            
-            return cell
-        }
-        
-        if(!keys.contains(current.items.gameName + "totalRankedDeaths") && !current.items.totalRankedDeaths.isEmpty){
-            keys.append(current.items.gameName + "totalRankedDeaths")
-            
-            cell.statLabel.text = "Total Ranked Deaths"
-            cell.statHeader.text = current.items.totalRankedDeaths
-            
-            return cell
-        }
-        
-        if(!keys.contains(current.items.gameName + "mostUsedAttacker") && !current.items.mostUsedAttacker.isEmpty){
-            keys.append(current.items.gameName + "mostUsedAttacker")
-            
-            cell.statLabel.text = "Most Used Attacker"
-            cell.statHeader.text = current.items.mostUsedAttacker
-            
-            return cell
-        }
-        
-        if(!keys.contains(current.items.gameName + "mostUsedDefender") && !current.items.mostUsedDefender.isEmpty){
-            keys.append(current.items.gameName + "mostUsedDefender")
-            
-            cell.statLabel.text = "Most Used Defender"
-            cell.statHeader.text = current.items.mostUsedDefender
-            
-            return cell
-        }
-        
-        if(!keys.contains(current.items.gameName + "totalRankedWins") && !current.items.totalRankedWins.isEmpty){
-            keys.append(current.items.gameName + "totalRankedWins")
-            
-            cell.statLabel.text = "Total Ranked Wins"
-            cell.statHeader.text = current.items.totalRankedWins
-            
-            return cell
-        }
-        
-        if(!keys.contains(current.items.gameName + "totalRankedLosses") && !current.items.totalRankedLosses.isEmpty){
-            keys.append(current.items.gameName + "totalRankedLosses")
-            
-            cell.statLabel.text = "Total Ranked Losses"
-            cell.statHeader.text = current.items.totalRankedLosses
-            
-            return cell
-        }
-        
-        if(!keys.contains(current.items.gameName + "authorized") && !current.items.authorized.isEmpty){
-            keys.append(current.items.gameName + "authorized")
-            
-            cell.statLabel.text = "Authorized"
-            cell.statHeader.text = current.items.authorized
-            
-            return cell
-        }
-        
-        if(!keys.contains(current.items.gameName + "setPublic") && !current.items.setPublic.isEmpty){
-            keys.append(current.items.gameName + "setPublic")
-            
-            cell.statLabel.text = "Public"
-            cell.statHeader.text = current.items.setPublic
-            
-            return cell
-        }
         
         return cell
     }
-    
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "header", for: indexPath) as! StatsHeaderCell
-        
-        let current = sections[indexPath.section]
-        header.headerText.text = current.name
-        
-        return header
+
+    func tableView(_: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return cellHeights[indexPath.row]
     }
-    
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+
+        let cell = tableView.cellForRow(at: indexPath) as! FoldingCell
+
+        if cell.isAnimating() {
+            return
+        }
+
+        var duration = 0.0
+        let cellIsCollapsed = cellHeights[indexPath.row] == Const.closeCellHeight
+        if cellIsCollapsed {
+            cellHeights[indexPath.row] = Const.openCellHeight
+            cell.unfold(true, animated: true, completion: nil)
+            duration = 0.5
+        } else {
+            cellHeights[indexPath.row] = Const.closeCellHeight
+            cell.unfold(false, animated: true, completion: nil)
+            duration = 0.5
+        }
+
+        UIView.animate(withDuration: duration, delay: 0, options: .curveEaseOut, animations: { () -> Void in
+            tableView.beginUpdates()
+            tableView.endUpdates()
+            
+            // fix https://github.com/Ramotion/folding-cell/issues/169
+            if cell.frame.maxY > tableView.frame.maxY {
+                tableView.scrollToRow(at: indexPath, at: UITableView.ScrollPosition.bottom, animated: true)
+            }
+        }, completion: nil)
+    }
 }
 
 struct Section {
@@ -489,4 +455,11 @@ struct Section {
         
         return count
     }
+}
+
+fileprivate struct C {
+  struct CellHeight {
+    static let close: CGFloat = 91 // equal or greater foregroundView height
+    static let open: CGFloat = 166 // equal or greater containerView height
+  }
 }

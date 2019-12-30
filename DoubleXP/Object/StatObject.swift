@@ -192,6 +192,49 @@ class StatObject: NSObject, NSCoding {
         }
     }
     
+    func getStatCount() -> Int{
+        var count = 0
+        
+        if(!killsPVE.isEmpty){
+            count += 1
+        }
+        if(!killsPVP.isEmpty){
+            count += 1
+        }
+        if(!playerLevelGame.isEmpty){
+            count += 1
+        }
+        if(!playerLevelPVP.isEmpty){
+            count += 1
+        }
+        if(!currentRank.isEmpty){
+            count += 1
+        }
+        if(!totalRankedWins.isEmpty){
+            count += 1
+        }
+        if(!totalRankedLosses.isEmpty){
+            count += 1
+        }
+        if(!totalRankedKills.isEmpty){
+            count += 1
+        }
+        if(!totalRankedDeaths.isEmpty){
+            count += 1
+        }
+        if(!mostUsedAttacker.isEmpty){
+            count += 1
+        }
+        if(!mostUsedDefender.isEmpty){
+            count += 1
+        }
+        if(!gearScore.isEmpty){
+            count += 1
+        }
+        
+        return count
+    }
+    
     func getItemCount()-> Int{
         var count = 0
         if(!gameName.isEmpty){

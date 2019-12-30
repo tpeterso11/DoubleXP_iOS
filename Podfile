@@ -15,6 +15,7 @@ target 'DoubleXP' do
   pod 'SwiftNotificationCenter'
   pod 'EMPageViewController'
   pod 'SendBirdSDK'
+  pod 'FoldingCell'
 
   # Pods for DoubleXP
 

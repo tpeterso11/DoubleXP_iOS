@@ -35,6 +35,11 @@
 		3080B3E623B80BE400638B22 /* request_highlight.png in Resources */ = {isa = PBXBuildFile; fileRef = 3080B3E523B80BE400638B22 /* request_highlight.png */; };
 		3080B3E823B81B5B00638B22 /* messaging_button.png in Resources */ = {isa = PBXBuildFile; fileRef = 3080B3E723B81B5B00638B22 /* messaging_button.png */; };
 		3080B3EA23B81BC100638B22 /* pending_button.png in Resources */ = {isa = PBXBuildFile; fileRef = 3080B3E923B81BC100638B22 /* pending_button.png */; };
+		3080B3EC23B83C5B00638B22 /* FoldingCellCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3080B3EB23B83C5B00638B22 /* FoldingCellCell.swift */; };
+		3080B3EE23B8488E00638B22 /* EmbeddedTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3080B3ED23B8488E00638B22 /* EmbeddedTableView.swift */; };
+		3080B3F023B92A5900638B22 /* Rainbow_Six_Siege.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 3080B3EF23B92A5900638B22 /* Rainbow_Six_Siege.jpg */; };
+		3080B3F223B9362C00638B22 /* more.png in Resources */ = {isa = PBXBuildFile; fileRef = 3080B3F123B9362C00638B22 /* more.png */; };
+		3080B3F423B94A6500638B22 /* ProfileStatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3080B3F323B94A6500638B22 /* ProfileStatCell.swift */; };
 		308213DE2267E91500A11876 /* LandingCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308213DD2267E91500A11876 /* LandingCollection.swift */; };
 		308BD01D238AED570034822B /* CreateTeamFrag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308BD01C238AED570034822B /* CreateTeamFrag.swift */; };
 		308BD01F238B06800034822B /* gcGameCreateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308BD01E238B06800034822B /* gcGameCreateCell.swift */; };
@@ -181,6 +186,11 @@
 		3080B3E523B80BE400638B22 /* request_highlight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = request_highlight.png; sourceTree = "<group>"; };
 		3080B3E723B81B5B00638B22 /* messaging_button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = messaging_button.png; sourceTree = "<group>"; };
 		3080B3E923B81BC100638B22 /* pending_button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pending_button.png; sourceTree = "<group>"; };
+		3080B3EB23B83C5B00638B22 /* FoldingCellCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoldingCellCell.swift; sourceTree = "<group>"; };
+		3080B3ED23B8488E00638B22 /* EmbeddedTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedTableView.swift; sourceTree = "<group>"; };
+		3080B3EF23B92A5900638B22 /* Rainbow_Six_Siege.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Rainbow_Six_Siege.jpg; sourceTree = "<group>"; };
+		3080B3F123B9362C00638B22 /* more.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = more.png; sourceTree = "<group>"; };
+		3080B3F323B94A6500638B22 /* ProfileStatCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStatCell.swift; sourceTree = "<group>"; };
 		308213DD2267E91500A11876 /* LandingCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingCollection.swift; sourceTree = "<group>"; };
 		308BD01C238AED570034822B /* CreateTeamFrag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTeamFrag.swift; sourceTree = "<group>"; };
 		308BD01E238B06800034822B /* gcGameCreateCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gcGameCreateCell.swift; sourceTree = "<group>"; };
@@ -355,6 +365,7 @@
 				30B6E19C23AC2C5A00B69F00 /* FAQuizConfirmation.swift */,
 				30B6E1A623AF15AA00B69F00 /* FAQuizConsoles.swift */,
 				30B6E1AA23B14F4400B69F00 /* FAQuizComplete.swift */,
+				3080B3ED23B8488E00638B22 /* EmbeddedTableView.swift */,
 			);
 			path = SubViews;
 			sourceTree = "<group>";
@@ -404,6 +415,8 @@
 				30B6E19E23ADB81600B69F00 /* OptionCell.swift */,
 				30B6E1A823B125AB00B69F00 /* ConfirmationQuestionCell.swift */,
 				3080B3DF23B7C4F500638B22 /* ParentVC.swift */,
+				3080B3EB23B83C5B00638B22 /* FoldingCellCell.swift */,
+				3080B3F323B94A6500638B22 /* ProfileStatCell.swift */,
 			);
 			path = CustomView;
 			sourceTree = "<group>";
@@ -484,6 +497,8 @@
 		4CB84C432205F74800183D28 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				3080B3F123B9362C00638B22 /* more.png */,
+				3080B3EF23B92A5900638B22 /* Rainbow_Six_Siege.jpg */,
 				3080B3E923B81BC100638B22 /* pending_button.png */,
 				3080B3E723B81B5B00638B22 /* messaging_button.png */,
 				3080B3E523B80BE400638B22 /* request_highlight.png */,
@@ -676,6 +691,7 @@
 			files = (
 				30B6E1A123ADBD8C00B69F00 /* game_over_PNG15.png in Resources */,
 				30C4EDB32267C1890046B615 /* doublexp_white.png in Resources */,
+				3080B3F223B9362C00638B22 /* more.png in Resources */,
 				301AEF5623886D7100339850 /* star.png in Resources */,
 				30B583E42352A22B00736733 /* point_rights.png in Resources */,
 				4C4D88312205F33200AD7090 /* LaunchScreen.storyboard in Resources */,
@@ -683,6 +699,7 @@
 				308BD02E238ED0DA0034822B /* envelope.png in Resources */,
 				3080B3E223B7FAA700638B22 /* request.png in Resources */,
 				3080B3E823B81B5B00638B22 /* messaging_button.png in Resources */,
+				3080B3F023B92A5900638B22 /* Rainbow_Six_Siege.jpg in Resources */,
 				3080B3E623B80BE400638B22 /* request_highlight.png in Resources */,
 				30C4EDB42267C1890046B615 /* team_thumbs_up.png in Resources */,
 				309F3A1323B40CA900FD0C48 /* left-arrow.png in Resources */,
@@ -831,12 +848,14 @@
 				30B583D1234FC50B00736733 /* LoginController.swift in Sources */,
 				308BD01F238B06800034822B /* gcGameCreateCell.swift in Sources */,
 				4C790E8A2266B85500FDA550 /* AdminActivity.swift in Sources */,
+				3080B3F423B94A6500638B22 /* ProfileStatCell.swift in Sources */,
 				4C4D88262205F32900AD7090 /* ViewController.swift in Sources */,
 				308213DE2267E91500A11876 /* LandingCollection.swift in Sources */,
 				30B583E223529B2500736733 /* RegisterActivity.swift in Sources */,
 				4CC1720322677FA5009A1B80 /* LandingActivity.swift in Sources */,
 				4CC17206226781DF009A1B80 /* NewsObject.swift in Sources */,
 				30B583D4234FCBAA00736733 /* FirebaseAuthManager.swift in Sources */,
+				3080B3EC23B83C5B00638B22 /* FoldingCellCell.swift in Sources */,
 				30B6E17F23A0892500B69F00 /* FADash.swift in Sources */,
 				3080B3E023B7C4F500638B22 /* ParentVC.swift in Sources */,
 				308BD0362391DB9C0034822B /* TeammateObject.swift in Sources */,
@@ -858,6 +877,7 @@
 				30B6E1A723AF15AA00B69F00 /* FAQuizConsoles.swift in Sources */,
 				30B583DE2350168B00736733 /* TeamObject.swift in Sources */,
 				308BD030238ED1370034822B /* DashFriendInviteCell.swift in Sources */,
+				3080B3EE23B8488E00638B22 /* EmbeddedTableView.swift in Sources */,
 				309F3A0D23B3EFBF00FD0C48 /* Utility.swift in Sources */,
 				3058131F23976183001BCE30 /* FreeAgentObject.swift in Sources */,
 				4C4D882C2205F32900AD7090 /* DoubleXP.xcdatamodeld in Sources */,
