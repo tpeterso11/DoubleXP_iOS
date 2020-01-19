@@ -11,6 +11,7 @@ import Firebase
 import ImageLoader
 import moa
 import MSPeekCollectionViewDelegateImplementation
+import UnderLineTextField
 
 class CreateTeamFrag: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, MSPeekImplementationDelegate, UICollectionViewDelegateFlowLayout {
     
@@ -20,7 +21,7 @@ class CreateTeamFrag: UIViewController, UICollectionViewDataSource, UICollection
     @IBOutlet weak var pcSwitch: UISwitch!
     @IBOutlet weak var nintendoSwitch: UISwitch!
     @IBOutlet weak var teamCreateNext: UIImageView!
-    @IBOutlet weak var teamName: UITextField!
+    @IBOutlet weak var teamName: UnderLineTextField!
     
     var switches = [UISwitch]()
     var consoleChecked = false

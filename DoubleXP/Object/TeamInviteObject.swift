@@ -8,7 +8,7 @@
 
 import UIKit
 
-class TeamInviteObject: NSObject, NSCoding {
+class TeamInviteObject: GenericRequestObject, NSCoding {
     var _gamerTag = ""
     var gamerTag:String {
         get {

@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-class FriendRequestObject: NSObject, NSCoding {
+class FriendRequestObject: GenericRequestObject, NSCoding {
     var _gamerTag = ""
     var gamerTag:String {
         get {

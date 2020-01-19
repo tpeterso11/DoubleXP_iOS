@@ -90,7 +90,7 @@ class PreSplashActivity: UIViewController {
                     }
                 }
             
-                DispatchQueue.main.async {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
                     let delegate = UIApplication.shared.delegate as! AppDelegate
                     delegate.gcGames = self.games
                     
@@ -98,13 +98,14 @@ class PreSplashActivity: UIViewController {
                     if(uId != nil){
                         if(!uId!.isEmpty){
                             self.downloadDBRef(uid: uId!)
+                            //self.performSegue(withIdentifier: "newLogin", sender: nil)
                         }
                         else{
-                            self.performSegue(withIdentifier: "adminTransition", sender: nil)
+                            self.performSegue(withIdentifier: "newLogin", sender: nil)
                         }
                     }
                     else{
-                        self.performSegue(withIdentifier: "adminTransition", sender: nil)
+                        self.performSegue(withIdentifier: "newLogin", sender: nil)
                     }
                 }
             }

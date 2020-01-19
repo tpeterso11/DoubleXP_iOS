@@ -16,6 +16,9 @@ target 'DoubleXP' do
   pod 'EMPageViewController'
   pod 'SendBirdSDK'
   pod 'FoldingCell'
+  pod 'SmoothButton'
+  pod 'lottie-ios'
+  pod 'UnderLineTextField', '~> 2.1'
 
   # Pods for DoubleXP
 

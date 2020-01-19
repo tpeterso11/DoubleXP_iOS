@@ -11,21 +11,28 @@ import FoldingCell
 
 class FoldingCellCell: FoldingCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     @IBOutlet weak var gameBack: UIImageView!
+    @IBOutlet weak var statCollection: UICollectionView!
     @IBOutlet weak var gameName: UILabel!
     @IBOutlet weak var developer: UILabel!
-    @IBOutlet weak var statCollection: UICollectionView!
+    @IBOutlet weak var statLayout: UIView!
     
     var currentStat: StatObject?
     var keys = [String]()
     
-    /*override func awakeFromNib() {
-        roundCorners(corners: [.topLeft, .topRight], radius: 5.0)
+    override func awakeFromNib() {
+        foregroundView.layer.cornerRadius = 10
         foregroundView.layer.masksToBounds = true
+        
+        containerView.layer.cornerRadius = 10
+        containerView.layer.masksToBounds = true
+        
+        statLayout.layer.cornerRadius = 10
+        statLayout.layer.masksToBounds = true
         super.awakeFromNib()
-    }*/
+    }
 
     override func animationDuration(_ itemIndex: NSInteger, type _: FoldingCell.AnimationType) -> TimeInterval {
-        let durations = [0.26, 0.2, 0.2]
+        let durations = [0.15, 0.25, 0.15]
         return durations[itemIndex]
     }
     

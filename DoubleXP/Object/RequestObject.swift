@@ -8,7 +8,7 @@
 
 import Foundation
 
-class RequestObject: NSObject, NSCoding {
+class RequestObject: GenericRequestObject, NSCoding {
 
     var _status = ""
     var status:String {

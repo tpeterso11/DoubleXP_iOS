@@ -9,6 +9,7 @@
 import UIKit
 import Firebase
 import ImageLoader
+import UnderLineTextField
 
 class LoginController: UIViewController {
     private var data: [NewsObject]!
@@ -25,6 +26,10 @@ class LoginController: UIViewController {
         // Do any additional setup after loading the view, typically from a nib.
         
         loginButton.addTarget(self, action: #selector(loginButtonClicked), for: .touchUpInside)
+        
+        let singleTap = UITapGestureRecognizer(target: self, action: #selector(registerClicked))
+        registerText.isUserInteractionEnabled = true
+        registerText.addGestureRecognizer(singleTap)
     }
     
     @objc func loginButtonClicked(_ sender: AnyObject?) {
@@ -48,6 +53,10 @@ class LoginController: UIViewController {
                 self.display(alertController: alertController)
             }
         }
+    }
+    
+    @objc func registerClicked(_ sender: AnyObject?) {
+        self.performSegue(withIdentifier: "register", sender: nil)
     }
     
     private func display(alertController: UIAlertController){
@@ -474,5 +483,18 @@ class LoginController: UIViewController {
                 print(error.localizedDescription)
             }
         }
+    }
+}
+
+extension UITextField {
+    func setLeftPaddingPoints(_ amount:CGFloat){
+        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: amount, height: self.frame.size.height))
+        self.leftView = paddingView
+        self.leftViewMode = .always
+    }
+    func setRightPaddingPoints(_ amount:CGFloat) {
+        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: amount, height: self.frame.size.height))
+        self.rightView = paddingView
+        self.rightViewMode = .always
     }
 }

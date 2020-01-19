@@ -22,6 +22,9 @@
 		3058131D23973FEB001BCE30 /* TeamBuildFAResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3058131C23973FEB001BCE30 /* TeamBuildFAResults.swift */; };
 		3058131F23976183001BCE30 /* FreeAgentObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3058131E23976183001BCE30 /* FreeAgentObject.swift */; };
 		30581321239A18A4001BCE30 /* FreeAgentResultCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30581320239A18A4001BCE30 /* FreeAgentResultCell.swift */; };
+		3058198023D26F72008684A7 /* pen.png in Resources */ = {isa = PBXBuildFile; fileRef = 3058197F23D26F72008684A7 /* pen.png */; };
+		3058198223D27152008684A7 /* observation.png in Resources */ = {isa = PBXBuildFile; fileRef = 3058198123D27152008684A7 /* observation.png */; };
+		3058198423D27160008684A7 /* search.png in Resources */ = {isa = PBXBuildFile; fileRef = 3058198323D27160008684A7 /* search.png */; };
 		3058240A239C349A00FDEA7D /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30582409239C349A00FDEA7D /* ChatMessage.swift */; };
 		3058240C239C3D7900FDEA7D /* UserChatBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3058240B239C3D7900FDEA7D /* UserChatBubble.swift */; };
 		3058240E239C3D9800FDEA7D /* OtherChatBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3058240D239C3D9800FDEA7D /* OtherChatBubble.swift */; };
@@ -40,7 +43,17 @@
 		3080B3F023B92A5900638B22 /* Rainbow_Six_Siege.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 3080B3EF23B92A5900638B22 /* Rainbow_Six_Siege.jpg */; };
 		3080B3F223B9362C00638B22 /* more.png in Resources */ = {isa = PBXBuildFile; fileRef = 3080B3F123B9362C00638B22 /* more.png */; };
 		3080B3F423B94A6500638B22 /* ProfileStatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3080B3F323B94A6500638B22 /* ProfileStatCell.swift */; };
+		3080B3F623BA579000638B22 /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3080B3F523BA579000638B22 /* GradientButton.swift */; };
+		3080B3FA23BBC52400638B22 /* hello.png in Resources */ = {isa = PBXBuildFile; fileRef = 3080B3F923BBC52400638B22 /* hello.png */; };
+		3080B3FC23BBCB1D00638B22 /* comment-black-oval-bubble-shape.png in Resources */ = {isa = PBXBuildFile; fileRef = 3080B3FB23BBCB1D00638B22 /* comment-black-oval-bubble-shape.png */; };
+		3080B3FE23BBCCB500638B22 /* follow.png in Resources */ = {isa = PBXBuildFile; fileRef = 3080B3FD23BBCCB400638B22 /* follow.png */; };
+		3080B40023BBCEBB00638B22 /* sand-clock.png in Resources */ = {isa = PBXBuildFile; fileRef = 3080B3FF23BBCEBB00638B22 /* sand-clock.png */; };
+		3080B40223BBD0C500638B22 /* new.png in Resources */ = {isa = PBXBuildFile; fileRef = 3080B40123BBD0C500638B22 /* new.png */; };
+		3080B40423BC07BE00638B22 /* x-mark.png in Resources */ = {isa = PBXBuildFile; fileRef = 3080B40323BC07BD00638B22 /* x-mark.png */; };
+		3080B40623BC089E00638B22 /* check.png in Resources */ = {isa = PBXBuildFile; fileRef = 3080B40523BC089E00638B22 /* check.png */; };
 		308213DE2267E91500A11876 /* LandingCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308213DD2267E91500A11876 /* LandingCollection.swift */; };
+		3086956D23BD97E8001E51EF /* SegueFromLeft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3086956C23BD97E8001E51EF /* SegueFromLeft.swift */; };
+		3086956F23BD9971001E51EF /* SegueFromRight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3086956E23BD9971001E51EF /* SegueFromRight.swift */; };
 		308BD01D238AED570034822B /* CreateTeamFrag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308BD01C238AED570034822B /* CreateTeamFrag.swift */; };
 		308BD01F238B06800034822B /* gcGameCreateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308BD01E238B06800034822B /* gcGameCreateCell.swift */; };
 		308BD021238B4AC90034822B /* TeamDashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308BD020238B4AC90034822B /* TeamDashboard.swift */; };
@@ -123,6 +136,15 @@
 		30C4EDB32267C1890046B615 /* doublexp_white.png in Resources */ = {isa = PBXBuildFile; fileRef = 30C4EDAF2267C1890046B615 /* doublexp_white.png */; };
 		30C4EDB42267C1890046B615 /* team_thumbs_up.png in Resources */ = {isa = PBXBuildFile; fileRef = 30C4EDB02267C1890046B615 /* team_thumbs_up.png */; };
 		30C4EDB52267C1890046B615 /* vintage_tv.png in Resources */ = {isa = PBXBuildFile; fileRef = 30C4EDB12267C1890046B615 /* vintage_tv.png */; };
+		30F6FCB423C58F580051813D /* show-more-button-with-three-dots.png in Resources */ = {isa = PBXBuildFile; fileRef = 30F6FCB323C58F570051813D /* show-more-button-with-three-dots.png */; };
+		30F6FCB623CBF65B0051813D /* RequestsFoldingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6FCB523CBF65B0051813D /* RequestsFoldingCell.swift */; };
+		30F6FCB823CBFC000051813D /* user (1).png in Resources */ = {isa = PBXBuildFile; fileRef = 30F6FCB723CBFC000051813D /* user (1).png */; };
+		30F6FCBA23CBFF9D0051813D /* more (1).png in Resources */ = {isa = PBXBuildFile; fileRef = 30F6FCB923CBFF9D0051813D /* more (1).png */; };
+		30F6FCBC23CC02AD0051813D /* cross.png in Resources */ = {isa = PBXBuildFile; fileRef = 30F6FCBB23CC02AD0051813D /* cross.png */; };
+		30F6FCBE23CC07A20051813D /* GenericRequestObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6FCBD23CC07A20051813D /* GenericRequestObject.swift */; };
+		30F6FCC023CD7F9D0051813D /* open-menu.png in Resources */ = {isa = PBXBuildFile; fileRef = 30F6FCBF23CD7F9C0051813D /* open-menu.png */; };
+		30F6FCC223CD948E0051813D /* cancel-mark.png in Resources */ = {isa = PBXBuildFile; fileRef = 30F6FCC123CD948D0051813D /* cancel-mark.png */; };
+		30F6FCC423CD96620051813D /* dashboard.png in Resources */ = {isa = PBXBuildFile; fileRef = 30F6FCC323CD96620051813D /* dashboard.png */; };
 		4C4D88242205F32900AD7090 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4D88232205F32900AD7090 /* AppDelegate.swift */; };
 		4C4D88262205F32900AD7090 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4D88252205F32900AD7090 /* ViewController.swift */; };
 		4C4D88292205F32900AD7090 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4C4D88272205F32900AD7090 /* Main.storyboard */; };
@@ -173,6 +195,9 @@
 		3058131C23973FEB001BCE30 /* TeamBuildFAResults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamBuildFAResults.swift; sourceTree = "<group>"; };
 		3058131E23976183001BCE30 /* FreeAgentObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeAgentObject.swift; sourceTree = "<group>"; };
 		30581320239A18A4001BCE30 /* FreeAgentResultCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeAgentResultCell.swift; sourceTree = "<group>"; };
+		3058197F23D26F72008684A7 /* pen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pen.png; sourceTree = "<group>"; };
+		3058198123D27152008684A7 /* observation.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = observation.png; sourceTree = "<group>"; };
+		3058198323D27160008684A7 /* search.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = search.png; sourceTree = "<group>"; };
 		30582409239C349A00FDEA7D /* ChatMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessage.swift; sourceTree = "<group>"; };
 		3058240B239C3D7900FDEA7D /* UserChatBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserChatBubble.swift; sourceTree = "<group>"; };
 		3058240D239C3D9800FDEA7D /* OtherChatBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OtherChatBubble.swift; sourceTree = "<group>"; };
@@ -191,7 +216,17 @@
 		3080B3EF23B92A5900638B22 /* Rainbow_Six_Siege.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Rainbow_Six_Siege.jpg; sourceTree = "<group>"; };
 		3080B3F123B9362C00638B22 /* more.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = more.png; sourceTree = "<group>"; };
 		3080B3F323B94A6500638B22 /* ProfileStatCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStatCell.swift; sourceTree = "<group>"; };
+		3080B3F523BA579000638B22 /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
+		3080B3F923BBC52400638B22 /* hello.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = hello.png; sourceTree = "<group>"; };
+		3080B3FB23BBCB1D00638B22 /* comment-black-oval-bubble-shape.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "comment-black-oval-bubble-shape.png"; sourceTree = "<group>"; };
+		3080B3FD23BBCCB400638B22 /* follow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = follow.png; sourceTree = "<group>"; };
+		3080B3FF23BBCEBB00638B22 /* sand-clock.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sand-clock.png"; sourceTree = "<group>"; };
+		3080B40123BBD0C500638B22 /* new.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = new.png; sourceTree = "<group>"; };
+		3080B40323BC07BD00638B22 /* x-mark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "x-mark.png"; sourceTree = "<group>"; };
+		3080B40523BC089E00638B22 /* check.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = check.png; sourceTree = "<group>"; };
 		308213DD2267E91500A11876 /* LandingCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingCollection.swift; sourceTree = "<group>"; };
+		3086956C23BD97E8001E51EF /* SegueFromLeft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegueFromLeft.swift; sourceTree = "<group>"; };
+		3086956E23BD9971001E51EF /* SegueFromRight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegueFromRight.swift; sourceTree = "<group>"; };
 		308BD01C238AED570034822B /* CreateTeamFrag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTeamFrag.swift; sourceTree = "<group>"; };
 		308BD01E238B06800034822B /* gcGameCreateCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gcGameCreateCell.swift; sourceTree = "<group>"; };
 		308BD020238B4AC90034822B /* TeamDashboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamDashboard.swift; sourceTree = "<group>"; };
@@ -276,6 +311,15 @@
 		30C4EDAF2267C1890046B615 /* doublexp_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = doublexp_white.png; sourceTree = "<group>"; };
 		30C4EDB02267C1890046B615 /* team_thumbs_up.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = team_thumbs_up.png; sourceTree = "<group>"; };
 		30C4EDB12267C1890046B615 /* vintage_tv.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = vintage_tv.png; sourceTree = "<group>"; };
+		30F6FCB323C58F570051813D /* show-more-button-with-three-dots.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "show-more-button-with-three-dots.png"; sourceTree = "<group>"; };
+		30F6FCB523CBF65B0051813D /* RequestsFoldingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestsFoldingCell.swift; sourceTree = "<group>"; };
+		30F6FCB723CBFC000051813D /* user (1).png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "user (1).png"; sourceTree = "<group>"; };
+		30F6FCB923CBFF9D0051813D /* more (1).png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "more (1).png"; sourceTree = "<group>"; };
+		30F6FCBB23CC02AD0051813D /* cross.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cross.png; sourceTree = "<group>"; };
+		30F6FCBD23CC07A20051813D /* GenericRequestObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericRequestObject.swift; sourceTree = "<group>"; };
+		30F6FCBF23CD7F9C0051813D /* open-menu.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "open-menu.png"; sourceTree = "<group>"; };
+		30F6FCC123CD948D0051813D /* cancel-mark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cancel-mark.png"; sourceTree = "<group>"; };
+		30F6FCC323CD96620051813D /* dashboard.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dashboard.png; sourceTree = "<group>"; };
 		4C4D88202205F32900AD7090 /* DoubleXP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DoubleXP.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C4D88232205F32900AD7090 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4C4D88252205F32900AD7090 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -417,6 +461,10 @@
 				3080B3DF23B7C4F500638B22 /* ParentVC.swift */,
 				3080B3EB23B83C5B00638B22 /* FoldingCellCell.swift */,
 				3080B3F323B94A6500638B22 /* ProfileStatCell.swift */,
+				3080B3F523BA579000638B22 /* GradientButton.swift */,
+				3086956C23BD97E8001E51EF /* SegueFromLeft.swift */,
+				3086956E23BD9971001E51EF /* SegueFromRight.swift */,
+				30F6FCB523CBF65B0051813D /* RequestsFoldingCell.swift */,
 			);
 			path = CustomView;
 			sourceTree = "<group>";
@@ -497,6 +545,20 @@
 		4CB84C432205F74800183D28 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				30F6FCBB23CC02AD0051813D /* cross.png */,
+				30F6FCB923CBFF9D0051813D /* more (1).png */,
+				3058197F23D26F72008684A7 /* pen.png */,
+				30F6FCB723CBFC000051813D /* user (1).png */,
+				3058198323D27160008684A7 /* search.png */,
+				3058198123D27152008684A7 /* observation.png */,
+				30F6FCB323C58F570051813D /* show-more-button-with-three-dots.png */,
+				3080B40523BC089E00638B22 /* check.png */,
+				3080B40323BC07BD00638B22 /* x-mark.png */,
+				3080B40123BBD0C500638B22 /* new.png */,
+				3080B3FF23BBCEBB00638B22 /* sand-clock.png */,
+				3080B3FD23BBCCB400638B22 /* follow.png */,
+				3080B3FB23BBCB1D00638B22 /* comment-black-oval-bubble-shape.png */,
+				3080B3F923BBC52400638B22 /* hello.png */,
 				3080B3F123B9362C00638B22 /* more.png */,
 				3080B3EF23B92A5900638B22 /* Rainbow_Six_Siege.jpg */,
 				3080B3E923B81BC100638B22 /* pending_button.png */,
@@ -518,10 +580,13 @@
 				30A84DF12381E877007BEAA5 /* plus-symbol-in-a-rounded-black-square.png */,
 				30A84DEF2381E86E007BEAA5 /* icon.png */,
 				30A60D8E2363C91B004B2150 /* group.png */,
+				30F6FCC123CD948D0051813D /* cancel-mark.png */,
 				30A60D8C2363C801004B2150 /* like.png */,
 				30A60D8A2363C784004B2150 /* communications.png */,
 				30B583E52352A2DA00736733 /* close_white.png */,
+				30F6FCC323CD96620051813D /* dashboard.png */,
 				30B583E32352A22B00736733 /* point_rights.png */,
+				30F6FCBF23CD7F9C0051813D /* open-menu.png */,
 				30B583CA2347B5E500736733 /* gamespot_icon_ios.png */,
 				30C4EDAE2267C1890046B615 /* double_xp_small_white.png */,
 				30C4EDAF2267C1890046B615 /* doublexp_white.png */,
@@ -553,6 +618,7 @@
 				30582411239C589D00FDEA7D /* ChatObject.swift */,
 				30B6E18C23A583E400B69F00 /* RequestObject.swift */,
 				30B6E19423A72F3A00B69F00 /* FAQuestion.swift */,
+				30F6FCBD23CC07A20051813D /* GenericRequestObject.swift */,
 			);
 			path = Object;
 			sourceTree = "<group>";
@@ -592,6 +658,7 @@
 				4C4D881D2205F32900AD7090 /* Frameworks */,
 				4C4D881E2205F32900AD7090 /* Resources */,
 				76084E605E46D4237B0B5091 /* [CP] Embed Pods Frameworks */,
+				0CEA5B16247F8ECA417CBD97 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -691,25 +758,39 @@
 			files = (
 				30B6E1A123ADBD8C00B69F00 /* game_over_PNG15.png in Resources */,
 				30C4EDB32267C1890046B615 /* doublexp_white.png in Resources */,
+				30F6FCBC23CC02AD0051813D /* cross.png in Resources */,
+				3080B40623BC089E00638B22 /* check.png in Resources */,
+				30F6FCC023CD7F9D0051813D /* open-menu.png in Resources */,
 				3080B3F223B9362C00638B22 /* more.png in Resources */,
+				30F6FCBA23CBFF9D0051813D /* more (1).png in Resources */,
 				301AEF5623886D7100339850 /* star.png in Resources */,
 				30B583E42352A22B00736733 /* point_rights.png in Resources */,
 				4C4D88312205F33200AD7090 /* LaunchScreen.storyboard in Resources */,
 				30A84DF22381E877007BEAA5 /* plus-symbol-in-a-rounded-black-square.png in Resources */,
 				308BD02E238ED0DA0034822B /* envelope.png in Resources */,
+				3080B40223BBD0C500638B22 /* new.png in Resources */,
+				3080B40023BBCEBB00638B22 /* sand-clock.png in Resources */,
 				3080B3E223B7FAA700638B22 /* request.png in Resources */,
 				3080B3E823B81B5B00638B22 /* messaging_button.png in Resources */,
 				3080B3F023B92A5900638B22 /* Rainbow_Six_Siege.jpg in Resources */,
 				3080B3E623B80BE400638B22 /* request_highlight.png in Resources */,
+				3058198223D27152008684A7 /* observation.png in Resources */,
+				3058198023D26F72008684A7 /* pen.png in Resources */,
 				30C4EDB42267C1890046B615 /* team_thumbs_up.png in Resources */,
 				309F3A1323B40CA900FD0C48 /* left-arrow.png in Resources */,
 				4C4D882E2205F33200AD7090 /* Assets.xcassets in Resources */,
 				30B583CB2347B5E500736733 /* gamespot_icon_ios.png in Resources */,
+				30F6FCC423CD96620051813D /* dashboard.png in Resources */,
+				3058198423D27160008684A7 /* search.png in Resources */,
 				30B583D8234FD01700736733 /* GoogleService-Info.plist in Resources */,
+				30F6FCB823CBFC000051813D /* user (1).png in Resources */,
 				4CC1720122677EF9009A1B80 /* test_banner.png in Resources */,
+				30F6FCC223CD948E0051813D /* cancel-mark.png in Resources */,
 				30582416239C8D1E00FDEA7D /* user.png in Resources */,
+				30F6FCB423C58F580051813D /* show-more-button-with-three-dots.png in Resources */,
 				3080B3EA23B81BC100638B22 /* pending_button.png in Resources */,
 				30A60D8B2363C784004B2150 /* communications.png in Resources */,
+				3080B3FC23BBCB1D00638B22 /* comment-black-oval-bubble-shape.png in Resources */,
 				308BD02C238ED0A10034822B /* invitation.png in Resources */,
 				30A60D8F2363C91B004B2150 /* group.png in Resources */,
 				301AEF502388604D00339850 /* opened-door-aperture.png in Resources */,
@@ -721,9 +802,12 @@
 				30A84DF02381E86E007BEAA5 /* icon.png in Resources */,
 				30A60D8D2363C801004B2150 /* like.png in Resources */,
 				308BD032238ED2450034822B /* restaurant-membership-card-tool.png in Resources */,
+				3080B40423BC07BE00638B22 /* x-mark.png in Resources */,
 				3080B3E423B80A5B00638B22 /* request2.png in Resources */,
 				30C4EDB22267C1890046B615 /* double_xp_small_white.png in Resources */,
+				3080B3FA23BBC52400638B22 /* hello.png in Resources */,
 				30C4EDB52267C1890046B615 /* vintage_tv.png in Resources */,
+				3080B3FE23BBCCB500638B22 /* follow.png in Resources */,
 				4C4D88292205F32900AD7090 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -745,6 +829,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		0CEA5B16247F8ECA417CBD97 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		76084E605E46D4237B0B5091 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -838,6 +939,7 @@
 				30B6E18523A09F1400B69F00 /* ViewTeams.swift in Sources */,
 				30581321239A18A4001BCE30 /* FreeAgentResultCell.swift in Sources */,
 				30B583E823537EEA00736733 /* GamerConnectRegisterActivity.swift in Sources */,
+				30F6FCB623CBF65B0051813D /* RequestsFoldingCell.swift in Sources */,
 				308BD02A238ECE150034822B /* TeamBuildFrag.swift in Sources */,
 				30B6E19D23AC2C5A00B69F00 /* FAQuizConfirmation.swift in Sources */,
 				309F3A1023B3F7DE00FD0C48 /* Test.m in Sources */,
@@ -865,6 +967,7 @@
 				4C4D88242205F32900AD7090 /* AppDelegate.swift in Sources */,
 				30B583EE235E7A2E00736733 /* GCInfoCell.swift in Sources */,
 				30B583EC2353A99200736733 /* GCGameCellTall.swift in Sources */,
+				3086956D23BD97E8001E51EF /* SegueFromLeft.swift in Sources */,
 				3058131B23973AED001BCE30 /* FATeamNeedsCell.swift in Sources */,
 				3058131923973A31001BCE30 /* TeamBuildFA.swift in Sources */,
 				30B6E18D23A583E400B69F00 /* RequestObject.swift in Sources */,
@@ -872,6 +975,7 @@
 				30A60D9823691646004B2150 /* VerticalAlignLabel.swift in Sources */,
 				30B6E18923A33A6300B69F00 /* TeamSearchGameCell.swift in Sources */,
 				303F2D402372883E004B68E1 /* NavigationPageController.swift in Sources */,
+				3080B3F623BA579000638B22 /* GradientButton.swift in Sources */,
 				30A84DEE2381E622007BEAA5 /* TeamInviteObject.swift in Sources */,
 				3008EE782267F89800E0D9ED /* NewsCell.swift in Sources */,
 				30B6E1A723AF15AA00B69F00 /* FAQuizConsoles.swift in Sources */,
@@ -882,6 +986,7 @@
 				3058131F23976183001BCE30 /* FreeAgentObject.swift in Sources */,
 				4C4D882C2205F32900AD7090 /* DoubleXP.xcdatamodeld in Sources */,
 				30A60D962367CCEF004B2150 /* RecommendedUsersCell.swift in Sources */,
+				30F6FCBE23CC07A20051813D /* GenericRequestObject.swift in Sources */,
 				30B6E19523A72F3A00B69F00 /* FAQuestion.swift in Sources */,
 				30B583CD2347B9D000736733 /* PreSplashActivity.swift in Sources */,
 				308BD028238E1AB70034822B /* TeamManager.swift in Sources */,
@@ -895,6 +1000,7 @@
 				30A84DEA2381C63A007BEAA5 /* FriendsManager.swift in Sources */,
 				30A84DEC2381DED0007BEAA5 /* Requests.swift in Sources */,
 				3058240C239C3D7900FDEA7D /* UserChatBubble.swift in Sources */,
+				3086956F23BD9971001E51EF /* SegueFromRight.swift in Sources */,
 				30B6E19923AC16CC00B69F00 /* FAQuizPage.swift in Sources */,
 				30B6E1A523ADC67E00B69F00 /* InterviewManager.swift in Sources */,
 				30A84DE82380FF2C007BEAA5 /* GamerProfileManager.swift in Sources */,

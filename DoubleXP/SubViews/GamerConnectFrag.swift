@@ -62,13 +62,26 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
             
             if(indexPath.item == 0){
                 cell.gamerTag.text = "allthesaints011"
+                cell.xBox.isHidden = true
             }
             if(indexPath.item == 1){
                 cell.gamerTag.text = "_fitboy"
+                cell.xBox.isHidden = true
             }
             if(indexPath.item == 2){
                 cell.gamerTag.text = "Kwatakye Raven"
             }
+            
+            
+            cell.contentView.layer.borderColor = UIColor.clear.cgColor
+            cell.contentView.layer.masksToBounds = true
+            
+            cell.layer.shadowColor = UIColor.black.cgColor
+            cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+            cell.layer.shadowRadius = 2.0
+            cell.layer.shadowOpacity = 0.5
+            cell.layer.masksToBounds = false
+            cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
             
             return cell
         }
@@ -129,7 +142,7 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         let kWhateverHeightYouWant = 150
         if collectionView == self.recommendedUsers {
-            return CGSize(width: collectionView.bounds.size.width, height: CGFloat(50))
+            return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(100))
         }
         else{
             return CGSize(width: 260, height: CGFloat(150))

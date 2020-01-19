@@ -77,6 +77,248 @@ class FriendsManager{
         }
     }
     
+    func acceptFriendFromProfile(otherUserRequest: FriendRequestObject, currentUserUid: String, callbacks: ProfileCallbacks){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser
+        let manager = GamerProfileManager()
+        
+        //Other User First
+        //First, lets remove the friend request
+        let ref = Database.database().reference().child("Users").child(otherUserRequest.uid)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                let value = snapshot.value as? NSDictionary
+                if(value?["pending_friends"] is [String]){
+                    var pendingRequests = value?["pending_friends"] as? [String] ?? [String]()
+                    if(!pendingRequests.isEmpty){
+                        for request in pendingRequests{
+                            if(request == manager.getGamerTag(user: currentUser!)){
+                                pendingRequests = pendingRequests.filter { $0 != manager.getGamerTag(user: currentUser!)}
+                            }
+                        }
+                        
+                        ref.child("pending_friends").setValue(pendingRequests)
+                    }
+                }
+                else{
+                    var pendingRequests = [FriendRequestObject]()
+                    let friendsArray = snapshot.childSnapshot(forPath: "pending_friends")
+                    for friend in friendsArray.children{
+                        let currentObj = friend as! DataSnapshot
+                        let dict = currentObj.value as! [String: Any]
+                        let gamerTag = dict["gamerTag"] as? String ?? ""
+                        let date = dict["date"] as? String ?? ""
+                        let uid = dict["uid"] as? String ?? ""
+                        
+                        let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
+                        pendingRequests.append(newFriend)
+                    }
+                    
+                    
+                    if(!pendingRequests.isEmpty){
+                        for request in pendingRequests{
+                            if(request.uid == currentUserUid){
+                                pendingRequests = pendingRequests.filter { $0 != request}
+                                break
+                            }
+                        }
+                    }
+                    
+                    ref.child("pending_friends").setValue(pendingRequests)
+                    currentUser!.pendingRequests = pendingRequests
+                }
+                
+                //Next, let's add the current user to the OTHER user's friends.
+                //var friends = value?["friends"] as? [String] ?? [String]()
+                let currentFriends = value?["friends"] as? NSDictionary
+                var friends = [String: FriendObject]()
+                
+                for friend in currentFriends!{
+                    let dict = friend.value as! [String: String]
+                    let newFriend = FriendObject(gamerTag: dict["gamerTag"]!, date: dict["date"]!, uid: dict["uId"]!)
+                    
+                    friends[newFriend.uid] = newFriend
+                }
+                
+                var contained = false
+                for friend in friends{
+                    if(friend.key == currentUser!.uId){
+                        contained = true
+                        break
+                    }
+                }
+                
+                if(!contained){
+                    let date = Date()
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "MMMM.dd.yyyy"
+                    let result = formatter.string(from: date)
+                    
+                    let newFriend = FriendObject(gamerTag: manager.getGamerTag(user: currentUser!), date: result, uid: currentUser!.uId)
+                    
+                    friends[currentUser!.uId] = newFriend
+                }
+                
+                ref.child("friends").setValue(friends)
+                
+                
+                self.updateCurrentUserProfile(otherUserRequest: otherUserRequest, currentUserUid: currentUserUid, callbacks: callbacks)
+            }
+            
+        }) { (error) in
+            print(error.localizedDescription)
+        }
+    }
+    
+    private func updateCurrentUserProfile(otherUserRequest: FriendRequestObject, currentUserUid: String, callbacks: ProfileCallbacks){
+        //Now Current User
+        //First, lets remove the sent request
+        let ref = Database.database().reference().child("Users").child(currentUserUid)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                let delegate = UIApplication.shared.delegate as! AppDelegate!
+                let currentUser = delegate?.currentUser
+                let manager = GamerProfileManager()
+                
+                let value = snapshot.value as? NSDictionary
+                var sentRequests = value?["sent_requests"] as? [FriendRequestObject] ?? [FriendRequestObject]()
+                
+                if(!sentRequests.isEmpty){
+                    for request in sentRequests{
+                        if(request.uid == otherUserRequest.uid){
+                            sentRequests = sentRequests.filter { $0 != request}
+                            break
+                        }
+                    }
+                }
+                
+                ref.child("sent_requests").setValue(sentRequests)
+                currentUser!.sentRequests = sentRequests
+                
+                
+                //Next, let's add the other user to the CURRENT user's friends.
+                let currentFriends = value?["friends"] as? NSDictionary
+                var friends = [String: FriendObject]()
+                
+                for friend in currentFriends!{
+                    let dict = friend.value as! [String: String]
+                    let newFriend = FriendObject(gamerTag: dict["gamerTag"]!, date: dict["date"]!, uid: dict["uId"]!)
+                    
+                    friends[newFriend.uid] = newFriend
+                }
+                
+                var contained = false
+                for friend in friends{
+                    if(friend.key == currentUser!.uId){
+                        contained = true
+                        break
+                    }
+                }
+                
+                if(!contained){
+                    let date = Date()
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "MMMM.dd.yyyy"
+                    let result = formatter.string(from: date)
+                    
+                    let newFriend = FriendObject(gamerTag: manager.getGamerTag(user: currentUser!), date: result, uid: currentUser!.uId)
+                    
+                    friends[currentUser!.uId] = newFriend
+                    
+                    ref.child("friends").setValue(friends)
+                }
+                
+                ref.child("friends").setValue(friends)
+                
+                callbacks.onFriendAdded()
+            }
+            
+        }) { (error) in
+            print(error.localizedDescription)
+        }
+    }
+    
+    func declineRequestFromProfile(otherUserRequest: FriendRequestObject, currentUserUid: String, callbacks: ProfileCallbacks){
+        
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser
+        let manager = GamerProfileManager()
+        
+        //Other User First
+        //First, lets remove the friend request
+        let ref = Database.database().reference().child("Users").child(otherUserRequest.uid)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                let value = snapshot.value as? NSDictionary
+                if(value?["pending_friends"] is [String]){
+                    var pendingRequests = value?["pending_friends"] as? [String] ?? [String]()
+                    if(!pendingRequests.isEmpty){
+                        for request in pendingRequests{
+                            if(request == manager.getGamerTag(user: currentUser!)){
+                                pendingRequests = pendingRequests.filter { $0 != manager.getGamerTag(user: currentUser!)}
+                            }
+                        }
+                        
+                        ref.child("pending_friends").setValue(pendingRequests)
+                    }
+                }
+                else{
+                    var pendingRequests = value?["pending_friends"] as? [FriendRequestObject] ?? [FriendRequestObject]()
+                    
+                    if(!pendingRequests.isEmpty){
+                        for request in pendingRequests{
+                            if(request.uid == currentUserUid){
+                                pendingRequests = pendingRequests.filter { $0 != request}
+                                break
+                            }
+                        }
+                    }
+                    
+                    ref.child("pending_friends").setValue(pendingRequests)
+                    currentUser!.pendingRequests = pendingRequests
+                }
+                
+                
+                self.updateCurrentUserRemoveProfile(otherUserRequest: otherUserRequest, currentUserUid: currentUserUid, callbacks: callbacks)
+            }
+            
+        }) { (error) in
+            print(error.localizedDescription)
+        }
+    }
+    
+    private func updateCurrentUserRemoveProfile(otherUserRequest: FriendRequestObject, currentUserUid: String, callbacks: ProfileCallbacks){
+        
+        let ref = Database.database().reference().child("Users").child(currentUserUid)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                let currentUser = delegate.currentUser
+                let manager = GamerProfileManager()
+                
+                let value = snapshot.value as? NSDictionary
+                var sentRequests = value?["sent_requests"] as? [FriendRequestObject] ?? [FriendRequestObject]()
+                
+                if(!sentRequests.isEmpty){
+                    for request in sentRequests{
+                        if(request.uid == otherUserRequest.uid){
+                            sentRequests = sentRequests.filter { $0 != request}
+                            break
+                        }
+                    }
+                }
+                
+                ref.child("sent_requests").setValue(sentRequests)
+                currentUser!.sentRequests = sentRequests
+                
+                callbacks.onFriendDeclined()
+            }
+            
+        }) { (error) in
+            print(error.localizedDescription)
+        }
+    }
+    
     private func updateLists(user: User){
         //updates the current lists for the current user.
         let sendingRef = Database.database().reference().child("Users").child(user.uId).child("sent_requests")

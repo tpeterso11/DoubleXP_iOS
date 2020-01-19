@@ -31,13 +31,19 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         let delegate = UIApplication.shared.delegate as! AppDelegate
         availableGames = delegate.gcGames
         
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .vertical //.horizontal
+        layout.minimumLineSpacing = 5
+        layout.minimumInteritemSpacing = 5
+        gcCollection.setCollectionViewLayout(layout, animated: true)
         
-        gcCollection.isPagingEnabled = true
+        
+        //gcCollection.isPagingEnabled = true
         gcCollection.dataSource = self
         gcCollection.delegate = self
-        if let layout = gcCollection.collectionViewLayout as? UICollectionViewFlowLayout {
-            layout.scrollDirection = .horizontal
-        }
+        //if let layout = gcCollection.collectionViewLayout as? UICollectionViewFlowLayout {
+        //    layout.scrollDirection = .horizontal
+        //}
         
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(nextButtonClicked))
         singleTap.numberOfTapsRequired = 1
@@ -148,31 +154,52 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
             let game = availableGames[indexPath.item]
             if(!selectedGames.contains(game.gameName)){
                 selectedGames.append(game.gameName)
-                cell.cover.isHidden = false
+                
+                UIView.animate(withDuration: 0.7, animations: {
+                    cell.cover.backgroundColor = #colorLiteral(red: 0.2202792764, green: 0.2189762592, blue: 0.2212850749, alpha: 0.598833476)
+                } )
             }
             else{
                 if let index = selectedGames.firstIndex(of: game.gameName) {
                     selectedGames.remove(at: index)
-                    cell.cover.isHidden = true
+                    
+                    UIView.animate(withDuration: 0.7, animations: {
+                        cell.cover.backgroundColor = #colorLiteral(red: 0.6000000238, green: 0.6000000238, blue: 0.6000000238, alpha: 0.5997699058)
+                    } )
                 }
             }
         }
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        var size = CGSize.zero
-        
-        if let layout = collectionViewLayout as? UICollectionViewFlowLayout {
-            size = layout.itemSize;
-            size.width = gcCollection.bounds.width
-        }
-        
-        return size
+    /*func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let flowayout = collectionViewLayout as? UICollectionViewFlowLayout
+        let space: CGFloat = (flowayout?.minimumInteritemSpacing ?? 0.0) + (flowayout?.sectionInset.left ?? 0.0) + (flowayout?.sectionInset.right ?? 0.0)
+        let size:CGFloat = (gcCollection.frame.size.width - space) / 2.0
+        return CGSize(width: size, height: size)
+    }*/
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 0, left: 0, bottom: 0.0, right: 0.0)
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+       return 0.0
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+    /*func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let screenSize: CGRect = UIScreen.main.bounds
+        let screenWidth = screenSize.width
+        return CGSize(width: (screenWidth/2), height: (screenWidth/2));
+    }*/
+    
+     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+               return CGSize(width: collectionView.bounds.size.width, height: CGFloat(100))
+       }
+    
+    /*func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         
-        if(pgNo == 0){
+        return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+       /* if(pgNo == 0){
             let totalCellWidth = 80 * collectionView.numberOfItems(inSection: 0)
             let totalSpacingWidth = 10 * (collectionView.numberOfItems(inSection: 0) - 1)
             
@@ -183,8 +210,8 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         }
         else{
             return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-        }
-    }
+        }*/
+    }*/
     
     @objc func backButtonClicked(_ sender: AnyObject?) {
         if(pgNo > 0 && self.x > 0){
@@ -490,7 +517,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                                 let delegate = UIApplication.shared.delegate as! AppDelegate!
                                 let user = delegate?.currentUser
                                 
-                                var ref = Database.database().reference().child("Users").child((user?.uId)!)
+                                let ref = Database.database().reference().child("Users").child((user?.uId)!)
                                 ref.child("stats").setValue(statObj)
                                 
                                 user?.stats.append(statObj)
@@ -569,8 +596,8 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
     }
     
     private func saveAndProceed(statObj: StatObject){
-        let delegate = UIApplication.shared.delegate as! AppDelegate!
-        let user = delegate?.currentUser
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let user = delegate.currentUser
         
         let ref = Database.database().reference().child("Users").child((user?.uId)!)
 
@@ -583,8 +610,8 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
     }
     
     private func zipItUp(){
-        let delegate = UIApplication.shared.delegate as! AppDelegate!
-        let user = delegate?.currentUser
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let user = delegate.currentUser
         
         let ref = Database.database().reference().child("Users").child((user?.uId)!)
         ref.child("games").setValue(selectedGames)

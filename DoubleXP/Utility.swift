@@ -42,6 +42,18 @@ extension UIView {
         return self
     }
     
+    func slideInBottomReset(from: Animation = .comeIn, startDelay: TimeInterval = 500, x: CGFloat = 0, y: CGFloat = 0, completion: ((Bool) -> Void)? = nil) -> UIView{
+        
+        let top = CGAffineTransform(translationX: 0, y: 0)
+
+        UIView.animate(withDuration: 0.4, delay: 0.6, options: [], animations: {
+            self.alpha = 1
+            self.transform = top
+        }, completion: nil)
+        
+        return self
+    }
+    
     func slideInBottomSmall(from: Animation = .comeIn, startDelay: TimeInterval = 500, x: CGFloat = 0, y: CGFloat = 0, distance: CGFloat = 0, completion: ((Bool) -> Void)? = nil) -> UIView{
            
            let top = CGAffineTransform(translationX: 0, y: -10)

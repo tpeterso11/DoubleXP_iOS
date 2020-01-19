@@ -12,11 +12,16 @@ import ImageLoader
 import moa
 import MSPeekCollectionViewDelegateImplementation
 
-class Requests: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, RequestsUpdate {
-    var userRequests = [Section]()
+class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUpdate {
+    var userRequests = [Any]()
+    var cellHeights: [CGFloat] = []
     
-    
-    @IBOutlet weak var requestList: UICollectionView!
+    @IBOutlet weak var requestList: UITableView!
+    enum Const {
+           static let closeCellHeight: CGFloat = 83
+           static let openCellHeight: CGFloat = 205
+           static let rowsCount = 1
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,82 +47,119 @@ class Requests: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate, 
     
     private func buildRequests(user: User){
         if(!user.pendingRequests.isEmpty){
-            var section = Section(name: "Friend Requests", items: nil)
-            var requests = [FriendRequestObject]()
             for request in user.pendingRequests{
-                if(!requests.contains(request)){
-                    requests.append(request)
-                }
+                self.userRequests.append(request)
             }
-            
-            section.items = requests
-            self.userRequests.append(section)
         }
         
         if(!user.teamInvites.isEmpty){
-            var section = Section(name: "Team Invites", items: nil)
-            var requests = [TeamObject]()
             for request in user.teamInvites{
-                requests.append(request)
+                self.userRequests.append(request)
             }
-            
-            section.items = requests
-            self.userRequests.append(section)
         }
         
+        cellHeights = Array(repeating: Const.closeCellHeight, count: self.userRequests.count)
+        
         if(!userRequests.isEmpty){
+            requestList.estimatedRowHeight = Const.closeCellHeight
+            requestList.rowHeight = UITableView.automaticDimension
+            requestList.backgroundColor = UIColor.white
+            
+            if #available(iOS 10.0, *) {
+                requestList.refreshControl = UIRefreshControl()
+                requestList.refreshControl?.addTarget(self, action: #selector(refreshHandler), for: .valueChanged)
+            }
+            
             requestList.delegate = self
             requestList.dataSource = self
         }
     }
     
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
+    @objc func refreshHandler() {
+        let deadlineTime = DispatchTime.now() + .seconds(1)
+        DispatchQueue.main.asyncAfter(deadline: deadlineTime, execute: { [weak self] in
+            if #available(iOS 10.0, *) {
+                self?.requestList.refreshControl?.endRefreshing()
+            }
+            self?.requestList.reloadData()
+        })
+    }
+    
+    func tableView(_: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return cellHeights[indexPath.row]
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.userRequests.count
     }
     
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        
-        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "requestHeader", for: indexPath) as! RequestHeader
-        
-        let current = userRequests[indexPath.section]
-        header.title.text = current.name
-        
-        if(current.name == "Friend Requests"){
-            header.sub.text = "These players want to connect."
+    func tableView(_: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        guard case let cell as RequestsFoldingCell = cell else {
+            return
         }
-        else{
-            header.sub.text = "These teams want you to join."
+
+        cell.backgroundColor = .clear
+
+        if cellHeights[indexPath.row] == Const.closeCellHeight {
+            cell.unfold(false, animated: false, completion: nil)
+        } else {
+            cell.unfold(true, animated: false, completion: nil)
         }
-        
-        return header
+
+        //cell.number = indexPath.row
     }
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.userRequests[section].items.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! RequestsFoldingCell
         
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "requestCell", for: indexPath) as! RequestCell
+        let current = userRequests[indexPath.item]
         
-        let current = self.userRequests[indexPath.section].items[indexPath.item]
-        
-        if(current is TeamObject){
-            cell.requestLabel.text = (current as! TeamObject).teamName
+        if(current is FriendRequestObject){
+            cell.setUI(friendRequest: (current as! FriendRequestObject), team: nil)
         }
         else{
-            cell.requestLabel.text = (current as! FriendRequestObject).gamerTag
+            cell.setUI(friendRequest: nil, team: (current as! TeamObject))
         }
+        
+        cell.layoutMargins = UIEdgeInsets.zero
+        cell.separatorInset = UIEdgeInsets.zero
         
         return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-            return CGSize(width: collectionView.bounds.size.width, height: CGFloat(80))
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+
+        let cell = tableView.cellForRow(at: indexPath) as! RequestsFoldingCell
+
+        if cell.isAnimating() {
+            return
+        }
+
+        var duration = 0.0
+        let cellIsCollapsed = cellHeights[indexPath.row] == Const.closeCellHeight
+        if cellIsCollapsed {
+            cellHeights[indexPath.row] = Const.openCellHeight
+            cell.unfold(true, animated: true, completion: nil)
+            duration = 0.6
+        } else {
+            cellHeights[indexPath.row] = Const.closeCellHeight
+            cell.unfold(false, animated: true, completion: nil)
+            duration = 0.3
+        }
+
+        UIView.animate(withDuration: duration, delay: 0, options: .curveEaseOut, animations: { () -> Void in
+            tableView.beginUpdates()
+            tableView.endUpdates()
+            
+            // fix https://github.com/Ramotion/folding-cell/issues/169
+            if cell.frame.maxY > tableView.frame.maxY {
+                tableView.scrollToRow(at: indexPath, at: UITableView.ScrollPosition.bottom, animated: true)
+            }
+        }, completion: nil)
     }
     
     func updateCell(indexPath: IndexPath) {
-        self.requestList.deleteItems(at: [indexPath])
+        self.requestList.deleteRows(at: [indexPath], with: .automatic)
     }
     
     struct Section {

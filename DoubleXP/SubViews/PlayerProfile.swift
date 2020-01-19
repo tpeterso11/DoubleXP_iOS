@@ -13,7 +13,7 @@ import moa
 import MSPeekCollectionViewDelegateImplementation
 import FoldingCell
 
-class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource {
+class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, ProfileCallbacks {
     var uid: String = ""
     var userForProfile: User? = nil
     
@@ -29,17 +29,26 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var consoleOne: UILabel!
     @IBOutlet weak var consoleTwo: UILabel!
     @IBOutlet weak var headerView: UIView!
-    @IBOutlet weak var connectButton: UIImageView!
-    @IBOutlet weak var table: UITableView!
+    //@IBOutlet weak var connectButton: UIImageView!
     @IBOutlet weak var statEmpty: UIView!
+    @IBOutlet weak var table: UITableView!
     @IBOutlet weak var userStatusText: UILabel!
+    @IBOutlet weak var mainLayout: UIView!
+    @IBOutlet weak var actionButton: UIView!
+    @IBOutlet weak var actionButtonIcon: UIImageView!
+    @IBOutlet weak var actionButtonText: UILabel!
+    @IBOutlet weak var actionOverlay: UIVisualEffectView!
+    @IBOutlet weak var actionDrawer: UIView!
+    @IBOutlet weak var acceptButton: UIView!
+    @IBOutlet weak var declineButton: UIView!
+    
     
     var sections = [Section]()
     var nav: NavigationPageController?
     
      enum Const {
-           static let closeCellHeight: CGFloat = 150
-           static let openCellHeight: CGFloat = 300
+           static let closeCellHeight: CGFloat = 72
+           static let openCellHeight: CGFloat = 235
            static let rowsCount = 1
     }
     
@@ -57,13 +66,64 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource {
         let currentLanding = appDelegate.currentLanding
         appDelegate.navStack.append(self)
         
-        currentLanding?.removeBottomNav(showNewNav: false, hideSearch: false, searchHint: "Search for player")
+        currentLanding?.removeBottomNav(showNewNav: true, hideSearch: true, searchHint: "Search for player")
         
         headerView.clipsToBounds = true
+        mainLayout.roundCorners(corners: [.topLeft, .topRight], radius: 20)
+        actionDrawer.roundCorners(corners: [.topLeft, .topRight], radius: 40)
+        
+        self.actionOverlay.effect = nil
+        actionOverlay.isHidden = false
     }
     
     @objc func messagingButtonClicked(_ sender: AnyObject?) {
-        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let currentLanding = appDelegate.currentLanding
+        currentLanding!.navigateToMessaging(groupChannelUrl: nil, otherUserId: self.uid)
+    }
+    
+    @objc func receivedButtonClicked(_ sender: AnyObject?) {
+        showDrawerAndOverlay()
+    }
+    
+    @objc func acceptClicked(_ sender: AnyObject?) {
+        let manager = FriendsManager()
+        if(self.userForProfile != nil){
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            let currentUser = delegate.currentUser
+            
+            for invite in currentUser!.pendingRequests{
+                if(self.userForProfile!.uId == invite.uid){
+                    manager.acceptFriendFromProfile(otherUserRequest: invite, currentUserUid: currentUser!.uId, callbacks: self)
+                    break
+                }
+            }
+        }
+    }
+    
+    @objc func declineClicked(_ sender: AnyObject?) {
+        let manager = FriendsManager()
+        if(self.userForProfile != nil){
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            let currentUser = delegate.currentUser
+            
+            for invite in currentUser!.pendingRequests{
+                if(self.userForProfile!.uId == invite.uid){
+                    manager.declineRequestFromProfile(otherUserRequest: invite, currentUserUid: currentUser!.uId, callbacks: self)
+                    break
+                }
+            }
+        }
+    }
+    
+    func onFriendAdded() {
+        updateToChatButton()
+        dismissDrawerAndOverlay()
+    }
+    
+    func onFriendDeclined() {
+        updateToRequestButton()
+        dismissDrawerAndOverlay()
     }
     
     func loadUserInfo(uid: String){
@@ -214,6 +274,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource {
         //self.profileLine2.text = String(consoleString)
         
         if(!user.stats.isEmpty){
+            self.statEmpty.isHidden = true
             self.setup()
         }
         
@@ -224,46 +285,51 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource {
         if(friendsManager.checkListsForUser(user: userForProfile!, currentUser: currentUser!)){
             
             if(friendsManager.isInFriendList(user: userForProfile!, currentUser: currentUser!)){
-                //change image
-                connectButton.image = UIImage(named: "messaging_button")
+                updateToChatButton()
                 
-                let singleTap = UITapGestureRecognizer(target: self, action: #selector(messagingButtonClicked))
-                connectButton.isUserInteractionEnabled = true
-                connectButton.addGestureRecognizer(singleTap)
-                
-                userStatusText.text = "This user is your friend. Tap here to chat."
             }
             
             for request in currentUser!.sentRequests{
                 if(request.uid == user.uId){
-                    connectButton.image = UIImage(named: "pending_button")
-                    userStatusText.text = "Your request has been sent. Just waiting for a response..."
+                    updateToPending()
                     break
                 }
             }
             
             for request in currentUser!.pendingRequests{
                 if(request.uid == user.uId){
-                    connectButton.image = UIImage(named: "pending_button")
-                    userStatusText.text = "Your request has been sent. Just waiting for a response..."
+                    actionButton.applyGradient(colours:  [#colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1), #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1)], orientation: .horizontal)
+                    actionButtonIcon.image = #imageLiteral(resourceName: "new.png")
+                    actionButtonText.text = "Received Request!"
+                    
+                    let singleTap = UITapGestureRecognizer(target: self, action: #selector(receivedButtonClicked))
+                    actionButton.isUserInteractionEnabled = true
+                    actionButton.addGestureRecognizer(singleTap)
+                    
+                    acceptButton.applyGradient(colours:  [#colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1), #colorLiteral(red: 0.4666666687, green: 0.7647058964, blue: 0.2666666806, alpha: 1)], orientation: .horizontal)
+                    declineButton.applyGradient(colours:  [#colorLiteral(red: 0.521568656, green: 0.1098039225, blue: 0.05098039284, alpha: 1), #colorLiteral(red: 0.7450980544, green: 0.1568627506, blue: 0.07450980693, alpha: 1)], orientation: .horizontal)
+                    
+                    let acceptTap = UITapGestureRecognizer(target: self, action: #selector(acceptClicked))
+                    acceptButton.isUserInteractionEnabled = true
+                    acceptButton.addGestureRecognizer(acceptTap)
+                    
+                    let declineTap = UITapGestureRecognizer(target: self, action: #selector(declineClicked))
+                    declineButton.isUserInteractionEnabled = true
+                    declineButton.addGestureRecognizer(declineTap)
                     break
                 }
             }
         }
         else{
-            let singleTap = UITapGestureRecognizer(target: self, action: #selector(connectButtonClicked))
-            connectButton.isUserInteractionEnabled = true
-            connectButton.addGestureRecognizer(singleTap)
-            
-            userStatusText.text = "Tap to send a friend request to this user."
+            updateToRequestButton()
         }
         
         guard !user.bio.isEmpty else{
-            //self.bio.text = "This user has not yet created a bio."
-            self.bio.text = "I roll with the muh-fuckin rough ridin, ride or dyin, killing ERRRRRYBODY CLAN Xoxx:snfdgXXX"
+            self.bio.text = "This user has not yet created a bio."
+            //self.bio.text = "\"" + "I roll with the muh-fuckin rough ridin, ride or dyin, killing ERRRRRYBODY CLAN Xoxx:snfdgXXX" + "\""
             return
         }
-        self.bio.text = user.bio
+        self.bio.text = "\"" + user.bio + "\""
     }
     
     private func setup() {
@@ -277,7 +343,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource {
             table.refreshControl?.addTarget(self, action: #selector(refreshHandler), for: .valueChanged)
         }
         
-        statEmpty.isHidden = true
+        //statEmpty.isHidden = true
         self.table.dataSource = self
         self.table.delegate = self
     }
@@ -292,6 +358,32 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource {
         })
     }
     
+    private func updateToChatButton(){
+        actionButton.applyGradient(colours:  [#colorLiteral(red: 0, green: 0.4987006783, blue: 0, alpha: 1), #colorLiteral(red: 0.5843137503, green: 0.8235294223, blue: 0.4196078479, alpha: 1)], orientation: .horizontal)
+        actionButtonIcon.image = #imageLiteral(resourceName: "comment-black-oval-bubble-shape.png")
+        actionButtonText.text = "Chat with this user"
+        
+        let singleTap = UITapGestureRecognizer(target: self, action: #selector(messagingButtonClicked))
+        actionButton.isUserInteractionEnabled = true
+        actionButton.addGestureRecognizer(singleTap)
+    }
+    
+    private func updateToRequestButton(){
+        let singleTap = UITapGestureRecognizer(target: self, action: #selector(connectButtonClicked))
+        actionButton.applyGradient(colours:  [.darkGray, .lightGray], orientation: .horizontal)
+        actionButtonIcon.image = #imageLiteral(resourceName: "follow.png")
+        actionButtonText.text = "Send Friend Request"
+
+        actionButton.isUserInteractionEnabled = true
+        actionButton.addGestureRecognizer(singleTap)
+    }
+    
+    private func updateToPending(){
+        actionButton.applyGradient(colours:  [#colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1), #colorLiteral(red: 0.501960814, green: 0.501960814, blue: 0.501960814, alpha: 1)], orientation: .horizontal)
+        actionButtonIcon.image = #imageLiteral(resourceName: "sand-clock.png")
+        actionButtonText.text = "Pending Request"
+    }
+    
     @objc func connectButtonClicked(_ sender: AnyObject?) {
         let friendsManager = FriendsManager()
         
@@ -300,6 +392,34 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource {
             let currentUser = delegate.currentUser
             friendsManager.sendRequestFromProfile(currentUser: currentUser!, otherUser: userForProfile!)
         }
+    }
+    
+    private func showDrawerAndOverlay(){
+        UIView.animate(withDuration: 0.7, animations: {
+            self.actionOverlay.effect = UIBlurEffect(style: .regular)
+        } )
+        
+        let top = CGAffineTransform(translationX: 0, y: -135)
+        UIView.animate(withDuration: 0.4, delay: 1.3, options: [], animations: {
+              self.actionDrawer.transform = top
+        }, completion: nil)
+        
+        let singleTap = UITapGestureRecognizer(target: self, action: #selector(dismissDrawerAndOverlay))
+        actionOverlay.isUserInteractionEnabled = true
+        actionOverlay.addGestureRecognizer(singleTap)
+    }
+    
+    @objc private func dismissDrawerAndOverlay(){
+        let top = CGAffineTransform(translationX: 0, y: 0)
+        UIView.animate(withDuration: 0.4, delay: 0.0, options: [], animations: {
+              self.actionDrawer.transform = top
+        }, completion: nil)
+        
+        UIView.animate(withDuration: 0.7, delay: 0.5,animations: {
+            self.actionOverlay.effect = nil
+        } )
+        
+        actionOverlay.isUserInteractionEnabled = false
     }
     
     func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
@@ -324,24 +444,29 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! FoldingCellCell
-        let durations: [TimeInterval] = [0.26, 0.2, 0.2]
-        cell.durationsForExpandedState = durations
-        cell.durationsForCollapsedState = durations
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let games = appDelegate.gcGames!
         let current = self.objects[indexPath.item]
+        
+        cell.gameName.text = ""
+        cell.developer.text = ""
         
         for game in games{
             if(game.gameName == current.gameName){
                 cell.gameBack.moa.url = game.imageUrl
                 cell.gameBack.contentMode = .scaleAspectFill
                 cell.gameBack.clipsToBounds = true
+                
+                cell.gameName.text = game.gameName
+                cell.developer.text = game.developer
             }
         }
         
         cell.setCollectionView(stat: current)
         
+        cell.layoutMargins = UIEdgeInsets.zero
+        cell.separatorInset = UIEdgeInsets.zero
         
         return cell
     }
@@ -363,11 +488,11 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource {
         if cellIsCollapsed {
             cellHeights[indexPath.row] = Const.openCellHeight
             cell.unfold(true, animated: true, completion: nil)
-            duration = 0.5
+            duration = 0.6
         } else {
             cellHeights[indexPath.row] = Const.closeCellHeight
             cell.unfold(false, animated: true, completion: nil)
-            duration = 0.5
+            duration = 0.3
         }
 
         UIView.animate(withDuration: duration, delay: 0, options: .curveEaseOut, animations: { () -> Void in
@@ -379,6 +504,36 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource {
                 tableView.scrollToRow(at: indexPath, at: UITableView.ScrollPosition.bottom, animated: true)
             }
         }, completion: nil)
+    }
+    
+    private func roundCorners(cornerRadius: Double, view: UIView) {
+        let path = UIBezierPath(roundedRect: view.bounds, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: cornerRadius, height: cornerRadius))
+        let maskLayer = CAShapeLayer()
+        maskLayer.frame = view.bounds
+        maskLayer.path = path.cgPath
+        view.layer.mask = maskLayer
+    }
+    
+    private func hexStringToUIColor (hex:String) -> UIColor {
+        var cString:String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+
+        if (cString.hasPrefix("#")) {
+            cString.remove(at: cString.startIndex)
+        }
+
+        if ((cString.count) != 6) {
+            return UIColor.gray
+        }
+
+        var rgbValue:UInt32 = 0
+        Scanner(string: cString).scanHexInt32(&rgbValue)
+
+        return UIColor(
+            red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
+            green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
+            blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
+            alpha: CGFloat(1.0)
+        )
     }
 }
 
@@ -462,4 +617,80 @@ fileprivate struct C {
     static let close: CGFloat = 91 // equal or greater foregroundView height
     static let open: CGFloat = 166 // equal or greater containerView height
   }
+}
+
+typealias GradientPoints = (startPoint: CGPoint, endPoint: CGPoint)
+
+extension UIColor {
+    convenience init(rgb: UInt) {
+        self.init(
+            red: CGFloat((rgb & 0xFF0000) >> 16) / 255.0,
+            green: CGFloat((rgb & 0x00FF00) >> 8) / 255.0,
+            blue: CGFloat(rgb & 0x0000FF) / 255.0,
+            alpha: CGFloat(1.0)
+        )
+    }
+}
+
+extension UIView {
+    @discardableResult
+    func applyGradient(colours: [UIColor]) -> CAGradientLayer {
+        return self.applyGradient(colours: colours, locations: nil)
+    }
+
+    @discardableResult
+    func applyGradient(colours: [UIColor], locations: [NSNumber]?) -> CAGradientLayer {
+        let gradient: CAGradientLayer = CAGradientLayer()
+        gradient.frame = self.bounds
+        gradient.colors = colours.map { $0.cgColor }
+        gradient.locations = locations
+        gradient.cornerRadius = 20
+        self.layer.insertSublayer(gradient, at: 0)
+        return gradient
+    }
+    
+    func applyGradient(colours: [UIColor], orientation: GradientOrientation) {
+        let gradient = CAGradientLayer()
+        gradient.frame = self.bounds
+        gradient.colors = colours.map { $0.cgColor }
+        gradient.startPoint = orientation.startPoint
+        gradient.endPoint = orientation.endPoint
+        gradient.cornerRadius = 20
+        self.layer.insertSublayer(gradient, at: 0)
+    }
+}
+
+extension UIVisualEffectView {
+
+    func fadeInEffect(_ style:UIBlurEffect.Style = .light, withDuration duration: TimeInterval = 1.0) {
+        if #available(iOS 10.0, *) {
+            let animator = UIViewPropertyAnimator(duration: duration, curve: .easeIn) {
+                self.effect = UIBlurEffect(style: style)
+            }
+
+            animator.startAnimation()
+        }else {
+            // Fallback on earlier versions
+            UIView.animate(withDuration: duration) {
+                self.effect = UIBlurEffect(style: style)
+            }
+        }
+    }
+
+    func fadeOutEffect(withDuration duration: TimeInterval = 1.0) {
+        if #available(iOS 10.0, *) {
+            let animator = UIViewPropertyAnimator(duration: duration, curve: .linear) {
+                self.effect = nil
+            }
+
+            animator.startAnimation()
+            animator.fractionComplete = 1
+        }else {
+            // Fallback on earlier versions
+            UIView.animate(withDuration: duration) {
+                self.effect = nil
+            }
+        }
+    }
+
 }

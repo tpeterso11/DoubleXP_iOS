@@ -39,6 +39,8 @@ protocol NavigateToProfile: class {
     
     func navigateToViewTeams()
     
+    func navigateToMessaging(groupChannelUrl: String?, otherUserId: String?)
+    
     func navigateToFreeAgentQuiz(team: TeamObject?, gcGame: GamerConnectGame, currentUser: User)
     
     func removeBottomNav(showNewNav: Bool, hideSearch: Bool, searchHint: String?)
@@ -91,4 +93,14 @@ protocol FreeAgentQuizNav: class {
 
 protocol BackHandler: class{
     func backPressed(previousVH: String)
+}
+
+protocol SearchCallbacks: class{
+    func searchSubmitted(searchString: String)
+}
+
+protocol ProfileCallbacks: class{
+    func onFriendAdded()
+    
+    func onFriendDeclined()
 }

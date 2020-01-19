@@ -15,7 +15,7 @@ protocol Profile {
     func goToProfile()
 }
 
-class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateToProfile {
+class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateToProfile, SearchCallbacks {
     @IBOutlet weak var navigationView: UIView!
     @IBOutlet weak var navContainer: UIView!
     @IBOutlet weak var teamButton: UIImageView!
@@ -30,6 +30,7 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     @IBOutlet weak var bottomNavBack: UIImageView!
     @IBOutlet weak var bottomNavSearch: UITextField!
     @IBOutlet weak var primaryBack: UIImageView!
+    @IBOutlet weak var searchButton: UIButton!
     //@IBOutlet weak var newNav: UIView!
     
     @IBOutlet weak var mainNavCollection: UICollectionView!
@@ -39,6 +40,7 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     private var homeAdded = false
     private var isSecondaryNavShowing = false
     var stackDepth = 0
+    var searchShowing = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,7 +57,16 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
         primaryBack.isUserInteractionEnabled = true
         primaryBack.addGestureRecognizer(singleTap2)
         
+        searchButton.addTarget(self, action: #selector(searchClicked), for: .touchUpInside)
         stackDepth = appDelegate.navStack.count
+    }
+    
+    @objc func searchClicked(_ sender: AnyObject?) {
+        if(!bottomNavSearch.text!.isEmpty){
+            Broadcaster.notify(SearchCallbacks.self) {
+                $0.searchSubmitted(searchString: bottomNavSearch.text!)
+            }
+        }
     }
     
     @objc func backButtonClicked(_ sender: AnyObject?) {
@@ -185,11 +196,21 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
           }
     }
     
+    func navigateToMessaging(groupChannelUrl: String?, otherUserId: String?){
+        stackDepth += 1
+        Broadcaster.notify(NavigateToProfile.self) {
+          $0.navigateToMessaging(groupChannelUrl: groupChannelUrl, otherUserId: otherUserId)
+        }
+    }
+    
     func navigateToViewTeams(){
         stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
           $0.navigateToViewTeams()
         }
+    }
+    
+    func searchSubmitted(searchString: String) {
     }
     
     func goBack(){
@@ -204,7 +225,25 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     func removeBottomNav(showNewNav: Bool, hideSearch: Bool, searchHint: String?){
         if(showNewNav){
             mainNavView.slideOutBottom()
-            bottomNavSearch.isHidden = hideSearch
+            
+            if(!bottomNavSearch.isHidden && hideSearch){
+                bottomNavSearch.slideOutBottom()
+                searchButton.slideOutBottom()
+                
+                searchShowing = false
+            }
+            else{
+                if(!searchShowing && hideSearch == false){
+                    bottomNavSearch.slideInBottomReset()
+                    searchButton.slideInBottomReset()
+                    
+                    searchShowing = true
+                }
+                else{
+                    bottomNavSearch.isHidden = hideSearch
+                    searchShowing = hideSearch
+                }
+            }
             
             if(searchHint != nil){
                 bottomNavSearch.placeholder = searchHint
@@ -218,8 +257,17 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
             
             isSecondaryNavShowing = true
         }
+        else if(isSecondaryNavShowing && hideSearch){
+            searchShowing = false
+            
+            primaryBack.slideInBottomSmall()
+        }
         else{
             isSecondaryNavShowing = false
+            
+            searchShowing = true
+            bottomNavSearch.isHidden = false
+            searchButton.isHidden = false
             
             primaryBack.slideInBottomSmall()
         }

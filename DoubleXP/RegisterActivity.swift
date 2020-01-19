@@ -40,6 +40,10 @@ class RegisterActivity: UIViewController {
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(nextButtonClicked))
         nextButton.isUserInteractionEnabled = true
         nextButton.addGestureRecognizer(singleTap)
+        
+        let backTap = UITapGestureRecognizer(target: self, action: #selector(backButtonClicked))
+        backX.isUserInteractionEnabled = true
+        backX.addGestureRecognizer(backTap)
     }
     
     func registerUser(email: String, pass: String){
@@ -96,7 +100,7 @@ class RegisterActivity: UIViewController {
     }
     
     @objc func nextButtonClicked(_ sender: AnyObject?) {
-        let email = emailField.text ?? ""
+        /*let email = emailField.text ?? ""
         let pass = passwordField.text ?? ""
         
         if(!email.isEmpty && !pass.isEmpty){
@@ -107,8 +111,12 @@ class RegisterActivity: UIViewController {
             let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             self.display(alertController: alertController)
-        }
-        //self.performSegue(withIdentifier: "registerGC", sender: nil)
+        }*/
+        self.performSegue(withIdentifier: "registerGC", sender: nil)
+    }
+    
+    @objc func backButtonClicked(_ sender: AnyObject?) {
+        self.performSegue(withIdentifier: "registerBack", sender: nil)
     }
     
     private func display(alertController: UIAlertController){

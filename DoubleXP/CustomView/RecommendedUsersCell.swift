@@ -11,4 +11,7 @@ import UIKit
 class RecommendedUsersCell: UICollectionViewCell{
     @IBOutlet weak var gamerTag: UILabel!
     @IBOutlet weak var tagImage: UIImageView!
+    @IBOutlet weak var psBox: UIView!
+    @IBOutlet weak var psTag: UILabel!
+    @IBOutlet weak var xBox: UIView!
 }

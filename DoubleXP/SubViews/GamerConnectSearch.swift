@@ -10,9 +10,10 @@ import UIKit
 import Firebase
 import ImageLoader
 import moa
+import SwiftNotificationCenter
 import MSPeekCollectionViewDelegateImplementation
 
-class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource {
+class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,  UICollectionViewDelegateFlowLayout, SearchCallbacks {
     var game: GamerConnectGame? = nil
     
     var returnedUsers = [User]()
@@ -20,6 +21,7 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
     var searchXbox = true
     var searchNintendo = true
     var searchPC = true
+    var set = false
     
     @IBOutlet weak var gameHeaderImage: UIImageView!
     @IBOutlet weak var gamerConnectResults: UICollectionView!
@@ -27,6 +29,9 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
     @IBOutlet weak var xboxSwitch: UISwitch!
     @IBOutlet weak var nintendoSwitch: UISwitch!
     @IBOutlet weak var pcSwitch: UISwitch!
+    @IBOutlet weak var searchEmpty: UIView!
+    @IBOutlet weak var searchEmptyText: UILabel!
+    @IBOutlet weak var searchEmptySub: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -72,6 +77,8 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
             nintendoSwitch.addTarget(self, action: #selector(nintendoSwitchChanged), for: UIControl.Event.valueChanged)
             
             searchUsers(userName: nil)
+            
+            Broadcaster.register(SearchCallbacks.self, observer: self)
         }
     }
     
@@ -120,7 +127,81 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
         let current = returnedUsers[indexPath.item]
         cell.gamerTag.text = manager.getGamerTagForOtherUserForGame(gameName: self.game!.gameName, returnedUser: current)
         
-        cell.consoleTag.text = current.getConsoleString()
+        if(current.bio.isEmpty){
+            cell.consoleTag.text = "No bio available."
+        }
+        else{
+            cell.consoleTag.text = current.bio
+        }
+        
+        var oneShowing = false
+        var twoShowing = false
+        var threeShowing = false
+        var fourShowing = false
+        
+        if(current.ps){
+            oneShowing = true
+            cell.oneTag.text = "PS"
+        }
+        if(current.xbox){
+            if(oneShowing && !twoShowing){
+                cell.consoleTwo.isHidden = false
+                cell.twoTag.text = "XBox"
+                twoShowing = true
+            }
+            else{
+                oneShowing = true
+                cell.oneTag.text = "XBox"
+            }
+        }
+        if(current.nintendo){
+            if(oneShowing && !twoShowing){
+                cell.consoleTwo.isHidden = false
+                cell.twoTag.text = "Nintendo"
+                twoShowing = true
+            }
+            else if(oneShowing && twoShowing && !threeShowing){
+                threeShowing = true
+                cell.consoleThree.isHidden = false
+                cell.threeTag.text = "Nintendo"
+            }
+            else{
+                oneShowing = true
+                cell.oneTag.text = "Nintendo"
+            }
+        }
+        if(current.pc){
+            if(oneShowing && !twoShowing){
+                cell.consoleTwo.isHidden = false
+                cell.twoTag.text = "PC"
+                twoShowing = true
+            }
+            else if(oneShowing && twoShowing && !threeShowing){
+                threeShowing = true
+                cell.consoleThree.isHidden = false
+                cell.threeTag.text = "PC"
+            }
+            else if(oneShowing && twoShowing && threeShowing && !fourShowing){
+                fourShowing = true
+                cell.consoleFour.isHidden = false
+                cell.fourTag.text = "PC"
+            }
+            else{
+                oneShowing = true
+                cell.oneTag.text = "PC"
+            }
+        }
+        
+        
+        cell.contentView.layer.borderColor = UIColor.clear.cgColor
+        cell.contentView.layer.masksToBounds = true
+        
+        cell.layer.shadowColor = UIColor.black.cgColor
+        cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+        cell.layer.shadowRadius = 2.0
+        cell.layer.shadowOpacity = 0.5
+        cell.layer.masksToBounds = false
+        cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
         
         return cell
     }
@@ -135,6 +216,7 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
     }
     
     private func searchUsers(userName: String?){
+        self.returnedUsers = [User]()
         let ref = Database.database().reference().child("Users")
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             // Get user value
@@ -145,6 +227,7 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
                 if(games.contains(self.game!.gameName)){
                     let uId = (user as! DataSnapshot).key
                     let gamerTag = value?["gamerTag"] as? String ?? ""
+                    let bio = value?["bio"] as? String ?? ""
                     let sentRequests = value?["sentRequests"] as? [FriendRequestObject] ?? [FriendRequestObject]()
                     
                     var friends = [FriendObject]()
@@ -191,10 +274,11 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
                     returnedUser.ps = ps
                     returnedUser.xbox = xbox
                     returnedUser.nintendo = nintendo
+                    returnedUser.bio = bio
                     
                     let gamerProfileManager = GamerProfileManager()
-                    let delegate = UIApplication.shared.delegate as! AppDelegate!
-                    let currentUser = delegate?.currentUser
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    let currentUser = delegate.currentUser
                     
                     if(userName != nil){
                         if(!gamerTag.isEmpty && gamerTag == userName && gamerProfileManager.getGamerTagForGame(gameName: self.game!.gameName) != userName){
@@ -228,15 +312,57 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
                     }
                 }
             }
-            
-            if(!self.returnedUsers.isEmpty){
+    
+            if(!self.set){
                 self.gamerConnectResults.delegate = self
                 self.gamerConnectResults.dataSource = self
+                
+                self.set = true
+                
+                if(!self.returnedUsers.isEmpty){
+                    self.searchEmpty.isHidden = true
+                }
+                else{
+                    self.searchEmpty.isHidden = false
+                    
+                    self.searchEmptyText.text = "No users returned for your chosen game."
+                    self.searchEmptySub.text = "No worries, try your search again later."
+                }
             }
+            else{
+                self.gamerConnectResults.reloadData()
+                
+                if(!self.returnedUsers.isEmpty){
+                    self.searchEmpty.isHidden = true
+                }
+                else{
+                    self.searchEmpty.isHidden = false
+                    
+                    if(userName != nil){
+                        self.searchEmptyText.text = "No users returned with that name."
+                        self.searchEmptySub.text = "No worries.\nMake sure you typed their naame correctly, and try again."
+                    }
+                    else{
+                        self.searchEmptyText.text = "No users returned for your chosen game."
+                        self.searchEmptySub.text = "No worries, try your search again later."
+                    }
+                }
+            }
+            
             
         }) { (error) in
             print(error.localizedDescription)
         }
+    }
+    
+    func searchSubmitted(searchString: String) {
+        searchUsers(userName: searchString)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(100))
     }
     
     private func addUserToList(returnedUser: User){

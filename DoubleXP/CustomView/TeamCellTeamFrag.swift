@@ -13,4 +13,5 @@ class TeamCellTeamFrag: UICollectionViewCell{
     @IBOutlet weak var teamName: UILabel!
     @IBOutlet weak var gameBackgroundImage: UIImageView!
     @IBOutlet weak var captainStar: UIImageView!
+    @IBOutlet weak var gameName: UILabel!
 }
