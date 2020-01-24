@@ -94,6 +94,9 @@ PODS:
   - SmoothButton (0.0.1)
   - SwiftHTTP (3.0.1)
   - SwiftNotificationCenter (1.0.4)
+  - TwitterCore (3.2.0)
+  - TwitterKit (3.4.2):
+    - TwitterCore (>= 3.2.0)
   - UnderLineTextField (2.1.0)
 
 DEPENDENCIES:
@@ -111,6 +114,7 @@ DEPENDENCIES:
   - SmoothButton
   - SwiftHTTP (~> 3.0)
   - SwiftNotificationCenter
+  - TwitterKit
   - UnderLineTextField (~> 2.1)
 
 SPEC REPOS:
@@ -142,6 +146,8 @@ SPEC REPOS:
     - SmoothButton
     - SwiftHTTP
     - SwiftNotificationCenter
+    - TwitterCore
+    - TwitterKit
     - UnderLineTextField
 
 SPEC CHECKSUMS:
@@ -172,8 +178,10 @@ SPEC CHECKSUMS:
   SmoothButton: b3191c0bdba16ff40bdd2934db9ddd93edaa9c9f
   SwiftHTTP: e94f1aa8cde58637dcc0100f6349de31a3337fde
   SwiftNotificationCenter: 760386da2ce03d3594cb5e96d1e22ec80b44b46f
+  TwitterCore: 8cbc9ad34d91c63a0035ea05bfbfc0d7ca72a28c
+  TwitterKit: 5e4f41d70b9abdb41df5467f52d7aa2c0fd26ebb
   UnderLineTextField: b3f5307b56962331e30a965e81b79aae2df1de83
 
-PODFILE CHECKSUM: 2ccf026ce6b3e2f7bd90d9e9776adc1e412edcd2
+PODFILE CHECKSUM: 49e3ab49fc06814a4389e51d19a8a436cc5ad8d7
 
 COCOAPODS: 1.8.4

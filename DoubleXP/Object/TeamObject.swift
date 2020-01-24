@@ -70,6 +70,16 @@ class TeamObject: NSObject, NSCoding {
         }
     }
     
+    var _teammates:[TeammateObject]? = nil
+       var teammates:[TeammateObject] {
+           get {
+               return (_teammates)!
+           }
+           set (newVal) {
+               _teammates = newVal
+           }
+       }
+    
     var _teamCaptain: String? = nil
     var teamCaptain: String {
         get {
@@ -175,6 +185,7 @@ class TeamObject: NSObject, NSCoding {
         self.teamChat = (decoder.decodeObject(forKey: "teamChat") as! String)
         self.imageUrl = (decoder.decodeObject(forKey: "imageUrl") as! String)
         self.selectedTeamNeeds = (decoder.decodeObject(forKey: "selectedTeamNeeds") as! [String])
+        self.teammates = (decoder.decodeObject(forKey: "teammates") as! [TeammateObject])
     }
     
     func encode(with coder: NSCoder) {
@@ -191,6 +202,7 @@ class TeamObject: NSObject, NSCoding {
         coder.encode(self.teamChat, forKey: "teamChat")
         coder.encode(self.imageUrl, forKey: "imageUrl")
         coder.encode(self.selectedTeamNeeds, forKey: "selectedTeamNeeds")
+        coder.encode(self.teammates, forKey: "teammates")
     }
     
 }

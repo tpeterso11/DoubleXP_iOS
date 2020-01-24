@@ -18,6 +18,7 @@ target 'DoubleXP' do
   pod 'FoldingCell'
   pod 'SmoothButton'
   pod 'lottie-ios'
+  pod 'TwitterKit'
   pod 'UnderLineTextField', '~> 2.1'
 
   # Pods for DoubleXP

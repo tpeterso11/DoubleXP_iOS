@@ -91,6 +91,21 @@ class ViewTeams: UIViewController, UICollectionViewDataSource, UICollectionViewD
                             invites.append(newInvite)
                         }
                         
+                        var teammateArray = [TeammateObject]()
+                        if(currentObj.hasChild("teammates")){
+                            let teammates = snapshot.childSnapshot(forPath: "teammates")
+                            for invite in teammates.children{
+                                let currentObj = invite as! DataSnapshot
+                                let dict = currentObj.value as! [String: Any]
+                                let gamerTag = dict["gamerTag"] as? String ?? ""
+                                let date = dict["date"] as? String ?? ""
+                                let uid = dict["uid"] as? String ?? ""
+                                
+                                let teammate = TeammateObject(gamerTag: gamerTag, date: date, uid: uid)
+                                teammateArray.append(teammate)
+                            }
+                        }
+                        
                         let teamInvitetags = dict["teamInviteTags"] as? [String] ?? [String]()
                         let captain = dict["teamCaptain"] as? String ?? ""
                         let imageUrl = dict["imageUrl"] as? String ?? ""
@@ -99,6 +114,8 @@ class ViewTeams: UIViewController, UICollectionViewDataSource, UICollectionViewD
                         let selectedTeamNeeds = dict["selectedTeamNeeds"] as? [String] ?? [String]()
                         
                         let currentTeam = TeamObject(teamName: currentTeamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl)
+                        currentTeam.teammates = teammateArray
+                        
                         self.teams.append(currentTeam)
                         
                         if(teamName != nil){
@@ -280,5 +297,4 @@ class ViewTeams: UIViewController, UICollectionViewDataSource, UICollectionViewD
     func successfulRequest(indexPath: IndexPath) {
         //show success
     }
-    
 }

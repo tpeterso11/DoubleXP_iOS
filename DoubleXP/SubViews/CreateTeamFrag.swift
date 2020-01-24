@@ -159,7 +159,12 @@ class CreateTeamFrag: UIViewController, UICollectionViewDataSource, UICollection
         
         let currentGame = getGameInfo(selectedGame: chosenGame)
         
+        var teammates = [TeammateObject]()
+        let captain = TeammateObject(gamerTag: manager.getGamerTagForGame(gameName: currentGame!.gameName), date: "", uid: user!.uId)
+        teammates.append(captain)
+        
         let newTeam = TeamObject(teamName: teamName.text!, teamId: randomAlphaNumericString(length: 12), games: selected, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: manager.getGamerTagForGame(gameName: chosenGame), teamInvites: [TeamInviteObject](), teamChat: "", teamInviteTags: [String](), teamNeeds: currentGame?.teamNeeds ?? [String](), selectedTeamNeeds: [String](), imageUrl: currentGame?.imageUrl ?? "")
+        newTeam.teammates = teammates
         
         createTeam(team: newTeam)
     }
@@ -169,10 +174,18 @@ class CreateTeamFrag: UIViewController, UICollectionViewDataSource, UICollection
         let user = delegate.currentUser
         
         let ref = Database.database().reference().child("Teams")
+        let userRef = Database.database().reference().child("Users").child(user!.uId)
 
-        let current = ["teamName": team.teamName, "teamId": team.teamId, "games": team.games, "consoles": team.consoles, "teammateTags": team.teammateTags, "teammateIds": team.teammateIds, "teamCaptain": team.teamCaptain, "teamInvites": team.teamInvites, "teamChat": team.teamChat, "teamInviteTags": team.teamInviteTags, "teamNeeds": team.teamNeeds, "selectedTeamNeeds": team.selectedTeamNeeds, "imageUrl": team.imageUrl] as [String : Any]
+        var teammates = [Dictionary<String, String>]()
+        for teammate in team.teammates{
+            let current = ["gamerTag": teammate.gamerTag, "date": teammate.date, "uid": teammate.uid]
+            teammates.append(current)
+        }
+        
+        let current = ["teamName": team.teamName, "teamId": team.teamId, "games": team.games, "consoles": team.consoles, "teammateTags": team.teammateTags, "teammateIds": team.teammateIds, "teamCaptain": team.teamCaptain, "teamInvites": team.teamInvites, "teamChat": team.teamChat, "teamInviteTags": team.teamInviteTags, "teamNeeds": team.teamNeeds, "selectedTeamNeeds": team.selectedTeamNeeds, "imageUrl": team.imageUrl, "teammates": teammates] as [String : Any]
         
         ref.child(team.teamName).setValue(current)
+        userRef.child("teams").child(team.teamName).setValue(current)
         
         user?.teams.append(team)
         

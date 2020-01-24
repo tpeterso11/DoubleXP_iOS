@@ -223,7 +223,23 @@ class PreSplashActivity: UIViewController {
                 let selectedTeamNeeds = dict["selectedTeamNeeds"] as? [String] ?? [String]()
                 
                 let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl)
-                teams.append(currentTeam)
+                
+                var teammateArray = [TeammateObject]()
+                if(currentObj.hasChild("teammates")){
+                    let teammates = currentObj.childSnapshot(forPath: "teammates")
+                    for teammate in teammates.children{
+                        let currentTeammate = teammate as! DataSnapshot
+                        let dict = currentTeammate.value as! [String: Any]
+                        let gamerTag = dict["gamerTag"] as? String ?? ""
+                        let date = dict["date"] as? String ?? ""
+                        let uid = dict["uid"] as? String ?? ""
+                        
+                        let teammate = TeammateObject(gamerTag: gamerTag, date: date, uid: uid)
+                        teammateArray.append(teammate)
+                    }
+                    currentTeam.teammates = teammateArray
+                    teams.append(currentTeam)
+                }
             }
             
             var currentTeamInvites = [TeamObject]()
@@ -259,9 +275,25 @@ class PreSplashActivity: UIViewController {
                 let selectedTeamNeeds = dict["selectedTeamNeeds"] as? [String] ?? [String]()
                 
                 let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl)
+                
+                var teammateArray = [TeammateObject]()
+                if(currentObj.hasChild("teammates")){
+                    let teammates = currentObj.childSnapshot(forPath: "teammates")
+                    for teammate in teammates.children{
+                        let currentTeammate = teammate as! DataSnapshot
+                        let dict = currentTeammate.value as! [String: Any]
+                        let gamerTag = dict["gamerTag"] as? String ?? ""
+                        let date = dict["date"] as? String ?? ""
+                        let uid = dict["uid"] as? String ?? ""
+                        
+                        let teammate = TeammateObject(gamerTag: gamerTag, date: date, uid: uid)
+                        teammateArray.append(teammate)
+                    }
+                    
+                    currentTeam.teammates = teammateArray
+                }
+                
                 teams.append(currentTeam)
-                
-                
                 
                 currentTeamInvites.append(currentTeam)
             }

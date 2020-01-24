@@ -110,7 +110,21 @@ class TeamManager{
                         invites.append(newInvite)
                     }
                     
+                    var teammateArray = [TeammateObject]()
+                    let teammates = snapshot.childSnapshot(forPath: "teammates")
+                    for teammate in teammates.children{
+                        let currentTeammate = teammate as! DataSnapshot
+                        let dict = currentTeammate.value as! [String: Any]
+                        let gamerTag = dict["gamerTag"] as? String ?? ""
+                        let date = dict["date"] as? String ?? ""
+                        let uid = dict["uid"] as? String ?? ""
+                        
+                        let teammate = TeammateObject(gamerTag: gamerTag, date: date, uid: uid)
+                        teammateArray.append(teammate)
+                    }
+                    
                     let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: teamCaptain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInviteTags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl)
+                    currentTeam.teammates = teammateArray
                     
                     currentInvites.append(currentTeam)
                 }

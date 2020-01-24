@@ -171,6 +171,21 @@ class LoginController: UIViewController {
                     invites.append(newInvite)
                 }
                 
+                var teammateArray = [TeammateObject]()
+                if(currentObj.hasChild("teammates")){
+                    let teammates = currentObj.childSnapshot(forPath: "teammates")
+                    for teammate in teammates.children{
+                        let currentTeammate = teammate as! DataSnapshot
+                        let dict = currentTeammate.value as! [String: Any]
+                        let gamerTag = dict["gamerTag"] as? String ?? ""
+                        let date = dict["date"] as? String ?? ""
+                        let uid = dict["uid"] as? String ?? ""
+                        
+                        let teammate = TeammateObject(gamerTag: gamerTag, date: date, uid: uid)
+                        teammateArray.append(teammate)
+                    }
+                }
+                
                 let teamInvitetags = dict["teamInviteTags"] as? [String] ?? [String]()
                 let captain = dict["teamCaptain"] as? String ?? ""
                 let imageUrl = dict["imageUrl"] as? String ?? ""
@@ -179,6 +194,7 @@ class LoginController: UIViewController {
                 let selectedTeamNeeds = dict["selectedTeamNeeds"] as? [String] ?? [String]()
                 
                 let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl)
+                currentTeam.teammates = teammateArray
                 teams.append(currentTeam)
             }
             
@@ -207,6 +223,21 @@ class LoginController: UIViewController {
                     invites.append(newInvite)
                 }
                 
+                var teammateArray = [TeammateObject]()
+                if(currentObj.hasChild("teammates")){
+                    let teammates = currentObj.childSnapshot(forPath: "teammates")
+                    for teammate in teammates.children{
+                        let currentTeammate = teammate as! DataSnapshot
+                        let dict = currentTeammate.value as! [String: Any]
+                        let gamerTag = dict["gamerTag"] as? String ?? ""
+                        let date = dict["date"] as? String ?? ""
+                        let uid = dict["uid"] as? String ?? ""
+                        
+                        let teammate = TeammateObject(gamerTag: gamerTag, date: date, uid: uid)
+                        teammateArray.append(teammate)
+                    }
+                }
+                
                 let teamInvitetags = dict["teamInviteTags"] as? [String] ?? [String]()
                 let captain = dict["teamCaptain"] as? String ?? ""
                 let imageUrl = dict["imageUrl"] as? String ?? ""
@@ -215,6 +246,7 @@ class LoginController: UIViewController {
                 let selectedTeamNeeds = dict["selectedTeamNeeds"] as? [String] ?? [String]()
                 
                 let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl)
+                currentTeam.teammates = teammateArray
                 teams.append(currentTeam)
                 
                 

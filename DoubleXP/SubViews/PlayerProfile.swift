@@ -172,6 +172,21 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                     invites.append(newInvite)
                 }
                 
+                var teammateArray = [TeammateObject]()
+                if(currentObj.hasChild("teammates")){
+                    let teammates = snapshot.childSnapshot(forPath: "teammates")
+                    for invite in teammates.children{
+                        let currentObj = invite as! DataSnapshot
+                        let dict = currentObj.value as! [String: Any]
+                        let gamerTag = dict["gamerTag"] as? String ?? ""
+                        let date = dict["date"] as? String ?? ""
+                        let uid = dict["uid"] as? String ?? ""
+                        
+                        let teammate = TeammateObject(gamerTag: gamerTag, date: date, uid: uid)
+                        teammateArray.append(teammate)
+                    }
+                }
+                
                 let teamInvitetags = dict["teamInviteTags"] as? [String] ?? [String]()
                 let captain = dict["teamCaptain"] as? String ?? ""
                 let imageUrl = dict["imageUrl"] as? String ?? ""
@@ -180,6 +195,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 let selectedTeamNeeds = dict["selectedTeamNeeds"] as? [String] ?? [String]()
                 
                 let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl)
+                currentTeam.teammates = teammateArray
                 teams.append(currentTeam)
             }
             
@@ -534,6 +550,66 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
             alpha: CGFloat(1.0)
         )
+    }
+    
+    private func convertTeammates(list: [String], userUid: String, teamName: String, game: String) -> [TeammateObject]{
+        var newArray = [TeammateObject]()
+        let manager = GamerProfileManager()
+        let tempTeammates = list
+        if(!tempTeammates.isEmpty){
+            for teammate in tempTeammates{
+                let ref = Database.database().reference().child("Users").child(teammate)
+                    ref.observeSingleEvent(of: .value, with: { (snapshot) in
+                        // Get user value
+                        let _ = snapshot.value as? NSDictionary
+                        let uId = snapshot.key
+                        var gamerTags = [GamerProfile]()
+                        let gamerTagsArray = snapshot.childSnapshot(forPath: "gamerTags")
+                        for gamerTagObj in gamerTagsArray.children {
+                            let currentObj = gamerTagObj as! DataSnapshot
+                            let dict = currentObj.value as! [String: Any]
+                            let currentTag = dict["gamerTag"] as? String ?? ""
+                            let currentGame = dict["game"] as? String ?? ""
+                            let console = dict["console"] as? String ?? ""
+                            
+                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
+                            gamerTags.append(currentGamerTagObj)
+                        }
+            
+                        let newTeammate = TeammateObject(gamerTag: manager.getGamerTagForGame(gameName: game), date: "", uid: uId)
+                        newArray.append(newTeammate)
+                })
+                { (error) in
+                    print(error.localizedDescription)
+                }
+            }
+                        
+            var teammates = [Dictionary<String, String>]()
+            for user in newArray{
+                let current = ["gamerTag": user.gamerTag, "date": user.date, "uid": user.uid]
+                teammates.append(current)
+            }
+            
+            if(!teammates.isEmpty){
+                let ref = Database.database().reference().child("Users").child(userUid).child("teams")
+                ref.observeSingleEvent(of: .value, with: { (snapshot) in
+                    for userTeam in snapshot.children{
+                        let currentObj = userTeam as! DataSnapshot
+                        let dict = currentObj.value as! [String: Any]
+                        let teamName = dict["teamName"] as? String ?? ""
+                        
+                        if(teamName == teamName){
+                            ref.child(userUid).child("teams").child(currentObj.key).child("teammates").setValue(teammates)
+                            break
+                        }
+                    }
+                })
+                
+                let teamRef = Database.database().reference().child("Teams")
+                teamRef.child(teamName).child("teammates").setValue(teammates)
+            }
+        }
+        return newArray
     }
 }
 

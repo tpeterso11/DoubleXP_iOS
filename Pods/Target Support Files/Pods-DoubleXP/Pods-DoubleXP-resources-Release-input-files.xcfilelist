@@ -7,3 +7,4 @@ ${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/octicons.ttf
 ${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/open-iconic.ttf
 ${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/SmoothButton.xib
 ${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/themify.ttf
+${PODS_ROOT}/TwitterKit/iOS/TwitterKit.framework/TwitterKitResources.bundle

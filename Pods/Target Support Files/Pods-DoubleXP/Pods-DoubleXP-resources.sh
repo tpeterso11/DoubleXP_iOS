@@ -105,6 +105,7 @@ if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/open-iconic.ttf"
   install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/SmoothButton.xib"
   install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/themify.ttf"
+  install_resource "${PODS_ROOT}/TwitterKit/iOS/TwitterKit.framework/TwitterKitResources.bundle"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
   install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/FontAwesome.ttf"
@@ -115,6 +116,7 @@ if [[ "$CONFIGURATION" == "Release" ]]; then
   install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/open-iconic.ttf"
   install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/SmoothButton.xib"
   install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/themify.ttf"
+  install_resource "${PODS_ROOT}/TwitterKit/iOS/TwitterKit.framework/TwitterKitResources.bundle"
 fi
 
 mkdir -p "${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}"

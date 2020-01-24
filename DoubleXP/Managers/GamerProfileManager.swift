@@ -36,6 +36,16 @@ class GamerProfileManager{
         return returnedUser.gamerTag
     }
     
+    func getGamerTagForOtherUserForGameProfiles(gameName: String, array: [GamerProfile]) -> String{
+        for gamerProfile in array{
+            if(gamerProfile.game == gameName){
+                return gamerProfile.gamerTag
+            }
+        }
+        
+        return array[0].gamerTag
+    }
+    
     func getGamerTag(user: User) -> String{
         if(!user.gamerTags.isEmpty){
             return (user.gamerTags[0].gamerTag)
