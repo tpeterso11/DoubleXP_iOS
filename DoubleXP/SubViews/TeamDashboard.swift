@@ -12,22 +12,72 @@ import ImageLoader
 import moa
 import MSPeekCollectionViewDelegateImplementation
 import TwitterKit
+import SwiftTwitch
+import WebKit
+import TwitchPlayer
 
-class TeamDashboard: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
-    
+class TeamDashboard: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, SocialMediaManagerCallback {
     var team: TeamObject? = nil
-    var tweets = [TWTRTweet]()
+    var tweets = [TweetObject]()
+    var streams = [TwitchStreamObject]()
     var teammates = [TeammateObject]()
+    let manager = SocialMediaManager()
+    
+    var viewLoadedBool = false
     
     
+    @IBOutlet weak var twitchView: UIView!
     @IBOutlet weak var teamLabel: UILabel!
     @IBOutlet weak var alertButton: UIButton!
     @IBOutlet weak var captainStar: UIImageView!
-    @IBOutlet weak var tweetCollection: UICollectionView!
-    @IBOutlet weak var rosterTable: UITableView!
     @IBOutlet weak var buildButton: UIView!
     @IBOutlet weak var teamChat: UIView!
     @IBOutlet weak var teamRoster: UICollectionView!
+    @IBOutlet weak var tweetCollection: UICollectionView!
+    @IBOutlet weak var tweetStreamSegment: UISegmentedControl!
+    @IBOutlet weak var twitchStreamList: UICollectionView!
+    @IBOutlet weak var webview: WKWebView!
+    @IBOutlet weak var twitchPlayer: TwitchPlayer!
+    
+    @IBAction func onChange(_ sender: Any) {
+        switch (tweetStreamSegment.selectedSegmentIndex){
+        case 0:
+            //Show Twitter
+            UIView.animate(withDuration: 0.25, delay: 0.0, options: UIView.AnimationOptions.curveEaseInOut, animations: {
+                    self.twitchStreamList.transform = CGAffineTransform(translationX: 0, y: 0)
+                }) { (finished) in
+                    self.tweetCollection.delegate = self
+                    self.tweetCollection.dataSource = self
+                    self.twitchStreamList.reloadData()
+                    
+                    UIView.animate(withDuration: 0.25, delay: 0.0, options: UIView.AnimationOptions.curveEaseInOut, animations: {
+                        self.tweetCollection.transform = CGAffineTransform(translationX: 0, y: 0)
+                    }) { (finished) in
+                        
+                        self.manager.loadTwitchStreams(team: self.team!, callbacks: self)
+                    }
+            }
+        case 1:
+            //Show Twitch
+            UIView.animate(withDuration: 0.25, delay: 0.0, options: UIView.AnimationOptions.curveEaseInOut, animations: {
+                self.tweetCollection.transform = CGAffineTransform(translationX: -375, y: 0)
+            }) { (finished) in
+                self.twitchStreamList.dataSource = self
+                self.twitchStreamList.delegate = self
+                self.twitchStreamList.reloadData()
+                
+                UIView.animate(withDuration: 0.25, delay: 0.0, options: UIView.AnimationOptions.curveEaseInOut, animations: {
+                    self.twitchStreamList.transform = CGAffineTransform(translationX: -375, y: 0)
+                }) { (finished) in
+                    
+                    self.manager.loadTweets(team: self.team!, callbacks: self)
+                }
+            }
+
+        default:
+            break;
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,15 +92,13 @@ class TeamDashboard: UIViewController, UICollectionViewDataSource, UICollectionV
             captainStar.isHidden = false
         }
         
-        //buildButton.applyGradient(colours:  [#colorLiteral(red: 0.3333052099, green: 0.3333491981, blue: 0.3332902789, alpha: 1), #colorLiteral(red: 0.4791436791, green: 0.4813652635, blue: 0.4867808223, alpha: 1)], orientation: .horizontal)
-        //teamChat.applyGradient(colours:  [#colorLiteral(red: 0.5893185735, green: 0.04998416454, blue: 0.09506303817, alpha: 1), #colorLiteral(red: 0.715370357, green: 0.04661592096, blue: 0.1113757268, alpha: 1)], orientation: .horizontal)
-        //buildButton.addTarget(self, action: #selector(buildButtonClicked), for: .touchUpInside)
-        
-        tweetCollection.delegate = self
-        tweetCollection.dataSource = self
-        
-        buildRoster()
-        //loadTweets()
+        tweetStreamSegment.selectedSegmentIndex = 0
+        loadTweets()
+    }
+    
+    private func getTwitch(){
+        let manager = SocialMediaManager()
+        manager.loadTwitchStreams(team: team!, callbacks: self)
     }
     
     private func buildRoster(){
@@ -79,18 +127,24 @@ class TeamDashboard: UIViewController, UICollectionViewDataSource, UICollectionV
         if collectionView == self.teamRoster {
             return self.teammates.count
         }
+        else if(collectionView == self.tweetCollection){
+            return self.tweets.count
+        }
         else{
-            return 5
+            return self.streams.count
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == self.tweetCollection {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! TeamTweetCell
-            
+            let current = self.tweets[indexPath.item]
+            cell.twitterTag.text = current.handle
+            cell.tweet.text = current.tweet
+            cell.bottomBorder.backgroundColor = #colorLiteral(red: 0.182135582, green: 0.6824935079, blue: 0.9568628669, alpha: 1)
             return cell
         }
-        else{
+        else if(collectionView == self.teamRoster){
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! TeamRosterCell
             let current = team!.teammates[indexPath.item]
             let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -127,68 +181,83 @@ class TeamDashboard: UIViewController, UICollectionViewDataSource, UICollectionV
             cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
             return cell
         }
+        else{
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! TwitchStreamCell
+            let current = streams[indexPath.item]
+            
+            if(current.type != "live"){
+                cell.liveIcon.isHidden = true
+            }
+            
+            let str = current.thumbnail
+            let replaced = str.replacingOccurrences(of: "{width}x{height}", with: "800x500")
+            
+            cell.previewImage.moa.url = replaced
+            cell.previewImage.contentMode = .scaleAspectFill
+            cell.previewImage.clipsToBounds = true
+            
+            return cell
+        }
     }
     
     private func loadTweets() {
-        let client = TWTRAPIClient()
-        let statusesShowEndpoint = "https://api.twitter.com/1.1/statuses/user_timeline.json"
-        let params = ["screen_name": "Activision" ,"count": "3"]
-        var clientError : NSError?
+        let manager = SocialMediaManager()
+        manager.loadTweets(team: team!, callbacks: self)
+    }
+    
+    func onTweetsLoaded(tweets: [TweetObject]) {
+        self.tweets = tweets
         
-        let request = client.urlRequest(withMethod: "GET", urlString: statusesShowEndpoint, parameters: params, error: &clientError)
-        client.sendTwitterRequest(request) { (response, data, connectionError) -> Void in
-            if connectionError != nil {
-                print("Error: \(String(describing: connectionError))")
-            }
-            do {
-                let json = try JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any]
-                //print(json)
-                let statuses = json!["statuses"] as? [Any]
-                let status = statuses![0]
-                print(status)
-            } catch let jsonError as NSError {
-                print("json error: \(jsonError.localizedDescription)")
-            }
+        if(!self.viewLoadedBool){
+            self.tweetCollection.delegate = self
+            self.tweetCollection.dataSource = self
+            
+            self.viewLoadedBool = true
+            
+            manager.loadTwitchStreams(team: self.team!, callbacks: self)
         }
-        
-        //let ds = TWTRTimelineDataSource()
-        //let dataSource = TWTRCollectionTimelineDataSource(collectionID: "539487832448843776", apiClient: client)
-        let dataSource = TWTRUserTimelineDataSource(screenName: "Activision", apiClient: TWTRAPIClient())
-        print("Error:")
-        
-        /*TWTRTwitter.sharedInstance().sessionStore.APIClient.loadTweetsWithIDs("") { tweets, error in
-            if let ts = tweets as? [TWTRTweet] {
-                self.tweets = ts
-            } else {
-                println("Failed to load tweets: \(error.localizedDescription)")
-            }
-        }*/
-        //let data = TWTRTimelineDataSource(screenName: "TomCruise", APIClient: TWTRAPIClient())
-        //let request = client.urlRequest(withMethod: "GET", urlString: statusesShowEndpoint, parameters: params, error: &clientError)
-
-        /*client.sendTwitterRequest(request) { (response, data, connectionError) -> Void in
-            if connectionError != nil {
-                print("Error: \(connectionError)")
-            }
-
-            do {
-                let json = try JSONSerialization.jsonObject(with: data!, options: [])
-                print("json: \(json)")
-            } catch let jsonError as NSError {
-                print("json error: \(jsonError.localizedDescription)")
-            }*/
-        //}
+    }
+    
+    func onStreamsLoaded(streams: [TwitchStreamObject]) {
+        self.streams = streams
     }
     
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
-        //if collectionView == self.tweetCollection {
-        //    return CGSize(width: self.tweetCollection.bounds.width, height: CGFloat(80))
-       // }
-       // else{
-            return CGSize(width: collectionView.bounds.width, height: CGFloat(60))
-       // }
+        if collectionView == self.tweetCollection {
+            return CGSize(width: self.tweetCollection.bounds.width, height: CGFloat(80))
+        }
+        else{
+            return CGSize(width: collectionView.bounds.width - 10, height: CGFloat(50))
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if(collectionView == twitchStreamList){
+            let cell = self.twitchStreamList.cellForItem(at: indexPath) as! TwitchStreamCell
+            let current = streams[indexPath.item]
+            
+            //var config = WKWebViewConfiguration()
+            //let contentController = config.userContentController
+            
+            //let aStr = String(format: "%@%", "<html><body style='margin:0px;padding:0px;'><iframe height='500px' width='500px' frameborder='0' scrolling='no' src='http://www.twitch.tv/btssmash/embed'></iframe></body></html>", webview.frame.height, webview.frame.width)
+            
+            //let url = URL(string: "http://www.twitch.tv/btssmash/embed")
+            //webview.load(URLRequest(url: url!))
+            //webview.loadHTMLString(aStr, baseURL: nil)
+            twitchPlayer.setChannel(to: "btssmash")
+            twitchPlayer.togglePlaybackState()
+            twitchView.isHidden = false
+            
+            //let progTwitchPlayer = TwitchPlayer()
+            //progTwitchPlayer.frame  = CGRect(x: 0, y: 0, width:400, height: 400)
+            //progTwitchPlayer.setChannel(to: "btssmash")
+            
+            //twitchView.addSubview(progTwitchPlayer)
+            //twitchPlayer.togglePlaybackState()
+            
+        }
     }
     
     @objc func goToChat(_ sender: AnyObject?) {

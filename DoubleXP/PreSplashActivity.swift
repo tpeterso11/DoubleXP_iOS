@@ -10,6 +10,7 @@ import UIKit
 import SwiftHTTP
 import ImageLoader
 import Firebase
+import TwitterKit
 
 class PreSplashActivity: UIViewController {
     private var data: [NewsObject]!
@@ -20,6 +21,7 @@ class PreSplashActivity: UIViewController {
         games = [GamerConnectGame]()
         // Do any additional setup after loading the view, typically from a nib.
         getAppConfig()
+        //testLoadTwitter()
     }
     
     func getAppConfig(){
@@ -58,7 +60,7 @@ class PreSplashActivity: UIViewController {
     }
     
     func loadGCGames(){
-        HTTP.GET("https://firebasestorage.googleapis.com/v0/b/gameterminal-767f7.appspot.com/o/config%2Fregister_config3.json?alt=media&token=944235d2-2f3b-48fa-9a67-15abfd4a340e") { response in
+        HTTP.GET("https://firebasestorage.googleapis.com/v0/b/gameterminal-767f7.appspot.com/o/config%2FgcGames.json?alt=media&token=3d7ac17e-34c6-46c5-a98b-f588d2fceeed") { response in
             if let err = response.error {
                 print("error: \(err.localizedDescription)")
                 return //also notify app of failure as needed
@@ -72,6 +74,7 @@ class PreSplashActivity: UIViewController {
                             var gameName = ""
                             var imageUrl = ""
                             var developer = ""
+                            var secondaryName = ""
                             var statsAvailable = false
                             var teamNeeds = [String]()
                             if let gameDict = game as? NSDictionary {
@@ -81,8 +84,10 @@ class PreSplashActivity: UIViewController {
                                 developer = (gameDict.value(forKey: "developer") as? String)!
                                 statsAvailable = (gameDict.value(forKey: "statsAvailable") as? Bool)!
                                 teamNeeds = (gameDict.value(forKey: "teamNeeds") as? [String]) ?? [String]()
+                                secondaryName = (gameDict.value(forKey: "secondaryName") as? String ?? "")
                                 
                                 let newGame  = GamerConnectGame(imageUrl: imageUrl, gameName: gameName, developer: developer, hook: hook, statsAvailable: statsAvailable, teamNeeds: teamNeeds)
+                                newGame.secondaryName = secondaryName
                                 self.games.append(newGame)
                                 }
                             }
@@ -110,6 +115,10 @@ class PreSplashActivity: UIViewController {
                 }
             }
         }
+    
+    func testLoadTwitter(){
+        
+    }
     
     private func downloadDBRef(uid: String){
         let ref = Database.database().reference().child("Users").child(uid)

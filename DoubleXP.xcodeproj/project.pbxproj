@@ -32,6 +32,11 @@
 		30582412239C589D00FDEA7D /* ChatObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30582411239C589D00FDEA7D /* ChatObject.swift */; };
 		30582414239C86B800FDEA7D /* list-interface-symbol.png in Resources */ = {isa = PBXBuildFile; fileRef = 30582413239C86B800FDEA7D /* list-interface-symbol.png */; };
 		30582416239C8D1E00FDEA7D /* user.png in Resources */ = {isa = PBXBuildFile; fileRef = 30582415239C8D1D00FDEA7D /* user.png */; };
+		306E6B5923DE23220069F426 /* TwitchStreamObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306E6B5823DE23220069F426 /* TwitchStreamObject.swift */; };
+		306E6B5B23DE49F70069F426 /* live_streaming.png in Resources */ = {isa = PBXBuildFile; fileRef = 306E6B5A23DE49F60069F426 /* live_streaming.png */; };
+		306E6B5D23DE4E4D0069F426 /* TwitchStreamCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306E6B5C23DE4E4D0069F426 /* TwitchStreamCell.swift */; };
+		306E6B5F23DE991B0069F426 /* TwitchPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306E6B5E23DE991B0069F426 /* TwitchPlayerViewController.swift */; };
+		306E6B6123DE99C40069F426 /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306E6B6023DE99C40069F426 /* Test.swift */; };
 		3080B3E023B7C4F500638B22 /* ParentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3080B3DF23B7C4F500638B22 /* ParentVC.swift */; };
 		3080B3E223B7FAA700638B22 /* request.png in Resources */ = {isa = PBXBuildFile; fileRef = 3080B3E123B7FAA600638B22 /* request.png */; };
 		3080B3E423B80A5B00638B22 /* request2.png in Resources */ = {isa = PBXBuildFile; fileRef = 3080B3E323B80A5A00638B22 /* request2.png */; };
@@ -140,6 +145,8 @@
 		30EBC3FC23D60A23009CFAB2 /* twitter_PNG3.png in Resources */ = {isa = PBXBuildFile; fileRef = 30EBC3FB23D60A23009CFAB2 /* twitter_PNG3.png */; };
 		30EBC3FE23D949A0009CFAB2 /* FoldingRosterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30EBC3FD23D949A0009CFAB2 /* FoldingRosterCell.swift */; };
 		30EBC40023DA8CC7009CFAB2 /* TeamRosterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30EBC3FF23DA8CC7009CFAB2 /* TeamRosterCell.swift */; };
+		30EBC40223DB632E009CFAB2 /* SocialMediaManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30EBC40123DB632E009CFAB2 /* SocialMediaManager.swift */; };
+		30EBC40423DB6E5D009CFAB2 /* TweetObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30EBC40323DB6E5D009CFAB2 /* TweetObject.swift */; };
 		30F6FCB423C58F580051813D /* show-more-button-with-three-dots.png in Resources */ = {isa = PBXBuildFile; fileRef = 30F6FCB323C58F570051813D /* show-more-button-with-three-dots.png */; };
 		30F6FCB623CBF65B0051813D /* RequestsFoldingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6FCB523CBF65B0051813D /* RequestsFoldingCell.swift */; };
 		30F6FCB823CBFC000051813D /* user (1).png in Resources */ = {isa = PBXBuildFile; fileRef = 30F6FCB723CBFC000051813D /* user (1).png */; };
@@ -209,6 +216,11 @@
 		30582411239C589D00FDEA7D /* ChatObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatObject.swift; sourceTree = "<group>"; };
 		30582413239C86B800FDEA7D /* list-interface-symbol.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "list-interface-symbol.png"; sourceTree = "<group>"; };
 		30582415239C8D1D00FDEA7D /* user.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = user.png; sourceTree = "<group>"; };
+		306E6B5823DE23220069F426 /* TwitchStreamObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchStreamObject.swift; sourceTree = "<group>"; };
+		306E6B5A23DE49F60069F426 /* live_streaming.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = live_streaming.png; sourceTree = "<group>"; };
+		306E6B5C23DE4E4D0069F426 /* TwitchStreamCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchStreamCell.swift; sourceTree = "<group>"; };
+		306E6B5E23DE991B0069F426 /* TwitchPlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchPlayerViewController.swift; sourceTree = "<group>"; };
+		306E6B6023DE99C40069F426 /* Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Test.swift; sourceTree = "<group>"; };
 		3080B3DF23B7C4F500638B22 /* ParentVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentVC.swift; sourceTree = "<group>"; };
 		3080B3E123B7FAA600638B22 /* request.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = request.png; sourceTree = "<group>"; };
 		3080B3E323B80A5A00638B22 /* request2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = request2.png; sourceTree = "<group>"; };
@@ -319,6 +331,8 @@
 		30EBC3FB23D60A23009CFAB2 /* twitter_PNG3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = twitter_PNG3.png; sourceTree = "<group>"; };
 		30EBC3FD23D949A0009CFAB2 /* FoldingRosterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoldingRosterCell.swift; sourceTree = "<group>"; };
 		30EBC3FF23DA8CC7009CFAB2 /* TeamRosterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamRosterCell.swift; sourceTree = "<group>"; };
+		30EBC40123DB632E009CFAB2 /* SocialMediaManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialMediaManager.swift; sourceTree = "<group>"; };
+		30EBC40323DB6E5D009CFAB2 /* TweetObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TweetObject.swift; sourceTree = "<group>"; };
 		30F6FCB323C58F570051813D /* show-more-button-with-three-dots.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "show-more-button-with-three-dots.png"; sourceTree = "<group>"; };
 		30F6FCB523CBF65B0051813D /* RequestsFoldingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestsFoldingCell.swift; sourceTree = "<group>"; };
 		30F6FCB723CBFC000051813D /* user (1).png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "user (1).png"; sourceTree = "<group>"; };
@@ -418,6 +432,7 @@
 				30B6E1A623AF15AA00B69F00 /* FAQuizConsoles.swift */,
 				30B6E1AA23B14F4400B69F00 /* FAQuizComplete.swift */,
 				3080B3ED23B8488E00638B22 /* EmbeddedTableView.swift */,
+				306E6B6023DE99C40069F426 /* Test.swift */,
 			);
 			path = SubViews;
 			sourceTree = "<group>";
@@ -432,6 +447,7 @@
 				308BD027238E1AB70034822B /* TeamManager.swift */,
 				30B6E18223A09A8900B69F00 /* FreeAgentManager.swift */,
 				30B6E1A423ADC67E00B69F00 /* InterviewManager.swift */,
+				30EBC40123DB632E009CFAB2 /* SocialMediaManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -476,6 +492,8 @@
 				30EBC3F923D608DB009CFAB2 /* TeamTweetCell.swift */,
 				30EBC3FD23D949A0009CFAB2 /* FoldingRosterCell.swift */,
 				30EBC3FF23DA8CC7009CFAB2 /* TeamRosterCell.swift */,
+				306E6B5C23DE4E4D0069F426 /* TwitchStreamCell.swift */,
+				306E6B5E23DE991B0069F426 /* TwitchPlayerViewController.swift */,
 			);
 			path = CustomView;
 			sourceTree = "<group>";
@@ -598,6 +616,7 @@
 				30F6FCC323CD96620051813D /* dashboard.png */,
 				30B583E32352A22B00736733 /* point_rights.png */,
 				30F6FCBF23CD7F9C0051813D /* open-menu.png */,
+				306E6B5A23DE49F60069F426 /* live_streaming.png */,
 				30EBC3FB23D60A23009CFAB2 /* twitter_PNG3.png */,
 				30B583CA2347B5E500736733 /* gamespot_icon_ios.png */,
 				30C4EDAE2267C1890046B615 /* double_xp_small_white.png */,
@@ -631,6 +650,8 @@
 				30B6E18C23A583E400B69F00 /* RequestObject.swift */,
 				30B6E19423A72F3A00B69F00 /* FAQuestion.swift */,
 				30F6FCBD23CC07A20051813D /* GenericRequestObject.swift */,
+				30EBC40323DB6E5D009CFAB2 /* TweetObject.swift */,
+				306E6B5823DE23220069F426 /* TwitchStreamObject.swift */,
 			);
 			path = Object;
 			sourceTree = "<group>";
@@ -817,6 +838,7 @@
 				308BD032238ED2450034822B /* restaurant-membership-card-tool.png in Resources */,
 				3080B40423BC07BE00638B22 /* x-mark.png in Resources */,
 				3080B3E423B80A5B00638B22 /* request2.png in Resources */,
+				306E6B5B23DE49F70069F426 /* live_streaming.png in Resources */,
 				30C4EDB22267C1890046B615 /* double_xp_small_white.png in Resources */,
 				3080B3FA23BBC52400638B22 /* hello.png in Resources */,
 				30C4EDB52267C1890046B615 /* vintage_tv.png in Resources */,
@@ -946,6 +968,7 @@
 				301AEF4C23885B2F00339850 /* MessagingManager.swift in Sources */,
 				30A84DF62381EB58007BEAA5 /* RequestCell.swift in Sources */,
 				303F2D4223728D09004B68E1 /* EMPageViewController.swift in Sources */,
+				306E6B5923DE23220069F426 /* TwitchStreamObject.swift in Sources */,
 				308BD021238B4AC90034822B /* TeamDashboard.swift in Sources */,
 				3058131D23973FEB001BCE30 /* TeamBuildFAResults.swift in Sources */,
 				30A84DD82373B88E007BEAA5 /* PlayerProfile.swift in Sources */,
@@ -981,6 +1004,8 @@
 				4C4D88242205F32900AD7090 /* AppDelegate.swift in Sources */,
 				30B583EE235E7A2E00736733 /* GCInfoCell.swift in Sources */,
 				30B583EC2353A99200736733 /* GCGameCellTall.swift in Sources */,
+				306E6B6123DE99C40069F426 /* Test.swift in Sources */,
+				30EBC40423DB6E5D009CFAB2 /* TweetObject.swift in Sources */,
 				3086956D23BD97E8001E51EF /* SegueFromLeft.swift in Sources */,
 				3058131B23973AED001BCE30 /* FATeamNeedsCell.swift in Sources */,
 				3058131923973A31001BCE30 /* TeamBuildFA.swift in Sources */,
@@ -993,6 +1018,7 @@
 				30A84DEE2381E622007BEAA5 /* TeamInviteObject.swift in Sources */,
 				3008EE782267F89800E0D9ED /* NewsCell.swift in Sources */,
 				30B6E1A723AF15AA00B69F00 /* FAQuizConsoles.swift in Sources */,
+				30EBC40223DB632E009CFAB2 /* SocialMediaManager.swift in Sources */,
 				30B583DE2350168B00736733 /* TeamObject.swift in Sources */,
 				308BD030238ED1370034822B /* DashFriendInviteCell.swift in Sources */,
 				3080B3EE23B8488E00638B22 /* EmbeddedTableView.swift in Sources */,
@@ -1012,6 +1038,7 @@
 				3058240E239C3D9800FDEA7D /* OtherChatBubble.swift in Sources */,
 				30B6E19723AC13BE00B69F00 /* QuizNavigationController.swift in Sources */,
 				30A84DEA2381C63A007BEAA5 /* FriendsManager.swift in Sources */,
+				306E6B5F23DE991B0069F426 /* TwitchPlayerViewController.swift in Sources */,
 				30A84DEC2381DED0007BEAA5 /* Requests.swift in Sources */,
 				3058240C239C3D7900FDEA7D /* UserChatBubble.swift in Sources */,
 				3086956F23BD9971001E51EF /* SegueFromRight.swift in Sources */,
@@ -1022,6 +1049,7 @@
 				30A84DE62380A6DC007BEAA5 /* GamerConnectSearch.swift in Sources */,
 				308BD026238D7CB40034822B /* TeamNeedsCell.swift in Sources */,
 				30EBC3FE23D949A0009CFAB2 /* FoldingRosterCell.swift in Sources */,
+				306E6B5D23DE4E4D0069F426 /* TwitchStreamCell.swift in Sources */,
 				30B6E18123A089BD00B69F00 /* FADashCell.swift in Sources */,
 				30A60D9123666716004B2150 /* UserCell.swift in Sources */,
 				30A84DE2237F80CE007BEAA5 /* StatsCell.swift in Sources */,

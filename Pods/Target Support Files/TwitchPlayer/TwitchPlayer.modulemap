@@ -1,0 +1,6 @@
+framework module TwitchPlayer {
+  umbrella header "TwitchPlayer-umbrella.h"
+
+  export *
+  module * { export * }
+}

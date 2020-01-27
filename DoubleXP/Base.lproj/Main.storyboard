@@ -1130,72 +1130,6 @@
                                     <constraint firstAttribute="height" constant="37" id="UeW-NZ-UzM"/>
                                 </constraints>
                             </imageView>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="v29-tG-qWM">
-                                <rect key="frame" x="16" y="455" width="343" height="192"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="192" id="oAd-LV-Lea"/>
-                                    <constraint firstAttribute="width" constant="343" id="zaU-cE-NiP"/>
-                                </constraints>
-                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="u7Y-3k-dMU">
-                                    <size key="itemSize" width="342" height="77"/>
-                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
-                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                </collectionViewFlowLayout>
-                                <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="cell" id="q9u-G5-Rc4" customClass="TeamTweetCell" customModule="DoubleXP" customModuleProvider="target">
-                                        <rect key="frame" x="0.5" y="0.0" width="342" height="77"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="tqk-AQ-c97">
-                                            <rect key="frame" x="0.0" y="0.0" width="342" height="77"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="@activision" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Taf-5B-rk0">
-                                                    <rect key="frame" x="8" y="8" width="270" height="21"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="21" id="SOo-ag-gF7"/>
-                                                        <constraint firstAttribute="width" constant="93" id="vdQ-eZ-InN"/>
-                                                    </constraints>
-                                                    <fontDescription key="fontDescription" type="italicSystem" pointSize="12"/>
-                                                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="This is an insanely long tweet so we can see what is being said and see what it looks like at the end" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="4" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gZs-Xq-miQ">
-                                                    <rect key="frame" x="8" y="37" width="326" height="27"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="11"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="twitter_PNG3.png" translatesAutoresizingMaskIntoConstraints="NO" id="QBB-he-itz">
-                                                    <rect key="frame" x="315" y="8" width="19" height="21"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="width" constant="19" id="3fE-fS-qUe"/>
-                                                        <constraint firstAttribute="height" constant="21" id="Nl0-SM-dVX"/>
-                                                    </constraints>
-                                                </imageView>
-                                            </subviews>
-                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                            <constraints>
-                                                <constraint firstAttribute="trailing" secondItem="gZs-Xq-miQ" secondAttribute="trailing" constant="8" id="2JB-8D-7tE"/>
-                                                <constraint firstAttribute="trailing" secondItem="QBB-he-itz" secondAttribute="trailing" constant="8" id="2iD-6V-Jyf"/>
-                                                <constraint firstAttribute="bottom" secondItem="gZs-Xq-miQ" secondAttribute="bottom" constant="13" id="DeC-b0-hbh"/>
-                                                <constraint firstItem="gZs-Xq-miQ" firstAttribute="top" secondItem="QBB-he-itz" secondAttribute="bottom" constant="8" id="Oem-Il-Mp0"/>
-                                                <constraint firstItem="QBB-he-itz" firstAttribute="top" secondItem="tqk-AQ-c97" secondAttribute="top" constant="8" id="RF0-kP-rPI"/>
-                                                <constraint firstItem="QBB-he-itz" firstAttribute="leading" secondItem="Taf-5B-rk0" secondAttribute="trailing" constant="37" id="Unl-Dg-aXR"/>
-                                                <constraint firstItem="Taf-5B-rk0" firstAttribute="top" secondItem="tqk-AQ-c97" secondAttribute="top" constant="8" id="eZS-sV-t13"/>
-                                                <constraint firstItem="gZs-Xq-miQ" firstAttribute="leading" secondItem="tqk-AQ-c97" secondAttribute="leading" constant="8" id="fe8-eI-xVq"/>
-                                                <constraint firstItem="Taf-5B-rk0" firstAttribute="leading" secondItem="tqk-AQ-c97" secondAttribute="leading" constant="8" id="xYD-CS-Gk7"/>
-                                            </constraints>
-                                        </collectionViewCellContentView>
-                                        <size key="customSize" width="342" height="77"/>
-                                        <connections>
-                                            <outlet property="tweet" destination="gZs-Xq-miQ" id="ScN-yR-GBE"/>
-                                            <outlet property="twitterTag" destination="Taf-5B-rk0" id="c5A-Wg-mxD"/>
-                                        </connections>
-                                    </collectionViewCell>
-                                </cells>
-                            </collectionView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oah-9e-gN5">
                                 <rect key="frame" x="31" y="158" width="100" height="40"/>
                                 <subviews>
@@ -1323,36 +1257,178 @@
                                 <rect key="frame" x="105" y="416" width="169" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="31" id="Jtn-Pr-9NX"/>
+                                    <constraint firstAttribute="width" constant="169" id="VUy-dP-JMW"/>
                                 </constraints>
                                 <segments>
                                     <segment title="Tweets"/>
                                     <segment title="Twitch"/>
                                 </segments>
+                                <connections>
+                                    <action selector="onChange:" destination="N8g-Xm-DSc" eventType="valueChanged" id="9l1-AC-W6E"/>
+                                </connections>
                             </segmentedControl>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="ckH-lW-8V9">
+                                <rect key="frame" x="0.0" y="455" width="375" height="192"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="192" id="6oU-XZ-lFv"/>
+                                    <constraint firstAttribute="width" constant="375" id="Neq-G7-knt"/>
+                                </constraints>
+                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="yer-Uj-yw0">
+                                    <size key="itemSize" width="343" height="70"/>
+                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                </collectionViewFlowLayout>
+                                <cells>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="cell" id="rbZ-1p-iBO" customClass="TeamTweetCell" customModule="DoubleXP" customModuleProvider="target">
+                                        <rect key="frame" x="16" y="0.0" width="343" height="70"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="Afp-sH-W2J">
+                                            <rect key="frame" x="0.0" y="0.0" width="343" height="70"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fA3-vK-eZH">
+                                                    <rect key="frame" x="8" y="8" width="296" height="21"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="italicSystem" pointSize="13"/>
+                                                    <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="twitter_PNG3.png" translatesAutoresizingMaskIntoConstraints="NO" id="RNf-jP-tjN">
+                                                    <rect key="frame" x="312" y="8" width="23" height="21"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                </imageView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="This is an extra long tweet basically so I can see where it breaks." textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ckn-JS-4OB">
+                                                    <rect key="frame" x="8" y="30" width="327" height="32"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5Ql-1D-eGV">
+                                                    <rect key="frame" x="52" y="69" width="239" height="1"/>
+                                                    <color key="backgroundColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="1" id="W36-qI-ijv"/>
+                                                        <constraint firstAttribute="width" constant="240" id="sF6-jG-hUF"/>
+                                                    </constraints>
+                                                </view>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="5Ql-1D-eGV" firstAttribute="leading" secondItem="Afp-sH-W2J" secondAttribute="leading" constant="52" id="M1k-Wk-pb0"/>
+                                                <constraint firstAttribute="bottom" secondItem="5Ql-1D-eGV" secondAttribute="bottom" id="a79-ka-AtA"/>
+                                                <constraint firstAttribute="trailing" secondItem="5Ql-1D-eGV" secondAttribute="trailing" constant="52" id="zVc-Ra-lTO"/>
+                                            </constraints>
+                                        </collectionViewCellContentView>
+                                        <size key="customSize" width="343" height="70"/>
+                                        <connections>
+                                            <outlet property="bottomBorder" destination="5Ql-1D-eGV" id="akF-tf-2P9"/>
+                                            <outlet property="tweet" destination="ckn-JS-4OB" id="sLE-vs-FFU"/>
+                                            <outlet property="twitterTag" destination="fA3-vK-eZH" id="oMq-2S-NXg"/>
+                                        </connections>
+                                    </collectionViewCell>
+                                </cells>
+                            </collectionView>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="FdF-6d-x78">
+                                <rect key="frame" x="375" y="455" width="375" height="192"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="375" id="QTt-gj-lnb"/>
+                                    <constraint firstAttribute="height" constant="192" id="hlo-YP-elQ"/>
+                                </constraints>
+                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="vaB-1d-WWS">
+                                    <size key="itemSize" width="343" height="72"/>
+                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                </collectionViewFlowLayout>
+                                <cells>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="cell" id="XhQ-gj-SDs" customClass="TwitchStreamCell" customModule="DoubleXP" customModuleProvider="target">
+                                        <rect key="frame" x="16" y="0.0" width="343" height="72"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="koB-Hv-G6e">
+                                            <rect key="frame" x="0.0" y="0.0" width="343" height="72"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="live_streaming.png" translatesAutoresizingMaskIntoConstraints="NO" id="C80-b2-n5Q">
+                                                    <rect key="frame" x="301" y="8" width="34" height="25"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                </imageView>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8lX-AI-YIh">
+                                                    <rect key="frame" x="-30" y="-27" width="392" height="132"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                </imageView>
+                                            </subviews>
+                                        </collectionViewCellContentView>
+                                        <size key="customSize" width="343" height="72"/>
+                                        <connections>
+                                            <outlet property="liveIcon" destination="C80-b2-n5Q" id="2Fi-DW-riz"/>
+                                            <outlet property="previewImage" destination="8lX-AI-YIh" id="agD-s7-lFO"/>
+                                        </connections>
+                                    </collectionViewCell>
+                                </cells>
+                            </collectionView>
+                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="p3f-RZ-4C4">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <subviews>
+                                    <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fXt-gV-Khh" customClass="TwitchPlayer" customModule="TwitchPlayer">
+                                        <rect key="frame" x="8" y="134" width="360" height="389"/>
+                                        <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="389" id="H8L-MZ-HkX"/>
+                                            <constraint firstAttribute="width" constant="360" id="IWl-qH-3Y0"/>
+                                        </constraints>
+                                        <wkWebViewConfiguration key="configuration">
+                                            <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                                            <wkPreferences key="preferences"/>
+                                        </wkWebViewConfiguration>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="playerThemeIsDark" value="YES"/>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="allowsFullScreen" value="YES"/>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="showingChatPanel" value="YES"/>
+                                        </userDefinedRuntimeAttributes>
+                                    </wkWebView>
+                                </subviews>
+                                <color key="backgroundColor" white="0.0" alpha="0.84594392123287676" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="fXt-gV-Khh" firstAttribute="top" secondItem="p3f-RZ-4C4" secondAttribute="top" constant="134" id="l8A-fQ-nA5"/>
+                                    <constraint firstAttribute="trailing" secondItem="fXt-gV-Khh" secondAttribute="trailing" constant="7" id="mNa-2t-OKG"/>
+                                    <constraint firstItem="fXt-gV-Khh" firstAttribute="leading" secondItem="p3f-RZ-4C4" secondAttribute="leading" constant="8" id="vjQ-qY-awO"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
+                            <constraint firstItem="ckH-lW-8V9" firstAttribute="top" secondItem="7eD-1G-N7U" secondAttribute="bottom" constant="8" id="1cx-gP-jwm"/>
+                            <constraint firstAttribute="trailing" secondItem="p3f-RZ-4C4" secondAttribute="trailing" id="3xc-X9-SpY"/>
+                            <constraint firstItem="p3f-RZ-4C4" firstAttribute="top" secondItem="NFo-pQ-uAO" secondAttribute="top" id="7Ay-5d-1UR"/>
                             <constraint firstItem="WFO-Xr-ABy" firstAttribute="leading" secondItem="U4n-bZ-Izn" secondAttribute="trailing" constant="8" id="9Ht-El-jGy"/>
+                            <constraint firstItem="7eD-1G-N7U" firstAttribute="top" secondItem="R8i-Am-W1M" secondAttribute="bottom" constant="8" id="FS5-Zo-fST"/>
                             <constraint firstItem="zwr-Dd-NfM" firstAttribute="leading" secondItem="X6b-lU-eJz" secondAttribute="leading" constant="16" id="GoS-wS-2xR"/>
+                            <constraint firstAttribute="trailing" secondItem="FdF-6d-x78" secondAttribute="trailing" constant="-375" id="Lkd-Yh-wu8"/>
                             <constraint firstItem="U4n-bZ-Izn" firstAttribute="leading" secondItem="oah-9e-gN5" secondAttribute="trailing" constant="8" id="LyD-qO-Bw9"/>
                             <constraint firstItem="X6b-lU-eJz" firstAttribute="trailing" secondItem="R8i-Am-W1M" secondAttribute="trailing" constant="16" id="Mdv-4m-ace"/>
                             <constraint firstItem="ceL-eR-8eH" firstAttribute="top" secondItem="NFo-pQ-uAO" secondAttribute="topMargin" constant="46" id="MtB-Oy-1BT"/>
                             <constraint firstItem="oah-9e-gN5" firstAttribute="top" secondItem="zwr-Dd-NfM" secondAttribute="bottom" constant="24" id="NXX-6f-mnI"/>
-                            <constraint firstItem="X6b-lU-eJz" firstAttribute="bottom" secondItem="v29-tG-qWM" secondAttribute="bottom" constant="20" id="YBx-7G-eDa"/>
                             <constraint firstItem="zwr-Dd-NfM" firstAttribute="top" secondItem="X6b-lU-eJz" secondAttribute="top" constant="103" id="ayV-uO-alj"/>
+                            <constraint firstAttribute="bottom" secondItem="FdF-6d-x78" secondAttribute="bottom" constant="20" id="bLU-ug-S2h"/>
                             <constraint firstItem="X6b-lU-eJz" firstAttribute="trailing" secondItem="ceL-eR-8eH" secondAttribute="trailing" constant="16" id="d82-GY-Nle"/>
                             <constraint firstItem="U4n-bZ-Izn" firstAttribute="top" secondItem="zwr-Dd-NfM" secondAttribute="bottom" constant="24" id="dVK-xB-jO7"/>
                             <constraint firstItem="7eD-1G-N7U" firstAttribute="leading" secondItem="X6b-lU-eJz" secondAttribute="leading" constant="105" id="eA5-vv-Gmn"/>
-                            <constraint firstItem="X6b-lU-eJz" firstAttribute="trailing" secondItem="v29-tG-qWM" secondAttribute="trailing" constant="16" id="fAc-pS-cMO"/>
                             <constraint firstItem="X6b-lU-eJz" firstAttribute="trailing" secondItem="7eD-1G-N7U" secondAttribute="trailing" constant="101" id="gRd-ob-vTg"/>
                             <constraint firstItem="R8i-Am-W1M" firstAttribute="leading" secondItem="X6b-lU-eJz" secondAttribute="leading" constant="16" id="hYh-Rl-ZxZ"/>
-                            <constraint firstItem="v29-tG-qWM" firstAttribute="top" secondItem="7eD-1G-N7U" secondAttribute="bottom" constant="8" id="jTV-ol-Eh0"/>
-                            <constraint firstItem="v29-tG-qWM" firstAttribute="leading" secondItem="X6b-lU-eJz" secondAttribute="leading" constant="16" id="oHC-nA-wzp"/>
+                            <constraint firstItem="p3f-RZ-4C4" firstAttribute="leading" secondItem="NFo-pQ-uAO" secondAttribute="leading" id="hzk-qc-T6T"/>
+                            <constraint firstItem="p3f-RZ-4C4" firstAttribute="bottom" secondItem="NFo-pQ-uAO" secondAttribute="bottom" id="lls-kD-O8A"/>
+                            <constraint firstItem="ckH-lW-8V9" firstAttribute="leading" secondItem="X6b-lU-eJz" secondAttribute="leading" id="m0V-A4-1LM"/>
                             <constraint firstItem="R8i-Am-W1M" firstAttribute="top" secondItem="oah-9e-gN5" secondAttribute="bottom" constant="24" id="pES-6e-3o4"/>
+                            <constraint firstItem="X6b-lU-eJz" firstAttribute="bottom" secondItem="ckH-lW-8V9" secondAttribute="bottom" constant="20" id="s2R-AW-RhK"/>
                             <constraint firstItem="oah-9e-gN5" firstAttribute="leading" secondItem="X6b-lU-eJz" secondAttribute="leading" constant="31" id="tYa-XQ-Oy5"/>
+                            <constraint firstItem="X6b-lU-eJz" firstAttribute="trailing" secondItem="ckH-lW-8V9" secondAttribute="trailing" id="u8n-iQ-Lhe"/>
                             <constraint firstItem="WFO-Xr-ABy" firstAttribute="top" secondItem="zwr-Dd-NfM" secondAttribute="bottom" constant="24" id="uaS-H7-hyN"/>
                             <constraint firstItem="X6b-lU-eJz" firstAttribute="trailing" secondItem="WFO-Xr-ABy" secondAttribute="trailing" constant="28" id="wbE-oW-F17"/>
                             <constraint firstItem="X6b-lU-eJz" firstAttribute="trailing" secondItem="zwr-Dd-NfM" secondAttribute="trailing" constant="16" id="zk3-dS-MDc"/>
+                            <constraint firstItem="FdF-6d-x78" firstAttribute="top" secondItem="7eD-1G-N7U" secondAttribute="bottom" constant="8" id="zlr-j1-0gB"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="X6b-lU-eJz"/>
                     </view>
@@ -1362,12 +1438,17 @@
                         <outlet property="teamChat" destination="U4n-bZ-Izn" id="GIt-zt-YOn"/>
                         <outlet property="teamLabel" destination="zwr-Dd-NfM" id="BMf-Ha-yWg"/>
                         <outlet property="teamRoster" destination="R8i-Am-W1M" id="eE7-gA-2N0"/>
-                        <outlet property="tweetCollection" destination="v29-tG-qWM" id="XBF-Ri-m2r"/>
+                        <outlet property="tweetCollection" destination="ckH-lW-8V9" id="2cb-3G-cuq"/>
+                        <outlet property="tweetStreamSegment" destination="7eD-1G-N7U" id="1Sm-66-itT"/>
+                        <outlet property="twitchPlayer" destination="fXt-gV-Khh" id="qZc-7B-WgL"/>
+                        <outlet property="twitchStreamList" destination="FdF-6d-x78" id="gAB-ea-e5N"/>
+                        <outlet property="twitchView" destination="p3f-RZ-4C4" id="6MA-0v-Gn2"/>
+                        <outlet property="webview" destination="fXt-gV-Khh" id="9sL-yq-olb"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="FMK-5Q-SVS" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2896.8000000000002" y="1681.7091454272866"/>
+            <point key="canvasLocation" x="2472.8000000000002" y="1681.7091454272866"/>
         </scene>
         <!--Messaging Frag-->
         <scene sceneID="t4V-i1-2Qe">
@@ -3586,6 +3667,43 @@
             </objects>
             <point key="canvasLocation" x="3725.5999999999999" y="909.89505247376314"/>
         </scene>
+        <!--Twitch Player View Controller-->
+        <scene sceneID="gpV-sZ-qfp">
+            <objects>
+                <viewController id="bdj-VV-gqC" customClass="TwitchPlayerViewController" customModule="DoubleXP" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="u7M-6P-Yty">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zqH-tc-lul">
+                                <rect key="frame" x="16" y="218" width="343" height="203"/>
+                                <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="343" id="380-I0-0U8"/>
+                                    <constraint firstAttribute="height" constant="203" id="6R8-cm-3ka"/>
+                                </constraints>
+                                <wkWebViewConfiguration key="configuration">
+                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                                    <wkPreferences key="preferences"/>
+                                </wkWebViewConfiguration>
+                            </wkWebView>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="zqH-tc-lul" firstAttribute="leading" secondItem="am5-Ve-eEI" secondAttribute="leading" constant="16" id="4RX-Pl-kaW"/>
+                            <constraint firstItem="am5-Ve-eEI" firstAttribute="trailing" secondItem="zqH-tc-lul" secondAttribute="trailing" constant="16" id="KA1-Lc-E68"/>
+                            <constraint firstItem="zqH-tc-lul" firstAttribute="top" secondItem="am5-Ve-eEI" secondAttribute="top" constant="218" id="UYK-u5-hEY"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="am5-Ve-eEI"/>
+                    </view>
+                    <connections>
+                        <outlet property="twitchPlayer" destination="zqH-tc-lul" id="hmg-Nn-yaR"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="cqA-wx-2Sh" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3176.8000000000002" y="1681.7091454272866"/>
+        </scene>
         <!--Team Build Frag-->
         <scene sceneID="DdQ-FY-pE6">
             <objects>
@@ -3695,7 +3813,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="sha-nA-dO0" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3676" y="1681.7091454272866"/>
+            <point key="canvasLocation" x="3881" y="1682"/>
         </scene>
         <!--Team BuildFA-->
         <scene sceneID="X2D-FJ-7Rh">
@@ -4832,6 +4950,7 @@
         <image name="left-arrow.png" width="384" height="384"/>
         <image name="like.png" width="96" height="96"/>
         <image name="list-interface-symbol.png" width="384" height="384"/>
+        <image name="live_streaming.png" width="384" height="384"/>
         <image name="message.fill" catalog="system" width="64" height="56"/>
         <image name="more (1).png" width="384" height="384"/>
         <image name="more.png" width="409.60000610351562" height="409.60000610351562"/>

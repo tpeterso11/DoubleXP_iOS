@@ -19,6 +19,8 @@ target 'DoubleXP' do
   pod 'SmoothButton'
   pod 'lottie-ios'
   pod 'TwitterKit'
+  pod 'SwiftTwitch'
+  pod 'TwitchPlayer'
   pod 'UnderLineTextField', '~> 2.1'
 
   # Pods for DoubleXP

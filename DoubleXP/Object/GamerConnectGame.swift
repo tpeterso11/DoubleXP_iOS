@@ -70,6 +70,16 @@ class GamerConnectGame: NSObject, NSCoding {
         }
     }
     
+    var _secondaryName:String? = nil
+    var secondaryName:String {
+        get {
+            return (_secondaryName)!
+        }
+        set (newVal) {
+            _secondaryName = newVal
+        }
+    }
+    
     init(imageUrl: String, gameName: String, developer: String, hook: String, statsAvailable: Bool, teamNeeds: [String])
     {
         super.init()
@@ -90,11 +100,7 @@ class GamerConnectGame: NSObject, NSCoding {
         self.hook = (decoder.decodeObject(forKey: "hook") as! String)
         self.statsAvailable = (decoder.decodeObject(forKey: "statsAvailable") as! Bool)
         self.teamNeeds = (decoder.decodeObject(forKey: "teamNeeds") as! [String])
-        /*self.soundUrl = decoder.decodeObject(forKey: "soundUrl") as! String
-         self.soundName = decoder.decodeObject(forKey: "soundName") as! String
-         self.active = decoder.decodeObject(forKey: "active") as! String
-         self.repeatAlarm = decoder.decodeObject(forKey: "repeat") as! String
-         self.id = decoder.decodeObject(forKey: "id") as! String*/
+        self.secondaryName = (decoder.decodeObject(forKey: "secondaryName") as! String)
     }
     
     func encode(with coder: NSCoder) {
@@ -104,10 +110,6 @@ class GamerConnectGame: NSObject, NSCoding {
         coder.encode(self.hook, forKey: "hook")
         coder.encode(self.statsAvailable, forKey: "statsAvailable")
         coder.encode(self.teamNeeds, forKey: "teamNeeds")
-        /*coder.encode(self.soundUrl, forKey: "soundUrl")
-         coder.encode(self.soundName, forKey: "soundName")
-         coder.encode(self.active, forKey: "active")
-         coder.encode(self.repeatAlarm, forKey: "repeat")
-         coder.encode(self.repeatAlarm, forKey: "id")*/
+        coder.encode(self.secondaryName, forKey: "secondaryName")
     }
 }

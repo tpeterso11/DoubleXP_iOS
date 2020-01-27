@@ -104,3 +104,8 @@ protocol ProfileCallbacks: class{
     
     func onFriendDeclined()
 }
+
+protocol SocialMediaManagerCallback: class {
+    func onTweetsLoaded(tweets: [TweetObject])
+    func onStreamsLoaded(streams: [TwitchStreamObject])
+}

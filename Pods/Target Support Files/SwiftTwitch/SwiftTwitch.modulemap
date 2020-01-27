@@ -1,0 +1,6 @@
+framework module SwiftTwitch {
+  umbrella header "SwiftTwitch-umbrella.h"
+
+  export *
+  module * { export * }
+}

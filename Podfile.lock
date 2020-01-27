@@ -83,6 +83,7 @@ PODS:
   - ImageLoader (0.14.0)
   - leveldb-library (1.22)
   - lottie-ios (3.1.5)
+  - Marshal (1.2.7)
   - moa (11.0.1)
   - MSPeekCollectionViewDelegateImplementation (2.0.0)
   - nanopb (0.3.9011):
@@ -94,6 +95,9 @@ PODS:
   - SmoothButton (0.0.1)
   - SwiftHTTP (3.0.1)
   - SwiftNotificationCenter (1.0.4)
+  - SwiftTwitch (0.1.0):
+    - Marshal (~> 1.2.7)
+  - TwitchPlayer (0.2.3)
   - TwitterCore (3.2.0)
   - TwitterKit (3.4.2):
     - TwitterCore (>= 3.2.0)
@@ -114,6 +118,8 @@ DEPENDENCIES:
   - SmoothButton
   - SwiftHTTP (~> 3.0)
   - SwiftNotificationCenter
+  - SwiftTwitch
+  - TwitchPlayer
   - TwitterKit
   - UnderLineTextField (~> 2.1)
 
@@ -139,6 +145,7 @@ SPEC REPOS:
     - ImageLoader
     - leveldb-library
     - lottie-ios
+    - Marshal
     - moa
     - MSPeekCollectionViewDelegateImplementation
     - nanopb
@@ -146,6 +153,8 @@ SPEC REPOS:
     - SmoothButton
     - SwiftHTTP
     - SwiftNotificationCenter
+    - SwiftTwitch
+    - TwitchPlayer
     - TwitterCore
     - TwitterKit
     - UnderLineTextField
@@ -171,6 +180,7 @@ SPEC CHECKSUMS:
   ImageLoader: 56f57e35d6ed26a74183dc2e472133b4b22eb7b9
   leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
   lottie-ios: 32bf84389337d86fbc8b12266e88452e0abf1dee
+  Marshal: ef480864a6af10a63f67be7e55bb5d8fe67a16d9
   moa: a26c4e97c7ac9345e87c4bb999e85116c8ec0310
   MSPeekCollectionViewDelegateImplementation: 3091e9512b3cd03facdea3c02e57673a4a06246a
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
@@ -178,10 +188,12 @@ SPEC CHECKSUMS:
   SmoothButton: b3191c0bdba16ff40bdd2934db9ddd93edaa9c9f
   SwiftHTTP: e94f1aa8cde58637dcc0100f6349de31a3337fde
   SwiftNotificationCenter: 760386da2ce03d3594cb5e96d1e22ec80b44b46f
+  SwiftTwitch: 40957abccac5d6d40d8e047224178364ebbaf20c
+  TwitchPlayer: 60e9999dec4f74121685eec0b6e9843c2b44d794
   TwitterCore: 8cbc9ad34d91c63a0035ea05bfbfc0d7ca72a28c
   TwitterKit: 5e4f41d70b9abdb41df5467f52d7aa2c0fd26ebb
   UnderLineTextField: b3f5307b56962331e30a965e81b79aae2df1de83
 
-PODFILE CHECKSUM: 49e3ab49fc06814a4389e51d19a8a436cc5ad8d7
+PODFILE CHECKSUM: 6a9a1ce8c6c39058cec80e118c4cd3692f0a79f0
 
 COCOAPODS: 1.8.4

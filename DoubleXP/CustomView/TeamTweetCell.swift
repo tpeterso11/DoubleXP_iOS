@@ -13,4 +13,5 @@ class TeamTweetCell: UICollectionViewCell
 {
     @IBOutlet weak var tweet: UILabel!
     @IBOutlet weak var twitterTag: UILabel!
+    @IBOutlet weak var bottomBorder: UIView!
 }
