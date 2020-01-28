@@ -12,5 +12,6 @@ import UIKit
 class TwitchStreamCell: UICollectionViewCell{
     @IBOutlet weak var liveIcon: UIImageView!
     @IBOutlet weak var previewImage: UIImageView!
+    @IBOutlet weak var streamName: UILabel!
     
 }

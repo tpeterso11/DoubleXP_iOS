@@ -37,7 +37,7 @@ class TeamDashboard: UIViewController, UICollectionViewDataSource, UICollectionV
     @IBOutlet weak var tweetStreamSegment: UISegmentedControl!
     @IBOutlet weak var twitchStreamList: UICollectionView!
     @IBOutlet weak var webview: WKWebView!
-    @IBOutlet weak var twitchPlayer: TwitchPlayer!
+    @IBOutlet weak var twitchPlayer: TestPlayer!
     
     @IBAction func onChange(_ sender: Any) {
         switch (tweetStreamSegment.selectedSegmentIndex){
@@ -93,6 +93,12 @@ class TeamDashboard: UIViewController, UICollectionViewDataSource, UICollectionV
         }
         
         tweetStreamSegment.selectedSegmentIndex = 0
+        
+        let buildTap = UITapGestureRecognizer(target: self, action: #selector(buildButtonClicked))
+        buildButton.isUserInteractionEnabled = true
+        buildButton.addGestureRecognizer(buildTap)
+        
+        buildRoster()
         loadTweets()
     }
     
@@ -120,7 +126,8 @@ class TeamDashboard: UIViewController, UICollectionViewDataSource, UICollectionV
     }
     
     @objc func buildButtonClicked(_ sender: AnyObject?) {
-        LandingActivity().navigateToTeamBuild(team: self.team!)
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.currentLanding!.navigateToTeamBuild(team: self.team!)
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -185,6 +192,8 @@ class TeamDashboard: UIViewController, UICollectionViewDataSource, UICollectionV
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! TwitchStreamCell
             let current = streams[indexPath.item]
             
+            cell.streamName.text = current.handle
+            
             if(current.type != "live"){
                 cell.liveIcon.isHidden = true
             }
@@ -196,6 +205,11 @@ class TeamDashboard: UIViewController, UICollectionViewDataSource, UICollectionV
             cell.previewImage.contentMode = .scaleAspectFill
             cell.previewImage.clipsToBounds = true
             
+            cell.contentView.layer.cornerRadius = 2.0
+            cell.contentView.layer.borderWidth = 1.0
+            cell.contentView.layer.borderColor = UIColor.clear.cgColor
+            cell.contentView.layer.masksToBounds = true
+            
             return cell
         }
     }
@@ -203,6 +217,7 @@ class TeamDashboard: UIViewController, UICollectionViewDataSource, UICollectionV
     private func loadTweets() {
         let manager = SocialMediaManager()
         manager.loadTweets(team: team!, callbacks: self)
+        manager.loadTwitchStreams(team: self.team!, callbacks: self)
     }
     
     func onTweetsLoaded(tweets: [TweetObject]) {
@@ -213,8 +228,6 @@ class TeamDashboard: UIViewController, UICollectionViewDataSource, UICollectionV
             self.tweetCollection.dataSource = self
             
             self.viewLoadedBool = true
-            
-            manager.loadTwitchStreams(team: self.team!, callbacks: self)
         }
     }
     
@@ -228,6 +241,9 @@ class TeamDashboard: UIViewController, UICollectionViewDataSource, UICollectionV
         if collectionView == self.tweetCollection {
             return CGSize(width: self.tweetCollection.bounds.width, height: CGFloat(80))
         }
+        else if(collectionView == twitchStreamList){
+            return CGSize(width: collectionView.bounds.width - 10, height: CGFloat(120))
+        }
         else{
             return CGSize(width: collectionView.bounds.width - 10, height: CGFloat(50))
         }
@@ -237,26 +253,39 @@ class TeamDashboard: UIViewController, UICollectionViewDataSource, UICollectionV
         if(collectionView == twitchStreamList){
             let cell = self.twitchStreamList.cellForItem(at: indexPath) as! TwitchStreamCell
             let current = streams[indexPath.item]
+        
+            NotificationCenter.default.addObserver(
+                forName: UIWindow.didBecomeKeyNotification,
+                object: self.view.window,
+                queue: nil
+            ) { notification in
+                print("Video stopped")
+                self.twitchPlayer.isHidden = true
+                self.twitchPlayer.setChannel(to: "")
+                
+                UIView.animate(withDuration: 0.8) {
+                    self.twitchView.alpha = 0
+                }
+            }
             
-            //var config = WKWebViewConfiguration()
-            //let contentController = config.userContentController
-            
-            //let aStr = String(format: "%@%", "<html><body style='margin:0px;padding:0px;'><iframe height='500px' width='500px' frameborder='0' scrolling='no' src='http://www.twitch.tv/btssmash/embed'></iframe></body></html>", webview.frame.height, webview.frame.width)
-            
-            //let url = URL(string: "http://www.twitch.tv/btssmash/embed")
-            //webview.load(URLRequest(url: url!))
-            //webview.loadHTMLString(aStr, baseURL: nil)
-            twitchPlayer.setChannel(to: "btssmash")
-            twitchPlayer.togglePlaybackState()
-            twitchView.isHidden = false
-            
-            //let progTwitchPlayer = TwitchPlayer()
-            //progTwitchPlayer.frame  = CGRect(x: 0, y: 0, width:400, height: 400)
-            //progTwitchPlayer.setChannel(to: "btssmash")
-            
-            //twitchView.addSubview(progTwitchPlayer)
+            twitchPlayer.configuration.allowsInlineMediaPlayback = true
+            twitchPlayer.configuration.mediaTypesRequiringUserActionForPlayback = []
+            twitchPlayer.setChannel(to: current.handle)
             //twitchPlayer.togglePlaybackState()
             
+            UIView.animate(withDuration: 0.8) {
+                self.twitchView.alpha = 1.0
+            }
+        }
+        else if(collectionView == teamRoster){
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            let currentUser = delegate.currentUser
+            
+            let current = self.teammates[indexPath.item]
+            
+            if(current.uid != currentUser?.uId){
+                delegate.currentLanding?.navigateToProfile(uid: currentUser!.uId)
+            }
         }
     }
     

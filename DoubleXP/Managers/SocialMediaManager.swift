@@ -54,7 +54,7 @@ class SocialMediaManager{
         var ids = [String]()
         ids.append(getTwitchGameId(gameName: team.games[0]))
         
-        Twitch.Streams.getStreams(tokenManager: TwitchTokenManager.shared, after: nil, before: nil, communityIds: nil, first: 15, gameIds: ids, languages: nil, userIds: nil, userNames: nil){
+        Twitch.Streams.getStreams(tokenManager: TwitchTokenManager.shared, after: nil, before: nil, communityIds: nil, first: 5, gameIds: ids, languages: nil, userIds: nil, userNames: nil){
             switch $0 {
             case .success(let getStreamsData):
                 print(getStreamsData)

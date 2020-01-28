@@ -1,11 +1,14 @@
 //
-//  TwitchPlayer.swift
-//  TwitchPlayer
+//  TestPlayer.swift
+//  DoubleXP
 //
-//  Created by Christopher Perkins on 1/13/19.
+//  Created by Toussaint Peterson on 1/27/20.
+//  Copyright © 2020 Peterson, Toussaint. All rights reserved.
 //
 
+import Foundation
 import WebKit
+import SwiftTwitch
 
 /// `TwitchPlayer` is an embeddable Twitch Web Player. You can play Twitch Streams and Videos from a `TwitchPlayer`
 /// instance.
@@ -27,8 +30,25 @@ import WebKit
 /// * pause state - `pause()`, `play()`, `togglePlaybackState()`
 ///
 /// - Note: You **cannot** load a Twitch Clip from this class.
-@IBDesignable public class TwitchPlayer: WKWebView {
+@IBDesignable public class TestPlayer: WKWebView {
 
+    internal static let allowsFullScreen = "allowfullscreen"
+       internal static let autoplay = "autoplay"
+       internal static let chatMode = "chat"
+       internal static let channel = "channel"
+       internal static let clip = "clip"
+       internal static let collection = "collection"
+       internal static let fontSize = "font-size"
+       internal static let height = "height"
+       internal static let layout = "layout"
+       internal static let muted = "muted"
+       internal static let preload = "preload"
+       internal static let scrolling = "scrolling"
+       internal static let source = "src"
+       internal static let theme = "theme"
+       internal static let video = "video"
+       internal static let width = "width"
+    
     // MARK: - Custom Data Types
 
     /// `PlayerTheme` specifies the potential color themes of a Twitch Player instance.
@@ -265,10 +285,13 @@ import WebKit
         self.playerTheme = playerTheme
         self.playerLayout = playerLayout
 
+        configuration.allowsInlineMediaPlayback = true
+        configuration.mediaTypesRequiringUserActionForPlayback = []
+        
         super.init(frame: frame, configuration: configuration)
 
         scrollView.isScrollEnabled = scrollingEnabled
-        isOpaque = TwitchPlayer.isWebViewBackgroundOpaque
+        isOpaque = TestPlayer.isWebViewBackgroundOpaque
         updateWebPlayer()
     }
 
@@ -281,7 +304,7 @@ import WebKit
         super.init(frame: frame, configuration: configuration)
 
         scrollView.isScrollEnabled = scrollingEnabled
-        isOpaque = TwitchPlayer.isWebViewBackgroundOpaque
+        isOpaque = TestPlayer.isWebViewBackgroundOpaque
         updateWebPlayer()
     }
 
@@ -292,7 +315,7 @@ import WebKit
         super.init(coder: coder)
 
         scrollView.isScrollEnabled = scrollingEnabled
-        isOpaque = TwitchPlayer.isWebViewBackgroundOpaque
+        isOpaque = TestPlayer.isWebViewBackgroundOpaque
         updateWebPlayer()
     }
 
@@ -426,41 +449,41 @@ import WebKit
 
         if let channelToLoad = channelToLoad {
             currentPlayerParameters.append(
-                getJsonParameterFormat(forKey: TwitchWebPlayerKeys.channel, forValue: channelToLoad))
+                getJsonParameterFormat(forKey: TestPlayer.self.channel, forValue: channelToLoad))
         }
         if let videoToLoad = videoToLoad {
             currentPlayerParameters.append(
-                getJsonParameterFormat(forKey: TwitchWebPlayerKeys.video, forValue: videoToLoad))
+                getJsonParameterFormat(forKey: TestPlayer.self.video, forValue: videoToLoad))
         }
         if let collectionToLoad = collectionToLoad {
             currentPlayerParameters.append(
-                getJsonParameterFormat(forKey: TwitchWebPlayerKeys.collection, forValue: collectionToLoad))
+                getJsonParameterFormat(forKey: TestPlayer.self.collection, forValue: collectionToLoad))
         }
         if let playerLayout = playerLayout {
             currentPlayerParameters.append(
-                getJsonParameterFormat(forKey: TwitchWebPlayerKeys.layout, forValue: playerLayout.rawValue))
+                getJsonParameterFormat(forKey: TestPlayer.self.layout, forValue: playerLayout.rawValue))
         }
         if let chatMode = chatMode {
             currentPlayerParameters.append(
-                getJsonParameterFormat(forKey: TwitchWebPlayerKeys.chatMode, forValue: chatMode.rawValue))
+                getJsonParameterFormat(forKey: TestPlayer.self.chatMode, forValue: chatMode.rawValue))
         }
         if let fontSize = fontSize {
             currentPlayerParameters.append(
-                getJsonParameterFormat(forKey: TwitchWebPlayerKeys.fontSize, forValue: fontSize.rawValue))
+                getJsonParameterFormat(forKey: TestPlayer.self.fontSize, forValue: fontSize.rawValue))
         }
         if let playerTheme = playerTheme {
             currentPlayerParameters.append(
-                getJsonParameterFormat(forKey: TwitchWebPlayerKeys.theme, forValue: playerTheme.rawValue))
+                getJsonParameterFormat(forKey: TestPlayer.self.theme, forValue: playerTheme.rawValue))
         }
         if let allowsFullScreen = allowsFullScreen {
             currentPlayerParameters.append(
-                getJsonParameterFormat(forKey: TwitchWebPlayerKeys.allowsFullScreen, forValue: allowsFullScreen,
+                getJsonParameterFormat(forKey: TestPlayer.self.allowsFullScreen, forValue: allowsFullScreen,
                                        isStringValued: false))
         }
 
-        return TwitchPlayer.playerHtmlContent
-            .replacingOccurrences(of: TwitchPlayer.initializationReplacementKey,
-                                  with: currentPlayerParameters.joined(separator: TwitchPlayer.jsonParameterDelimiter))
+        return TestPlayer.playerHtmlContent
+            .replacingOccurrences(of: TestPlayer.initializationReplacementKey,
+                                  with: currentPlayerParameters.joined(separator: TestPlayer.jsonParameterDelimiter))
     }
 
     /// `getJsonParameterFormat` is used to convert a key-value mapping to its corresponding JSON format.
@@ -473,7 +496,7 @@ import WebKit
     /// - Returns: The key and value put together in JSON-Parameterized format
     private func getJsonParameterFormat(forKey key: String, forValue value: Any,
                                         isStringValued: Bool = true) -> String {
-        return isStringValued ? "\(key)\(TwitchPlayer.jsonKeyValueDelimiter) \"\(value)\""
-            : "\(key)\(TwitchPlayer.jsonKeyValueDelimiter) \(value)"
+        return isStringValued ? "\(key)\(TestPlayer.jsonKeyValueDelimiter) \"\(value)\""
+            : "\(key)\(TestPlayer.jsonKeyValueDelimiter) \(value)"
     }
 }

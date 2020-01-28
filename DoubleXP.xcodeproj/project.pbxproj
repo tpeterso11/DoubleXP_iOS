@@ -32,6 +32,8 @@
 		30582412239C589D00FDEA7D /* ChatObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30582411239C589D00FDEA7D /* ChatObject.swift */; };
 		30582414239C86B800FDEA7D /* list-interface-symbol.png in Resources */ = {isa = PBXBuildFile; fileRef = 30582413239C86B800FDEA7D /* list-interface-symbol.png */; };
 		30582416239C8D1E00FDEA7D /* user.png in Resources */ = {isa = PBXBuildFile; fileRef = 30582415239C8D1D00FDEA7D /* user.png */; };
+		305D8F0E23DFD03D007D0991 /* TestPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 305D8F0D23DFD03D007D0991 /* TestPlayer.swift */; };
+		305D8F1023DFE605007D0991 /* live.png in Resources */ = {isa = PBXBuildFile; fileRef = 305D8F0F23DFE605007D0991 /* live.png */; };
 		306E6B5923DE23220069F426 /* TwitchStreamObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306E6B5823DE23220069F426 /* TwitchStreamObject.swift */; };
 		306E6B5B23DE49F70069F426 /* live_streaming.png in Resources */ = {isa = PBXBuildFile; fileRef = 306E6B5A23DE49F60069F426 /* live_streaming.png */; };
 		306E6B5D23DE4E4D0069F426 /* TwitchStreamCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306E6B5C23DE4E4D0069F426 /* TwitchStreamCell.swift */; };
@@ -216,6 +218,8 @@
 		30582411239C589D00FDEA7D /* ChatObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatObject.swift; sourceTree = "<group>"; };
 		30582413239C86B800FDEA7D /* list-interface-symbol.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "list-interface-symbol.png"; sourceTree = "<group>"; };
 		30582415239C8D1D00FDEA7D /* user.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = user.png; sourceTree = "<group>"; };
+		305D8F0D23DFD03D007D0991 /* TestPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestPlayer.swift; sourceTree = "<group>"; };
+		305D8F0F23DFE605007D0991 /* live.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = live.png; sourceTree = "<group>"; };
 		306E6B5823DE23220069F426 /* TwitchStreamObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchStreamObject.swift; sourceTree = "<group>"; };
 		306E6B5A23DE49F60069F426 /* live_streaming.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = live_streaming.png; sourceTree = "<group>"; };
 		306E6B5C23DE4E4D0069F426 /* TwitchStreamCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchStreamCell.swift; sourceTree = "<group>"; };
@@ -494,6 +498,7 @@
 				30EBC3FF23DA8CC7009CFAB2 /* TeamRosterCell.swift */,
 				306E6B5C23DE4E4D0069F426 /* TwitchStreamCell.swift */,
 				306E6B5E23DE991B0069F426 /* TwitchPlayerViewController.swift */,
+				305D8F0D23DFD03D007D0991 /* TestPlayer.swift */,
 			);
 			path = CustomView;
 			sourceTree = "<group>";
@@ -584,6 +589,7 @@
 				3080B40523BC089E00638B22 /* check.png */,
 				3080B40323BC07BD00638B22 /* x-mark.png */,
 				3080B40123BBD0C500638B22 /* new.png */,
+				305D8F0F23DFE605007D0991 /* live.png */,
 				3080B3FF23BBCEBB00638B22 /* sand-clock.png */,
 				3080B3FD23BBCCB400638B22 /* follow.png */,
 				3080B3FB23BBCB1D00638B22 /* comment-black-oval-bubble-shape.png */,
@@ -824,6 +830,7 @@
 				3080B3EA23B81BC100638B22 /* pending_button.png in Resources */,
 				30EBC3FC23D60A23009CFAB2 /* twitter_PNG3.png in Resources */,
 				30A60D8B2363C784004B2150 /* communications.png in Resources */,
+				305D8F1023DFE605007D0991 /* live.png in Resources */,
 				3080B3FC23BBCB1D00638B22 /* comment-black-oval-bubble-shape.png in Resources */,
 				308BD02C238ED0A10034822B /* invitation.png in Resources */,
 				30A60D8F2363C91B004B2150 /* group.png in Resources */,
@@ -993,6 +1000,7 @@
 				30B583E223529B2500736733 /* RegisterActivity.swift in Sources */,
 				4CC1720322677FA5009A1B80 /* LandingActivity.swift in Sources */,
 				4CC17206226781DF009A1B80 /* NewsObject.swift in Sources */,
+				305D8F0E23DFD03D007D0991 /* TestPlayer.swift in Sources */,
 				30B583D4234FCBAA00736733 /* FirebaseAuthManager.swift in Sources */,
 				3080B3EC23B83C5B00638B22 /* FoldingCellCell.swift in Sources */,
 				30B6E17F23A0892500B69F00 /* FADash.swift in Sources */,

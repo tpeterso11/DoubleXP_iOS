@@ -19,12 +19,18 @@ class TeamBuildFrag: UIViewController, UICollectionViewDataSource, UICollectionV
     @IBOutlet weak var friendList: UICollectionView!
     @IBOutlet weak var inviteButton: UIButton!
     @IBOutlet weak var freeAgentButton: UIButton!
+    @IBOutlet weak var captainStar: UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
         currentUser = delegate.currentUser
+        
+        let teamManager = TeamManager()
+        if teamManager.isTeamCaptain(user: currentUser!, team: self.team!){
+            captainStar.isHidden = false
+        }
         
         friendList.delegate = self
         friendList.dataSource = self
