@@ -12,7 +12,7 @@ import ImageLoader
 import moa
 import MSPeekCollectionViewDelegateImplementation
 
-class TeamBuildFrag: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, TeamCallbacks {
+class TeamBuildFrag: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, TeamCallbacks {
     var team: TeamObject?
     var currentUser: User?
     
@@ -55,27 +55,27 @@ class TeamBuildFrag: UIViewController, UICollectionViewDataSource, UICollectionV
                 break
             }
         }
-        
-        if(containedInInvites){
-            cell.invitedIcon.isHidden = false
-        }
-        else if((team?.teammateTags.contains(current.gamerTag))!){
-            cell.memberIcon.isHidden = false
-        }
-        else{
-            cell.inviteIcon.isHidden = false
             
-            let singleTap = UITapGestureRecognizer(target: self, action: #selector(inviteButtonClicked))
-            cell.inviteIcon.isUserInteractionEnabled = true
-            cell.inviteIcon.tag = indexPath.item
-            cell.inviteIcon.addGestureRecognizer(singleTap)
-        }
+        cell.inviteButton.addTarget(self, action: #selector(inviteButtonClicked), for: .touchUpInside)
+        
+        cell.contentView.layer.cornerRadius = 2.0
+        cell.contentView.layer.borderWidth = 1.0
+        cell.contentView.layer.borderColor = UIColor.clear.cgColor
+        cell.contentView.layer.masksToBounds = true
+        
+        cell.layer.shadowColor = UIColor.black.cgColor
+        cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+        cell.layer.shadowRadius = 2.0
+        cell.layer.shadowOpacity = 0.5
+        cell.layer.masksToBounds = false
+        cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
         
         return cell
     }
     
     @objc func faButtonClicked(_ sender: AnyObject?) {
-        LandingActivity().navigateToTeamFreeAgentSearch(team: self.team!)
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.currentLanding?.navigateToTeamFreeAgentSearch(team: self.team!)
     }
     
     
@@ -89,7 +89,14 @@ class TeamBuildFrag: UIViewController, UICollectionViewDataSource, UICollectionV
         currentUser!.teamInvites.append(team!)
         
         let cell = friendList.cellForItem(at: indexPath) as! DashFriendInviteCell
-        cell.inviteIcon.isHidden = true
-        cell.invitedIcon.isHidden = false
+        
+        cell.inviteButton.addTarget(self, action: #selector(inviteButtonClicked), for: .touchUpInside)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
+        
+        return CGSize(width: collectionView.bounds.width - 10, height: CGFloat(60))
     }
 }

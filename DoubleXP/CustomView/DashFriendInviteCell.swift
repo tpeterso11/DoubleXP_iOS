@@ -11,7 +11,6 @@ import UIKit
 class DashFriendInviteCell: UICollectionViewCell{
     
     @IBOutlet weak var friendLabel: UILabel!
-    @IBOutlet weak var inviteIcon: UIImageView!
-    @IBOutlet weak var invitedIcon: UIImageView!
-    @IBOutlet weak var memberIcon: UIImageView!
+    @IBOutlet weak var inviteButton: UIButton!
+    
 }
