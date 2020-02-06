@@ -48,7 +48,7 @@ class TeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate {
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let currentLanding = appDelegate.currentLanding
-        currentLanding?.removeBottomNav(showNewNav: false, hideSearch: true, searchHint: nil)
+        currentLanding?.removeBottomNav(showNewNav: false, hideSearch: true, searchHint: nil, searchButtonText: nil, isMessaging: false)
         
         headerView.roundCorners(corners: [.topLeft, .topRight], radius: 25)
         
@@ -131,7 +131,8 @@ class TeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let team = user?.teams[indexPath.item]
-        
-        LandingActivity().navigateToTeamDashboard(team: team!, newTeam: false)
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let currentLanding = appDelegate.currentLanding
+        currentLanding!.navigateToTeamDashboard(team: team!, newTeam: false)
     }
 }

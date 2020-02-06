@@ -16,7 +16,7 @@ import SwiftTwitch
 import WebKit
 import TwitchPlayer
 
-class TeamDashboard: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, SocialMediaManagerCallback {
+class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, SocialMediaManagerCallback {
     var team: TeamObject? = nil
     var tweets = [Any]()
     var streams = [Any]()
@@ -84,6 +84,9 @@ class TeamDashboard: UIViewController, UICollectionViewDataSource, UICollectionV
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let currentUser = delegate.currentUser
+        
+        self.pageName = "Profile"
+        delegate.navStack.append(self)
     
         teamLabel.text = team?.teamName
         

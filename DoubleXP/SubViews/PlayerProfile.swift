@@ -66,7 +66,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         let currentLanding = appDelegate.currentLanding
         appDelegate.navStack.append(self)
         
-        currentLanding?.removeBottomNav(showNewNav: true, hideSearch: true, searchHint: "Search for player")
+        currentLanding?.removeBottomNav(showNewNav: true, hideSearch: true, searchHint: "Search for player", searchButtonText: nil, isMessaging: false)
         
         headerView.clipsToBounds = true
         mainLayout.roundCorners(corners: [.topLeft, .topRight], radius: 20)

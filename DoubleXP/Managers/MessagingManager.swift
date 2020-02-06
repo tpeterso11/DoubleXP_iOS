@@ -17,9 +17,10 @@ class MessagingManager: UIViewController, SBDConnectionDelegate, SBDUserEventDel
     private var currentChannel: SBDGroupChannel?
     var messagingCallbacks: MessagingCallbacks?
     
-    func setup(sendBirdId: String?, currentUser: User){
+    func setup(sendBirdId: String?, currentUser: User, messagingCallbacks: MessagingCallbacks){
         self.sendbirdId = sendBirdId
         self.currentUser = currentUser
+        self.messagingCallbacks = messagingCallbacks
         
         SBDMain.initWithApplicationId("B1CA477B-83D6-40D9-A8BB-10C959689426")
         SBDMain.connect(withUserId: currentUser.uId, completionHandler: { (user, error) in
@@ -32,6 +33,7 @@ class MessagingManager: UIViewController, SBDConnectionDelegate, SBDUserEventDel
                     self.updateMeta(user: user, key: "accepted", value: "true")
                 }
                 else{
+                    self.sendbirdId = user?.userId
                     self.messagingCallbacks!.connectionSuccessful()
                 }
             }
@@ -63,6 +65,7 @@ class MessagingManager: UIViewController, SBDConnectionDelegate, SBDUserEventDel
                 return
             }
             
+            self.sendbirdId = user?.userId
             self.currentUser?.sendBirdId = user!.userId
             self.messagingCallbacks!.connectionSuccessful()
         }

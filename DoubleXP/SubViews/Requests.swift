@@ -38,7 +38,7 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let currentLanding = appDelegate.currentLanding
-        currentLanding?.removeBottomNav(showNewNav: false, hideSearch: true, searchHint: nil)
+        currentLanding?.removeBottomNav(showNewNav: false, hideSearch: true, searchHint: nil, searchButtonText: nil, isMessaging: false)
         
         appDelegate.navStack.append(self)
         

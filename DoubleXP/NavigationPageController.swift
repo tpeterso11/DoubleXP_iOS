@@ -9,6 +9,7 @@
 import UIKit
 import EMPageViewController
 import SwiftNotificationCenter
+import MessageKit
 
 class NavigationPageController: EMPageViewController, EMPageViewControllerDataSource, NavigateToProfile {
     
@@ -249,6 +250,6 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         self.scrollReverse(animated: true, completion: nil)
     }
     
-    func removeBottomNav(showNewNav: Bool, hideSearch: Bool, searchHint: String?) {
+     func removeBottomNav(showNewNav: Bool, hideSearch: Bool, searchHint: String?, searchButtonText: String?, isMessaging: Bool) {
     }
 }

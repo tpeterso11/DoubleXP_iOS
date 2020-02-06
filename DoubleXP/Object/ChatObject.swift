@@ -29,6 +29,16 @@ class ChatObject: NSObject, NSCoding {
             _otherUser = newVal
         }
     }
+    
+    var _otherUserId = ""
+    var otherUserId: String {
+        get {
+            return (_otherUserId)
+        }
+        set (newVal) {
+            _otherUserId = newVal
+        }
+    }
 
     init(chatUrl: String, otherUser: String)
     {
@@ -42,11 +52,13 @@ class ChatObject: NSObject, NSCoding {
         super.init()
         self.chatUrl = (decoder.decodeObject(forKey: "chatUrl") as! String)
         self.otherUser = (decoder.decodeObject(forKey: "otherUser") as! String)
+        self.otherUserId = (decoder.decodeObject(forKey: "otherUserId") as! String)
     }
 
     func encode(with coder: NSCoder) {
         coder.encode(self.chatUrl, forKey: "chatUrl")
         coder.encode(self.otherUser, forKey: "otherUser")
+        coder.encode(self.otherUser, forKey: "otherUserId")
     }
 }
 

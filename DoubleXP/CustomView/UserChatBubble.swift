@@ -11,4 +11,5 @@ import UIKit
 class UserChatBubble: UICollectionViewCell{
     @IBOutlet weak var message: UILabel!
     @IBOutlet weak var timestamp: UILabel!
+    
 }

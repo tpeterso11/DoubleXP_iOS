@@ -43,7 +43,7 @@ protocol NavigateToProfile: class {
     
     func navigateToFreeAgentQuiz(team: TeamObject?, gcGame: GamerConnectGame, currentUser: User)
     
-    func removeBottomNav(showNewNav: Bool, hideSearch: Bool, searchHint: String?)
+    func removeBottomNav(showNewNav: Bool, hideSearch: Bool, searchHint: String?, searchButtonText: String?, isMessaging: Bool)
     
     func goBack()
     
@@ -97,6 +97,8 @@ protocol BackHandler: class{
 
 protocol SearchCallbacks: class{
     func searchSubmitted(searchString: String)
+    
+    func messageTextSubmitted(string: String, list: [String]?)
 }
 
 protocol ProfileCallbacks: class{
@@ -108,4 +110,9 @@ protocol ProfileCallbacks: class{
 protocol SocialMediaManagerCallback: class {
     func onTweetsLoaded(tweets: [TweetObject])
     func onStreamsLoaded(streams: [TwitchStreamObject])
+}
+
+protocol LandingMenuCallbacks: class{
+    func menuNavigateToMessaging(uId: String)
+    func menuNavigateToProfile(uId: String)
 }

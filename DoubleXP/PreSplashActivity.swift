@@ -224,6 +224,16 @@ class PreSplashActivity: UIViewController {
                     invites.append(newInvite)
                 }
                 
+                /*var currentMessaging = [ChatObject]()
+                let chatArray = snapshot.childSnapshot(forPath: "messaging")
+                for chatObj in chatArray.children {
+                    let currentObj = chatObj as! DataSnapshot
+                    let dict = currentObj.value as! [String: Any]
+                    let channelUrl = dict["channelUrl"] as? String ?? ""
+                    let legacy = dict["legacy"] as? String ?? ""
+                    let otherUser = dict["otherUser"] as? String ?? ""
+                }*/
+                
                 let teamInvitetags = dict["teamInviteTags"] as? [String] ?? [String]()
                 let captain = dict["teamCaptain"] as? String ?? ""
                 let imageUrl = dict["imageUrl"] as? String ?? ""

@@ -7,8 +7,11 @@
 //
 import Foundation
 import CoreData
+import MessageKit
 
-class User: NSObject, NSCoding {
+class User: NSObject, NSCoding, SenderType {
+    var displayName: String = "You"
+    
     var _gamerTags = [GamerProfile]()
     var gamerTags:[GamerProfile] {
         get {
@@ -38,6 +41,16 @@ class User: NSObject, NSCoding {
             _uId = newVal
         }
     }
+    
+    var _senderId = ""
+       var senderId: String {
+           get {
+               return (_uId)
+           }
+           set (newVal) {
+               _uId = newVal
+           }
+       }
     
     var _gamerTag = ""
     var gamerTag: String {
@@ -179,6 +192,16 @@ class User: NSObject, NSCoding {
         }
     }
     
+    var _chatObjects = [ChatObject]()
+    var chatObjects: [ChatObject] {
+        get {
+            return (_chatObjects)
+        }
+        set (newVal) {
+            _chatObjects = newVal
+        }
+    }
+    
     var _stats = [StatObject]()
     var stats: [StatObject] {
         get {
@@ -246,6 +269,7 @@ class User: NSObject, NSCoding {
         self.teams = (decoder.decodeObject(forKey: "teams") as! [TeamObject])
         self.teamInvites = (decoder.decodeObject(forKey: "teamInvites") as! [TeamObject])
         self.stats = (decoder.decodeObject(forKey: "stats") as! [StatObject])
+        self.chatObjects = (decoder.decodeObject(forKey: "chatObjects") as! [ChatObject])
         self.sendBirdId = (decoder.decodeObject(forKey: "sendBirdId") as! String)
     }
     
@@ -262,6 +286,7 @@ class User: NSObject, NSCoding {
         coder.encode(self.stats, forKey: "stats")
         coder.encode(self.bio, forKey: "bio")
         coder.encode(self.sendBirdId, forKey: "sendBirdId")
+        coder.encode(self.chatObjects, forKey: "chatObjects")
     }
 }
 

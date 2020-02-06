@@ -43,6 +43,18 @@
 		3071171323E1019F005F6355 /* TwitchDescCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3071171223E1019F005F6355 /* TwitchDescCell.swift */; };
 		3071171523E137A4005F6355 /* splash.png in Resources */ = {isa = PBXBuildFile; fileRef = 3071171423E137A4005F6355 /* splash.png */; };
 		3071171723E13864005F6355 /* TwitterDescCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3071171623E13864005F6355 /* TwitterDescCell.swift */; };
+		307B01D723E4D3D5006A5F1F /* TeamBuildFriendCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307B01D623E4D3D5006A5F1F /* TeamBuildFriendCell.swift */; };
+		307B01D923E773D2006A5F1F /* AnimatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307B01D823E773D2006A5F1F /* AnimatingView.swift */; };
+		307CE34723E9F62300DCB12A /* MenuFriendsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307CE34623E9F62300DCB12A /* MenuFriendsList.swift */; };
+		307CE34923E9F74B00DCB12A /* MenuFriendsListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307CE34823E9F74B00DCB12A /* MenuFriendsListCell.swift */; };
+		307CE34B23EA0BDE00DCB12A /* ExpandedTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307CE34A23EA0BDE00DCB12A /* ExpandedTVCell.swift */; };
+		307CE34D23EA2B5000DCB12A /* message.png in Resources */ = {isa = PBXBuildFile; fileRef = 307CE34C23EA2B5000DCB12A /* message.png */; };
+		307CE34F23EA3EA100DCB12A /* information.png in Resources */ = {isa = PBXBuildFile; fileRef = 307CE34E23EA3EA100DCB12A /* information.png */; };
+		307CE35123EC3E1500DCB12A /* MockMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307CE35023EC3E1500DCB12A /* MockMessage.swift */; };
+		307CE35323EC452600DCB12A /* TestCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307CE35223EC452600DCB12A /* TestCell.swift */; };
+		307CE35523EC508600DCB12A /* InsetLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307CE35423EC508600DCB12A /* InsetLabel.swift */; };
+		307CE35723EC99B900DCB12A /* SlantedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307CE35623EC99B900DCB12A /* SlantedView.swift */; };
+		307CE35923EC9C2100DCB12A /* send.png in Resources */ = {isa = PBXBuildFile; fileRef = 307CE35823EC9C2000DCB12A /* send.png */; };
 		3080B3E023B7C4F500638B22 /* ParentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3080B3DF23B7C4F500638B22 /* ParentVC.swift */; };
 		3080B3E223B7FAA700638B22 /* request.png in Resources */ = {isa = PBXBuildFile; fileRef = 3080B3E123B7FAA600638B22 /* request.png */; };
 		3080B3E423B80A5B00638B22 /* request2.png in Resources */ = {isa = PBXBuildFile; fileRef = 3080B3E323B80A5A00638B22 /* request2.png */; };
@@ -162,6 +174,10 @@
 		30F6FCC023CD7F9D0051813D /* open-menu.png in Resources */ = {isa = PBXBuildFile; fileRef = 30F6FCBF23CD7F9C0051813D /* open-menu.png */; };
 		30F6FCC223CD948E0051813D /* cancel-mark.png in Resources */ = {isa = PBXBuildFile; fileRef = 30F6FCC123CD948D0051813D /* cancel-mark.png */; };
 		30F6FCC423CD96620051813D /* dashboard.png in Resources */ = {isa = PBXBuildFile; fileRef = 30F6FCC323CD96620051813D /* dashboard.png */; };
+		30FC34BF23E7ADB1007F0080 /* MenuFriendsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FC34BE23E7ADB1007F0080 /* MenuFriendsCell.swift */; };
+		30FC34C123E7DAE8007F0080 /* settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 30FC34C023E7DAE8007F0080 /* settings.png */; };
+		30FC34C323E914CA007F0080 /* MenuHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FC34C223E914CA007F0080 /* MenuHeaderCell.swift */; };
+		30FC34C723E927BE007F0080 /* MenuSettingsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FC34C623E927BE007F0080 /* MenuSettingsCell.swift */; };
 		4C4D88242205F32900AD7090 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4D88232205F32900AD7090 /* AppDelegate.swift */; };
 		4C4D88262205F32900AD7090 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4D88252205F32900AD7090 /* ViewController.swift */; };
 		4C4D88292205F32900AD7090 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4C4D88272205F32900AD7090 /* Main.storyboard */; };
@@ -233,6 +249,18 @@
 		3071171223E1019F005F6355 /* TwitchDescCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchDescCell.swift; sourceTree = "<group>"; };
 		3071171423E137A4005F6355 /* splash.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = splash.png; sourceTree = "<group>"; };
 		3071171623E13864005F6355 /* TwitterDescCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitterDescCell.swift; sourceTree = "<group>"; };
+		307B01D623E4D3D5006A5F1F /* TeamBuildFriendCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamBuildFriendCell.swift; sourceTree = "<group>"; };
+		307B01D823E773D2006A5F1F /* AnimatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatingView.swift; sourceTree = "<group>"; };
+		307CE34623E9F62300DCB12A /* MenuFriendsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuFriendsList.swift; sourceTree = "<group>"; };
+		307CE34823E9F74B00DCB12A /* MenuFriendsListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuFriendsListCell.swift; sourceTree = "<group>"; };
+		307CE34A23EA0BDE00DCB12A /* ExpandedTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandedTVCell.swift; sourceTree = "<group>"; };
+		307CE34C23EA2B5000DCB12A /* message.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = message.png; sourceTree = "<group>"; };
+		307CE34E23EA3EA100DCB12A /* information.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = information.png; sourceTree = "<group>"; };
+		307CE35023EC3E1500DCB12A /* MockMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockMessage.swift; sourceTree = "<group>"; };
+		307CE35223EC452600DCB12A /* TestCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestCell.swift; sourceTree = "<group>"; };
+		307CE35423EC508600DCB12A /* InsetLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsetLabel.swift; sourceTree = "<group>"; };
+		307CE35623EC99B900DCB12A /* SlantedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlantedView.swift; sourceTree = "<group>"; };
+		307CE35823EC9C2000DCB12A /* send.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = send.png; sourceTree = "<group>"; };
 		3080B3DF23B7C4F500638B22 /* ParentVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentVC.swift; sourceTree = "<group>"; };
 		3080B3E123B7FAA600638B22 /* request.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = request.png; sourceTree = "<group>"; };
 		3080B3E323B80A5A00638B22 /* request2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = request2.png; sourceTree = "<group>"; };
@@ -354,6 +382,10 @@
 		30F6FCBF23CD7F9C0051813D /* open-menu.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "open-menu.png"; sourceTree = "<group>"; };
 		30F6FCC123CD948D0051813D /* cancel-mark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cancel-mark.png"; sourceTree = "<group>"; };
 		30F6FCC323CD96620051813D /* dashboard.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dashboard.png; sourceTree = "<group>"; };
+		30FC34BE23E7ADB1007F0080 /* MenuFriendsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuFriendsCell.swift; sourceTree = "<group>"; };
+		30FC34C023E7DAE8007F0080 /* settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = settings.png; sourceTree = "<group>"; };
+		30FC34C223E914CA007F0080 /* MenuHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuHeaderCell.swift; sourceTree = "<group>"; };
+		30FC34C623E927BE007F0080 /* MenuSettingsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuSettingsCell.swift; sourceTree = "<group>"; };
 		4C4D88202205F32900AD7090 /* DoubleXP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DoubleXP.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C4D88232205F32900AD7090 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4C4D88252205F32900AD7090 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -509,6 +541,17 @@
 				305D8F0D23DFD03D007D0991 /* TestPlayer.swift */,
 				3071171223E1019F005F6355 /* TwitchDescCell.swift */,
 				3071171623E13864005F6355 /* TwitterDescCell.swift */,
+				307B01D623E4D3D5006A5F1F /* TeamBuildFriendCell.swift */,
+				307B01D823E773D2006A5F1F /* AnimatingView.swift */,
+				30FC34BE23E7ADB1007F0080 /* MenuFriendsCell.swift */,
+				30FC34C223E914CA007F0080 /* MenuHeaderCell.swift */,
+				30FC34C623E927BE007F0080 /* MenuSettingsCell.swift */,
+				307CE34623E9F62300DCB12A /* MenuFriendsList.swift */,
+				307CE34823E9F74B00DCB12A /* MenuFriendsListCell.swift */,
+				307CE34A23EA0BDE00DCB12A /* ExpandedTVCell.swift */,
+				307CE35223EC452600DCB12A /* TestCell.swift */,
+				307CE35423EC508600DCB12A /* InsetLabel.swift */,
+				307CE35623EC99B900DCB12A /* SlantedView.swift */,
 			);
 			path = CustomView;
 			sourceTree = "<group>";
@@ -606,6 +649,7 @@
 				3080B3F923BBC52400638B22 /* hello.png */,
 				3080B3F123B9362C00638B22 /* more.png */,
 				3080B3EF23B92A5900638B22 /* Rainbow_Six_Siege.jpg */,
+				307CE35823EC9C2000DCB12A /* send.png */,
 				3080B3E923B81BC100638B22 /* pending_button.png */,
 				3080B3E723B81B5B00638B22 /* messaging_button.png */,
 				3080B3E523B80BE400638B22 /* request_highlight.png */,
@@ -627,6 +671,7 @@
 				30A84DEF2381E86E007BEAA5 /* icon.png */,
 				30A60D8E2363C91B004B2150 /* group.png */,
 				30F6FCC123CD948D0051813D /* cancel-mark.png */,
+				307CE34E23EA3EA100DCB12A /* information.png */,
 				30A60D8C2363C801004B2150 /* like.png */,
 				30A60D8A2363C784004B2150 /* communications.png */,
 				30B583E52352A2DA00736733 /* close_white.png */,
@@ -635,9 +680,11 @@
 				30F6FCBF23CD7F9C0051813D /* open-menu.png */,
 				306E6B5A23DE49F60069F426 /* live_streaming.png */,
 				30EBC3FB23D60A23009CFAB2 /* twitter_PNG3.png */,
+				30FC34C023E7DAE8007F0080 /* settings.png */,
 				3071171423E137A4005F6355 /* splash.png */,
 				30B583CA2347B5E500736733 /* gamespot_icon_ios.png */,
 				30C4EDAE2267C1890046B615 /* double_xp_small_white.png */,
+				307CE34C23EA2B5000DCB12A /* message.png */,
 				30C4EDAF2267C1890046B615 /* doublexp_white.png */,
 				30C4EDB02267C1890046B615 /* team_thumbs_up.png */,
 				30C4EDB12267C1890046B615 /* vintage_tv.png */,
@@ -670,6 +717,7 @@
 				30F6FCBD23CC07A20051813D /* GenericRequestObject.swift */,
 				30EBC40323DB6E5D009CFAB2 /* TweetObject.swift */,
 				306E6B5823DE23220069F426 /* TwitchStreamObject.swift */,
+				307CE35023EC3E1500DCB12A /* MockMessage.swift */,
 			);
 			path = Object;
 			sourceTree = "<group>";
@@ -815,6 +863,7 @@
 				3080B3F223B9362C00638B22 /* more.png in Resources */,
 				30F6FCBA23CBFF9D0051813D /* more (1).png in Resources */,
 				301AEF5623886D7100339850 /* star.png in Resources */,
+				307CE34F23EA3EA100DCB12A /* information.png in Resources */,
 				30B583E42352A22B00736733 /* point_rights.png in Resources */,
 				4C4D88312205F33200AD7090 /* LaunchScreen.storyboard in Resources */,
 				30A84DF22381E877007BEAA5 /* plus-symbol-in-a-rounded-black-square.png in Resources */,
@@ -829,6 +878,7 @@
 				3058198023D26F72008684A7 /* pen.png in Resources */,
 				30C4EDB42267C1890046B615 /* team_thumbs_up.png in Resources */,
 				309F3A1323B40CA900FD0C48 /* left-arrow.png in Resources */,
+				307CE35923EC9C2100DCB12A /* send.png in Resources */,
 				4C4D882E2205F33200AD7090 /* Assets.xcassets in Resources */,
 				30B583CB2347B5E500736733 /* gamespot_icon_ios.png in Resources */,
 				30F6FCC423CD96620051813D /* dashboard.png in Resources */,
@@ -840,6 +890,7 @@
 				30582416239C8D1E00FDEA7D /* user.png in Resources */,
 				30F6FCB423C58F580051813D /* show-more-button-with-three-dots.png in Resources */,
 				3080B3EA23B81BC100638B22 /* pending_button.png in Resources */,
+				30FC34C123E7DAE8007F0080 /* settings.png in Resources */,
 				30EBC3FC23D60A23009CFAB2 /* twitter_PNG3.png in Resources */,
 				3071171123E1014A005F6355 /* 580b57fcd9996e24bc43c540.png in Resources */,
 				30A60D8B2363C784004B2150 /* communications.png in Resources */,
@@ -865,6 +916,7 @@
 				30C4EDB52267C1890046B615 /* vintage_tv.png in Resources */,
 				3080B3FE23BBCCB500638B22 /* follow.png in Resources */,
 				4C4D88292205F32900AD7090 /* Main.storyboard in Resources */,
+				307CE34D23EA2B5000DCB12A /* message.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1001,6 +1053,7 @@
 				30B6E19D23AC2C5A00B69F00 /* FAQuizConfirmation.swift in Sources */,
 				309F3A1023B3F7DE00FD0C48 /* Test.m in Sources */,
 				308BD034238F5BE90034822B /* FriendObject.swift in Sources */,
+				307CE35723EC99B900DCB12A /* SlantedView.swift in Sources */,
 				3071171323E1019F005F6355 /* TwitchDescCell.swift in Sources */,
 				30582410239C3E4100FDEA7D /* MessagingFrag.swift in Sources */,
 				30A60D9423668A0D004B2150 /* GamerConnectFrag.swift in Sources */,
@@ -1019,6 +1072,7 @@
 				30B583D4234FCBAA00736733 /* FirebaseAuthManager.swift in Sources */,
 				3080B3EC23B83C5B00638B22 /* FoldingCellCell.swift in Sources */,
 				30B6E17F23A0892500B69F00 /* FADash.swift in Sources */,
+				307CE35123EC3E1500DCB12A /* MockMessage.swift in Sources */,
 				3080B3E023B7C4F500638B22 /* ParentVC.swift in Sources */,
 				308BD0362391DB9C0034822B /* TeammateObject.swift in Sources */,
 				30A60D9C236925D9004B2150 /* BasicStatCell.swift in Sources */,
@@ -1031,6 +1085,7 @@
 				30EBC40423DB6E5D009CFAB2 /* TweetObject.swift in Sources */,
 				3086956D23BD97E8001E51EF /* SegueFromLeft.swift in Sources */,
 				3058131B23973AED001BCE30 /* FATeamNeedsCell.swift in Sources */,
+				30FC34C323E914CA007F0080 /* MenuHeaderCell.swift in Sources */,
 				3058131923973A31001BCE30 /* TeamBuildFA.swift in Sources */,
 				30B6E18D23A583E400B69F00 /* RequestObject.swift in Sources */,
 				3058240A239C349A00FDEA7D /* ChatMessage.swift in Sources */,
@@ -1041,9 +1096,12 @@
 				30A84DEE2381E622007BEAA5 /* TeamInviteObject.swift in Sources */,
 				3008EE782267F89800E0D9ED /* NewsCell.swift in Sources */,
 				30B6E1A723AF15AA00B69F00 /* FAQuizConsoles.swift in Sources */,
+				307B01D923E773D2006A5F1F /* AnimatingView.swift in Sources */,
 				30EBC40223DB632E009CFAB2 /* SocialMediaManager.swift in Sources */,
 				30B583DE2350168B00736733 /* TeamObject.swift in Sources */,
 				308BD030238ED1370034822B /* DashFriendInviteCell.swift in Sources */,
+				307CE35323EC452600DCB12A /* TestCell.swift in Sources */,
+				307CE34B23EA0BDE00DCB12A /* ExpandedTVCell.swift in Sources */,
 				3080B3EE23B8488E00638B22 /* EmbeddedTableView.swift in Sources */,
 				309F3A0D23B3EFBF00FD0C48 /* Utility.swift in Sources */,
 				3058131F23976183001BCE30 /* FreeAgentObject.swift in Sources */,
@@ -1056,9 +1114,11 @@
 				30B6E1A923B125AB00B69F00 /* ConfirmationQuestionCell.swift in Sources */,
 				30A84DE423809BD4007BEAA5 /* StatHeaderCell.swift in Sources */,
 				30B583EA2353A0FA00736733 /* HWSwiftyViewPager.swift in Sources */,
+				307CE34723E9F62300DCB12A /* MenuFriendsList.swift in Sources */,
 				30B583E023526C6300736733 /* StatObject.swift in Sources */,
 				30B6E19323A71E8F00B69F00 /* faQuizGameCell.swift in Sources */,
 				3058240E239C3D9800FDEA7D /* OtherChatBubble.swift in Sources */,
+				307B01D723E4D3D5006A5F1F /* TeamBuildFriendCell.swift in Sources */,
 				30B6E19723AC13BE00B69F00 /* QuizNavigationController.swift in Sources */,
 				30A84DEA2381C63A007BEAA5 /* FriendsManager.swift in Sources */,
 				306E6B5F23DE991B0069F426 /* TwitchPlayerViewController.swift in Sources */,
@@ -1072,15 +1132,19 @@
 				30A84DE62380A6DC007BEAA5 /* GamerConnectSearch.swift in Sources */,
 				308BD026238D7CB40034822B /* TeamNeedsCell.swift in Sources */,
 				30EBC3FE23D949A0009CFAB2 /* FoldingRosterCell.swift in Sources */,
+				30FC34BF23E7ADB1007F0080 /* MenuFriendsCell.swift in Sources */,
 				306E6B5D23DE4E4D0069F426 /* TwitchStreamCell.swift in Sources */,
+				307CE34923E9F74B00DCB12A /* MenuFriendsListCell.swift in Sources */,
 				30B6E18123A089BD00B69F00 /* FADashCell.swift in Sources */,
 				30A60D9123666716004B2150 /* UserCell.swift in Sources */,
+				307CE35523EC508600DCB12A /* InsetLabel.swift in Sources */,
 				3071171723E13864005F6355 /* TwitterDescCell.swift in Sources */,
 				30A84DE2237F80CE007BEAA5 /* StatsCell.swift in Sources */,
 				303F2D442373AC1B004B68E1 /* homeGCCell.swift in Sources */,
 				30B6E1AB23B14F4400B69F00 /* FAQuizComplete.swift in Sources */,
 				30B6E19B23AC17EA00B69F00 /* FAQuizCover.swift in Sources */,
 				30A84DF823836FB9007BEAA5 /* FriendRequestObject.swift in Sources */,
+				30FC34C723E927BE007F0080 /* MenuSettingsCell.swift in Sources */,
 				308BD01D238AED570034822B /* CreateTeamFrag.swift in Sources */,
 				30B6E18B23A472A300B69F00 /* FreeAgentFront.swift in Sources */,
 				30B583CF2348290700736733 /* GamerConnectGame.swift in Sources */,

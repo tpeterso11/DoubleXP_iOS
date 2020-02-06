@@ -14,6 +14,7 @@ import SwiftNotificationCenter
 import MSPeekCollectionViewDelegateImplementation
 
 class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,  UICollectionViewDelegateFlowLayout, SearchCallbacks {
+    
     var game: GamerConnectGame? = nil
     
     var returnedUsers = [User]()
@@ -38,7 +39,7 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let currentLanding = appDelegate.currentLanding
-        currentLanding?.removeBottomNav(showNewNav: true, hideSearch: false, searchHint: "Search for player")
+        currentLanding?.removeBottomNav(showNewNav: true, hideSearch: false, searchHint: "Search for player", searchButtonText: "Search", isMessaging: false)
         
         appDelegate.navStack.append(self)
         
@@ -382,4 +383,6 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
         }
     }
     
+    func messageTextSubmitted(string: String, list: [String]?) {
+    }
 }

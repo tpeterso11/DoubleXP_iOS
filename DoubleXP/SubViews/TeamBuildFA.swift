@@ -7,21 +7,55 @@
 //
 import UIKit
 import Firebase
+import moa
 
-class TeamBuildFA: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
+class TeamBuildFA: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource {
     var team: TeamObject?
     var currentUser: User?
+    var cellHeights: [CGFloat] = []
+    @IBOutlet weak var topBorder: UIView!
+    @IBOutlet weak var bottomBorder: UIView!
+    @IBOutlet weak var mainImage: UIImageView!
     
     @IBOutlet weak var teamNeeds: UICollectionView!
     @IBOutlet weak var searchButton: UIButton!
+    
+    enum Const {
+           static let closeCellHeight: CGFloat = 75
+           static let openCellHeight: CGFloat = 235
+           static let rowsCount = 1
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
         currentUser = delegate.currentUser
         
-        teamNeeds.delegate = self
-        teamNeeds.dataSource = self
+        self.pageName = "Team Build Free Agent"
+        delegate.navStack.append(self)
+        
+        if(self.team?.teamNeeds.count ?? 0 > 0){
+            teamNeeds.delegate = self
+            teamNeeds.dataSource = self
+        }
+        else{
+            teamNeeds.isHidden = true
+        
+            topBorder.layer.masksToBounds = false
+            topBorder.layer.shadowOffset = CGSize(width: 0, height: 20)
+            topBorder.layer.shadowRadius = 10
+            topBorder.layer.shadowOpacity = 0.5
+            
+            bottomBorder.layer.masksToBounds = false
+            bottomBorder.layer.shadowOffset = CGSize(width: 0, height: -20)
+            bottomBorder.layer.shadowRadius = 10
+            bottomBorder.layer.shadowOpacity = 0.5
+            
+            mainImage.moa.url = team!.imageUrl
+            mainImage.contentMode = .scaleAspectFill
+            mainImage.clipsToBounds = true
+        }
         
         searchButton.addTarget(self, action: #selector(searchButtonClicked), for: .touchUpInside)
     }
@@ -43,7 +77,7 @@ class TeamBuildFA: UIViewController, UICollectionViewDataSource, UICollectionVie
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.team?.teamNeeds.count ?? 0
+        return self.team!.teamNeeds.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {

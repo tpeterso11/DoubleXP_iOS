@@ -13,7 +13,7 @@ import moa
 import MSPeekCollectionViewDelegateImplementation
 import UnderLineTextField
 
-class CreateTeamFrag: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, MSPeekImplementationDelegate, UICollectionViewDelegateFlowLayout {
+class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate, MSPeekImplementationDelegate, UICollectionViewDelegateFlowLayout {
     
     @IBOutlet weak var gcGameScroll: UICollectionView!
     @IBOutlet weak var psSwitch: UISwitch!
@@ -42,8 +42,13 @@ class CreateTeamFrag: UIViewController, UICollectionViewDataSource, UICollection
         switches.append(pcSwitch)
         switches.append(nintendoSwitch)
         
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate!
-        gcGames = appDelegate!.gcGames
+        self.pageName = "Create Team"
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let currentLanding = appDelegate.currentLanding
+        appDelegate.navStack.append(self)
+        
+        gcGames = appDelegate.gcGames
         
         psSwitch.addTarget(self, action: #selector(psSwitchChanged), for: UIControl.Event.valueChanged)
         xboxSwitch.addTarget(self, action: #selector(xboxSwitchChanged), for: UIControl.Event.valueChanged)

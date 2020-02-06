@@ -21,6 +21,8 @@ target 'DoubleXP' do
   pod 'TwitterKit'
   pod 'SwiftTwitch'
   pod 'TwitchPlayer'
+  pod 'MessageKit'
+  pod 'ExpyTableView'
   pod 'UnderLineTextField', '~> 2.1'
 
   # Pods for DoubleXP

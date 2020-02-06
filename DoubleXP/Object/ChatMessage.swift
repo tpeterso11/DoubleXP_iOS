@@ -60,6 +60,16 @@ class ChatMessage: NSObject, NSCoding {
             _mentionedUsers = newVal
         }
     }
+    
+    var _senderString = ""
+    var senderString: String {
+        get {
+            return (_senderString)
+        }
+        set (newVal) {
+            _senderString = newVal
+        }
+    }
 
     init(message: String, timeStamp: String)
     {
@@ -76,6 +86,7 @@ class ChatMessage: NSObject, NSCoding {
         self.sender = (decoder.decodeObject(forKey: "sender") as! SBDSender)
         self.data = (decoder.decodeObject(forKey: "data") as! String)
         self.mentionedUsers = (decoder.decodeObject(forKey: "mentionedUsers") as! [User])
+        self.senderString = (decoder.decodeObject(forKey: "senderString") as! String)
     }
 
     func encode(with coder: NSCoder) {
@@ -84,5 +95,6 @@ class ChatMessage: NSObject, NSCoding {
         coder.encode(self.sender, forKey: "sender")
         coder.encode(self.data, forKey: "data")
         coder.encode(self.mentionedUsers, forKey: "mentionedUsers")
+        coder.encode(self.senderString, forKey: "senderString")
     }
 }
