@@ -33,6 +33,8 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
     @IBOutlet weak var searchEmpty: UIView!
     @IBOutlet weak var searchEmptyText: UILabel!
     @IBOutlet weak var searchEmptySub: UILabel!
+    @IBOutlet weak var loadingView: UIView!
+    @IBOutlet weak var searchProgress: UIActivityIndicatorView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,9 +48,16 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
         self.pageName = "GC Search"
         
         if(game != nil){
+            //gameHeaderImage.alpha = 0
+            
             gameHeaderImage.moa.url = game?.imageUrl
             gameHeaderImage.contentMode = .scaleAspectFill
             //gameImageHeader.clipsToBounds = true
+            
+            searchPS = false
+            searchXbox = false
+            searchNintendo = false
+            searchPC = false
             
             let delegate = UIApplication.shared.delegate as! AppDelegate
             let user = delegate.currentUser
@@ -77,7 +86,9 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
             xboxSwitch.addTarget(self, action: #selector(xboxSwitchChanged), for: UIControl.Event.valueChanged)
             nintendoSwitch.addTarget(self, action: #selector(nintendoSwitchChanged), for: UIControl.Event.valueChanged)
             
-            searchUsers(userName: nil)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self.searchUsers(userName: nil)
+            }
             
             Broadcaster.register(SearchCallbacks.self, observer: self)
         }
@@ -90,6 +101,7 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
         else{
             searchPS = false
         }
+        searchUsers(userName: nil)
     }
     @objc func xboxSwitchChanged(xSwitch: UISwitch) {
         if(xSwitch.isOn){
@@ -98,6 +110,7 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
         else{
             searchXbox = false
         }
+        searchUsers(userName: nil)
     }
     @objc func nintendoSwitchChanged(switchSwitch: UISwitch) {
         if(switchSwitch.isOn){
@@ -106,6 +119,7 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
         else{
             searchNintendo = false
         }
+        searchUsers(userName: nil)
     }
     @objc func pcSwitchChanged(compSwitch: UISwitch) {
         if(compSwitch.isOn){
@@ -114,6 +128,7 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
         else{
             searchPC = false
         }
+        searchUsers(userName: nil)
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -217,6 +232,19 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
     }
     
     private func searchUsers(userName: String?){
+        if(self.loadingView.alpha == 0){
+            self.searchProgress.startAnimating()
+            
+            UIView.animate(withDuration: 0.8, delay: 0.2, options: [], animations: {
+                self.loadingView.alpha = 1
+            }, completion: { (finished: Bool) in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    self.searchUsers(userName: userName)
+                }
+            })
+            return
+        }
+        
         self.returnedUsers = [User]()
         let ref = Database.database().reference().child("Users")
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
@@ -225,7 +253,7 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
                 let value = (user as! DataSnapshot).value as? NSDictionary
                 let games = value?["games"] as? [String] ?? [String]()
                 
-                if(games.contains(self.game!.gameName)){
+                if(games.contains(self.game!.gameName) && userName == nil){
                     let uId = (user as! DataSnapshot).key
                     let gamerTag = value?["gamerTag"] as? String ?? ""
                     let bio = value?["bio"] as? String ?? ""
@@ -277,38 +305,180 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
                     returnedUser.nintendo = nintendo
                     returnedUser.bio = bio
                     
+                    //if the returned user plays the game being searched AND the returned users gamertag
+                    //does not equal the current users gamertag, then add to list.
                     let gamerProfileManager = GamerProfileManager()
-                    let delegate = UIApplication.shared.delegate as! AppDelegate
-                    let currentUser = delegate.currentUser
-                    
-                    if(userName != nil){
-                        if(!gamerTag.isEmpty && gamerTag == userName && gamerProfileManager.getGamerTagForGame(gameName: self.game!.gameName) != userName){
-                            self.returnedUsers.append(returnedUser)
-                            
-                            self.gamerConnectResults.delegate = self
-                            self.gamerConnectResults.dataSource = self
-                            
-                            return
+                    if(returnedUser.games.contains(self.game!.gameName) && gamerProfileManager.getGamerTagForOtherUserForGame(gameName: self.game!.gameName, returnedUser: returnedUser) != gamerProfileManager.getGamerTagForGame(gameName: self.game!.gameName)){
+                        
+                        if(self.searchPS && returnedUser.ps){
+                            self.addUserToList(returnedUser: returnedUser)
+                        }
+                        else if(self.searchPC && returnedUser.pc){
+                            self.addUserToList(returnedUser: returnedUser)
+                        }
+                        else if(self.searchXbox && returnedUser.xbox){
+                            self.addUserToList(returnedUser: returnedUser)
+                        }
+                        else if(self.searchNintendo && returnedUser.nintendo){
+                            self.addUserToList(returnedUser: returnedUser)
                         }
                     }
-                    else{
-                        //if the returned user plays the game being searched AND the returned users gamertag
-                        //does not equal the current users gamertag, then add to list.
+                    
+                }
+                else if(userName != nil){
+                    let trimmedUser = userName!.trimmingCharacters(in: .whitespacesAndNewlines)
+                    var gamerTag = (value?["gamerTag"] as? String) ?? ""
+                    if(!gamerTag.isEmpty){
+                        gamerTag = gamerTag.trimmingCharacters(in: .whitespacesAndNewlines)
+                    }
+                    
+                    var gamerTags = [GamerProfile]()
+                    let gamerTagsArray = (user as! DataSnapshot).childSnapshot(forPath: "gamerTags")
+                    for gamerTagObj in gamerTagsArray.children {
+                        let currentObj = gamerTagObj as! DataSnapshot
+                        let dict = currentObj.value as! [String: Any]
+                        let currentTag = dict["gamerTag"] as? String ?? ""
+                        let currentGame = dict["game"] as? String ?? ""
+                        let console = dict["console"] as? String ?? ""
                         
-                        if(returnedUser.games.contains(self.game!.gameName) && gamerProfileManager.getGamerTagForOtherUserForGame(gameName: self.game!.gameName, returnedUser: returnedUser) != gamerProfileManager.getGamerTagForGame(gameName: self.game!.gameName)){
+                        let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
+                        gamerTags.append(currentGamerTagObj)
+                    }
+                    
+                    var contained = false
+                    //check legacy users first
+                    if(gamerTag == trimmedUser){
+                        contained = true
+                    }
+                    
+                    //if not legacy, or not found, check gamertags one more time
+                    if(!contained){
+                        for gamerTagObj in gamerTags{
+                            if(gamerTagObj.gamerTag == trimmedUser){
+                                contained = true
+                                break
+                            }
+                        }
+                    }
+                    
+                    if(contained){
+                    let gamerProfileManager = GamerProfileManager()
+                    
+                    if(userName != nil){
+                        if(!gamerTag.isEmpty && gamerTag == trimmedUser && (gamerProfileManager.getGamerTagForGame(gameName: self.game!.gameName) != userName)){
                             
-                            if(self.searchPS && returnedUser.ps){
-                                self.addUserToList(returnedUser: returnedUser)
+                            let uId = (user as! DataSnapshot).key
+                            let bio = value?["bio"] as? String ?? ""
+                            let sentRequests = value?["sentRequests"] as? [FriendRequestObject] ?? [FriendRequestObject]()
+                            
+                            var friends = [FriendObject]()
+                            let friendsArray = snapshot.childSnapshot(forPath: "friends")
+                            for friend in friendsArray.children{
+                                let currentObj = friend as! DataSnapshot
+                                let dict = currentObj.value as! [String: Any]
+                                let gamerTag = dict["gamerTag"] as? String ?? ""
+                                let date = dict["date"] as? String ?? ""
+                                let uid = dict["uid"] as? String ?? ""
+                                
+                                let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
+                                friends.append(newFriend)
                             }
-                            else if(self.searchPC && returnedUser.pc){
-                                self.addUserToList(returnedUser: returnedUser)
+                            
+                            let games = value?["games"] as? [String] ?? [String]()
+                            var gamerTags = [GamerProfile]()
+                            let gamerTagsArray = (user as! DataSnapshot).childSnapshot(forPath: "gamerTags")
+                            for gamerTagObj in gamerTagsArray.children {
+                                let currentObj = gamerTagObj as! DataSnapshot
+                                let dict = currentObj.value as! [String: Any]
+                                let currentTag = dict["gamerTag"] as? String ?? ""
+                                let currentGame = dict["game"] as? String ?? ""
+                                let console = dict["console"] as? String ?? ""
+                                
+                                let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
+                                gamerTags.append(currentGamerTagObj)
                             }
-                            else if(self.searchXbox && returnedUser.xbox){
-                                self.addUserToList(returnedUser: returnedUser)
+                            
+                            let consoleArray = (user as! DataSnapshot).childSnapshot(forPath: "consoles")
+                            let dict = consoleArray.value as? [String: Bool]
+                            let nintendo = dict?["nintendo"] ?? false
+                            let ps = dict?["ps"] ?? false
+                            let xbox = dict?["xbox"] ?? false
+                            let pc = dict?["pc"] ?? false
+                            
+                            let returnedUser = User(uId: uId)
+                            returnedUser.gamerTags = gamerTags
+                            returnedUser.games = games
+                            returnedUser.friends = friends
+                            returnedUser.sentRequests = sentRequests
+                            returnedUser.gamerTag = gamerTag
+                            returnedUser.pc = pc
+                            returnedUser.ps = ps
+                            returnedUser.xbox = xbox
+                            returnedUser.nintendo = nintendo
+                            returnedUser.bio = bio
+                            
+                            self.returnedUsers.append(returnedUser)
+                            
+                            if(!self.set){
+                                self.gamerConnectResults.delegate = self
+                                self.gamerConnectResults.dataSource = self
+                                
+                                self.set = true
+                                
+                                self.searchProgress.stopAnimating()
+                                UIView.animate(withDuration: 0.8, animations: {
+                                    self.loadingView.alpha = 0
+                                }, completion: { (finished: Bool) in
+                                    UIView.animate(withDuration: 0.8, delay: 0.5, options: [], animations: {
+                                        if(!self.returnedUsers.isEmpty){
+                                            self.searchEmpty.isHidden = true
+                                            let top = CGAffineTransform(translationX: 0, y: -30)
+                                            
+                                            self.gamerConnectResults.alpha = 1
+                                            self.gamerConnectResults.transform = top
+                                            
+                                            UIView.animate(withDuration: 0.8, animations: {
+                                                self.gamerConnectResults.delegate = self
+                                                self.gamerConnectResults.dataSource = self
+                                            }, completion: nil)
+                                        }
+                                        else{
+                                            self.searchEmpty.isHidden = false
+                                            
+                                            self.searchEmptyText.text = "No users returned for your chosen game."
+                                            self.searchEmptySub.text = "No worries, try your search again later."
+                                        }
+                                    }, completion: nil)
+                                })
                             }
-                            else if(self.searchNintendo && returnedUser.nintendo){
-                                self.addUserToList(returnedUser: returnedUser)
+                            else{
+                                if(!self.loadingView.isHidden){
+                                    self.searchProgress.stopAnimating()
+                                    UIView.animate(withDuration: 0.8, animations: {
+                                        self.loadingView.alpha = 0
+                                    }, completion: { (finished: Bool) in
+                                        self.gamerConnectResults.reloadData()
+                                        
+                                        if(!self.returnedUsers.isEmpty){
+                                            self.searchEmpty.isHidden = true
+                                        }
+                                        else{
+                                            self.searchEmpty.isHidden = false
+                                            
+                                            if(userName != nil){
+                                                self.searchEmptyText.text = "No users returned with that name."
+                                                self.searchEmptySub.text = "No worries.\nMake sure you typed their naame correctly, and try again."
+                                            }
+                                            else{
+                                                self.searchEmptyText.text = "No users returned for your chosen game."
+                                                self.searchEmptySub.text = "No worries, try your search again later."
+                                            }
+                                        }
+                                    })
+                                }
                             }
+                            
+                            return
                         }
                     }
                 }
@@ -320,37 +490,60 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
                 
                 self.set = true
                 
-                if(!self.returnedUsers.isEmpty){
-                    self.searchEmpty.isHidden = true
-                }
-                else{
-                    self.searchEmpty.isHidden = false
-                    
-                    self.searchEmptyText.text = "No users returned for your chosen game."
-                    self.searchEmptySub.text = "No worries, try your search again later."
-                }
+                self.searchProgress.stopAnimating()
+                UIView.animate(withDuration: 0.8, animations: {
+                    self.loadingView.alpha = 0
+                }, completion: { (finished: Bool) in
+                    UIView.animate(withDuration: 0.8, delay: 0.5, options: [], animations: {
+                        if(!self.returnedUsers.isEmpty){
+                            self.searchEmpty.isHidden = true
+                            let top = CGAffineTransform(translationX: 0, y: -30)
+                            
+                            self.gamerConnectResults.alpha = 1
+                            self.gamerConnectResults.transform = top
+                            
+                            UIView.animate(withDuration: 0.8, animations: {
+                                self.gamerConnectResults.delegate = self
+                                self.gamerConnectResults.dataSource = self
+                            }, completion: nil)
+                        }
+                        else{
+                            self.searchEmpty.isHidden = false
+                            
+                            self.searchEmptyText.text = "No users returned for your chosen game."
+                            self.searchEmptySub.text = "No worries, try your search again later."
+                        }
+                    }, completion: nil)
+                })
             }
             else{
-                self.gamerConnectResults.reloadData()
-                
-                if(!self.returnedUsers.isEmpty){
-                    self.searchEmpty.isHidden = true
-                }
-                else{
-                    self.searchEmpty.isHidden = false
-                    
-                    if(userName != nil){
-                        self.searchEmptyText.text = "No users returned with that name."
-                        self.searchEmptySub.text = "No worries.\nMake sure you typed their naame correctly, and try again."
-                    }
-                    else{
-                        self.searchEmptyText.text = "No users returned for your chosen game."
-                        self.searchEmptySub.text = "No worries, try your search again later."
-                    }
+                if(!self.loadingView.isHidden){
+                    self.searchProgress.stopAnimating()
+                    UIView.animate(withDuration: 0.8, animations: {
+                        self.loadingView.alpha = 0
+                    }, completion: { (finished: Bool) in
+                        self.gamerConnectResults.reloadData()
+                        
+                        if(!self.returnedUsers.isEmpty){
+                            self.searchEmpty.isHidden = true
+                        }
+                        else{
+                            self.searchEmpty.isHidden = false
+                            
+                            if(userName != nil){
+                                self.searchEmptyText.text = "No users returned with that name."
+                                self.searchEmptySub.text = "No worries.\nMake sure you typed their naame correctly, and try again."
+                            }
+                            else{
+                                self.searchEmptyText.text = "No users returned for your chosen game."
+                                self.searchEmptySub.text = "No worries, try your search again later."
+                            }
+                        }
+                    })
                 }
             }
-            
-            
+        }
+        
         }) { (error) in
             print(error.localizedDescription)
         }

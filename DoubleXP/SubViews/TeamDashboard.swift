@@ -26,6 +26,9 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
     var viewLoadedBool = false
     
     
+    @IBOutlet weak var loadingElement: UILabel!
+    @IBOutlet weak var loadingStatus: UILabel!
+    @IBOutlet weak var loadingView: UIView!
     @IBOutlet weak var twitchView: UIView!
     @IBOutlet weak var teamLabel: UILabel!
     @IBOutlet weak var alertButton: UIButton!
@@ -102,7 +105,11 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
         buildButton.addGestureRecognizer(buildTap)
         
         buildRoster()
-        loadTweets()
+        
+        loadingStatus.text = "loading..."
+        loadingElement.isHidden = true
+        
+        self.loadSocial()
     }
     
     private func getTwitch(){
@@ -126,6 +133,12 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
         
         teamRoster.dataSource = self
         teamRoster.delegate = self
+        
+        let top = CGAffineTransform(translationX: 0, y: -10)
+        UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+            self.teamRoster.alpha = 1
+            self.teamRoster.transform = top
+        }, completion: nil)
     }
     
     @objc func buildButtonClicked(_ sender: AnyObject?) {
@@ -242,9 +255,8 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
         }
     }
     
-    private func loadTweets() {
+    private func loadSocial() {
         let manager = SocialMediaManager()
-        manager.loadTweets(team: team!, callbacks: self)
         manager.loadTwitchStreams(team: self.team!, callbacks: self)
     }
     
@@ -255,6 +267,16 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
         if(!self.viewLoadedBool){
             self.tweetCollection.delegate = self
             self.tweetCollection.dataSource = self
+            self.twitchStreamList.dataSource = self
+            self.twitchStreamList.delegate = self
+            
+            let top = CGAffineTransform(translationX: 0, y: 8)
+            UIView.animate(withDuration: 0.3, delay: 0.2, options: [], animations: {
+                self.tweetCollection.alpha = 1
+                self.tweetCollection.transform = top
+                self.twitchStreamList.alpha = 1
+                self.loadingView.alpha = 0
+            }, completion: nil)
             
             self.viewLoadedBool = true
         }
@@ -263,6 +285,8 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
     func onStreamsLoaded(streams: [TwitchStreamObject]) {
         self.streams = streams
         self.streams.insert("label", at: 0)
+        
+        self.manager.loadTweets(team: self.team!, callbacks: self)
     }
     
     func collectionView(_ collectionView: UICollectionView,

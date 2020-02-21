@@ -91,7 +91,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
     }
     
     func navigateToTeamNeeds(team: TeamObject) {
-        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "teamNeeds") as! TeamDashboard
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "teamNeeds") as! TeamNeedsSelection
         currentViewController.team = team
         
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)

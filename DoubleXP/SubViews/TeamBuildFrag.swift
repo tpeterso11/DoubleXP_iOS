@@ -22,9 +22,11 @@ class TeamBuildFrag: ParentVC, UITableViewDataSource, UITableViewDelegate, TeamC
     @IBOutlet weak var freeAgentButton: UIButton!
     @IBOutlet weak var captainStar: UIImageView!
     
+    var invitableFriends = [FriendObject]()
+    
     enum Const {
-           static let closeCellHeight: CGFloat = 90
-           static let openCellHeight: CGFloat = 235
+           static let closeCellHeight: CGFloat = 92
+           static let openCellHeight: CGFloat = 185
            static let rowsCount = 1
     }
     
@@ -44,23 +46,38 @@ class TeamBuildFrag: ParentVC, UITableViewDataSource, UITableViewDelegate, TeamC
         }
         
         if(!(self.currentUser?.friends.isEmpty)!){
-            self.setup()
-            friendsList.delegate = self
-            friendsList.dataSource = self
+            for friend in currentUser!.friends{
+                if(!(team!.teammateIds.contains(friend.uid)) && !(team!.teamInviteTags.contains(friend.gamerTag))){
+                    invitableFriends.append(friend)
+                }
+            }
+            
+            if(!invitableFriends.isEmpty){
+                self.setup()
+                friendsList.delegate = self
+                friendsList.dataSource = self
+            }
+            else{
+                //show empty
+            }
         }
         
         freeAgentButton.addTarget(self, action: #selector(faButtonClicked), for: .touchUpInside)
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.currentUser?.friends.count ?? 0
+        return self.invitableFriends.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! TeamBuildFriendCell
         
-        let current = self.currentUser!.friends[indexPath.item]
+        let current = self.invitableFriends[indexPath.item]
+        cell.coverLabel.text = current.gamerTag
+        cell.underLabel.text = current.gamerTag
         
+        cell.inviteButton.addTarget(self, action: #selector(inviteButtonClicked), for: .touchUpInside)
+        cell.profileButton.addTarget(self, action: #selector(profileButtonClicked), for: .touchUpInside)
         
         return cell
     }
@@ -116,29 +133,6 @@ class TeamBuildFrag: ParentVC, UITableViewDataSource, UITableViewDelegate, TeamC
         }, completion: nil)
     }
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.currentUser?.friends.count ?? 0
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! DashFriendInviteCell
-        
-        let current = self.currentUser!.friends[indexPath.item]
-        cell.friendLabel.text = current.gamerTag
-        
-        var containedInInvites = false
-        for invite in team!.teamInvites{
-            if(invite.gamerTag == current.gamerTag){
-                containedInInvites = true
-                break
-            }
-        }
-            
-        cell.inviteButton.addTarget(self, action: #selector(inviteButtonClicked), for: .touchUpInside)
-        
-        return cell
-    }
-    
     @objc func faButtonClicked(_ sender: AnyObject?) {
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.currentLanding?.navigateToTeamFreeAgentSearch(team: self.team!)
@@ -146,28 +140,60 @@ class TeamBuildFrag: ParentVC, UITableViewDataSource, UITableViewDelegate, TeamC
     
     
     @objc func inviteButtonClicked(_ sender: AnyObject?) {
-        let manager = TeamManager()
         let indexPath = IndexPath(item: (sender?.tag)!, section: 0)
-        manager.inviteToTeam(team: self.team!, friend: currentUser!.friends[(sender?.tag)!], position: indexPath, callbacks: self)
+        let cell = friendsList.cellForRow(at: indexPath) as! TeamBuildFriendCell
+        cellHeights[indexPath.row] = Const.closeCellHeight
+        cell.unfold(false, animated: true, completion: nil)
+        let duration = 0.3
+        
+        UIView.animate(withDuration: duration, delay: 0, options: .curveEaseOut, animations: { () -> Void in
+            self.friendsList.beginUpdates()
+            self.friendsList.endUpdates()
+            
+            // fix https://github.com/Ramotion/folding-cell/issues/169
+            if cell.frame.maxY > self.friendsList.frame.maxY {
+                self.friendsList.scrollToRow(at: indexPath, at: UITableView.ScrollPosition.bottom, animated: true)
+            }
+        }, completion: { (finished: Bool) in
+           let manager = TeamManager()
+           let indexPath = IndexPath(item: (sender?.tag)!, section: 0)
+           manager.inviteToTeam(team: self.team!, friend: self.invitableFriends[(sender?.tag)!], position: indexPath, callbacks: self)
+        })
+    }
+    
+    @objc func profileButtonClicked(_ sender: AnyObject?) {
+        let indexPath = IndexPath(item: (sender?.tag)!, section: 0)
+        let cell = friendsList.cellForRow(at: indexPath) as! TeamBuildFriendCell
+        cellHeights[indexPath.row] = Const.closeCellHeight
+        cell.unfold(false, animated: true, completion: nil)
+        let duration = 0.3
+        
+        UIView.animate(withDuration: duration, delay: 0, options: .curveEaseOut, animations: { () -> Void in
+            self.friendsList.beginUpdates()
+            self.friendsList.endUpdates()
+            
+            // fix https://github.com/Ramotion/folding-cell/issues/169
+            if cell.frame.maxY > self.friendsList.frame.maxY {
+                self.friendsList.scrollToRow(at: indexPath, at: UITableView.ScrollPosition.bottom, animated: true)
+            }
+        }, completion: { (finished: Bool) in
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            let current = self.invitableFriends[(sender?.tag)!]
+            
+            delegate.currentLanding?.navigateToProfile(uid: current.uid)
+        })
     }
     
     func updateCell(indexPath: IndexPath) {
         currentUser!.teamInvites.append(team!)
+        team!.teamInviteTags.append(self.invitableFriends[indexPath.item].gamerTag)
         
-        //let cell = friendsList.cellForItem(at: indexPath) as! DashFriendInviteCell
-        
-        //cell.inviteButton.addTarget(self, action: #selector(inviteButtonClicked), for: .touchUpInside)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        sizeForItemAt indexPath: IndexPath) -> CGSize {
-        
-        return CGSize(width: collectionView.bounds.width - 10, height: CGFloat(60))
+        self.invitableFriends.remove(at: indexPath.item)
+        self.friendsList.deleteRows(at: [indexPath], with: .automatic)
     }
     
     private func setup() {
-        cellHeights = Array(repeating: Const.closeCellHeight, count: (self.currentUser?.friends.count)!)
+        cellHeights = Array(repeating: Const.closeCellHeight, count: (self.invitableFriends.count))
         friendsList.estimatedRowHeight = Const.closeCellHeight
         friendsList.rowHeight = UITableView.automaticDimension
         friendsList.backgroundColor = UIColor.white

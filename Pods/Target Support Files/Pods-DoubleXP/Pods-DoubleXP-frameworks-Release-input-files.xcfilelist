@@ -1,5 +1,7 @@
 ${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-frameworks.sh
+${BUILT_PRODUCTS_DIR}/Bartinter/Bartinter.framework
 ${BUILT_PRODUCTS_DIR}/CollapsibleTableSectionViewController/CollapsibleTableSectionViewController.framework
+${BUILT_PRODUCTS_DIR}/DynamicBlurView/DynamicBlurView.framework
 ${BUILT_PRODUCTS_DIR}/EMPageViewController/EMPageViewController.framework
 ${BUILT_PRODUCTS_DIR}/ExpyTableView/ExpyTableView.framework
 ${BUILT_PRODUCTS_DIR}/FoldingCell/FoldingCell.framework
@@ -10,6 +12,7 @@ ${BUILT_PRODUCTS_DIR}/InputBarAccessoryView/InputBarAccessoryView.framework
 ${BUILT_PRODUCTS_DIR}/MSPeekCollectionViewDelegateImplementation/MSPeekCollectionViewDelegateImplementation.framework
 ${BUILT_PRODUCTS_DIR}/Marshal/Marshal.framework
 ${BUILT_PRODUCTS_DIR}/MessageKit/MessageKit.framework
+${BUILT_PRODUCTS_DIR}/PopupDialog/PopupDialog.framework
 ${PODS_ROOT}/SendBirdSDK/SendBirdSDK.framework
 ${PODS_ROOT}/SendBirdSDK/SendBirdSDK.framework.dSYM
 ${BUILT_PRODUCTS_DIR}/SwiftHTTP/SwiftHTTP.framework

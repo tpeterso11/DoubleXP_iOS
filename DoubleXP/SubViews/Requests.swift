@@ -23,18 +23,32 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
            static let rowsCount = 1
     }
     
+    @IBOutlet weak var requestsSub: UILabel!
+    @IBOutlet weak var requestsHeader: UILabel!
     override func viewDidLoad() {
         super.viewDidLoad()
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let currentUser = delegate.currentUser
         
-        if(currentUser != nil){
-            buildRequests(user: currentUser!)
-        }
-        else{
-            return
-        }
+        let top = CGAffineTransform(translationX: 0, y: 30)
+        UIView.animate(withDuration: 0.8, delay: 0.3, options:[], animations: {
+            self.requestsHeader.alpha = 1
+            self.requestsHeader.transform = top
+            self.requestsSub.alpha = 1
+            self.requestsSub.transform = top
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
+                if(currentUser != nil){
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        self.buildRequests(user: currentUser!)
+                    }
+                }
+                else{
+                    return
+                }
+            }, completion: nil)
+        })
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let currentLanding = appDelegate.currentLanding
@@ -43,6 +57,17 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
         appDelegate.navStack.append(self)
         
         self.pageName = "Requests"
+    }
+    
+    private func animateView(){
+        requestList.delegate = self
+        requestList.dataSource = self
+        
+        let top = CGAffineTransform(translationX: 0, y: 30)
+        UIView.animate(withDuration: 0.8, animations: {
+            self.requestList.alpha = 1
+            self.requestList.transform = top
+        }, completion: nil)
     }
     
     private func buildRequests(user: User){
@@ -70,8 +95,10 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
                 requestList.refreshControl?.addTarget(self, action: #selector(refreshHandler), for: .valueChanged)
             }
             
-            requestList.delegate = self
-            requestList.dataSource = self
+            animateView()
+        }
+        else{
+            //show empty
         }
     }
     

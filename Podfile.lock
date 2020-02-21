@@ -1,5 +1,7 @@
 PODS:
+  - Bartinter (0.0.5)
   - CollapsibleTableSectionViewController (1.0.1)
+  - DynamicBlurView (3.0.1)
   - EMPageViewController (3.0.0)
   - ExpyTableView (1.1)
   - Firebase/Analytics (6.13.0):
@@ -95,6 +97,8 @@ PODS:
     - nanopb/encode (= 0.3.9011)
   - nanopb/decode (0.3.9011)
   - nanopb/encode (0.3.9011)
+  - PopupDialog (1.0.0):
+    - DynamicBlurView (~> 3.0.1)
   - SendBirdSDK (3.0.161)
   - SmoothButton (0.0.1)
   - SwiftHTTP (3.0.1)
@@ -108,6 +112,7 @@ PODS:
   - UnderLineTextField (2.1.0)
 
 DEPENDENCIES:
+  - Bartinter
   - CollapsibleTableSectionViewController (~> 1.0.0)
   - EMPageViewController
   - ExpyTableView
@@ -120,6 +125,7 @@ DEPENDENCIES:
   - MessageKit
   - moa (~> 11.0)
   - MSPeekCollectionViewDelegateImplementation
+  - PopupDialog (~> 1.0)
   - SendBirdSDK
   - SmoothButton
   - SwiftHTTP (~> 3.0)
@@ -131,7 +137,9 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - Bartinter
     - CollapsibleTableSectionViewController
+    - DynamicBlurView
     - EMPageViewController
     - ExpyTableView
     - Firebase
@@ -158,6 +166,7 @@ SPEC REPOS:
     - moa
     - MSPeekCollectionViewDelegateImplementation
     - nanopb
+    - PopupDialog
     - SendBirdSDK
     - SmoothButton
     - SwiftHTTP
@@ -169,7 +178,9 @@ SPEC REPOS:
     - UnderLineTextField
 
 SPEC CHECKSUMS:
+  Bartinter: 3c1fc3bcb631b066fdd78f7e01f1635fbafffdea
   CollapsibleTableSectionViewController: c41694de812a1039c5f8581c934cf0fc38e4e871
+  DynamicBlurView: b1df5415f9bd31897549e5d7077e5ec120a4d636
   EMPageViewController: 8e0abc2b2f53f56a83044527eadbb56bd71ae3e3
   ExpyTableView: 52dde6e141056544c0b8e7b083a840c37ddb6132
   Firebase: 458d109512200d1aca2e1b9b6cf7d68a869a4a46
@@ -196,6 +207,7 @@ SPEC CHECKSUMS:
   moa: a26c4e97c7ac9345e87c4bb999e85116c8ec0310
   MSPeekCollectionViewDelegateImplementation: 3091e9512b3cd03facdea3c02e57673a4a06246a
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
+  PopupDialog: 28f29a1ffe9e1fab32fb258b53d56ca31670e8a2
   SendBirdSDK: fae108b5757e21250d7cd32f4ff023075d7c06ae
   SmoothButton: b3191c0bdba16ff40bdd2934db9ddd93edaa9c9f
   SwiftHTTP: e94f1aa8cde58637dcc0100f6349de31a3337fde
@@ -206,6 +218,6 @@ SPEC CHECKSUMS:
   TwitterKit: 5e4f41d70b9abdb41df5467f52d7aa2c0fd26ebb
   UnderLineTextField: b3f5307b56962331e30a965e81b79aae2df1de83
 
-PODFILE CHECKSUM: 981893fc4e85cf6e51e262aab1bf0870766034d3
+PODFILE CHECKSUM: 1d856a2ce660a4a0e98554b651902ed3a3fd4bb4
 
 COCOAPODS: 1.8.4

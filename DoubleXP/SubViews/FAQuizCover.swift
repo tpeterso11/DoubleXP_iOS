@@ -20,12 +20,12 @@ class FAQuizCover: UIViewController, FreeAgentQuizNav{
     var interviewManager: InterviewManager?
     var currentUrl = ""
     
+    @IBOutlet weak var topView: UIView!
+    @IBOutlet weak var bottomView: UIView!
     @IBOutlet weak var gameImage: UIImageView!
     @IBOutlet weak var gameName: UILabel!
-    @IBOutlet weak var startButton: UIImageView!
-    @IBOutlet weak var gameOverButton: UIImageView!
-    @IBOutlet weak var empty: UIView!
     @IBOutlet weak var dashButton: UIButton!
+    @IBOutlet weak var startButton: UIButton!
     
     
     override func viewDidLoad() {
@@ -41,9 +41,23 @@ class FAQuizCover: UIViewController, FreeAgentQuizNav{
         let delegate = UIApplication.shared.delegate as! AppDelegate
         interviewManager = delegate.interviewManager
         
-        let doneTap = UITapGestureRecognizer(target: self, action: #selector(doneButtonClicked))
-        gameOverButton.isUserInteractionEnabled = true
-        gameOverButton.addGestureRecognizer(doneTap)
+        //let doneTap = UITapGestureRecognizer(target: self, action: #selector(doneButtonClicked))
+        //gameOverButton.isUserInteractionEnabled = true
+        //gameOverButton.addGestureRecognizer(doneTap)
+        
+        startButton.addTarget(self, action: #selector(doneButtonClicked), for: .touchUpInside)
+        
+        startButton.layer.shadowColor = UIColor.black.cgColor
+        startButton.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+        startButton.layer.shadowRadius = 2.0
+        startButton.layer.shadowOpacity = 0.5
+        startButton.layer.masksToBounds = false
+        startButton.layer.shadowPath = UIBezierPath(roundedRect: startButton.bounds, cornerRadius: startButton.cornerRadius).cgPath
+        
+        topView.layer.masksToBounds = false
+        topView.layer.shadowOffset = CGSize(width: 0, height: 20)
+        topView.layer.shadowRadius = 10
+        topView.layer.shadowOpacity = 0.5
     }
     
     @objc func startButtonClicked(_ sender: AnyObject?) {
@@ -51,7 +65,7 @@ class FAQuizCover: UIViewController, FreeAgentQuizNav{
     }
     
     func showEmpty() {
-        empty.isHidden = false
+        //empty.isHidden = false
         dashButton.addTarget(self, action: #selector(dashButtonClicked), for: .touchUpInside)
     }
     

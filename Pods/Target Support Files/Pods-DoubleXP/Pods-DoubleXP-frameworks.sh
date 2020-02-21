@@ -161,7 +161,9 @@ strip_invalid_archs() {
 
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
+  install_framework "${BUILT_PRODUCTS_DIR}/Bartinter/Bartinter.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/CollapsibleTableSectionViewController/CollapsibleTableSectionViewController.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/DynamicBlurView/DynamicBlurView.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/EMPageViewController/EMPageViewController.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/ExpyTableView/ExpyTableView.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/FoldingCell/FoldingCell.framework"
@@ -172,6 +174,7 @@ if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/MSPeekCollectionViewDelegateImplementation/MSPeekCollectionViewDelegateImplementation.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/Marshal/Marshal.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/MessageKit/MessageKit.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/PopupDialog/PopupDialog.framework"
   install_framework "${PODS_ROOT}/SendBirdSDK/SendBirdSDK.framework"
   install_dsym "${PODS_ROOT}/SendBirdSDK/SendBirdSDK.framework.dSYM"
   install_framework "${BUILT_PRODUCTS_DIR}/SwiftHTTP/SwiftHTTP.framework"
@@ -187,7 +190,9 @@ if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
+  install_framework "${BUILT_PRODUCTS_DIR}/Bartinter/Bartinter.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/CollapsibleTableSectionViewController/CollapsibleTableSectionViewController.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/DynamicBlurView/DynamicBlurView.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/EMPageViewController/EMPageViewController.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/ExpyTableView/ExpyTableView.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/FoldingCell/FoldingCell.framework"
@@ -198,6 +203,7 @@ if [[ "$CONFIGURATION" == "Release" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/MSPeekCollectionViewDelegateImplementation/MSPeekCollectionViewDelegateImplementation.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/Marshal/Marshal.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/MessageKit/MessageKit.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/PopupDialog/PopupDialog.framework"
   install_framework "${PODS_ROOT}/SendBirdSDK/SendBirdSDK.framework"
   install_dsym "${PODS_ROOT}/SendBirdSDK/SendBirdSDK.framework.dSYM"
   install_framework "${BUILT_PRODUCTS_DIR}/SwiftHTTP/SwiftHTTP.framework"

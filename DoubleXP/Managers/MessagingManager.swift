@@ -61,7 +61,7 @@ class MessagingManager: UIViewController, SBDConnectionDelegate, SBDUserEventDel
         ]
         
         user!.createMetaData(data) { (metaData, error) in
-            guard error == nil else {   // Error.
+            guard error != nil else {   // Error.
                 return
             }
             

@@ -18,7 +18,7 @@ class FAQuizConsoles: UIViewController{
     @IBOutlet weak var xboxSwitch: UISwitch!
     @IBOutlet weak var nintendoSwitch: UISwitch!
     @IBOutlet weak var pcSwitch: UISwitch!
-    @IBOutlet weak var nextButton: UIImageView!
+    @IBOutlet weak var nextButtonNew: UIButton!
     var interviewManager: InterviewManager?
     
     var switches = [UISwitch]()
@@ -36,9 +36,8 @@ class FAQuizConsoles: UIViewController{
         let delegate = UIApplication.shared.delegate as! AppDelegate
         interviewManager = delegate.interviewManager
         
-        let singleTap = UITapGestureRecognizer(target: self, action: #selector(nextButtonClicked))
-        nextButton.isUserInteractionEnabled = true
-        nextButton.addGestureRecognizer(singleTap)
+        checkSwitches(selected: "")
+        nextButtonNew.addTarget(self, action: #selector(nextButtonClicked), for: .touchUpInside)
     }
     
     @objc func nextButtonClicked(_ sender: AnyObject?) {
@@ -96,30 +95,45 @@ class FAQuizConsoles: UIViewController{
             pcSwitch.isOn = false
             xboxSwitch.isOn = false
             nintendoSwitch.isOn = false
+            
+            nextButtonNew.alpha = 1
+            nextButtonNew.isUserInteractionEnabled = true
         }
         else if(selectedConsole == "XBox"){
             ps4Switch.isOn = false
             pcSwitch.isOn = false
             xboxSwitch.isOn = true
             nintendoSwitch.isOn = false
+            
+            nextButtonNew.alpha = 1
+            nextButtonNew.isUserInteractionEnabled = true
         }
         else if(selectedConsole == "nintendo"){
             ps4Switch.isOn = false
             pcSwitch.isOn = false
             xboxSwitch.isOn = false
             nintendoSwitch.isOn = true
+            
+            nextButtonNew.alpha = 1
+            nextButtonNew.isUserInteractionEnabled = true
         }
         else if(selectedConsole == "pc"){
             ps4Switch.isOn = false
             pcSwitch.isOn = true
             xboxSwitch.isOn = false
             nintendoSwitch.isOn = false
+            
+            nextButtonNew.alpha = 1
+            nextButtonNew.isUserInteractionEnabled = true
         }
         else{
             ps4Switch.isOn = false
             pcSwitch.isOn = false
             xboxSwitch.isOn = false
             nintendoSwitch.isOn = false
+            
+            nextButtonNew.alpha = 0.4
+            nextButtonNew.isUserInteractionEnabled = false
         }
     }
 }

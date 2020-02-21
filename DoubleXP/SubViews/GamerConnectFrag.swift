@@ -11,12 +11,14 @@ import Firebase
 import ImageLoader
 import moa
 import MSPeekCollectionViewDelegateImplementation
+import Bartinter
 
 class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, MSPeekImplementationDelegate {
     @IBOutlet weak var gcGameScroll: UICollectionView!
     @IBOutlet weak var recommendedUsers: UICollectionView!
     var selectedCell = false
     
+    @IBOutlet weak var connectHeader: UILabel!
     @IBOutlet weak var currentDate: UILabel!
     var gcGames = [GamerConnectGame]()
     var delegate: MSPeekCollectionViewDelegateImplementation!
@@ -24,10 +26,7 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        gcGameScroll.delegate = self
-        recommendedUsers.delegate = self
-        gcGameScroll.dataSource = self
-        recommendedUsers.dataSource = self
+        animateView()
         
         gcGameScroll.configureForPeekingDelegate()
         let todaysDate:NSDate = NSDate()
@@ -45,6 +44,36 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
         }
         
         self.pageName = "Home"
+        
+        self.updatesStatusBarAppearanceAutomatically = true
+    }
+    
+    private func animateView(){
+        let top = CGAffineTransform(translationX: 0, y: 50)
+        UIView.animate(withDuration: 0.5, animations: {
+            self.connectHeader.alpha = 1
+            self.connectHeader.transform = top
+            self.currentDate.transform = top
+            self.currentDate.alpha = 1
+        }, completion: nil)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            self.gcGameScroll.delegate = self
+            self.recommendedUsers.delegate = self
+            self.gcGameScroll.dataSource = self
+            self.recommendedUsers.dataSource = self
+            
+            let top = CGAffineTransform(translationX: 0, y: 40)
+            UIView.animate(withDuration: 0.8, animations: {
+                self.gcGameScroll.alpha = 1
+                self.gcGameScroll.transform = top
+            }, completion: { (finished: Bool) in
+                UIView.animate(withDuration: 0.8, delay: 0.2, options: [], animations: {
+                    self.recommendedUsers.transform = top
+                    self.recommendedUsers.alpha = 1
+                }, completion: nil)
+            })
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -65,7 +94,7 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
                 cell.xBox.isHidden = true
             }
             if(indexPath.item == 1){
-                cell.gamerTag.text = "_fitboy"
+                cell.gamerTag.text = "fitboy_"
                 cell.xBox.isHidden = true
             }
             if(indexPath.item == 2){

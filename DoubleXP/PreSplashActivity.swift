@@ -18,6 +18,7 @@ class PreSplashActivity: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         games = [GamerConnectGame]()
         // Do any additional setup after loading the view, typically from a nib.
         getAppConfig()
@@ -60,7 +61,7 @@ class PreSplashActivity: UIViewController {
     }
     
     func loadGCGames(){
-        HTTP.GET("https://firebasestorage.googleapis.com/v0/b/gameterminal-767f7.appspot.com/o/config%2FgcGames.json?alt=media&token=3d7ac17e-34c6-46c5-a98b-f588d2fceeed") { response in
+        HTTP.GET("https://firebasestorage.googleapis.com/v0/b/gameterminal-767f7.appspot.com/o/config%2FgcGames.json?alt=media&token=c0985b72-c141-499d-ac49-8ea8db3adaa0") { response in
             if let err = response.error {
                 print("error: \(err.localizedDescription)")
                 return //also notify app of failure as needed

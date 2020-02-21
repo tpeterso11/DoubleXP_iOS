@@ -53,10 +53,18 @@ class TeamManager{
                 let currentInvite = TeamInviteObject(gamerTag: friend.gamerTag, date: result, uid: friend.uid)
                 invites.append(currentInvite)
                 
+                var sendList = [[String: Any]]()
                 for invite in invites{
                     let current = ["gamerTag": invite.gamerTag, "date": invite.date, "uid": invite.uid] as [String : String]
-                    ref.child(team.teamName).child("teamInvites").setValue(current)
+                    sendList.append(current)
                 }
+                
+                let dict = snapshot.value as! [String: Any]
+                var teamInvitetags = dict["teamInviteTags"] as? [String] ?? [String]()
+                teamInvitetags.append(friend.gamerTag)
+                
+                ref.child("teamInvites").setValue(sendList)
+                ref.child("teamInviteTags").setValue(teamInvitetags)
                 
                 
                 self.updateUserTeamInvite(team: team, friend: friend, position: position, callbacks: callbacks)

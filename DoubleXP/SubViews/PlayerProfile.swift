@@ -12,6 +12,7 @@ import ImageLoader
 import moa
 import MSPeekCollectionViewDelegateImplementation
 import FoldingCell
+import Bartinter
 
 class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, ProfileCallbacks {
     var uid: String = ""
@@ -74,6 +75,8 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         
         self.actionOverlay.effect = nil
         actionOverlay.isHidden = false
+        
+        self.updatesStatusBarAppearanceAutomatically = true
     }
     
     @objc func messagingButtonClicked(_ sender: AnyObject?) {

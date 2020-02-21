@@ -125,6 +125,8 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
             Broadcaster.notify(SearchCallbacks.self) {
                 $0.searchSubmitted(searchString: bottomNavSearch.text!)
             }
+            
+            bottomNavSearch.text = ""
         }
     }
     
@@ -430,8 +432,11 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
             mainNavView.slideInBottomNav()
         }
         else{
-            primaryBack.slideOutBottomSmall()
-            backButtonShowing = false
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            if(appDelegate.currentFrag == "Home"){
+                primaryBack.slideOutBottomSmall()
+                backButtonShowing = false
+            }
         }
     }
     
@@ -508,6 +513,10 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
             }, completion: { (finished: Bool) in
                 UIView.animate(withDuration: 0.4, delay: 0.3, options: [], animations: {
                     self.menuVie.transform = top
+                    
+                    let backTap = UITapGestureRecognizer(target: self, action: #selector(self.dismissMenu))
+                    self.blur.isUserInteractionEnabled = true
+                    self.blur.addGestureRecognizer(backTap)
                 }, completion: nil)
             })
             
@@ -530,7 +539,7 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
         }
     }
     
-    func dismissMenu(){
+    @objc func dismissMenu(){
         self.restoreBottomNav()
         menuVie.viewShowing = false
         
@@ -540,6 +549,7 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
         }, completion: { (finished: Bool) in
             UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
                 self.blur.alpha = 0.0
+                self.blur.isUserInteractionEnabled = false
             }, completion: nil)
         })
     }

@@ -21,7 +21,7 @@ class SocialMediaManager{
     
     func getTwitterHandle(developer: String) -> String{
         switch developer {
-        case "2K":
+        case "2K Sports":
             return "2K"
         case "Ubisoft":
             return "ubisoft"

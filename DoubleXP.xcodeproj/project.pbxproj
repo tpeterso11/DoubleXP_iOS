@@ -14,6 +14,12 @@
 		301AEF502388604D00339850 /* opened-door-aperture.png in Resources */ = {isa = PBXBuildFile; fileRef = 301AEF4F2388604C00339850 /* opened-door-aperture.png */; };
 		301AEF54238862D000339850 /* TeamCellTeamFrag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301AEF53238862D000339850 /* TeamCellTeamFrag.swift */; };
 		301AEF5623886D7100339850 /* star.png in Resources */ = {isa = PBXBuildFile; fileRef = 301AEF5523886D7100339850 /* star.png */; };
+		301B4AE223F07DC900A6FE5B /* FreeAgentExpandingResultCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301B4AE123F07DC900A6FE5B /* FreeAgentExpandingResultCell.swift */; };
+		301B4AE423F07DEC00A6FE5B /* FreeAgentExpandingActionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301B4AE323F07DEC00A6FE5B /* FreeAgentExpandingActionCell.swift */; };
+		301B4AE623F4DB6F00A6FE5B /* FreeAgentDashCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301B4AE523F4DB6F00A6FE5B /* FreeAgentDashCell.swift */; };
+		301B4AE823F4DB8A00A6FE5B /* FreeAgentDashExpanded.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301B4AE723F4DB8A00A6FE5B /* FreeAgentDashExpanded.swift */; };
+		301B4AEA23F649A300A6FE5B /* hqdefault.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 301B4AE923F649A300A6FE5B /* hqdefault.jpg */; };
+		301B4AEC23F7462400A6FE5B /* bubble.png in Resources */ = {isa = PBXBuildFile; fileRef = 301B4AEB23F7462300A6FE5B /* bubble.png */; };
 		303F2D402372883E004B68E1 /* NavigationPageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 303F2D3F2372883E004B68E1 /* NavigationPageController.swift */; };
 		303F2D4223728D09004B68E1 /* EMPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 303F2D4123728D09004B68E1 /* EMPageViewController.swift */; };
 		303F2D442373AC1B004B68E1 /* homeGCCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 303F2D432373AC1B004B68E1 /* homeGCCell.swift */; };
@@ -55,6 +61,8 @@
 		307CE35523EC508600DCB12A /* InsetLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307CE35423EC508600DCB12A /* InsetLabel.swift */; };
 		307CE35723EC99B900DCB12A /* SlantedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307CE35623EC99B900DCB12A /* SlantedView.swift */; };
 		307CE35923EC9C2100DCB12A /* send.png in Resources */ = {isa = PBXBuildFile; fileRef = 307CE35823EC9C2000DCB12A /* send.png */; };
+		307CE35D23EE404B00DCB12A /* FAHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307CE35C23EE404B00DCB12A /* FAHeaderCell.swift */; };
+		307CE35F23EE5CC200DCB12A /* AnswerTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307CE35E23EE5CC200DCB12A /* AnswerTableCell.swift */; };
 		3080B3E023B7C4F500638B22 /* ParentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3080B3DF23B7C4F500638B22 /* ParentVC.swift */; };
 		3080B3E223B7FAA700638B22 /* request.png in Resources */ = {isa = PBXBuildFile; fileRef = 3080B3E123B7FAA600638B22 /* request.png */; };
 		3080B3E423B80A5B00638B22 /* request2.png in Resources */ = {isa = PBXBuildFile; fileRef = 3080B3E323B80A5A00638B22 /* request2.png */; };
@@ -90,6 +98,11 @@
 		308BD032238ED2450034822B /* restaurant-membership-card-tool.png in Resources */ = {isa = PBXBuildFile; fileRef = 308BD031238ED2450034822B /* restaurant-membership-card-tool.png */; };
 		308BD034238F5BE90034822B /* FriendObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308BD033238F5BE90034822B /* FriendObject.swift */; };
 		308BD0362391DB9C0034822B /* TeammateObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308BD0352391DB9C0034822B /* TeammateObject.swift */; };
+		308E79BC23FF471D00197035 /* meeting.png in Resources */ = {isa = PBXBuildFile; fileRef = 308E79BB23FF471D00197035 /* meeting.png */; };
+		308E79BE23FF492600197035 /* connection_white.png in Resources */ = {isa = PBXBuildFile; fileRef = 308E79BD23FF492600197035 /* connection_white.png */; };
+		308E79C023FF4B2C00197035 /* hashtag.png in Resources */ = {isa = PBXBuildFile; fileRef = 308E79BF23FF4B2C00197035 /* hashtag.png */; };
+		308EBA2423FDCC4300DE186D /* connection.png in Resources */ = {isa = PBXBuildFile; fileRef = 308EBA2323FDCC4200DE186D /* connection.png */; };
+		308EBA2623FDCCDC00DE186D /* live_menu.png in Resources */ = {isa = PBXBuildFile; fileRef = 308EBA2523FDCCDB00DE186D /* live_menu.png */; };
 		309F3A0D23B3EFBF00FD0C48 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309F3A0C23B3EFBF00FD0C48 /* Utility.swift */; };
 		309F3A1023B3F7DE00FD0C48 /* Test.m in Sources */ = {isa = PBXBuildFile; fileRef = 309F3A0F23B3F7DE00FD0C48 /* Test.m */; };
 		309F3A1323B40CA900FD0C48 /* left-arrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 309F3A1223B40CA900FD0C48 /* left-arrow.png */; };
@@ -220,6 +233,12 @@
 		301AEF4F2388604C00339850 /* opened-door-aperture.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "opened-door-aperture.png"; path = "../../../../Downloads/opened-door-aperture.png"; sourceTree = "<group>"; };
 		301AEF53238862D000339850 /* TeamCellTeamFrag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamCellTeamFrag.swift; sourceTree = "<group>"; };
 		301AEF5523886D7100339850 /* star.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = star.png; path = ../../../../Downloads/star.png; sourceTree = "<group>"; };
+		301B4AE123F07DC900A6FE5B /* FreeAgentExpandingResultCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeAgentExpandingResultCell.swift; sourceTree = "<group>"; };
+		301B4AE323F07DEC00A6FE5B /* FreeAgentExpandingActionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeAgentExpandingActionCell.swift; sourceTree = "<group>"; };
+		301B4AE523F4DB6F00A6FE5B /* FreeAgentDashCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeAgentDashCell.swift; sourceTree = "<group>"; };
+		301B4AE723F4DB8A00A6FE5B /* FreeAgentDashExpanded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeAgentDashExpanded.swift; sourceTree = "<group>"; };
+		301B4AE923F649A300A6FE5B /* hqdefault.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = hqdefault.jpg; sourceTree = "<group>"; };
+		301B4AEB23F7462300A6FE5B /* bubble.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bubble.png; sourceTree = "<group>"; };
 		303F2D3F2372883E004B68E1 /* NavigationPageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationPageController.swift; sourceTree = "<group>"; };
 		303F2D4123728D09004B68E1 /* EMPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EMPageViewController.swift; sourceTree = "<group>"; };
 		303F2D432373AC1B004B68E1 /* homeGCCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = homeGCCell.swift; sourceTree = "<group>"; };
@@ -261,6 +280,8 @@
 		307CE35423EC508600DCB12A /* InsetLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsetLabel.swift; sourceTree = "<group>"; };
 		307CE35623EC99B900DCB12A /* SlantedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlantedView.swift; sourceTree = "<group>"; };
 		307CE35823EC9C2000DCB12A /* send.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = send.png; sourceTree = "<group>"; };
+		307CE35C23EE404B00DCB12A /* FAHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FAHeaderCell.swift; sourceTree = "<group>"; };
+		307CE35E23EE5CC200DCB12A /* AnswerTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerTableCell.swift; sourceTree = "<group>"; };
 		3080B3DF23B7C4F500638B22 /* ParentVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentVC.swift; sourceTree = "<group>"; };
 		3080B3E123B7FAA600638B22 /* request.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = request.png; sourceTree = "<group>"; };
 		3080B3E323B80A5A00638B22 /* request2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = request2.png; sourceTree = "<group>"; };
@@ -296,6 +317,11 @@
 		308BD031238ED2450034822B /* restaurant-membership-card-tool.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "restaurant-membership-card-tool.png"; path = "../../../../Downloads/restaurant-membership-card-tool.png"; sourceTree = "<group>"; };
 		308BD033238F5BE90034822B /* FriendObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendObject.swift; sourceTree = "<group>"; };
 		308BD0352391DB9C0034822B /* TeammateObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeammateObject.swift; sourceTree = "<group>"; };
+		308E79BB23FF471D00197035 /* meeting.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = meeting.png; sourceTree = "<group>"; };
+		308E79BD23FF492600197035 /* connection_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = connection_white.png; sourceTree = "<group>"; };
+		308E79BF23FF4B2C00197035 /* hashtag.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = hashtag.png; sourceTree = "<group>"; };
+		308EBA2323FDCC4200DE186D /* connection.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = connection.png; sourceTree = "<group>"; };
+		308EBA2523FDCCDB00DE186D /* live_menu.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = live_menu.png; sourceTree = "<group>"; };
 		309F3A0C23B3EFBF00FD0C48 /* Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
 		309F3A0E23B3F7DE00FD0C48 /* Test.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Test.h; sourceTree = "<group>"; };
 		309F3A0F23B3F7DE00FD0C48 /* Test.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Test.m; sourceTree = "<group>"; };
@@ -552,6 +578,12 @@
 				307CE35223EC452600DCB12A /* TestCell.swift */,
 				307CE35423EC508600DCB12A /* InsetLabel.swift */,
 				307CE35623EC99B900DCB12A /* SlantedView.swift */,
+				307CE35C23EE404B00DCB12A /* FAHeaderCell.swift */,
+				307CE35E23EE5CC200DCB12A /* AnswerTableCell.swift */,
+				301B4AE123F07DC900A6FE5B /* FreeAgentExpandingResultCell.swift */,
+				301B4AE323F07DEC00A6FE5B /* FreeAgentExpandingActionCell.swift */,
+				301B4AE523F4DB6F00A6FE5B /* FreeAgentDashCell.swift */,
+				301B4AE723F4DB8A00A6FE5B /* FreeAgentDashExpanded.swift */,
 			);
 			path = CustomView;
 			sourceTree = "<group>";
@@ -673,6 +705,7 @@
 				30F6FCC123CD948D0051813D /* cancel-mark.png */,
 				307CE34E23EA3EA100DCB12A /* information.png */,
 				30A60D8C2363C801004B2150 /* like.png */,
+				301B4AE923F649A300A6FE5B /* hqdefault.jpg */,
 				30A60D8A2363C784004B2150 /* communications.png */,
 				30B583E52352A2DA00736733 /* close_white.png */,
 				30F6FCC323CD96620051813D /* dashboard.png */,
@@ -684,7 +717,13 @@
 				3071171423E137A4005F6355 /* splash.png */,
 				30B583CA2347B5E500736733 /* gamespot_icon_ios.png */,
 				30C4EDAE2267C1890046B615 /* double_xp_small_white.png */,
+				308EBA2323FDCC4200DE186D /* connection.png */,
+				301B4AEB23F7462300A6FE5B /* bubble.png */,
+				308EBA2523FDCCDB00DE186D /* live_menu.png */,
 				307CE34C23EA2B5000DCB12A /* message.png */,
+				308E79BB23FF471D00197035 /* meeting.png */,
+				308E79BF23FF4B2C00197035 /* hashtag.png */,
+				308E79BD23FF492600197035 /* connection_white.png */,
 				30C4EDAF2267C1890046B615 /* doublexp_white.png */,
 				30C4EDB02267C1890046B615 /* team_thumbs_up.png */,
 				30C4EDB12267C1890046B615 /* vintage_tv.png */,
@@ -861,6 +900,7 @@
 				3080B40623BC089E00638B22 /* check.png in Resources */,
 				30F6FCC023CD7F9D0051813D /* open-menu.png in Resources */,
 				3080B3F223B9362C00638B22 /* more.png in Resources */,
+				301B4AEA23F649A300A6FE5B /* hqdefault.jpg in Resources */,
 				30F6FCBA23CBFF9D0051813D /* more (1).png in Resources */,
 				301AEF5623886D7100339850 /* star.png in Resources */,
 				307CE34F23EA3EA100DCB12A /* information.png in Resources */,
@@ -873,6 +913,7 @@
 				3080B3E223B7FAA700638B22 /* request.png in Resources */,
 				3080B3E823B81B5B00638B22 /* messaging_button.png in Resources */,
 				3080B3F023B92A5900638B22 /* Rainbow_Six_Siege.jpg in Resources */,
+				308E79BE23FF492600197035 /* connection_white.png in Resources */,
 				3080B3E623B80BE400638B22 /* request_highlight.png in Resources */,
 				3058198223D27152008684A7 /* observation.png in Resources */,
 				3058198023D26F72008684A7 /* pen.png in Resources */,
@@ -880,7 +921,9 @@
 				309F3A1323B40CA900FD0C48 /* left-arrow.png in Resources */,
 				307CE35923EC9C2100DCB12A /* send.png in Resources */,
 				4C4D882E2205F33200AD7090 /* Assets.xcassets in Resources */,
+				308E79BC23FF471D00197035 /* meeting.png in Resources */,
 				30B583CB2347B5E500736733 /* gamespot_icon_ios.png in Resources */,
+				308E79C023FF4B2C00197035 /* hashtag.png in Resources */,
 				30F6FCC423CD96620051813D /* dashboard.png in Resources */,
 				3058198423D27160008684A7 /* search.png in Resources */,
 				30B583D8234FD01700736733 /* GoogleService-Info.plist in Resources */,
@@ -895,6 +938,7 @@
 				3071171123E1014A005F6355 /* 580b57fcd9996e24bc43c540.png in Resources */,
 				30A60D8B2363C784004B2150 /* communications.png in Resources */,
 				305D8F1023DFE605007D0991 /* live.png in Resources */,
+				301B4AEC23F7462400A6FE5B /* bubble.png in Resources */,
 				3080B3FC23BBCB1D00638B22 /* comment-black-oval-bubble-shape.png in Resources */,
 				308BD02C238ED0A10034822B /* invitation.png in Resources */,
 				30A60D8F2363C91B004B2150 /* group.png in Resources */,
@@ -909,6 +953,8 @@
 				30A60D8D2363C801004B2150 /* like.png in Resources */,
 				308BD032238ED2450034822B /* restaurant-membership-card-tool.png in Resources */,
 				3080B40423BC07BE00638B22 /* x-mark.png in Resources */,
+				308EBA2623FDCCDC00DE186D /* live_menu.png in Resources */,
+				308EBA2423FDCC4300DE186D /* connection.png in Resources */,
 				3080B3E423B80A5B00638B22 /* request2.png in Resources */,
 				306E6B5B23DE49F70069F426 /* live_streaming.png in Resources */,
 				30C4EDB22267C1890046B615 /* double_xp_small_white.png in Resources */,
@@ -1059,6 +1105,7 @@
 				30A60D9423668A0D004B2150 /* GamerConnectFrag.swift in Sources */,
 				30B6E19F23ADB81600B69F00 /* OptionCell.swift in Sources */,
 				30B583D1234FC50B00736733 /* LoginController.swift in Sources */,
+				301B4AE223F07DC900A6FE5B /* FreeAgentExpandingResultCell.swift in Sources */,
 				308BD01F238B06800034822B /* gcGameCreateCell.swift in Sources */,
 				4C790E8A2266B85500FDA550 /* AdminActivity.swift in Sources */,
 				3080B3F423B94A6500638B22 /* ProfileStatCell.swift in Sources */,
@@ -1066,6 +1113,7 @@
 				4C4D88262205F32900AD7090 /* ViewController.swift in Sources */,
 				308213DE2267E91500A11876 /* LandingCollection.swift in Sources */,
 				30B583E223529B2500736733 /* RegisterActivity.swift in Sources */,
+				301B4AE623F4DB6F00A6FE5B /* FreeAgentDashCell.swift in Sources */,
 				4CC1720322677FA5009A1B80 /* LandingActivity.swift in Sources */,
 				4CC17206226781DF009A1B80 /* NewsObject.swift in Sources */,
 				305D8F0E23DFD03D007D0991 /* TestPlayer.swift in Sources */,
@@ -1114,6 +1162,7 @@
 				30B6E1A923B125AB00B69F00 /* ConfirmationQuestionCell.swift in Sources */,
 				30A84DE423809BD4007BEAA5 /* StatHeaderCell.swift in Sources */,
 				30B583EA2353A0FA00736733 /* HWSwiftyViewPager.swift in Sources */,
+				307CE35D23EE404B00DCB12A /* FAHeaderCell.swift in Sources */,
 				307CE34723E9F62300DCB12A /* MenuFriendsList.swift in Sources */,
 				30B583E023526C6300736733 /* StatObject.swift in Sources */,
 				30B6E19323A71E8F00B69F00 /* faQuizGameCell.swift in Sources */,
@@ -1124,6 +1173,7 @@
 				306E6B5F23DE991B0069F426 /* TwitchPlayerViewController.swift in Sources */,
 				30A84DEC2381DED0007BEAA5 /* Requests.swift in Sources */,
 				3058240C239C3D7900FDEA7D /* UserChatBubble.swift in Sources */,
+				307CE35F23EE5CC200DCB12A /* AnswerTableCell.swift in Sources */,
 				3086956F23BD9971001E51EF /* SegueFromRight.swift in Sources */,
 				30B6E19923AC16CC00B69F00 /* FAQuizPage.swift in Sources */,
 				30B6E1A523ADC67E00B69F00 /* InterviewManager.swift in Sources */,
@@ -1144,12 +1194,14 @@
 				30B6E1AB23B14F4400B69F00 /* FAQuizComplete.swift in Sources */,
 				30B6E19B23AC17EA00B69F00 /* FAQuizCover.swift in Sources */,
 				30A84DF823836FB9007BEAA5 /* FriendRequestObject.swift in Sources */,
+				301B4AE423F07DEC00A6FE5B /* FreeAgentExpandingActionCell.swift in Sources */,
 				30FC34C723E927BE007F0080 /* MenuSettingsCell.swift in Sources */,
 				308BD01D238AED570034822B /* CreateTeamFrag.swift in Sources */,
 				30B6E18B23A472A300B69F00 /* FreeAgentFront.swift in Sources */,
 				30B583CF2348290700736733 /* GamerConnectGame.swift in Sources */,
 				308BD023238B521B0034822B /* TeamNeedsSelection.swift in Sources */,
 				30EBC3FA23D608DB009CFAB2 /* TeamTweetCell.swift in Sources */,
+				301B4AE823F4DB8A00A6FE5B /* FreeAgentDashExpanded.swift in Sources */,
 				30B6E18323A09A8900B69F00 /* FreeAgentManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

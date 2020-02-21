@@ -16,12 +16,14 @@ import SwiftNotificationCenter
 class FAQuizPage: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, FreeAgentQuizNav{
     var question: FAQuestion?
     private var options = [String]()
+    private var optionDescriptions = [String]()
     private var interviewManager: InterviewManager?
     
-    @IBOutlet weak var questionNumber: UILabel!
     @IBOutlet weak var questionDescription: UILabel!
     @IBOutlet weak var questionLabel: UILabel!
     @IBOutlet weak var questionOptions: UICollectionView!
+    
+    private let reuseIdentifier = "cell"
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,7 +31,6 @@ class FAQuizPage: UIViewController, UICollectionViewDataSource, UICollectionView
         let delegate = UIApplication.shared.delegate as! AppDelegate
         interviewManager = delegate.interviewManager
         
-        questionNumber.text = "Question # " + question!.questionNumber
         questionDescription.text = question!.questionDescription
         questionLabel.text = question!.question
         
@@ -49,6 +50,22 @@ class FAQuizPage: UIViewController, UICollectionViewDataSource, UICollectionView
             options.append(question!.option5)
         }
         
+        if(!question!.option1Description.isEmpty){
+            optionDescriptions.append(question!.option1Description)
+        }
+        if(!question!.option2Description.isEmpty){
+            optionDescriptions.append(question!.option2Description)
+        }
+        if(!question!.option3Description.isEmpty){
+            optionDescriptions.append(question!.option3Description)
+        }
+        if(!question!.option4Description.isEmpty){
+            optionDescriptions.append(question!.option4Description)
+        }
+        if(!question!.option5Description.isEmpty){
+            optionDescriptions.append(question!.option5Description)
+        }
+        
         questionOptions.delegate = self
         questionOptions.dataSource = self
     }
@@ -64,10 +81,11 @@ class FAQuizPage: UIViewController, UICollectionViewDataSource, UICollectionView
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! OptionCell
         let current = self.options[indexPath.item]
         cell.answer.text = current
+        cell.answerDesc.text = self.optionDescriptions[indexPath.item]
         
-        cell.contentView.layer.cornerRadius = 2.0
+        cell.contentView.layer.cornerRadius = 20.0
         cell.contentView.layer.borderWidth = 1.0
-        cell.contentView.layer.borderColor = UIColor.black.cgColor
+        cell.contentView.layer.borderColor = UIColor.white.cgColor
         cell.contentView.layer.masksToBounds = true
 
         cell.layer.shadowColor = UIColor.black.cgColor
@@ -82,21 +100,36 @@ class FAQuizPage: UIViewController, UICollectionViewDataSource, UICollectionView
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let cell = self.questionOptions.cellForItem(at: indexPath) as! OptionCell
-        cell.contentView.layer.borderColor = UIColor.blue.cgColor
-        cell.answer.textColor = UIColor.blue
-        
-        for unselectedAnswer in self.questionOptions.visibleCells{
-            if(unselectedAnswer != cell){
-                cell.contentView.layer.borderColor = UIColor.black.cgColor
-                cell.answer.textColor = UIColor.black
-            }
-        }
-        
         updateAnswer(answer: cell.answer.text!, question: question!)
     }
     
+    func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
+        UIView.animate(withDuration: 0.2) {
+            if let cell = collectionView.cellForItem(at: indexPath) as? OptionCell {
+                cell.answer.transform = .init(scaleX: 0.95, y: 0.95)
+                cell.answerDesc.transform = .init(scaleX: 0.95, y: 0.95)
+                cell.divider.transform = .init(scaleX: 0.95, y: 0.95)
+                cell.layer.shadowOpacity = 0
+            }
+        }
+    }
+
+    func collectionView(_ collectionView: UICollectionView, didUnhighlightItemAt indexPath: IndexPath) {
+        UIView.animate(withDuration: 0.2) {
+            if let cell = collectionView.cellForItem(at: indexPath) as? OptionCell {
+                cell.answer.transform = .identity
+                cell.answerDesc.transform = .identity
+                cell.divider.transform = .identity
+                cell.layer.shadowOpacity = 0.5
+            }
+        }
+    }
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-            return CGSize(width: collectionView.bounds.size.width, height: CGFloat(50))
+        let flowayout = collectionViewLayout as? UICollectionViewFlowLayout
+        let space: CGFloat = (flowayout?.minimumInteritemSpacing ?? 0.0) + (flowayout?.sectionInset.left ?? 0.0) + (flowayout?.sectionInset.right ?? 0.0)
+        let size:CGFloat = (collectionView.frame.size.width - space) / 2.0
+        return CGSize(width: size, height: size)
     }
     
     func updateAnswer(answer: String, question: FAQuestion) {

@@ -12,6 +12,10 @@ import FoldingCell
 class TeamBuildFriendCell: FoldingCell{
     
     @IBOutlet weak var drawer: UIView!
+    @IBOutlet weak var coverLabel: UILabel!
+    @IBOutlet weak var underLabel: UILabel!
+    @IBOutlet weak var profileButton: UIButton!
+    @IBOutlet weak var inviteButton: UIButton!
     
     
     override func awakeFromNib() {
@@ -24,11 +28,21 @@ class TeamBuildFriendCell: FoldingCell{
         drawer.layer.cornerRadius = 10
         drawer.layer.masksToBounds = true
         
-        super.awakeFromNib()
-    }
-    
-    func setUI(friendRequest: FriendRequestObject?, team: TeamObject?){
+        inviteButton.layer.shadowColor = UIColor.black.cgColor
+        inviteButton.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+        inviteButton.layer.shadowRadius = 2.0
+        inviteButton.layer.shadowOpacity = 0.5
+        inviteButton.layer.masksToBounds = false
+        inviteButton.layer.shadowPath = UIBezierPath(roundedRect: inviteButton.bounds, cornerRadius: inviteButton.layer.cornerRadius).cgPath
         
+        profileButton.layer.shadowColor = UIColor.black.cgColor
+        profileButton.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+        profileButton.layer.shadowRadius = 2.0
+        profileButton.layer.shadowOpacity = 0.5
+        profileButton.layer.masksToBounds = false
+        profileButton.layer.shadowPath = UIBezierPath(roundedRect: inviteButton.bounds, cornerRadius: inviteButton.layer.cornerRadius).cgPath
+        
+        super.awakeFromNib()
     }
 
     override func animationDuration(_ itemIndex: NSInteger, type _: FoldingCell.AnimationType) -> TimeInterval {

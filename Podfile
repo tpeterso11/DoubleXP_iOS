@@ -22,7 +22,9 @@ target 'DoubleXP' do
   pod 'SwiftTwitch'
   pod 'TwitchPlayer'
   pod 'MessageKit'
+  pod 'Bartinter'
   pod 'ExpyTableView'
+  pod 'PopupDialog', '~> 1.0'
   pod 'UnderLineTextField', '~> 2.1'
 
   # Pods for DoubleXP

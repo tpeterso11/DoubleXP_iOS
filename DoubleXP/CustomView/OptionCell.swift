@@ -12,5 +12,8 @@ import UIKit
 
 class OptionCell: UICollectionViewCell{
     
+    @IBOutlet weak var divider: UIView!
     @IBOutlet weak var answer: UILabel!
+    @IBOutlet weak var answerDesc: UILabel!
+    @IBOutlet weak var cover: UIView!
 }

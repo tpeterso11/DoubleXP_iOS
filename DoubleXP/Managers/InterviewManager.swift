@@ -20,7 +20,8 @@ class InterviewManager{
     
     
     func initialize(gameName: String, uId: String){
-        faObject = FreeAgentObject(gamerTag: "", competitionId: "", consoles: [String](), game: gameName, userId: uId, questions: [[String]]())
+        let profileManager = GamerProfileManager()
+        faObject = FreeAgentObject(gamerTag: profileManager.getGamerTagForGame(gameName: gameName), competitionId: "", consoles: [String](), game: gameName, userId: uId, questions: [[String]]())
     }
     
     func setConsoles(console: String){
@@ -54,7 +55,7 @@ class InterviewManager{
     
     func showNextQuestion(){
         currentQuestionIndex += 1
-        if(questions.count != (currentQuestionIndex + 1)){
+        if(questions.count + 1 != (currentQuestionIndex + 1)){
             Broadcaster.notify(FreeAgentQuizNav.self) {
                 $0.addQuestion(question: questions[currentQuestionIndex])
             }
@@ -239,7 +240,6 @@ class InterviewManager{
     
     private func checkProfileExists(multiStep : Bool, callbacks: FreeAgentQuizNav) {
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        let currentUser = delegate.currentUser
         let profiles = delegate.freeAgentProfiles ?? [FreeAgentObject]()
         var contained = false
         
@@ -310,7 +310,7 @@ class InterviewManager{
                                 profile.statTree = statTree
                             }
                             else if(statObj.gameName == "Rainbow Six Siege"){
-                                let statTree = ["currentRank": statObj.currentRank, "killsPVP": statObj.killsPVP, "totalRankedWins": statObj.totalRankedWins, "totalRankedLosses": statObj.totalRankedLosses, "totalRankedKills": statObj.totalRankedKills, "totalRankedLosses": statObj.totalRankedDeaths, "mostUsedAttacker": statObj.mostUsedAttacker, "mostUsedDefender": statObj.mostUsedDefender]
+                                let statTree = ["currentRank": statObj.currentRank, "killsPVP": statObj.killsPVP, "totalRankedWins": statObj.totalRankedWins, "totalRankedLosses": statObj.totalRankedLosses, "totalRankedKills": statObj.totalRankedKills, "totalRankedDeaths": statObj.totalRankedDeaths, "mostUsedAttacker": statObj.mostUsedAttacker, "mostUsedDefender": statObj.mostUsedDefender]
                                 profile.statTree = statTree
                             }
                         }

@@ -17,9 +17,10 @@ class FreeAgentFront: UIViewController, UICollectionViewDataSource, UICollection
     var team: TeamObject?
     var games = [GamerConnectGame]()
     var chosenGame = ""
+    var currentPos = 0
     
-    @IBOutlet weak var gcGames: UICollectionView!
     @IBOutlet weak var nextButton: UIImageView!
+    @IBOutlet weak var gcGameList: UICollectionView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,11 +28,14 @@ class FreeAgentFront: UIViewController, UICollectionViewDataSource, UICollection
         let delegate = UIApplication.shared.delegate as! AppDelegate
         games = delegate.gcGames
         
-        gcGames.configureForPeekingDelegate()
-        gcGames.delegate = self
-        gcGames.dataSource = self
+        gcGameList.delegate = self
+        gcGameList.dataSource = self
+        //gcGameList.configureForPeekingDelegate()
         
         handleNextButton(activate: false)
+        
+        chosenGame = "NBA 2K20"
+        handleNextButton(activate: true)
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -39,45 +43,34 @@ class FreeAgentFront: UIViewController, UICollectionViewDataSource, UICollection
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! faQuizGameCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! homeGCCell
         
         let game = games[indexPath.item]
-        cell.gameBack.moa.url = game.imageUrl
-        cell.gameBack.contentMode = .scaleAspectFill
-        cell.gameBack.clipsToBounds = true
+        cell.backgroundImage.moa.url = game.imageUrl
+        cell.backgroundImage.contentMode = .scaleAspectFill
+        cell.backgroundImage.clipsToBounds = true
         
-        cell.gameName.text = games[indexPath.item].gameName
+        cell.hook.text = games[indexPath.item].gameName
         
-        cell.contentView.layer.cornerRadius = 2.0
-        cell.contentView.layer.borderWidth = 1.0
-        cell.contentView.layer.borderColor = UIColor.clear.cgColor
-        cell.contentView.layer.masksToBounds = true
-        
-        cell.layer.shadowColor = UIColor.black.cgColor
-        cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
-        cell.layer.shadowRadius = 2.0
-        cell.layer.shadowOpacity = 0.5
-        cell.layer.masksToBounds = false
-        cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let cell = self.gcGames.cellForItem(at: indexPath) as! faQuizGameCell
+        let cell = self.gcGameList.cellForItem(at: indexPath) as! homeGCCell
         
         if(chosenGame != games[indexPath.item].gameName){
             chosenGame = games[indexPath.item].gameName
             cell.cover.isHidden = false
-            cell.gameName.textColor = UIColor.white
+            //cell.hook.textColor = UIColor.white
         }
         else{
             chosenGame = ""
             cell.cover.isHidden = true
-            cell.gameName.textColor = UIColor.black
+            //cell.hook.textColor = UIColor.black
         }
         
-        for gameCell in gcGames.visibleCells {
-            if (cell != gameCell as! faQuizGameCell){
+        for gameCell in gcGameList.visibleCells {
+            if (cell != gameCell as! homeGCCell){
                 (gameCell as! faQuizGameCell).cover.isHidden = true
                 (gameCell as! faQuizGameCell).gameName.textColor = UIColor.black
             }
@@ -89,9 +82,8 @@ class FreeAgentFront: UIViewController, UICollectionViewDataSource, UICollection
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let kWhateverHeightYouWant = 150
         
-        return CGSize(width: collectionView.bounds.size.width, height: CGFloat(kWhateverHeightYouWant))
+        return CGSize(width: 280, height: 180)
     }
     
     private func handleNextButton(activate: Bool){
@@ -106,6 +98,32 @@ class FreeAgentFront: UIViewController, UICollectionViewDataSource, UICollection
             nextButton.alpha = 0.4
             nextButton.isUserInteractionEnabled = false
         }
+    }
+    
+    @objc func cellTapped(_ sender: AnyObject?) {
+        let indexPath = IndexPath(row: self.currentPos, section: 0)
+        
+        let cell = self.gcGameList.cellForItem(at: indexPath) as! homeGCCell
+        
+        if(chosenGame != games[indexPath.item].gameName){
+            chosenGame = games[indexPath.item].gameName
+            cell.cover.isHidden = false
+            //cell.hook.textColor = UIColor.white
+        }
+        else{
+            chosenGame = ""
+            cell.cover.isHidden = true
+            //cell.hook.textColor = UIColor.black
+        }
+        
+        for gameCell in gcGameList.visibleCells {
+            if (cell != gameCell as! homeGCCell){
+                (gameCell as! faQuizGameCell).cover.isHidden = true
+                (gameCell as! faQuizGameCell).gameName.textColor = UIColor.black
+            }
+        }
+        
+        handleNextButton(activate: chosenGame != "")
     }
     
     @objc func nextClicked(_ sender: AnyObject?) {

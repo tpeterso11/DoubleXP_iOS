@@ -22,13 +22,13 @@ class TeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate {
     @IBOutlet weak var faDashButton: UIView!
     @IBOutlet weak var teamSearchButton: UIView!
     @IBOutlet weak var headerView: UIView!
+    private var emptyTeamList = [TeamObject]()
     
+    @IBOutlet weak var buttonLayout: UIView!
     private var user: User?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        populateList()
         
         let createTap = UITapGestureRecognizer(target: self, action: #selector(createButtonClicked))
         createButton.isUserInteractionEnabled = true
@@ -54,18 +54,26 @@ class TeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate {
         
         appDelegate.navStack.append(self)
         self.pageName = "Team"
+        
+        populateList()
     }
     
     @objc func createButtonClicked(_ sender: AnyObject?) {
-        LandingActivity().navigateToCreateFrag()
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let currentLanding = appDelegate.currentLanding
+        currentLanding?.navigateToCreateFrag()
     }
     
     @objc func faButtonClicked(_ sender: AnyObject?) {
-        LandingActivity().navigateToTeamFreeAgentDash()
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let currentLanding = appDelegate.currentLanding
+        currentLanding?.navigateToTeamFreeAgentDash()
     }
     
     @objc func searchButtonClicked(_ sender: AnyObject?) {
-        LandingActivity().navigateToViewTeams()
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let currentLanding = appDelegate.currentLanding
+        currentLanding?.navigateToViewTeams()
     }
     
     private func populateList(){
@@ -90,27 +98,65 @@ class TeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate {
             status.text = "Inactive"
         }
         
-        teamList.delegate = self
-        teamList.dataSource = self
+        if((user?.teams.isEmpty)!){
+            let emptyTeam = TeamObject(teamName: "No Teams", teamId: "", games: ["Tap to build your first."], consoles: [""], teammateTags: [""], teammateIds: [""], teamCaptain: "", teamInvites: [TeamInviteObject](), teamChat: "", teamInviteTags: [""], teamNeeds: [""], selectedTeamNeeds: [""], imageUrl: "")
+            
+            self.emptyTeamList.append(emptyTeam)
+        }
+        
+        self.animateView()
+    }
+    
+    private func animateView(){
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            self.teamList.delegate = self
+            self.teamList.dataSource = self
+            
+            let top = CGAffineTransform(translationX: 0, y: 30)
+            let top2 = CGAffineTransform(translationX: 0, y: -30)
+            
+            UIView.animate(withDuration: 0.8, animations: {
+                    self.teamList.alpha = 1
+                    self.teamList.transform = top
+                }, completion: { (finished: Bool) in
+                    UIView.animate(withDuration: 0.8, delay: 0.2, options: [], animations: {
+                        self.buttonLayout.transform = top2
+                        self.buttonLayout.alpha = 1
+                }, completion: nil)
+            })
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return user?.teams.count ?? 0
+        if((user?.teams.isEmpty)!){
+            return self.emptyTeamList.count
+        }
+        else{
+            return user?.teams.count ?? 0
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "teamCell", for: indexPath) as! TeamCellTeamFrag
         
-        let current = user?.teams[indexPath.item]
-        cell.teamName.text = current?.teamName
+        var current: TeamObject
         
-        if(current?.teamCaptain == self.user?.uId ?? ""){
+        if((user?.teams.isEmpty)!){
+            current = self.emptyTeamList[indexPath.item]
+        }
+        else{
+            current = (user?.teams[indexPath.item]) ?? TeamObject(teamName: "", teamId: "", games: [""], consoles: [""], teammateTags: [""], teammateIds: [""], teamCaptain: "", teamInvites: [TeamInviteObject](), teamChat: "", teamInviteTags: [""], teamNeeds: [""], selectedTeamNeeds: [""], imageUrl: "")
+        }
+        cell.teamName.text = current.teamName
+        
+        
+        if(current.teamCaptain == self.user?.uId ?? ""){
             cell.captainStar.isHidden = false
         }
         
-        if(!(current?.games.isEmpty)!){
-            cell.gameName.text = current?.games[0]
+        if(!current.games.isEmpty){
+            cell.gameName.text = current.games[0]
         }
         
         cell.contentView.applyGradient(colours:  [#colorLiteral(red: 0.9491214156, green: 0.9434790015, blue: 0.953458488, alpha: 1), #colorLiteral(red: 0.945284307, green: 0.9604713321, blue: 0.9703486562, alpha: 1)], orientation: .horizontal)
@@ -130,9 +176,14 @@ class TeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let team = user?.teams[indexPath.item]
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let currentLanding = appDelegate.currentLanding
-        currentLanding!.navigateToTeamDashboard(team: team!, newTeam: false)
+        if(!user!.teams.isEmpty){
+            let team = user?.teams[indexPath.item]
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let currentLanding = appDelegate.currentLanding
+            currentLanding!.navigateToTeamDashboard(team: team!, newTeam: false)
+        }
+        else{
+            self.createButtonClicked(self)
+        }
     }
 }

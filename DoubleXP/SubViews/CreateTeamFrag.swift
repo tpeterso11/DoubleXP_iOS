@@ -12,16 +12,22 @@ import ImageLoader
 import moa
 import MSPeekCollectionViewDelegateImplementation
 import UnderLineTextField
+import SendBirdSDK
 
-class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate, MSPeekImplementationDelegate, UICollectionViewDelegateFlowLayout {
+class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate, MSPeekImplementationDelegate, UICollectionViewDelegateFlowLayout, MessagingCallbacks {
     
     @IBOutlet weak var gcGameScroll: UICollectionView!
     @IBOutlet weak var psSwitch: UISwitch!
     @IBOutlet weak var xboxSwitch: UISwitch!
     @IBOutlet weak var pcSwitch: UISwitch!
     @IBOutlet weak var nintendoSwitch: UISwitch!
-    @IBOutlet weak var teamCreateNext: UIImageView!
+    //@IBOutlet weak var teamCreateNext: UIImageView!
+    @IBOutlet weak var bottomView: UIView!
+    @IBOutlet weak var createButton: UIButton!
     @IBOutlet weak var teamName: UnderLineTextField!
+    private var tempPayload = [String: Any]()
+    private var setupTeamObj: TeamObject?
+    private var selectedCells = [String]()
     
     var switches = [UISwitch]()
     var consoleChecked = false
@@ -33,8 +39,9 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        gcGameScroll.delegate = self
-        gcGameScroll.dataSource = self
+        //animateView()
+        self.gcGameScroll.delegate = self
+        self.gcGameScroll.dataSource = self
         gcGameScroll.configureForPeekingDelegate()
         
         switches.append(psSwitch)
@@ -46,8 +53,6 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let currentLanding = appDelegate.currentLanding
-        appDelegate.navStack.append(self)
-        
         gcGames = appDelegate.gcGames
         
         psSwitch.addTarget(self, action: #selector(psSwitchChanged), for: UIControl.Event.valueChanged)
@@ -57,15 +62,25 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         
         teamName.addTarget(self, action: #selector(self.textFieldDidChange(_:)), for: UIControl.Event.editingChanged)
         
-        let singleTap = UITapGestureRecognizer(target: self, action: #selector(createButtonClicked(_:)))
-        singleTap.numberOfTapsRequired = 1
-        teamCreateNext.isUserInteractionEnabled = true
-        teamCreateNext.addGestureRecognizer(singleTap)
+        checkNextActivation()
+    }
+    
+    private func animateView(){
+        /*DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+        self.gcGameScroll.delegate = self
+        self.gcGameScroll.dataSource = self
+        
+            let top = CGAffineTransform(translationX: 0, y: -20)
+            UIView.animate(withDuration: 0.8, animations: {
+                self.gcGameScroll.alpha = 1
+                self.gcGameScroll.transform = top
+            }, completion: nil)
+        }*/
     }
     
     @objc func textFieldDidChange(_ textField: UITextField) {
         if(textField.text != nil){
-            if textField.text!.count >= 5 {
+            if textField.text!.count >= 3 {
                 gamerTagChosen = true
                 checkNextActivation()
             }
@@ -134,14 +149,15 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
     
     private func checkNextActivation(){
         if(consoleChecked && gamerTagChosen){
-            teamCreateNext.alpha = 1
+            createButton.alpha = 1
             
-            teamCreateNext.isUserInteractionEnabled = true
+            createButton.isUserInteractionEnabled = true
+             createButton.addTarget(self, action: #selector(createButtonClicked), for: .touchUpInside)
         }
         else{
-            teamCreateNext.alpha = 0.33
+            createButton.alpha = 0.33
            
-            teamCreateNext.isUserInteractionEnabled = false
+            createButton.isUserInteractionEnabled = false
         }
     }
     
@@ -175,31 +191,13 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
     }
     
     private func createTeam(team: TeamObject){
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        let user = delegate.currentUser
+        self.setupTeamObj = team
         
-        let ref = Database.database().reference().child("Teams")
-        let userRef = Database.database().reference().child("Users").child(user!.uId)
-
-        var teammates = [Dictionary<String, String>]()
-        for teammate in team.teammates{
-            let current = ["gamerTag": teammate.gamerTag, "date": teammate.date, "uid": teammate.uid]
-            teammates.append(current)
-        }
+        let manager = MessagingManager()
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let user = appDelegate.currentUser
         
-        let current = ["teamName": team.teamName, "teamId": team.teamId, "games": team.games, "consoles": team.consoles, "teammateTags": team.teammateTags, "teammateIds": team.teammateIds, "teamCaptain": team.teamCaptain, "teamInvites": team.teamInvites, "teamChat": team.teamChat, "teamInviteTags": team.teamInviteTags, "teamNeeds": team.teamNeeds, "selectedTeamNeeds": team.selectedTeamNeeds, "imageUrl": team.imageUrl, "teammates": teammates] as [String : Any]
-        
-        ref.child(team.teamName).setValue(current)
-        userRef.child("teams").child(team.teamName).setValue(current)
-        
-        user?.teams.append(team)
-        
-        if (!team.teamNeeds.isEmpty){
-            LandingActivity().navigateToTeamNeeds(team: team)
-        }
-        else{
-            LandingActivity().navigateToTeamDashboard(team: team, newTeam: true)
-        }
+        manager.setup(sendBirdId: nil, currentUser: user!, messagingCallbacks: self)
     }
     
     private func randomAlphaNumericString(length: Int) -> String {
@@ -237,12 +235,16 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         cell.backgroundImage.contentMode = .scaleAspectFill
         cell.backgroundImage.clipsToBounds = true
         
-        cell.hook.text = game.gameName
-        cell.hook.isHidden = true
+        cell.hook.text = game.secondaryName.uppercased()
         
-        cell.cover.clipsToBounds = true
-        cell.cover.bounds.size.height = cell.bounds.size.height
-        cell.cover.bounds.size.width = cell.bounds.size.width
+        if(self.selectedCells.contains(game.gameName)){
+            cell.hook.isHidden = false
+            cell.cover.isHidden = false
+        }
+        else{
+            cell.hook.isHidden = true
+            cell.cover.isHidden = true
+        }
         
         cell.contentView.layer.cornerRadius = 2.0
         cell.contentView.layer.borderWidth = 1.0
@@ -264,22 +266,34 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         let kWhateverHeightYouWant = 150
         
-        return CGSize(width: collectionView.bounds.size.width - 40, height: CGFloat(kWhateverHeightYouWant))
+        return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(kWhateverHeightYouWant))
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let currentCell = collectionView.cellForItem(at: indexPath as IndexPath) as! homeGCCell
+        
+        self.chosenGame = ""
+        
+        if(self.selectedCells.contains(self.gcGames[indexPath.item].gameName)){
+            self.selectedCells.remove(at: self.selectedCells.index(of: self.gcGames[indexPath.item].gameName)!)
+            currentCell.cover.isHidden = true
+            currentCell.hook.isHidden = true
+        }
+        else{
+            self.selectedCells = [String]()
+            self.selectedCells.append(currentCell.hook.text!)
+            currentCell.cover.isHidden = false
+            currentCell.hook.isHidden = false
+            
+            self.chosenGame = self.gcGames[indexPath.item].gameName
+        }
+        
+        
         for cell in collectionView.visibleCells as! [homeGCCell] {
             if cell == collectionView.cellForItem(at: indexPath as IndexPath) as! homeGCCell{
-                if(cell.cover.isHidden == false){
+                if(cell != currentCell && cell.cover.isHidden == false){
                     cell.cover.isHidden = true
                     cell.hook.isHidden = true
-                    
-                    self.chosenGame = ""
-                }
-                else{
-                    self.chosenGame = cell.hook.text!
-                    cell.cover.isHidden = false
-                    cell.hook.isHidden = false
                 }
             }
             else{
@@ -289,4 +303,50 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         }
     }
 
+    func connectionSuccessful() {
+        let manager = MessagingManager()
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let user = appDelegate.currentUser
+        manager.createTeamChannel(userId: user!.uId, callbacks: self)
+    }
+    
+    func createTeamChannelSuccessful(groupChannel: SBDGroupChannel) {
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let user = delegate.currentUser
+        let ref = Database.database().reference().child("Teams")
+        let userRef = Database.database().reference().child("Users").child(user!.uId)
+        let team = self.setupTeamObj!
+        
+        var teammates = [Dictionary<String, String>]()
+        for teammate in team.teammates{
+            let current = ["gamerTag": teammate.gamerTag, "date": teammate.date, "uid": teammate.uid]
+            teammates.append(current)
+        }
+        
+        tempPayload = ["teamName": team.teamName, "teamId": team.teamId, "games": team.games, "consoles": team.consoles, "teammateTags": team.teammateTags, "teammateIds": team.teammateIds, "teamCaptain": team.teamCaptain, "teamInvites": team.teamInvites, "teamChat": groupChannel.channelUrl, "teamInviteTags": team.teamInviteTags, "teamNeeds": team.teamNeeds, "selectedTeamNeeds": team.selectedTeamNeeds, "imageUrl": team.imageUrl, "teammates": teammates] as [String : Any]
+        
+        user?.teams.append(team)
+        ref.child(team.teamName).setValue(tempPayload)
+        userRef.child("teams").child(team.teamName).setValue(tempPayload)
+        
+        let currentLanding = delegate.currentLanding
+        if (!self.setupTeamObj!.teamNeeds.isEmpty){
+            currentLanding?.navigateToTeamNeeds(team: self.setupTeamObj!)
+        }
+        else{
+            currentLanding?.navigateToTeamDashboard(team: self.setupTeamObj!, newTeam: true)
+        }
+    }
+    
+    func messageSuccessfullyReceived(message: SBDUserMessage) {
+    }
+    
+    func onMessagesLoaded(messages: [SBDUserMessage]) {
+    }
+    
+    func successfulLeaveChannel() {
+    }
+    
+    func messageSentSuccessfully(chatMessage: ChatMessage, sender: SBDSender) {
+    }
 }
