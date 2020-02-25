@@ -200,6 +200,7 @@ class PreSplashActivity: UIViewController {
                 gamerTags.append(currentGamerTagObj)
             }
             let messagingNotifications = value?["messagingNotifications"] as? Bool ?? false
+            
             var teams = [TeamObject]()
             let teamsArray = snapshot.childSnapshot(forPath: "teams")
             for teamObj in teamsArray.children {
@@ -224,16 +225,6 @@ class PreSplashActivity: UIViewController {
                     let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid)
                     invites.append(newInvite)
                 }
-                
-                /*var currentMessaging = [ChatObject]()
-                let chatArray = snapshot.childSnapshot(forPath: "messaging")
-                for chatObj in chatArray.children {
-                    let currentObj = chatObj as! DataSnapshot
-                    let dict = currentObj.value as! [String: Any]
-                    let channelUrl = dict["channelUrl"] as? String ?? ""
-                    let legacy = dict["legacy"] as? String ?? ""
-                    let otherUser = dict["otherUser"] as? String ?? ""
-                }*/
                 
                 let teamInvitetags = dict["teamInviteTags"] as? [String] ?? [String]()
                 let captain = dict["teamCaptain"] as? String ?? ""

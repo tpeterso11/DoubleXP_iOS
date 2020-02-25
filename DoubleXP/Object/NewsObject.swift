@@ -82,11 +82,6 @@ class NewsObject: NSObject, NSCoding {
     {
         super.init()
         self.imageUrl = (decoder.decodeObject(forKey: "imageUrl") as! String)
-        /*self.soundUrl = decoder.decodeObject(forKey: "soundUrl") as! String
-        self.soundName = decoder.decodeObject(forKey: "soundName") as! String
-        self.active = decoder.decodeObject(forKey: "active") as! String
-        self.repeatAlarm = decoder.decodeObject(forKey: "repeat") as! String
-        self.id = decoder.decodeObject(forKey: "id") as! String*/
     }
     
     func encode(with coder: NSCoder) {

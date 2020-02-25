@@ -38,23 +38,28 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
     @IBOutlet weak var teamRoster: UICollectionView!
     @IBOutlet weak var tweetCollection: UICollectionView!
     @IBOutlet weak var tweetStreamSegment: UISegmentedControl!
-    @IBOutlet weak var twitchStreamList: UICollectionView!
     @IBOutlet weak var webview: WKWebView!
     @IBOutlet weak var twitchPlayer: TestPlayer!
+    var dataSet = "twitter"
+    @IBOutlet weak var spinner: UIActivityIndicatorView!
     
     @IBAction func onChange(_ sender: Any) {
         switch (tweetStreamSegment.selectedSegmentIndex){
         case 0:
             //Show Twitter
+            self.dataSet = "twitter"
             UIView.animate(withDuration: 0.25, delay: 0.0, options: UIView.AnimationOptions.curveEaseInOut, animations: {
-                    self.twitchStreamList.transform = CGAffineTransform(translationX: 0, y: 0)
+                    self.tweetCollection.transform = CGAffineTransform(translationX: 0, y: 0)
+                    self.tweetCollection.alpha = 0
                 }) { (finished) in
-                    self.tweetCollection.delegate = self
-                    self.tweetCollection.dataSource = self
-                    self.twitchStreamList.reloadData()
+                    //self.tweetCollection.delegate = self
+                    //self.tweetCollection.dataSource = self
+                    self.tweetCollection.reloadData()
                     
+                    let top = CGAffineTransform(translationX: 0, y: -10)
                     UIView.animate(withDuration: 0.25, delay: 0.0, options: UIView.AnimationOptions.curveEaseInOut, animations: {
-                        self.tweetCollection.transform = CGAffineTransform(translationX: 0, y: 0)
+                        self.tweetCollection.transform = top
+                        self.tweetCollection.alpha = 1
                     }) { (finished) in
                         
                         self.manager.loadTwitchStreams(team: self.team!, callbacks: self)
@@ -62,15 +67,19 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
             }
         case 1:
             //Show Twitch
+            self.dataSet = "twitch"
             UIView.animate(withDuration: 0.25, delay: 0.0, options: UIView.AnimationOptions.curveEaseInOut, animations: {
-                self.tweetCollection.transform = CGAffineTransform(translationX: -375, y: 0)
+                self.tweetCollection.transform = CGAffineTransform(translationX: 0, y: 0)
+                self.tweetCollection.alpha = 0
             }) { (finished) in
-                self.twitchStreamList.dataSource = self
-                self.twitchStreamList.delegate = self
-                self.twitchStreamList.reloadData()
+                //self.tweetCollection.delegate = self
+                //self.tweetCollection.dataSource = self
+                self.tweetCollection.reloadData()
                 
+                let top = CGAffineTransform(translationX: 0, y: -10)
                 UIView.animate(withDuration: 0.25, delay: 0.0, options: UIView.AnimationOptions.curveEaseInOut, animations: {
-                    self.twitchStreamList.transform = CGAffineTransform(translationX: -375, y: 0)
+                    self.tweetCollection.transform = top
+                    self.tweetCollection.alpha = 1
                 }) { (finished) in
                     
                     self.manager.loadTweets(team: self.team!, callbacks: self)
@@ -79,6 +88,12 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
 
         default:
             break;
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + 0.3) {
+            self.loadSocial()
         }
     }
     
@@ -107,9 +122,13 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
         buildRoster()
         
         loadingStatus.text = "loading..."
-        loadingElement.isHidden = true
         
-        self.loadSocial()
+        
+        UIView.animate(withDuration: 0.8, animations: {
+            self.spinner.alpha = 1
+            self.loadingStatus.alpha = 1
+            self.spinner.startAnimating()
+        }, completion: nil)
     }
     
     private func getTwitch(){
@@ -150,33 +169,76 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
         if collectionView == self.teamRoster {
             return self.teammates.count
         }
-        else if(collectionView == self.tweetCollection){
-            return self.tweets.count
-        }
         else{
-            return self.streams.count
+            if(self.dataSet == "twitter"){
+                return self.tweets.count
+            }
+            else{
+                return self.streams.count
+            }
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == self.tweetCollection {
-            let current = tweets[indexPath.item]
-            
-            if current is String {
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "label", for: indexPath) as! TwitterDescCell
-                return cell
+            if(dataSet == "twitter"){
+                let current = tweets[indexPath.item]
+                
+                if current is String {
+                    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "label", for: indexPath) as! TwitterDescCell
+                    return cell
+                }
+                else{
+                    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! TeamTweetCell
+                    
+                    let current = self.tweets[indexPath.item] as! TweetObject
+                    cell.twitterTag.text = current.handle
+                    cell.tweet.text = current.tweet
+                    cell.bottomBorder.backgroundColor = #colorLiteral(red: 0.182135582, green: 0.6824935079, blue: 0.9568628669, alpha: 1)
+                    return cell
+                }
             }
             else{
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! TeamTweetCell
-                
-                let current = self.tweets[indexPath.item] as! TweetObject
-                cell.twitterTag.text = current.handle
-                cell.tweet.text = current.tweet
-                cell.bottomBorder.backgroundColor = #colorLiteral(red: 0.182135582, green: 0.6824935079, blue: 0.9568628669, alpha: 1)
-                return cell
+                let current = streams[indexPath.item]
+    
+                if current is String {
+                    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "twitchLabel", for: indexPath) as! TwitchDescCell
+                    
+                    cell.contentView.layer.cornerRadius = 2.0
+                    cell.contentView.layer.borderWidth = 1.0
+                    cell.contentView.layer.borderColor = UIColor.clear.cgColor
+                    cell.contentView.layer.masksToBounds = true
+                    
+                    return cell
+                }
+                else{
+                    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "twitchCell", for: indexPath) as! TwitchStreamCell
+                    let currentStream = streams[indexPath.item] as! TwitchStreamObject
+                    
+                    cell.streamName.text = currentStream.handle
+                    
+                    if(currentStream.type != "live"){
+                        cell.liveIcon.isHidden = true
+                    }
+                    
+                    let str = currentStream.thumbnail
+                    let replaced = str.replacingOccurrences(of: "{width}x{height}", with: "800x500")
+                    
+                    cell.previewImage.moa.url = replaced
+                    cell.previewImage.contentMode = .scaleAspectFill
+                    cell.previewImage.clipsToBounds = true
+                    
+                    cell.contentView.layer.cornerRadius = 2.0
+                    cell.contentView.layer.borderWidth = 1.0
+                    cell.contentView.layer.borderColor = UIColor.clear.cgColor
+                    cell.contentView.layer.masksToBounds = true
+                    
+                    return cell
+                }
             }
         }
-        else if(collectionView == self.teamRoster){
+            //roster
+        else{
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! TeamRosterCell
             let current = team!.teammates[indexPath.item]
             let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -213,46 +275,6 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
             cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
             return cell
         }
-        else{
-            let current = streams[indexPath.item]
-            
-            if current is String {
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "label", for: indexPath) as! TwitchDescCell
-                
-                cell.backgroundColor = .white
-                
-                cell.contentView.layer.cornerRadius = 2.0
-                cell.contentView.layer.borderWidth = 1.0
-                cell.contentView.layer.borderColor = UIColor.clear.cgColor
-                cell.contentView.layer.masksToBounds = true
-                
-                return cell
-            }
-            else{
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! TwitchStreamCell
-                let currentStream = streams[indexPath.item] as! TwitchStreamObject
-                
-                cell.streamName.text = currentStream.handle
-                
-                if(currentStream.type != "live"){
-                    cell.liveIcon.isHidden = true
-                }
-                
-                let str = currentStream.thumbnail
-                let replaced = str.replacingOccurrences(of: "{width}x{height}", with: "800x500")
-                
-                cell.previewImage.moa.url = replaced
-                cell.previewImage.contentMode = .scaleAspectFill
-                cell.previewImage.clipsToBounds = true
-                
-                cell.contentView.layer.cornerRadius = 2.0
-                cell.contentView.layer.borderWidth = 1.0
-                cell.contentView.layer.borderColor = UIColor.clear.cgColor
-                cell.contentView.layer.masksToBounds = true
-                
-                return cell
-            }
-        }
     }
     
     private func loadSocial() {
@@ -267,17 +289,15 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
         if(!self.viewLoadedBool){
             self.tweetCollection.delegate = self
             self.tweetCollection.dataSource = self
-            self.twitchStreamList.dataSource = self
-            self.twitchStreamList.delegate = self
             
             let top = CGAffineTransform(translationX: 0, y: 8)
             UIView.animate(withDuration: 0.3, delay: 0.2, options: [], animations: {
                 self.tweetCollection.alpha = 1
                 self.tweetCollection.transform = top
-                self.twitchStreamList.alpha = 1
                 self.loadingView.alpha = 0
             }, completion: nil)
             
+            self.spinner.stopAnimating()
             self.viewLoadedBool = true
         }
     }
@@ -293,23 +313,24 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         if collectionView == self.tweetCollection {
-            let current = tweets[indexPath.item]
-            
-            if current is String {
-                 return CGSize(width: collectionView.bounds.width - 10, height: CGFloat(50))
+            if(self.dataSet == "twitter"){
+                let current = tweets[indexPath.item]
+                
+                if current is String {
+                     return CGSize(width: collectionView.bounds.width - 10, height: CGFloat(50))
+                }
+                else{
+                    return CGSize(width: self.tweetCollection.bounds.width, height: CGFloat(80))
+                }
             }
             else{
-                return CGSize(width: self.tweetCollection.bounds.width, height: CGFloat(80))
-            }
-        }
-        else if(collectionView == twitchStreamList){
-            let current = streams[indexPath.item]
-            
-            if current is String {
-                 return CGSize(width: collectionView.bounds.width - 10, height: CGFloat(50))
-            }
-            else{
-                return CGSize(width: collectionView.bounds.width - 10, height: CGFloat(120))
+                let current = self.streams[indexPath.item]
+                if current is String {
+                     return CGSize(width: self.tweetCollection.bounds.width, height: CGFloat(50))
+                }
+                else{
+                    return CGSize(width: self.tweetCollection.bounds.width, height: CGFloat(120))
+                }
             }
         }
         else{
@@ -318,8 +339,8 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if(collectionView == twitchStreamList){
-            let cell = self.twitchStreamList.cellForItem(at: indexPath) as! TwitchStreamCell
+        if(collectionView == tweetCollection && dataSet == "twitch"){
+            let cell = self.tweetCollection.cellForItem(at: indexPath) as! TwitchStreamCell
             let current = streams[indexPath.item]
         
             NotificationCenter.default.addObserver(

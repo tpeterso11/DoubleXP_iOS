@@ -33,6 +33,8 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         selectViewController(currentViewController, direction: .forward, animated: false, completion: nil)
         
         Broadcaster.register(NavigateToProfile.self, observer: self)
+        
+        
     }
     
     fileprivate func populateItems() {
@@ -66,6 +68,12 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
     
     func navigateToRequests(){
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "requests") as! Requests
+        
+        selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
+    }
+    
+    func navigateToMedia(){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "mediaFrag") as! MediaFrag
         
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
     }

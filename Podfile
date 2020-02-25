@@ -24,6 +24,7 @@ target 'DoubleXP' do
   pod 'MessageKit'
   pod 'Bartinter'
   pod 'ExpyTableView'
+  pod 'TRMosaicLayout'
   pod 'PopupDialog', '~> 1.0'
   pod 'UnderLineTextField', '~> 2.1'
 

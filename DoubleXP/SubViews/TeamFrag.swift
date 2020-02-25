@@ -50,7 +50,7 @@ class TeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate {
         let currentLanding = appDelegate.currentLanding
         currentLanding?.removeBottomNav(showNewNav: false, hideSearch: true, searchHint: nil, searchButtonText: nil, isMessaging: false)
         
-        headerView.roundCorners(corners: [.topLeft, .topRight], radius: 25)
+        //headerView.roundCorners(corners: [.topLeft, .topRight], radius: 25)
         
         appDelegate.navStack.append(self)
         self.pageName = "Team"

@@ -80,6 +80,16 @@ class TeamObject: NSObject, NSCoding {
            }
        }
     
+    var _requests:[RequestObject]? = [RequestObject]()
+    var requests:[RequestObject] {
+        get {
+            return (_requests)!
+        }
+        set (newVal) {
+            _requests = newVal
+        }
+    }
+    
     var _teamCaptain: String? = nil
     var teamCaptain: String {
         get {
@@ -186,6 +196,7 @@ class TeamObject: NSObject, NSCoding {
         self.imageUrl = (decoder.decodeObject(forKey: "imageUrl") as! String)
         self.selectedTeamNeeds = (decoder.decodeObject(forKey: "selectedTeamNeeds") as! [String])
         self.teammates = (decoder.decodeObject(forKey: "teammates") as! [TeammateObject])
+        self.requests = (decoder.decodeObject(forKey: "requests") as! [RequestObject])
     }
     
     func encode(with coder: NSCoder) {
@@ -203,6 +214,7 @@ class TeamObject: NSObject, NSCoding {
         coder.encode(self.imageUrl, forKey: "imageUrl")
         coder.encode(self.selectedTeamNeeds, forKey: "selectedTeamNeeds")
         coder.encode(self.teammates, forKey: "teammates")
+        coder.encode(self.requests, forKey: "requests")
     }
     
 }

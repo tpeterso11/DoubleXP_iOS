@@ -50,6 +50,7 @@ protocol Profile {
 }
 
 class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateToProfile, SearchCallbacks, LandingMenuCallbacks, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+    
     @IBOutlet weak var navigationView: UIView!
     @IBOutlet weak var navContainer: UIView!
     @IBOutlet weak var teamButton: UIImageView!
@@ -68,6 +69,7 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     @IBOutlet weak var searchButton: UIButton!
     //@IBOutlet weak var newNav: UIView!
     
+    @IBOutlet weak var mediaButton: UIImageView!
     @IBOutlet weak var logOut: UIButton!
     @IBOutlet weak var menuCollection: UICollectionView!
     @IBOutlet weak var friendsLabel: UILabel!
@@ -78,6 +80,7 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     private var teamFragAdded = false
     private var profileAdded = false
     private var homeAdded = false
+    private var mediaAdded = false
     private var isSecondaryNavShowing = false
     var stackDepth = 0
     var searchShowing = true
@@ -229,6 +232,13 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
         stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToTeamBuild(team: team)
+        }
+    }
+    
+    func navigateToMedia() {
+        stackDepth += 1
+        Broadcaster.notify(NavigateToProfile.self) {
+            $0.navigateToMedia()
         }
     }
     
@@ -458,6 +468,10 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
         menuButton.isUserInteractionEnabled = true
         menuButton.addGestureRecognizer(singleTapMenu)
         
+        let singleTapMedia = UITapGestureRecognizer(target: self, action: #selector(mediaButtonClicked))
+        mediaButton.isUserInteractionEnabled = true
+        mediaButton.addGestureRecognizer(singleTapMedia)
+        
         bottomNav.isHidden = false
         bottomNav.isUserInteractionEnabled = true
     }
@@ -471,6 +485,19 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
             requestsAdded = false
             teamFragAdded = false
             profileAdded = false
+        }
+    }
+    
+    @objc func mediaButtonClicked(_ sender: AnyObject?) {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        
+        if(appDelegate.currentFrag != "Media"){
+            navigateToMedia()
+            homeAdded = false
+            requestsAdded = false
+            teamFragAdded = false
+            profileAdded = false
+            mediaAdded = true
         }
     }
     

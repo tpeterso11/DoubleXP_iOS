@@ -32,7 +32,7 @@ extension UIView {
     
     func slideInBottom(from: Animation = .comeIn, startDelay: TimeInterval = 500, x: CGFloat = 0, y: CGFloat = 0, completion: ((Bool) -> Void)? = nil) -> UIView{
         
-        let top = CGAffineTransform(translationX: 0, y: -27)
+        let top = CGAffineTransform(translationX: 0, y: -10)
 
         UIView.animate(withDuration: 0.4, delay: 0.6, options: [], animations: {
             self.alpha = 1

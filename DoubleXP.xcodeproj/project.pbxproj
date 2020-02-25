@@ -40,6 +40,16 @@
 		30582416239C8D1E00FDEA7D /* user.png in Resources */ = {isa = PBXBuildFile; fileRef = 30582415239C8D1D00FDEA7D /* user.png */; };
 		305D8F0E23DFD03D007D0991 /* TestPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 305D8F0D23DFD03D007D0991 /* TestPlayer.swift */; };
 		305D8F1023DFE605007D0991 /* live.png in Resources */ = {isa = PBXBuildFile; fileRef = 305D8F0F23DFE605007D0991 /* live.png */; };
+		305DA86F2400BE94002ED813 /* stop.png in Resources */ = {isa = PBXBuildFile; fileRef = 305DA86E2400BE94002ED813 /* stop.png */; };
+		30634D5424055E6900FEAD40 /* tower_white.png in Resources */ = {isa = PBXBuildFile; fileRef = 30634D5224055E6900FEAD40 /* tower_white.png */; };
+		30634D5524055E6900FEAD40 /* tower_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 30634D5324055E6900FEAD40 /* tower_dark.png */; };
+		30634D57240563EB00FEAD40 /* MediaFrag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30634D56240563EB00FEAD40 /* MediaFrag.swift */; };
+		30634D5924056B7300FEAD40 /* new_logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 30634D5824056B7300FEAD40 /* new_logo.png */; };
+		30634D5B240572E800FEAD40 /* MediaCategoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30634D5A240572E800FEAD40 /* MediaCategoryCell.swift */; };
+		30634D5D24059B1500FEAD40 /* 498852.png in Resources */ = {isa = PBXBuildFile; fileRef = 30634D5C24059B1500FEAD40 /* 498852.png */; };
+		30634D5F24059E6800FEAD40 /* NewsArticleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30634D5E24059E6800FEAD40 /* NewsArticleCell.swift */; };
+		30634D612405AE6900FEAD40 /* TestCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30634D602405AE6900FEAD40 /* TestCollection.swift */; };
+		30634D632405C27000FEAD40 /* MediaManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30634D622405C27000FEAD40 /* MediaManager.swift */; };
 		306E6B5923DE23220069F426 /* TwitchStreamObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306E6B5823DE23220069F426 /* TwitchStreamObject.swift */; };
 		306E6B5B23DE49F70069F426 /* live_streaming.png in Resources */ = {isa = PBXBuildFile; fileRef = 306E6B5A23DE49F60069F426 /* live_streaming.png */; };
 		306E6B5D23DE4E4D0069F426 /* TwitchStreamCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306E6B5C23DE4E4D0069F426 /* TwitchStreamCell.swift */; };
@@ -103,6 +113,9 @@
 		308E79C023FF4B2C00197035 /* hashtag.png in Resources */ = {isa = PBXBuildFile; fileRef = 308E79BF23FF4B2C00197035 /* hashtag.png */; };
 		308EBA2423FDCC4300DE186D /* connection.png in Resources */ = {isa = PBXBuildFile; fileRef = 308EBA2323FDCC4200DE186D /* connection.png */; };
 		308EBA2623FDCCDC00DE186D /* live_menu.png in Resources */ = {isa = PBXBuildFile; fileRef = 308EBA2523FDCCDB00DE186D /* live_menu.png */; };
+		30900A962401F32F00AEA2C8 /* ViewTeamsFoldingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30900A952401F32F00AEA2C8 /* ViewTeamsFoldingCell.swift */; };
+		30900A982402E09300AEA2C8 /* ViewTeamsNeedsHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30900A972402E09300AEA2C8 /* ViewTeamsNeedsHeader.swift */; };
+		30900A9A2402E18E00AEA2C8 /* ViewTeamsNeedsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30900A992402E18E00AEA2C8 /* ViewTeamsNeedsCell.swift */; };
 		309F3A0D23B3EFBF00FD0C48 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309F3A0C23B3EFBF00FD0C48 /* Utility.swift */; };
 		309F3A1023B3F7DE00FD0C48 /* Test.m in Sources */ = {isa = PBXBuildFile; fileRef = 309F3A0F23B3F7DE00FD0C48 /* Test.m */; };
 		309F3A1323B40CA900FD0C48 /* left-arrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 309F3A1223B40CA900FD0C48 /* left-arrow.png */; };
@@ -259,6 +272,16 @@
 		30582415239C8D1D00FDEA7D /* user.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = user.png; sourceTree = "<group>"; };
 		305D8F0D23DFD03D007D0991 /* TestPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestPlayer.swift; sourceTree = "<group>"; };
 		305D8F0F23DFE605007D0991 /* live.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = live.png; sourceTree = "<group>"; };
+		305DA86E2400BE94002ED813 /* stop.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stop.png; sourceTree = "<group>"; };
+		30634D5224055E6900FEAD40 /* tower_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tower_white.png; sourceTree = "<group>"; };
+		30634D5324055E6900FEAD40 /* tower_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tower_dark.png; sourceTree = "<group>"; };
+		30634D56240563EB00FEAD40 /* MediaFrag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaFrag.swift; sourceTree = "<group>"; };
+		30634D5824056B7300FEAD40 /* new_logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = new_logo.png; sourceTree = "<group>"; };
+		30634D5A240572E800FEAD40 /* MediaCategoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaCategoryCell.swift; sourceTree = "<group>"; };
+		30634D5C24059B1500FEAD40 /* 498852.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 498852.png; sourceTree = "<group>"; };
+		30634D5E24059E6800FEAD40 /* NewsArticleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsArticleCell.swift; sourceTree = "<group>"; };
+		30634D602405AE6900FEAD40 /* TestCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestCollection.swift; sourceTree = "<group>"; };
+		30634D622405C27000FEAD40 /* MediaManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaManager.swift; sourceTree = "<group>"; };
 		306E6B5823DE23220069F426 /* TwitchStreamObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchStreamObject.swift; sourceTree = "<group>"; };
 		306E6B5A23DE49F60069F426 /* live_streaming.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = live_streaming.png; sourceTree = "<group>"; };
 		306E6B5C23DE4E4D0069F426 /* TwitchStreamCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchStreamCell.swift; sourceTree = "<group>"; };
@@ -322,6 +345,9 @@
 		308E79BF23FF4B2C00197035 /* hashtag.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = hashtag.png; sourceTree = "<group>"; };
 		308EBA2323FDCC4200DE186D /* connection.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = connection.png; sourceTree = "<group>"; };
 		308EBA2523FDCCDB00DE186D /* live_menu.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = live_menu.png; sourceTree = "<group>"; };
+		30900A952401F32F00AEA2C8 /* ViewTeamsFoldingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewTeamsFoldingCell.swift; sourceTree = "<group>"; };
+		30900A972402E09300AEA2C8 /* ViewTeamsNeedsHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewTeamsNeedsHeader.swift; sourceTree = "<group>"; };
+		30900A992402E18E00AEA2C8 /* ViewTeamsNeedsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewTeamsNeedsCell.swift; sourceTree = "<group>"; };
 		309F3A0C23B3EFBF00FD0C48 /* Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
 		309F3A0E23B3F7DE00FD0C48 /* Test.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Test.h; sourceTree = "<group>"; };
 		309F3A0F23B3F7DE00FD0C48 /* Test.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Test.m; sourceTree = "<group>"; };
@@ -503,6 +529,7 @@
 				30B6E1AA23B14F4400B69F00 /* FAQuizComplete.swift */,
 				3080B3ED23B8488E00638B22 /* EmbeddedTableView.swift */,
 				306E6B6023DE99C40069F426 /* Test.swift */,
+				30634D56240563EB00FEAD40 /* MediaFrag.swift */,
 			);
 			path = SubViews;
 			sourceTree = "<group>";
@@ -518,6 +545,7 @@
 				30B6E18223A09A8900B69F00 /* FreeAgentManager.swift */,
 				30B6E1A423ADC67E00B69F00 /* InterviewManager.swift */,
 				30EBC40123DB632E009CFAB2 /* SocialMediaManager.swift */,
+				30634D622405C27000FEAD40 /* MediaManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -584,6 +612,11 @@
 				301B4AE323F07DEC00A6FE5B /* FreeAgentExpandingActionCell.swift */,
 				301B4AE523F4DB6F00A6FE5B /* FreeAgentDashCell.swift */,
 				301B4AE723F4DB8A00A6FE5B /* FreeAgentDashExpanded.swift */,
+				30900A952401F32F00AEA2C8 /* ViewTeamsFoldingCell.swift */,
+				30900A972402E09300AEA2C8 /* ViewTeamsNeedsHeader.swift */,
+				30900A992402E18E00AEA2C8 /* ViewTeamsNeedsCell.swift */,
+				30634D5A240572E800FEAD40 /* MediaCategoryCell.swift */,
+				30634D5E24059E6800FEAD40 /* NewsArticleCell.swift */,
 			);
 			path = CustomView;
 			sourceTree = "<group>";
@@ -688,6 +721,8 @@
 				3080B3E323B80A5A00638B22 /* request2.png */,
 				3071171023E1014A005F6355 /* 580b57fcd9996e24bc43c540.png */,
 				3080B3E123B7FAA600638B22 /* request.png */,
+				30634D5324055E6900FEAD40 /* tower_dark.png */,
+				30634D5224055E6900FEAD40 /* tower_white.png */,
 				309F3A1223B40CA900FD0C48 /* left-arrow.png */,
 				30B6E18E23A6EEA700B69F00 /* question.png */,
 				30582415239C8D1D00FDEA7D /* user.png */,
@@ -722,9 +757,12 @@
 				308EBA2523FDCCDB00DE186D /* live_menu.png */,
 				307CE34C23EA2B5000DCB12A /* message.png */,
 				308E79BB23FF471D00197035 /* meeting.png */,
+				30634D5824056B7300FEAD40 /* new_logo.png */,
 				308E79BF23FF4B2C00197035 /* hashtag.png */,
+				305DA86E2400BE94002ED813 /* stop.png */,
 				308E79BD23FF492600197035 /* connection_white.png */,
 				30C4EDAF2267C1890046B615 /* doublexp_white.png */,
+				30634D5C24059B1500FEAD40 /* 498852.png */,
 				30C4EDB02267C1890046B615 /* team_thumbs_up.png */,
 				30C4EDB12267C1890046B615 /* vintage_tv.png */,
 				4CC1720022677EF8009A1B80 /* test_banner.png */,
@@ -757,6 +795,7 @@
 				30EBC40323DB6E5D009CFAB2 /* TweetObject.swift */,
 				306E6B5823DE23220069F426 /* TwitchStreamObject.swift */,
 				307CE35023EC3E1500DCB12A /* MockMessage.swift */,
+				30634D602405AE6900FEAD40 /* TestCollection.swift */,
 			);
 			path = Object;
 			sourceTree = "<group>";
@@ -913,6 +952,7 @@
 				3080B3E223B7FAA700638B22 /* request.png in Resources */,
 				3080B3E823B81B5B00638B22 /* messaging_button.png in Resources */,
 				3080B3F023B92A5900638B22 /* Rainbow_Six_Siege.jpg in Resources */,
+				30634D5424055E6900FEAD40 /* tower_white.png in Resources */,
 				308E79BE23FF492600197035 /* connection_white.png in Resources */,
 				3080B3E623B80BE400638B22 /* request_highlight.png in Resources */,
 				3058198223D27152008684A7 /* observation.png in Resources */,
@@ -925,6 +965,7 @@
 				30B583CB2347B5E500736733 /* gamespot_icon_ios.png in Resources */,
 				308E79C023FF4B2C00197035 /* hashtag.png in Resources */,
 				30F6FCC423CD96620051813D /* dashboard.png in Resources */,
+				305DA86F2400BE94002ED813 /* stop.png in Resources */,
 				3058198423D27160008684A7 /* search.png in Resources */,
 				30B583D8234FD01700736733 /* GoogleService-Info.plist in Resources */,
 				30F6FCB823CBFC000051813D /* user (1).png in Resources */,
@@ -932,6 +973,7 @@
 				30F6FCC223CD948E0051813D /* cancel-mark.png in Resources */,
 				30582416239C8D1E00FDEA7D /* user.png in Resources */,
 				30F6FCB423C58F580051813D /* show-more-button-with-three-dots.png in Resources */,
+				30634D5924056B7300FEAD40 /* new_logo.png in Resources */,
 				3080B3EA23B81BC100638B22 /* pending_button.png in Resources */,
 				30FC34C123E7DAE8007F0080 /* settings.png in Resources */,
 				30EBC3FC23D60A23009CFAB2 /* twitter_PNG3.png in Resources */,
@@ -943,6 +985,7 @@
 				308BD02C238ED0A10034822B /* invitation.png in Resources */,
 				30A60D8F2363C91B004B2150 /* group.png in Resources */,
 				301AEF502388604D00339850 /* opened-door-aperture.png in Resources */,
+				30634D5524055E6900FEAD40 /* tower_dark.png in Resources */,
 				4C790E882266B7A200FDA550 /* placeholder_landing.jpg in Resources */,
 				30B6E18F23A6EEA800B69F00 /* question.png in Resources */,
 				30B583E62352A2DA00736733 /* close_white.png in Resources */,
@@ -951,6 +994,7 @@
 				30582414239C86B800FDEA7D /* list-interface-symbol.png in Resources */,
 				30A84DF02381E86E007BEAA5 /* icon.png in Resources */,
 				30A60D8D2363C801004B2150 /* like.png in Resources */,
+				30634D5D24059B1500FEAD40 /* 498852.png in Resources */,
 				308BD032238ED2450034822B /* restaurant-membership-card-tool.png in Resources */,
 				3080B40423BC07BE00638B22 /* x-mark.png in Resources */,
 				308EBA2623FDCCDC00DE186D /* live_menu.png in Resources */,
@@ -1094,6 +1138,7 @@
 				30B6E18523A09F1400B69F00 /* ViewTeams.swift in Sources */,
 				30581321239A18A4001BCE30 /* FreeAgentResultCell.swift in Sources */,
 				30B583E823537EEA00736733 /* GamerConnectRegisterActivity.swift in Sources */,
+				30634D57240563EB00FEAD40 /* MediaFrag.swift in Sources */,
 				30F6FCB623CBF65B0051813D /* RequestsFoldingCell.swift in Sources */,
 				308BD02A238ECE150034822B /* TeamBuildFrag.swift in Sources */,
 				30B6E19D23AC2C5A00B69F00 /* FAQuizConfirmation.swift in Sources */,
@@ -1121,15 +1166,19 @@
 				3080B3EC23B83C5B00638B22 /* FoldingCellCell.swift in Sources */,
 				30B6E17F23A0892500B69F00 /* FADash.swift in Sources */,
 				307CE35123EC3E1500DCB12A /* MockMessage.swift in Sources */,
+				30634D5B240572E800FEAD40 /* MediaCategoryCell.swift in Sources */,
 				3080B3E023B7C4F500638B22 /* ParentVC.swift in Sources */,
 				308BD0362391DB9C0034822B /* TeammateObject.swift in Sources */,
+				30634D632405C27000FEAD40 /* MediaManager.swift in Sources */,
 				30A60D9C236925D9004B2150 /* BasicStatCell.swift in Sources */,
 				30B583DC2350147B00736733 /* GamerProfile.swift in Sources */,
+				30900A962401F32F00AEA2C8 /* ViewTeamsFoldingCell.swift in Sources */,
 				301AEF54238862D000339850 /* TeamCellTeamFrag.swift in Sources */,
 				4C4D88242205F32900AD7090 /* AppDelegate.swift in Sources */,
 				30B583EE235E7A2E00736733 /* GCInfoCell.swift in Sources */,
 				30B583EC2353A99200736733 /* GCGameCellTall.swift in Sources */,
 				306E6B6123DE99C40069F426 /* Test.swift in Sources */,
+				30900A982402E09300AEA2C8 /* ViewTeamsNeedsHeader.swift in Sources */,
 				30EBC40423DB6E5D009CFAB2 /* TweetObject.swift in Sources */,
 				3086956D23BD97E8001E51EF /* SegueFromLeft.swift in Sources */,
 				3058131B23973AED001BCE30 /* FATeamNeedsCell.swift in Sources */,
@@ -1141,6 +1190,7 @@
 				30B6E18923A33A6300B69F00 /* TeamSearchGameCell.swift in Sources */,
 				303F2D402372883E004B68E1 /* NavigationPageController.swift in Sources */,
 				3080B3F623BA579000638B22 /* GradientButton.swift in Sources */,
+				30634D612405AE6900FEAD40 /* TestCollection.swift in Sources */,
 				30A84DEE2381E622007BEAA5 /* TeamInviteObject.swift in Sources */,
 				3008EE782267F89800E0D9ED /* NewsCell.swift in Sources */,
 				30B6E1A723AF15AA00B69F00 /* FAQuizConsoles.swift in Sources */,
@@ -1191,10 +1241,12 @@
 				3071171723E13864005F6355 /* TwitterDescCell.swift in Sources */,
 				30A84DE2237F80CE007BEAA5 /* StatsCell.swift in Sources */,
 				303F2D442373AC1B004B68E1 /* homeGCCell.swift in Sources */,
+				30634D5F24059E6800FEAD40 /* NewsArticleCell.swift in Sources */,
 				30B6E1AB23B14F4400B69F00 /* FAQuizComplete.swift in Sources */,
 				30B6E19B23AC17EA00B69F00 /* FAQuizCover.swift in Sources */,
 				30A84DF823836FB9007BEAA5 /* FriendRequestObject.swift in Sources */,
 				301B4AE423F07DEC00A6FE5B /* FreeAgentExpandingActionCell.swift in Sources */,
+				30900A9A2402E18E00AEA2C8 /* ViewTeamsNeedsCell.swift in Sources */,
 				30FC34C723E927BE007F0080 /* MenuSettingsCell.swift in Sources */,
 				308BD01D238AED570034822B /* CreateTeamFrag.swift in Sources */,
 				30B6E18B23A472A300B69F00 /* FreeAgentFront.swift in Sources */,

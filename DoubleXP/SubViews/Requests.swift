@@ -88,7 +88,6 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
         if(!userRequests.isEmpty){
             requestList.estimatedRowHeight = Const.closeCellHeight
             requestList.rowHeight = UITableView.automaticDimension
-            requestList.backgroundColor = UIColor.white
             
             if #available(iOS 10.0, *) {
                 requestList.refreshControl = UIRefreshControl()

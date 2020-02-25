@@ -39,6 +39,8 @@ protocol NavigateToProfile: class {
     
     func navigateToViewTeams()
     
+    func navigateToMedia()
+    
     func navigateToMessaging(groupChannelUrl: String?, otherUserId: String?)
     
     func navigateToFreeAgentQuiz(team: TeamObject?, gcGame: GamerConnectGame, currentUser: User)
@@ -73,6 +75,7 @@ protocol MessagingCallbacks: class {
 
 protocol TeamInteractionCallbacks: class{
     func successfulRequest(indexPath: IndexPath)
+    func failedRequest(indexPath: IndexPath)
 }
 
 protocol FreeAgentQuizNav: class {

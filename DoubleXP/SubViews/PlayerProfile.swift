@@ -42,6 +42,9 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     @IBOutlet weak var actionDrawer: UIView!
     @IBOutlet weak var acceptButton: UIView!
     @IBOutlet weak var declineButton: UIView!
+    @IBOutlet weak var bottomBlur: UIVisualEffectView!
+    @IBOutlet weak var userStatsLabel: UILabel!
+    @IBOutlet weak var tapInstructions: UILabel!
     
     
     var sections = [Section]()
@@ -70,7 +73,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         currentLanding?.removeBottomNav(showNewNav: true, hideSearch: true, searchHint: "Search for player", searchButtonText: nil, isMessaging: false)
         
         headerView.clipsToBounds = true
-        mainLayout.roundCorners(corners: [.topLeft, .topRight], radius: 20)
+        //mainLayout.roundCorners(corners: [.topLeft, .topRight], radius: 20)
         actionDrawer.roundCorners(corners: [.topLeft, .topRight], radius: 40)
         
         self.actionOverlay.effect = nil
@@ -289,13 +292,8 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 consoleTwo.layer.cornerRadius = 15
             }
         }
-        //let consoleString = user.getConsoleString()
-        //self.profileLine2.text = String(consoleString)
         
-        if(!user.stats.isEmpty){
-            self.statEmpty.isHidden = true
-            self.setup()
-        }
+        self.setup(statsEmpty: user.stats.isEmpty)
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let currentUser = delegate.currentUser
@@ -351,11 +349,10 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         self.bio.text = "\"" + user.bio + "\""
     }
     
-    private func setup() {
+    private func setup(statsEmpty: Bool) {
         cellHeights = Array(repeating: Const.closeCellHeight, count: self.objects.count)
         table.estimatedRowHeight = Const.closeCellHeight
         table.rowHeight = UITableView.automaticDimension
-        table.backgroundColor = UIColor.white
         
         if #available(iOS 10.0, *) {
             table.refreshControl = UIRefreshControl()
@@ -363,8 +360,30 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         }
         
         //statEmpty.isHidden = true
-        self.table.dataSource = self
-        self.table.delegate = self
+        if(statsEmpty){
+            self.bottomBlur.isHidden = true
+            
+            let top = CGAffineTransform(translationX: 0, y: -10)
+            UIView.animate(withDuration: 0.8, animations: {
+                self.statEmpty.alpha = 1
+                self.statEmpty.transform = top
+            }, completion: nil)
+        }
+        else{
+            self.table.dataSource = self
+            self.table.delegate = self
+            
+            let top = CGAffineTransform(translationX: 0, y: -10)
+            UIView.animate(withDuration: 0.8, animations: {
+                self.table.alpha = 1
+                self.table.transform = top
+                self.userStatsLabel.alpha = 1
+                self.userStatsLabel.transform = top
+                
+                self.tapInstructions.alpha = 1
+                self.tapInstructions.transform = top
+            }, completion: nil)
+        }
     }
     
     @objc func refreshHandler() {

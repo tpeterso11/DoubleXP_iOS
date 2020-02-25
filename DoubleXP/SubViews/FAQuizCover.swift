@@ -28,6 +28,10 @@ class FAQuizCover: UIViewController, FreeAgentQuizNav{
     @IBOutlet weak var startButton: UIButton!
     
     
+    override func awakeFromNib() {
+        super.awakeFromNib()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         

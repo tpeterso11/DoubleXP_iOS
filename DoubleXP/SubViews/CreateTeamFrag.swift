@@ -14,7 +14,7 @@ import MSPeekCollectionViewDelegateImplementation
 import UnderLineTextField
 import SendBirdSDK
 
-class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate, MSPeekImplementationDelegate, UICollectionViewDelegateFlowLayout, MessagingCallbacks {
+class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate, MSPeekImplementationDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, MessagingCallbacks {
     
     @IBOutlet weak var gcGameScroll: UICollectionView!
     @IBOutlet weak var psSwitch: UISwitch!
@@ -40,9 +40,9 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         super.viewDidLoad()
         
         //animateView()
+        gcGameScroll.configureForPeekingDelegate()
         self.gcGameScroll.delegate = self
         self.gcGameScroll.dataSource = self
-        gcGameScroll.configureForPeekingDelegate()
         
         switches.append(psSwitch)
         switches.append(xboxSwitch)
@@ -63,6 +63,15 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         teamName.addTarget(self, action: #selector(self.textFieldDidChange(_:)), for: UIControl.Event.editingChanged)
         
         checkNextActivation()
+        
+        teamName.delegate = self
+        teamName.returnKeyType = UIReturnKeyType.done
+        textFieldShouldReturn(teamName)
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField!) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
     
     private func animateView(){

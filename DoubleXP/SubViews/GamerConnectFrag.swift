@@ -68,7 +68,7 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
                 self.gcGameScroll.alpha = 1
                 self.gcGameScroll.transform = top
             }, completion: { (finished: Bool) in
-                UIView.animate(withDuration: 0.8, delay: 0.2, options: [], animations: {
+                UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
                     self.recommendedUsers.transform = top
                     self.recommendedUsers.alpha = 1
                 }, completion: nil)

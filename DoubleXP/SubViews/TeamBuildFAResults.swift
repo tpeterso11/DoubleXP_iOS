@@ -27,6 +27,8 @@ class TeamBuildFAResults: UIViewController, ExpyTableViewDelegate, ExpyTableView
     @IBOutlet weak var blur: UIVisualEffectView!
     @IBOutlet weak var quizView: UIView!
     
+    @IBOutlet weak var emptyLabel: UILabel!
+    @IBOutlet weak var empty: UIView!
     @IBOutlet weak var faResults: ExpyTableView!
     @IBOutlet weak var quizTable: UITableView!
     var currentQuizPos = 0
@@ -46,7 +48,6 @@ class TeamBuildFAResults: UIViewController, ExpyTableViewDelegate, ExpyTableView
         doSearch(needs: team!.selectedTeamNeeds)
         //self.view.sendSubviewToBack(self.clickArea)
     }
-    
     
     func doSearch(needs: [String]){
         let ref = Database.database().reference().child("Free Agents V2")
@@ -80,12 +81,27 @@ class TeamBuildFAResults: UIViewController, ExpyTableViewDelegate, ExpyTableView
                 self.processResults(results: results)
             }
             else{
-                
+                self.showEmpty(teamNeeds: self.team!.selectedTeamNeeds.count > 0)
             }
             
         }) { (error) in
             print(error.localizedDescription)
         }
+    }
+    
+    private func showEmpty(teamNeeds: Bool){
+        if(teamNeeds){
+            emptyLabel.text = "No free agents match your criteria. Please try again later."
+        }
+        else{
+            emptyLabel.text = "No free agents available. Please try again later."
+        }
+        
+        let top = CGAffineTransform(translationX: 0, y: -10)
+        UIView.animate(withDuration: 0.8, delay: 0.2, options: [], animations: {
+            self.empty.alpha = 1
+            self.empty.transform = top
+        }, completion: nil)
     }
     
     private func processResults(results: [FreeAgentObject]){
@@ -131,8 +147,17 @@ class TeamBuildFAResults: UIViewController, ExpyTableViewDelegate, ExpyTableView
     }
     
      private func setup() {
-       self.faResults.dataSource = self
-       self.faResults.delegate = self
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            self.faResults.dataSource = self
+            self.faResults.delegate = self
+            
+            let top2 = CGAffineTransform(translationX: 0, y: -10)
+            
+            UIView.animate(withDuration: 0.8, animations: {
+                    self.faResults.alpha = 1
+                    self.faResults.transform = top2
+            }, completion: nil)
+        }
     }
     
     func tableView(_ tableView: ExpyTableView, expandableCellForSection section: Int) -> UITableViewCell {

@@ -43,14 +43,26 @@ class TeamNeedsSelection: UIViewController, UICollectionViewDataSource, UICollec
     }
     
     @objc func nextButtonClicked(_ sender: AnyObject?) {
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentLanding = delegate.currentLanding
+        
         if(selectedNeeds.isEmpty){
-            LandingActivity().navigateToTeamDashboard(team: team!, newTeam: true)
+            currentLanding?.navigateToTeamDashboard(team: team!, newTeam: true)
         }
         else{
             let ref = Database.database().reference().child("Teams").child(team!.teamName)
             ref.child("selectedTeamNeeds").setValue(selectedNeeds)
             
-            LandingActivity().navigateToTeamDashboard(team: team!, newTeam: true)
+            let userRef = Database.database().reference().child("Users").child(delegate.currentUser!.uId).child("teams").child(team!.teamName)
+            userRef.child("selectedTeamNeeds").setValue(selectedNeeds)
+            
+            for team in delegate.currentUser!.teams{
+                if(team.teamName == self.team!.teamName){
+                    team.selectedTeamNeeds.append(contentsOf: self.selectedNeeds)
+                }
+            }
+            
+            currentLanding?.navigateToTeamDashboard(team: team!, newTeam: true)
         }
     }
     
@@ -74,13 +86,6 @@ class TeamNeedsSelection: UIViewController, UICollectionViewDataSource, UICollec
             cell.doWeNeed.font = UIFont.systemFont(ofSize: 17.0, weight: UIFont.Weight.regular)
             cell.doWeNeed.text = "do we need a..."
         }
-
-        cell.layer.shadowColor = UIColor.black.cgColor
-        cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
-        cell.layer.shadowRadius = 2.0
-        cell.layer.shadowOpacity = 0.5
-        cell.layer.masksToBounds = false
-        cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
         
         return cell
     }
@@ -93,7 +98,6 @@ class TeamNeedsSelection: UIViewController, UICollectionViewDataSource, UICollec
             cell.cover.isHidden = false
             cell.doWeNeed.text = "we need a..."
             cell.doWeNeed.font = UIFont.systemFont(ofSize: 18.0, weight: UIFont.Weight.semibold)
-            //cell.backgroundColor = .white
         }
         else{
             selectedNeeds = selectedNeeds.filter{$0 != team?.teamNeeds[indexPath.item]}
@@ -102,7 +106,6 @@ class TeamNeedsSelection: UIViewController, UICollectionViewDataSource, UICollec
             cell.cover.isHidden = true
             cell.doWeNeed.font = UIFont.systemFont(ofSize: 17.0, weight: UIFont.Weight.regular)
             cell.doWeNeed.text = "do we need a..."
-            //cell.backgroundColor = .darkGray
         }
     }
     

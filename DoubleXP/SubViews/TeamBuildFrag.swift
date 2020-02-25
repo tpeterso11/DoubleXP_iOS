@@ -25,7 +25,7 @@ class TeamBuildFrag: ParentVC, UITableViewDataSource, UITableViewDelegate, TeamC
     var invitableFriends = [FriendObject]()
     
     enum Const {
-           static let closeCellHeight: CGFloat = 92
+           static let closeCellHeight: CGFloat = 93
            static let openCellHeight: CGFloat = 185
            static let rowsCount = 1
     }
@@ -54,8 +54,7 @@ class TeamBuildFrag: ParentVC, UITableViewDataSource, UITableViewDelegate, TeamC
             
             if(!invitableFriends.isEmpty){
                 self.setup()
-                friendsList.delegate = self
-                friendsList.dataSource = self
+                animateView()
             }
             else{
                 //show empty
@@ -63,6 +62,20 @@ class TeamBuildFrag: ParentVC, UITableViewDataSource, UITableViewDelegate, TeamC
         }
         
         freeAgentButton.addTarget(self, action: #selector(faButtonClicked), for: .touchUpInside)
+    }
+    
+    private func animateView(){
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            self.friendsList.delegate = self
+            self.friendsList.dataSource = self
+            
+            let top2 = CGAffineTransform(translationX: 0, y: -10)
+            
+            UIView.animate(withDuration: 0.8, animations: {
+                    self.friendsList.alpha = 1
+                    self.friendsList.transform = top2
+            }, completion: nil)
+        }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -78,6 +91,9 @@ class TeamBuildFrag: ParentVC, UITableViewDataSource, UITableViewDelegate, TeamC
         
         cell.inviteButton.addTarget(self, action: #selector(inviteButtonClicked), for: .touchUpInside)
         cell.profileButton.addTarget(self, action: #selector(profileButtonClicked), for: .touchUpInside)
+        
+        cell.layoutMargins = UIEdgeInsets.zero
+        cell.separatorInset = UIEdgeInsets.zero
         
         return cell
     }
@@ -196,7 +212,6 @@ class TeamBuildFrag: ParentVC, UITableViewDataSource, UITableViewDelegate, TeamC
         cellHeights = Array(repeating: Const.closeCellHeight, count: (self.invitableFriends.count))
         friendsList.estimatedRowHeight = Const.closeCellHeight
         friendsList.rowHeight = UITableView.automaticDimension
-        friendsList.backgroundColor = UIColor.white
         
         if #available(iOS 10.0, *) {
             friendsList.refreshControl = UIRefreshControl()
