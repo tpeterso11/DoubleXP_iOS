@@ -23,7 +23,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var currentLanding: LandingActivity?
     var currentFrag: String = ""
     var interviewManager = InterviewManager()
+    var mediaManager = MediaManager()
     var navStack = [UIViewController]()
+    var mediaCache = MediaCache()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         gcGames = [GamerConnectGame]()

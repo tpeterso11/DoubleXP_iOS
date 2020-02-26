@@ -13,7 +13,6 @@ import ImageLoader
 import moa
 import SwiftHTTP
 import SwiftNotificationCenter
-import TRMosaicLayout
 
 class MediaFrag: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
@@ -21,7 +20,8 @@ class MediaFrag: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     @IBOutlet weak var news: UICollectionView!
     var options = [String]()
     var selectedCategory = ""
-    var articles = [String]()
+    var newsSet = false
+    var articles = [Any]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,21 +33,16 @@ class MediaFrag: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         
         self.selectedCategory = options[0]
         
-        articles.append("reviews")
-        articles.append("reviews")
-        articles.append("reviews")
-        articles.append("reviews")
-        articles.append("reviews")
-        
         optionsCollection.dataSource = self
         optionsCollection.delegate = self
         
-        let mosaicLayout = TRMosaicLayout()
         self.news?.collectionViewLayout = TestCollection()
-        //mosaicLayout.delegate = self
         
-        news.dataSource = self
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        articles.append(contentsOf: delegate.mediaCache.newsCache)
+        
         news.delegate = self
+        news.dataSource = self
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -77,20 +72,29 @@ class MediaFrag: UIViewController, UICollectionViewDelegate, UICollectionViewDat
             return cell
         }
         else{
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "newsCell", for: indexPath) as! NewsArticleCell
-            /*cell.contentView.layer.cornerRadius = 15.0
-            cell.contentView.layer.borderWidth = 1.0
-            cell.contentView.layer.borderColor = UIColor.clear.cgColor
-            cell.contentView.layer.masksToBounds = true
-            
-            cell.layer.shadowColor = UIColor.black.cgColor
-            cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
-            cell.layer.shadowRadius = 2.0
-            cell.layer.shadowOpacity = 0.5
-            cell.layer.masksToBounds = false
-            cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath*/
-            
-            return cell
+            let current = self.articles[indexPath.item]
+            if(current is NewsObject){
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "newsCell", for: indexPath) as! NewsArticleCell
+                cell.title.text = (current as! NewsObject).title
+                cell.subTitle.text = (current as! NewsObject).subTitle
+                
+                cell.articleBack.moa.onSuccess = { image in
+                    UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                        cell.articleBack.alpha = 0.1
+                        cell.articleBack.contentMode = .scaleAspectFill
+                        cell.articleBack.clipsToBounds = true
+                    }, completion: nil)
+                    
+                  return image
+                }
+                cell.articleBack.moa.url = (current as! NewsObject).imageUrl
+                
+                return cell
+            }
+            else{
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "contributorCell", for: indexPath) as! ContributorCell
+                return cell
+            }
         }
     }
     
@@ -110,6 +114,58 @@ class MediaFrag: UIViewController, UICollectionViewDelegate, UICollectionViewDat
                     currentCell.mediaCategory.textColor = #colorLiteral(red: 0.6000000238, green: 0.6000000238, blue: 0.6000000238, alpha: 1)
                 }
             }
+            
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            
+            switch(self.selectedCategory){
+                case "popular":
+                    self.articles = [Any]()
+                    articles.append(contentsOf: delegate.mediaCache.newsCache)
+                    
+                    self.news.performBatchUpdates({
+                        let indexSet = IndexSet(integersIn: 0...0)
+                        self.news.reloadSections(indexSet)
+                    }, completion: nil)
+                break;
+                case "twitch":
+                    self.articles = [Any]()
+                    articles.append(contentsOf: delegate.mediaCache.newsCache)
+                    
+                    self.news.performBatchUpdates({
+                        let indexSet = IndexSet(integersIn: 0...0)
+                        self.news.reloadSections(indexSet)
+                    }, completion: nil)
+                break;
+                case "news":
+                    self.articles = [Any]()
+                    articles.append(0)
+                    articles.append(contentsOf: delegate.mediaCache.newsCache)
+                    
+                    self.news.performBatchUpdates({
+                        let indexSet = IndexSet(integersIn: 0...0)
+                        self.news.reloadSections(indexSet)
+                    }, completion: nil)
+                break;
+                case "reviews":
+                    self.articles = [Any]()
+                    articles.append(0)
+                    articles.append(contentsOf: delegate.mediaCache.reviewsCache)
+                    
+                    self.news.performBatchUpdates({
+                        let indexSet = IndexSet(integersIn: 0...0)
+                        self.news.reloadSections(indexSet)
+                    }, completion: nil)
+                break;
+                default:
+                    self.articles = [Any]()
+                    articles.append(contentsOf: delegate.mediaCache.newsCache)
+                    
+                    self.news.performBatchUpdates({
+                        let indexSet = IndexSet(integersIn: 0...0)
+                        self.news.reloadSections(indexSet)
+                    }, completion: nil)
+                break;
+            }
         }
     }
     
@@ -122,25 +178,19 @@ class MediaFrag: UIViewController, UICollectionViewDelegate, UICollectionViewDat
             return CGSize(width: 180, height: CGFloat(150))
         }
         else{
-            if(indexPath.item % 3 == 0){
-                return CGSize(width: (collectionView.bounds.width / 2) - 20, height: CGFloat(50))
+            let current = self.articles[indexPath.item]
+            if(current is Int){
+                return CGSize(width: (collectionView.bounds.width - 20), height: CGFloat(200))
             }
             else{
-                return CGSize(width: (collectionView.bounds.width), height: CGFloat(300))
+                if(indexPath.item % 3 == 0){
+                    return CGSize(width: (collectionView.bounds.width / 2) - 20, height: CGFloat(50))
+                }
+                else{
+                    return CGSize(width: (collectionView.bounds.width), height: CGFloat(300))
+                }
             }
         }
     }
-    
-    /*func collectionView(_ collectionView: UICollectionView, mosaicCellSizeTypeAtIndexPath indexPath: IndexPath) -> TRMosaicCellType {
-        return indexPath.item % 3 == 0 ? TRMosaicCellType.big : TRMosaicCellType.small
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: TRMosaicLayout, insetAtSection: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 3, left: 3, bottom: 3, right: 3)
-    }
-    
-    func heightForSmallMosaicCell() -> CGFloat {
-        return 250
-    }*/
     
 }

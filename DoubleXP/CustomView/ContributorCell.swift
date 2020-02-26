@@ -1,5 +1,5 @@
 //
-//  NewsArticleCell.swift
+//  ContributorCell.swift
 //  DoubleXP
 //
 //  Created by Toussaint Peterson on 2/25/20.
@@ -8,11 +8,7 @@
 
 import UIKit
 
-class NewsArticleCell: UICollectionViewCell{
-    
-    @IBOutlet weak var articleBack: UIImageView!
-    @IBOutlet weak var subTitle: UILabel!
-    @IBOutlet weak var title: UILabel!
+class ContributorCell: UICollectionViewCell{
     
     override func awakeFromNib() {
         self.layer.cornerRadius = 10
@@ -28,3 +24,4 @@ class NewsArticleCell: UICollectionViewCell{
         super.awakeFromNib()
     }
 }
+

@@ -50,6 +50,10 @@
 		30634D5F24059E6800FEAD40 /* NewsArticleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30634D5E24059E6800FEAD40 /* NewsArticleCell.swift */; };
 		30634D612405AE6900FEAD40 /* TestCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30634D602405AE6900FEAD40 /* TestCollection.swift */; };
 		30634D632405C27000FEAD40 /* MediaManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30634D622405C27000FEAD40 /* MediaManager.swift */; };
+		30634D652405FE5700FEAD40 /* MediaCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30634D642405FE5700FEAD40 /* MediaCache.swift */; };
+		30634D672406067C00FEAD40 /* hodges_badge.png in Resources */ = {isa = PBXBuildFile; fileRef = 30634D662406067B00FEAD40 /* hodges_badge.png */; };
+		30634D692406084B00FEAD40 /* ContributorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30634D682406084B00FEAD40 /* ContributorCell.swift */; };
+		30634D6B24061B7E00FEAD40 /* mike_badge.png in Resources */ = {isa = PBXBuildFile; fileRef = 30634D6A24061B7D00FEAD40 /* mike_badge.png */; };
 		306E6B5923DE23220069F426 /* TwitchStreamObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306E6B5823DE23220069F426 /* TwitchStreamObject.swift */; };
 		306E6B5B23DE49F70069F426 /* live_streaming.png in Resources */ = {isa = PBXBuildFile; fileRef = 306E6B5A23DE49F60069F426 /* live_streaming.png */; };
 		306E6B5D23DE4E4D0069F426 /* TwitchStreamCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306E6B5C23DE4E4D0069F426 /* TwitchStreamCell.swift */; };
@@ -282,6 +286,10 @@
 		30634D5E24059E6800FEAD40 /* NewsArticleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsArticleCell.swift; sourceTree = "<group>"; };
 		30634D602405AE6900FEAD40 /* TestCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestCollection.swift; sourceTree = "<group>"; };
 		30634D622405C27000FEAD40 /* MediaManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaManager.swift; sourceTree = "<group>"; };
+		30634D642405FE5700FEAD40 /* MediaCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaCache.swift; sourceTree = "<group>"; };
+		30634D662406067B00FEAD40 /* hodges_badge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = hodges_badge.png; sourceTree = "<group>"; };
+		30634D682406084B00FEAD40 /* ContributorCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContributorCell.swift; sourceTree = "<group>"; };
+		30634D6A24061B7D00FEAD40 /* mike_badge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mike_badge.png; sourceTree = "<group>"; };
 		306E6B5823DE23220069F426 /* TwitchStreamObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchStreamObject.swift; sourceTree = "<group>"; };
 		306E6B5A23DE49F60069F426 /* live_streaming.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = live_streaming.png; sourceTree = "<group>"; };
 		306E6B5C23DE4E4D0069F426 /* TwitchStreamCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchStreamCell.swift; sourceTree = "<group>"; };
@@ -546,6 +554,7 @@
 				30B6E1A423ADC67E00B69F00 /* InterviewManager.swift */,
 				30EBC40123DB632E009CFAB2 /* SocialMediaManager.swift */,
 				30634D622405C27000FEAD40 /* MediaManager.swift */,
+				30634D642405FE5700FEAD40 /* MediaCache.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -617,6 +626,7 @@
 				30900A992402E18E00AEA2C8 /* ViewTeamsNeedsCell.swift */,
 				30634D5A240572E800FEAD40 /* MediaCategoryCell.swift */,
 				30634D5E24059E6800FEAD40 /* NewsArticleCell.swift */,
+				30634D682406084B00FEAD40 /* ContributorCell.swift */,
 			);
 			path = CustomView;
 			sourceTree = "<group>";
@@ -754,10 +764,12 @@
 				30C4EDAE2267C1890046B615 /* double_xp_small_white.png */,
 				308EBA2323FDCC4200DE186D /* connection.png */,
 				301B4AEB23F7462300A6FE5B /* bubble.png */,
+				30634D662406067B00FEAD40 /* hodges_badge.png */,
 				308EBA2523FDCCDB00DE186D /* live_menu.png */,
 				307CE34C23EA2B5000DCB12A /* message.png */,
 				308E79BB23FF471D00197035 /* meeting.png */,
 				30634D5824056B7300FEAD40 /* new_logo.png */,
+				30634D6A24061B7D00FEAD40 /* mike_badge.png */,
 				308E79BF23FF4B2C00197035 /* hashtag.png */,
 				305DA86E2400BE94002ED813 /* stop.png */,
 				308E79BD23FF492600197035 /* connection_white.png */,
@@ -955,6 +967,7 @@
 				30634D5424055E6900FEAD40 /* tower_white.png in Resources */,
 				308E79BE23FF492600197035 /* connection_white.png in Resources */,
 				3080B3E623B80BE400638B22 /* request_highlight.png in Resources */,
+				30634D672406067C00FEAD40 /* hodges_badge.png in Resources */,
 				3058198223D27152008684A7 /* observation.png in Resources */,
 				3058198023D26F72008684A7 /* pen.png in Resources */,
 				30C4EDB42267C1890046B615 /* team_thumbs_up.png in Resources */,
@@ -973,6 +986,7 @@
 				30F6FCC223CD948E0051813D /* cancel-mark.png in Resources */,
 				30582416239C8D1E00FDEA7D /* user.png in Resources */,
 				30F6FCB423C58F580051813D /* show-more-button-with-three-dots.png in Resources */,
+				30634D6B24061B7E00FEAD40 /* mike_badge.png in Resources */,
 				30634D5924056B7300FEAD40 /* new_logo.png in Resources */,
 				3080B3EA23B81BC100638B22 /* pending_button.png in Resources */,
 				30FC34C123E7DAE8007F0080 /* settings.png in Resources */,
@@ -1133,6 +1147,7 @@
 				303F2D4223728D09004B68E1 /* EMPageViewController.swift in Sources */,
 				306E6B5923DE23220069F426 /* TwitchStreamObject.swift in Sources */,
 				308BD021238B4AC90034822B /* TeamDashboard.swift in Sources */,
+				30634D692406084B00FEAD40 /* ContributorCell.swift in Sources */,
 				3058131D23973FEB001BCE30 /* TeamBuildFAResults.swift in Sources */,
 				30A84DD82373B88E007BEAA5 /* PlayerProfile.swift in Sources */,
 				30B6E18523A09F1400B69F00 /* ViewTeams.swift in Sources */,
@@ -1255,6 +1270,7 @@
 				30EBC3FA23D608DB009CFAB2 /* TeamTweetCell.swift in Sources */,
 				301B4AE823F4DB8A00A6FE5B /* FreeAgentDashExpanded.swift in Sources */,
 				30B6E18323A09A8900B69F00 /* FreeAgentManager.swift in Sources */,
+				30634D652405FE5700FEAD40 /* MediaCache.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -119,3 +119,8 @@ protocol LandingMenuCallbacks: class{
     func menuNavigateToMessaging(uId: String)
     func menuNavigateToProfile(uId: String)
 }
+
+protocol MediaCallbacks: class{
+    func onReviewsReceived(payload: [NewsObject])
+    func onMediaReceived()
+}

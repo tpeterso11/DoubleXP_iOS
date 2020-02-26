@@ -12,7 +12,7 @@ import ImageLoader
 import Firebase
 import TwitterKit
 
-class PreSplashActivity: UIViewController {
+class PreSplashActivity: UIViewController, MediaCallbacks {
     private var data: [NewsObject]!
     private var games: [GamerConnectGame]!
     
@@ -21,6 +21,7 @@ class PreSplashActivity: UIViewController {
         
         games = [GamerConnectGame]()
         // Do any additional setup after loading the view, typically from a nib.
+        
         getAppConfig()
         //testLoadTwitter()
     }
@@ -96,24 +97,9 @@ class PreSplashActivity: UIViewController {
                     }
                 }
             
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
-                    let delegate = UIApplication.shared.delegate as! AppDelegate
-                    delegate.gcGames = self.games
-                    
-                    let uId = UserDefaults.standard.string(forKey: "userId")
-                    if(uId != nil){
-                        if(!uId!.isEmpty){
-                            self.downloadDBRef(uid: uId!)
-                            //self.performSegue(withIdentifier: "newLogin", sender: nil)
-                        }
-                        else{
-                            self.performSegue(withIdentifier: "newLogin", sender: nil)
-                        }
-                    }
-                    else{
-                        self.performSegue(withIdentifier: "newLogin", sender: nil)
-                    }
-                }
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                let manager = delegate.mediaManager
+                manager.getReviews(callbacks: self)
             }
         }
     
@@ -568,6 +554,30 @@ class PreSplashActivity: UIViewController {
                 
             }) { (error) in
                 print(error.localizedDescription)
+            }
+        }
+    }
+    
+    func onReviewsReceived(payload: [NewsObject]) {
+    }
+    
+    func onMediaReceived(){
+        DispatchQueue.main.async {
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            delegate.gcGames = self.games
+            
+            let uId = UserDefaults.standard.string(forKey: "userId")
+            if(uId != nil){
+                if(!uId!.isEmpty){
+                    self.downloadDBRef(uid: uId!)
+                    //self.performSegue(withIdentifier: "newLogin", sender: nil)
+                }
+                else{
+                    self.performSegue(withIdentifier: "newLogin", sender: nil)
+                }
+            }
+            else{
+                self.performSegue(withIdentifier: "newLogin", sender: nil)
             }
         }
     }

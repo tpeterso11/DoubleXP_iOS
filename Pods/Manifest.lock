@@ -105,7 +105,6 @@ PODS:
   - SwiftNotificationCenter (1.0.4)
   - SwiftTwitch (0.1.0):
     - Marshal (~> 1.2.7)
-  - TRMosaicLayout (1.0.0)
   - TwitchPlayer (0.2.3)
   - TwitterCore (3.2.0)
   - TwitterKit (3.4.2):
@@ -132,7 +131,6 @@ DEPENDENCIES:
   - SwiftHTTP (~> 3.0)
   - SwiftNotificationCenter
   - SwiftTwitch
-  - TRMosaicLayout
   - TwitchPlayer
   - TwitterKit
   - UnderLineTextField (~> 2.1)
@@ -174,7 +172,6 @@ SPEC REPOS:
     - SwiftHTTP
     - SwiftNotificationCenter
     - SwiftTwitch
-    - TRMosaicLayout
     - TwitchPlayer
     - TwitterCore
     - TwitterKit
@@ -216,12 +213,11 @@ SPEC CHECKSUMS:
   SwiftHTTP: e94f1aa8cde58637dcc0100f6349de31a3337fde
   SwiftNotificationCenter: 760386da2ce03d3594cb5e96d1e22ec80b44b46f
   SwiftTwitch: 40957abccac5d6d40d8e047224178364ebbaf20c
-  TRMosaicLayout: 1875505c48dd2877afd69a8bea7b4c1c63afa5b5
   TwitchPlayer: 60e9999dec4f74121685eec0b6e9843c2b44d794
   TwitterCore: 8cbc9ad34d91c63a0035ea05bfbfc0d7ca72a28c
   TwitterKit: 5e4f41d70b9abdb41df5467f52d7aa2c0fd26ebb
   UnderLineTextField: b3f5307b56962331e30a965e81b79aae2df1de83
 
-PODFILE CHECKSUM: 016491160d208f4a27b2023b6d81ab291330f90b
+PODFILE CHECKSUM: 1d856a2ce660a4a0e98554b651902ed3a3fd4bb4
 
 COCOAPODS: 1.8.4
