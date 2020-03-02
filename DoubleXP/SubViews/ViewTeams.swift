@@ -405,7 +405,6 @@ UITableViewDataSource {
         cellHeights = Array(repeating: Const.closeCellHeight, count: (self.teams.count))
         teamResults.estimatedRowHeight = Const.closeCellHeight
         teamResults.rowHeight = UITableView.automaticDimension
-        teamResults.backgroundColor = UIColor.white
         
         if #available(iOS 10.0, *) {
             teamResults.refreshControl = UIRefreshControl()

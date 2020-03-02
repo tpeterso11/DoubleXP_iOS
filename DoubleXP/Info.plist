@@ -42,6 +42,20 @@
 		<true/>
 		<key>NSExceptionDomains</key>
 		<dict>
+			<key>http://commondatastorage.googleapis.com</key>
+			<dict>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+			<key>https://firebasestorage.googleapis.com</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
 			<key>example.com</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>

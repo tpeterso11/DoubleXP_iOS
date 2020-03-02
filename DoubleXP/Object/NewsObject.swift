@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import UIKit
 
 class NewsObject: NSObject, NSCoding {
     var _title:String? = ""
@@ -120,6 +121,26 @@ class NewsObject: NSObject, NSCoding {
            }
        }
     
+    var _image: UIImage? = nil
+    var image: UIImage {
+        get {
+            return (_image)!
+        }
+        set (newVal) {
+            _image = newVal
+        }
+    }
+    
+    var _imageAdded: Bool = false
+    var imageAdded: Bool {
+        get {
+            return (_imageAdded)
+        }
+        set (newVal) {
+            _imageAdded = newVal
+        }
+    }
+    
     init(title: String, author: String, storyText: String, imageUrl: String?)
     {
         super.init()
@@ -143,6 +164,8 @@ class NewsObject: NSObject, NSCoding {
         self.videoUrl = (decoder.decodeObject(forKey: "videoUrl") as! String)
         self.source = (decoder.decodeObject(forKey: "source") as! String)
         self.type = (decoder.decodeObject(forKey: "type") as! String)
+        self.image = (decoder.decodeObject(forKey: "image") as! UIImage)
+        self.imageAdded = (decoder.decodeObject(forKey: "imageAdded") as! Bool)
         
     }
     
@@ -158,5 +181,7 @@ class NewsObject: NSObject, NSCoding {
         coder.encode(self.videoUrl, forKey: "videoUrl")
         coder.encode(self.source, forKey: "source")
         coder.encode(self.source, forKey: "type")
+        coder.encode(self.source, forKey: "image")
+        coder.encode(self.source, forKey: "imageAdded")
     }
 }

@@ -66,6 +66,12 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
     }
     
+    func navigateToCurrentUserProfile(){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "profile") as! ProfileFrag
+        
+        selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
+    }
+    
     func navigateToRequests(){
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "requests") as! Requests
         

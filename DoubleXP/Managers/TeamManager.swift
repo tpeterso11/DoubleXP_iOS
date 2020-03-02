@@ -11,6 +11,9 @@ import UIKit
 import Firebase
 
 class TeamManager{
+    var tempIds = [String]()
+    var tempTags = [String]()
+    var tempTeammates = [TeammateObject]()
     
     func isTeamCaptain(user: User, team: TeamObject) -> Bool{
         var isCaptain = false
@@ -309,6 +312,228 @@ class TeamManager{
             
         }) { (error) in
             print(error.localizedDescription)
+        }
+    }
+    
+    func acceptTeamRequest(team: TeamObject, callbacks: RequestsUpdate, indexPath: IndexPath){
+        //update team
+        let ref = Database.database().reference().child("Teams").child(team.teamName)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                let currentUser = delegate.currentUser
+                
+                self.tempTags = [String]()
+                let tagssArray = snapshot.childSnapshot(forPath: "teammateTags")
+                for tag in tagssArray.children{
+                    self.tempTags.append(tag as? String ?? "")
+                }
+                let profileManager = GamerProfileManager()
+                self.tempTags.append(profileManager.getGamerTagForGame(gameName: team.games[0]))
+                
+                self.tempIds = [String]()
+                let idsArray = snapshot.childSnapshot(forPath: "teammateIds")
+                for id in idsArray.children{
+                    self.tempIds.append(id as? String ?? "")
+                }
+                self.tempIds.append(currentUser!.uId)
+                
+                self.tempTeammates = [TeammateObject]()
+                let teamArray = snapshot.childSnapshot(forPath: "teammates")
+                for teammate in teamArray.children{
+                    let currentObj = teammate as! DataSnapshot
+                    let dict = currentObj.value as! [String: Any]
+                    let date = dict["date"] as? String ?? ""
+                    let tag = dict["gamerTag"] as? String ?? ""
+                    let uid = dict["uid"] as? String ?? ""
+                    
+                    let teammate = TeammateObject(gamerTag: tag, date: date, uid: uid)
+                    self.tempTeammates.append(teammate)
+                }
+                
+                let teammate = TeammateObject(gamerTag: profileManager.getGamerTagForGame(gameName: team.games[0]), date: "", uid: delegate.currentUser!.uId)
+                self.tempTeammates.append(teammate)
+                
+                var sendList = [[String: Any]]()
+                for teammate in self.tempTeammates{
+                    let current = ["gamerTag": teammate.gamerTag, "date": teammate.date, "uid": teammate.uid] as [String : String]
+                    sendList.append(current)
+                }
+                
+                ref.child("teammates").setValue(sendList)
+                ref.child("teammateIds").setValue(self.tempIds)
+                ref.child("teammateTags").setValue(self.tempTags)
+                
+                self.updateTeammates(team: team, callbacks: callbacks, indexPath: indexPath)
+            }
+            
+        }) { (error) in
+            print(error.localizedDescription)
+        }
+    }
+    
+    func recjectTeamRequest(team: TeamObject, callbacks: RequestsUpdate, indexPath: IndexPath){
+        //update team
+        let ref = Database.database().reference().child("Teams").child(team.teamName)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                let currentUser = delegate.currentUser
+                
+                var invites = [TeamInviteObject]()
+                let teamInvites = snapshot.childSnapshot(forPath: "teamInvites")
+                for invite in teamInvites.children{
+                    let currentObj = invite as! DataSnapshot
+                    let dict = currentObj.value as! [String: Any]
+                    let gamerTag = dict["gamerTag"] as? String ?? ""
+                    let date = dict["date"] as? String ?? ""
+                    let uid = dict["uid"] as? String ?? ""
+                   
+                    let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid)
+                    invites.append(newInvite)
+                }
+                
+                for invite in invites{
+                    if(invite.uid == currentUser!.uId){
+                        invites.remove(at: invites.index(of: invite)!)
+                        break
+                    }
+                }
+                
+                var sendList = [[String: Any]]()
+                for invite in invites{
+                    let current = ["gamerTag": invite.gamerTag, "date": invite.date, "uid": invite.uid] as [String : String]
+                    sendList.append(current)
+                }
+                
+                ref.child("teamInvites").setValue(sendList)
+                
+                self.updateTeammates(team: team, callbacks: callbacks, indexPath: indexPath)
+            }
+            
+        }) { (error) in
+            print(error.localizedDescription)
+        }
+    }
+    
+    private func updateCurrentUserRejectTeam(team: TeamObject, callbacks: RequestsUpdate, indexPath: IndexPath){
+        //remove request from user.
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser
+        
+        let ref = Database.database().reference().child("Users").child(currentUser!.uId)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                var currentInvites = [TeamObject]()
+                    let teamInvites = snapshot.childSnapshot(forPath: "teamInvites")
+                    for invite in teamInvites.children{
+                        let currentObj = invite as! DataSnapshot
+                        let dict = currentObj.value as! [String: Any]
+                        
+                        let teamName = dict["teamName"] as? String ?? ""
+                        let teamId = dict["teamId"] as? String ?? ""
+                        let games = dict["games"] as? [String] ?? [String]()
+                        let consoles = dict["consoles"] as? [String] ?? [String]()
+                        let teamNeeds = dict["teamNeeds"] as? [String] ?? [String]()
+                        let selectedTeamNeeds = dict["selectedTeamNeeds"] as? [String] ?? [String]()
+                        let teamInviteTags = dict["teamInviteTags"] as? [String] ?? [String]()
+                        let teammateIds = dict["teammateIds"] as? [String] ?? [String]()
+                        let teammateTags = dict["teammateTags"] as? [String] ?? [String]()
+                        let teamCaptain = dict["teamCaptain"] as? String ?? ""
+                        let imageUrl = dict["imageUrl"] as? String ?? ""
+                        let teamChat = dict["teamChat"] as? String ?? ""
+                        
+                        var invites = [TeamInviteObject]()
+                        let teamInvites = snapshot.childSnapshot(forPath: "teamInvites")
+                        for invite in teamInvites.children{
+                            let currentObj = invite as! DataSnapshot
+                            let dict = currentObj.value as! [String: Any]
+                            let gamerTag = dict["gamerTag"] as? String ?? ""
+                            let date = dict["date"] as? String ?? ""
+                            let uid = dict["uid"] as? String ?? ""
+                            
+                            let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid)
+                            invites.append(newInvite)
+                        }
+                        
+                        var teammateArray = [TeammateObject]()
+                        let teammates = snapshot.childSnapshot(forPath: "teammates")
+                        for teammate in teammates.children{
+                            let currentTeammate = teammate as! DataSnapshot
+                            let dict = currentTeammate.value as! [String: Any]
+                            let gamerTag = dict["gamerTag"] as? String ?? ""
+                            let date = dict["date"] as? String ?? ""
+                            let uid = dict["uid"] as? String ?? ""
+                            
+                            let teammate = TeammateObject(gamerTag: gamerTag, date: date, uid: uid)
+                            teammateArray.append(teammate)
+                        }
+                        
+                        let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: teamCaptain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInviteTags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl)
+                        currentTeam.teammates = teammateArray
+                        
+                        currentInvites.append(currentTeam)
+                    }
+                
+                for invite in currentInvites{
+                    if(invite.teamId == team.teamId){
+                        currentInvites.remove(at: currentInvites.index(of: invite)!)
+                        break
+                    }
+                }
+                    
+                    //convert them and send them back.
+                    var sendInvites = [[String: Any]]()
+                    for team in currentInvites{
+                        let current = ["teamName": team.teamName, "teamId": team.teamId, "games": team.games, "consoles": team.consoles, "teammateTags": team.teammateTags, "teammateIds": team.teammateIds, "teamCaptain": team.teamCaptain, "teamInvites": self.convertInvitesToSendableValue(invites: team.teamInvites), "teamChat": team.teamChat, "teamInviteTags": team.teamInviteTags, "teamNeeds": team.teamNeeds, "selectedTeamNeeds": team.selectedTeamNeeds, "imageUrl": team.imageUrl] as [String : Any]
+                        
+                        sendInvites.append(current)
+                    }
+                
+                    ref.child(team.teamName).child("teamInvites").setValue(sendInvites)
+                    
+                    callbacks.updateCell(indexPath: indexPath)
+            }
+            
+        }) { (error) in
+            print(error.localizedDescription)
+        }
+    }
+    
+    private func updateTeammates(team: TeamObject, callbacks: RequestsUpdate, indexPath: IndexPath){
+        let unchangingList = self.tempIds
+        
+        if(!self.tempIds.isEmpty){
+            
+            for id in self.tempIds{
+                let ref = Database.database().reference().child("Users").child(id).child("teams").child(team.teamName)
+                self.tempIds.remove(at: self.tempIds.index(of: id)!)
+                
+                ref.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if(snapshot.exists()){
+        
+                        var sendList = [[String: Any]]()
+                        for teammate in self.tempTeammates{
+                            let current = ["gamerTag": teammate.gamerTag, "date": teammate.date, "uid": teammate.uid] as [String : String]
+                            sendList.append(current)
+                        }
+                        
+                        ref.child("teammates").setValue(sendList)
+                        ref.child("teammateIds").setValue(unchangingList)
+                        ref.child("teammateTags").setValue(self.tempTags)
+                        
+                        if(self.tempIds.isEmpty){
+                            callbacks.updateCell(indexPath: indexPath)
+                        }
+                    }
+                    
+                }) { (error) in
+                    if(!self.tempIds.isEmpty){
+                        self.updateTeammates(team: team, callbacks: callbacks, indexPath: indexPath)
+                    }
+                    //update error
+                }
+            }
         }
     }
     

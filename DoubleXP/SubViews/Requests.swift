@@ -16,6 +16,7 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
     var userRequests = [Any]()
     var cellHeights: [CGFloat] = []
     
+    @IBOutlet weak var emptyLayout: UIView!
     @IBOutlet weak var requestList: UITableView!
     enum Const {
            static let closeCellHeight: CGFloat = 83
@@ -97,7 +98,11 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
             animateView()
         }
         else{
-            //show empty
+            let top = CGAffineTransform(translationX: 0, y: -10)
+            UIView.animate(withDuration: 0.8, animations: {
+                self.emptyLayout.alpha = 1
+                self.emptyLayout.transform = top
+            }, completion: nil)
         }
     }
     
@@ -141,10 +146,10 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
         let current = userRequests[indexPath.item]
         
         if(current is FriendRequestObject){
-            cell.setUI(friendRequest: (current as! FriendRequestObject), team: nil)
+            cell.setUI(friendRequest: (current as! FriendRequestObject), team: nil, indexPath: indexPath, callbacks: self)
         }
         else{
-            cell.setUI(friendRequest: nil, team: (current as! TeamObject))
+            cell.setUI(friendRequest: nil, team: (current as! TeamObject), indexPath: indexPath, callbacks: self)
         }
         
         cell.layoutMargins = UIEdgeInsets.zero
@@ -185,6 +190,7 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
     }
     
     func updateCell(indexPath: IndexPath) {
+        self.userRequests.remove(at: indexPath.item)
         self.requestList.deleteRows(at: [indexPath], with: .automatic)
     }
     

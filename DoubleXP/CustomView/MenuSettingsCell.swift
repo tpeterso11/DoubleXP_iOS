@@ -11,4 +11,6 @@ import UIKit
 
 class MenuSettingsCell: UICollectionViewCell{
 
+    @IBOutlet weak var profileButton: UIButton!
+    @IBOutlet weak var settingsButton: UIImageView!
 }

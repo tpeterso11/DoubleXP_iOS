@@ -23,7 +23,10 @@ target 'DoubleXP' do
   pod 'TwitchPlayer'
   pod 'MessageKit'
   pod 'Bartinter'
+  pod 'Hero'
   pod 'ExpyTableView'
+  pod 'PINRemoteImage'
+  pod 'AIFlatSwitch'
   pod 'PopupDialog', '~> 1.0'
   pod 'UnderLineTextField', '~> 2.1'
 

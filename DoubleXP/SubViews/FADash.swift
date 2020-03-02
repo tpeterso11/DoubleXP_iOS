@@ -28,6 +28,8 @@ class FADash: UIViewController, ExpyTableViewDelegate, ExpyTableViewDataSource, 
     @IBOutlet weak var quizView: UIView!
     @IBOutlet weak var quizTable: UITableView!
     @IBOutlet weak var backButton: UIView!
+    @IBOutlet weak var emptyLayout: UIView!
+    @IBOutlet weak var createEmpty: UIButton!
     
     private var quizOverlayShowing = false
     
@@ -73,7 +75,13 @@ class FADash: UIViewController, ExpyTableViewDelegate, ExpyTableViewDataSource, 
                 self.reload(tableView: self.profileList)
             }
             else{
-                //show empty
+                self.createEmpty.addTarget(self, action: #selector(self.createButtonClicked), for: .touchUpInside)
+                
+                let top = CGAffineTransform(translationX: 0, y: -10)
+                UIView.animate(withDuration: 0.8, animations: {
+                    self.emptyLayout.alpha = 1
+                    self.emptyLayout.transform = top
+                }, completion: nil)
             }
             
         }) { (error) in

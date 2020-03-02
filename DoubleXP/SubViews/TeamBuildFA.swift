@@ -50,49 +50,14 @@ class TeamBuildFA: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
             }
         }
         
-        let manager = GamerProfileManager()
-        if(manager.getGamerTagForGame(gameName: team!.games[0]) != team!.teamCaptain){
-            captainCover.isHidden = true
-            captainControls.isHidden = false
-            
-            searchButtonCaptain.addTarget(self, action: #selector(searchButtonClicked), for: .touchUpInside)
-        }
-        else{
-            if(team!.teamNeeds.isEmpty){
-                captainCover.isHidden = true
-                captainControls.isHidden = true
-                
-                searchButtonCaptain.addTarget(self, action: #selector(searchButtonClicked), for: .touchUpInside)
-            }
-            else{
-                captainCover.isHidden = false
-                captainControls.isHidden = true
-                
-                checkSaveButton()
-                searchButton.addTarget(self, action: #selector(searchButtonClicked), for: .touchUpInside)
-            }
-        }
+        captainCover.isHidden = true
+        captainControls.isHidden = false
+        
+        searchButtonCaptain.addTarget(self, action: #selector(searchButtonClicked), for: .touchUpInside)
         
         if(selectedGame != nil && (!(selectedGame?.teamNeeds.isEmpty)!)){
             self.selectedNeeds.append(contentsOf: team!.selectedTeamNeeds)
             createData()
-        }
-        else{
-            teamNeeds.isHidden = true
-        
-            topBorder.layer.masksToBounds = false
-            topBorder.layer.shadowOffset = CGSize(width: 0, height: 20)
-            topBorder.layer.shadowRadius = 10
-            topBorder.layer.shadowOpacity = 0.5
-            
-            bottomBorder.layer.masksToBounds = false
-            bottomBorder.layer.shadowOffset = CGSize(width: 0, height: -20)
-            bottomBorder.layer.shadowRadius = 10
-            bottomBorder.layer.shadowOpacity = 0.5
-            
-            mainImage.moa.url = team!.imageUrl
-            mainImage.contentMode = .scaleAspectFill
-            mainImage.clipsToBounds = true
         }
     }
     

@@ -115,6 +115,10 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
         
         tweetStreamSegment.selectedSegmentIndex = 0
         
+        let chatTap = UITapGestureRecognizer(target: self, action: #selector(chatButtonClicked))
+        teamChat.isUserInteractionEnabled = true
+        teamChat.addGestureRecognizer(chatTap)
+        
         let buildTap = UITapGestureRecognizer(target: self, action: #selector(buildButtonClicked))
         buildButton.isUserInteractionEnabled = true
         buildButton.addGestureRecognizer(buildTap)
@@ -163,6 +167,11 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
     @objc func buildButtonClicked(_ sender: AnyObject?) {
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.currentLanding!.navigateToTeamBuild(team: self.team!)
+    }
+    
+    @objc func chatButtonClicked(_ sender: AnyObject?) {
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.currentLanding!.navigateToMessaging(groupChannelUrl: team!.teamChat, otherUserId: nil)
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {

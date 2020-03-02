@@ -12,14 +12,17 @@ import FoldingCell
 class RequestsFoldingCell: FoldingCell{
     
     @IBOutlet weak var drawer: UIView!
-    @IBOutlet weak var reject: UIImageView!
-    @IBOutlet weak var accept: UIImageView!
-    @IBOutlet weak var profile: UIImageView!
+    
+    @IBOutlet weak var profile: UIButton!
+    @IBOutlet weak var reject: UIButton!
+    @IBOutlet weak var accept: UIButton!
     @IBOutlet weak var gamerTagMan: UILabel!
     @IBOutlet weak var gamerTagSub: UILabel!
     @IBOutlet weak var requestType: UILabel!
     @IBOutlet weak var requestSince: UILabel!
     private var currentRequest: Any?
+    private var indexPath: IndexPath!
+    private var callbacks: RequestsUpdate!
     
     override func awakeFromNib() {
         foregroundView.layer.cornerRadius = 10
@@ -34,7 +37,10 @@ class RequestsFoldingCell: FoldingCell{
         super.awakeFromNib()
     }
     
-    func setUI(friendRequest: FriendRequestObject?, team: TeamObject?){
+    func setUI(friendRequest: FriendRequestObject?, team: TeamObject?, indexPath: IndexPath, callbacks: RequestsUpdate){
+        self.indexPath = indexPath
+        self.callbacks = callbacks
+        
         if(friendRequest != nil){
             currentRequest = friendRequest
             gamerTagMan.text = friendRequest?.gamerTag
@@ -71,12 +77,13 @@ class RequestsFoldingCell: FoldingCell{
             requestSince.isHidden = true
         }
         
-        let profileTap = UITapGestureRecognizer(target: self, action: #selector(profileClicked))
-        profile.isUserInteractionEnabled = true
-        profile.addGestureRecognizer(profileTap)
+    
+        profile.addTarget(self, action: #selector(profileClicked), for: .touchUpInside)
+        reject.addTarget(self, action: #selector(rejectClicked), for: .touchUpInside)
+        accept.addTarget(self, action: #selector(acceptClicked), for: .touchUpInside)
         
         if(currentRequest is TeamObject){
-            profile.image = #imageLiteral(resourceName: "dashboard.png")
+            profile.titleLabel?.text = "View"
         }
     }
     
@@ -109,6 +116,31 @@ class RequestsFoldingCell: FoldingCell{
         }
         else{
             landing?.navigateToTeamDashboard(team: (currentRequest as! TeamObject), newTeam: false)
+        }
+    }
+    
+    @objc func acceptClicked(_ sender: AnyObject?) {
+        let manager = FriendsManager()
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        
+        if(self.currentRequest is FriendRequestObject){
+            manager.acceptFriendFromRequests(position: self.indexPath, otherUserRequest: (self.currentRequest as! FriendRequestObject), currentUserUid: delegate.currentUser!.uId, callbacks: self.callbacks)
+        }
+        else{
+            let teamManager = TeamManager()
+            teamManager.acceptTeamRequest(team: (self.currentRequest as! TeamObject), callbacks: self.callbacks, indexPath: indexPath)
+        }
+    }
+    
+    @objc func rejectClicked(_ sender: AnyObject?) {
+        let manager = FriendsManager()
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        if(self.currentRequest is FriendRequestObject){
+        manager.declineRequest(position: self.indexPath, otherUserRequest: (self.currentRequest as! FriendRequestObject), currentUserUid: delegate.currentUser!.uId, callbacks: self.callbacks)
+        }
+        else{
+            let teamManager = TeamManager()
+            teamManager.acceptTeamRequest(team: (self.currentRequest as! TeamObject), callbacks: self.callbacks, indexPath: indexPath)
         }
     }
 }

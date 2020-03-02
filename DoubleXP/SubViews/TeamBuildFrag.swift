@@ -151,7 +151,13 @@ class TeamBuildFrag: ParentVC, UITableViewDataSource, UITableViewDelegate, TeamC
     
     @objc func faButtonClicked(_ sender: AnyObject?) {
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        delegate.currentLanding?.navigateToTeamFreeAgentSearch(team: self.team!)
+        let teamManager = TeamManager()
+        if(team!.teamNeeds.isEmpty || !teamManager.isTeamCaptain(user: delegate.currentUser!, team: self.team!)){
+            delegate.currentLanding?.navigateToTeamFreeAgentSearch(team: self.team!)
+        }
+        else{
+            delegate.currentLanding?.navigateToTeamFreeAgentResults(team: self.team!)
+        }
     }
     
     

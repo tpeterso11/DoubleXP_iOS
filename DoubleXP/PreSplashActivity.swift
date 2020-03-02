@@ -11,19 +11,64 @@ import SwiftHTTP
 import ImageLoader
 import Firebase
 import TwitterKit
+import SwiftTwitch
+import Marshal
 
 class PreSplashActivity: UIViewController, MediaCallbacks {
     private var data: [NewsObject]!
     private var games: [GamerConnectGame]!
     
+    struct Constants {
+        static let secret = "uyvhqn68476njzzdvja9ulqsb8esn3"
+        static let id = "aio1d4ucufi6bpzae0lxtndanh3nob"
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         
         games = [GamerConnectGame]()
         // Do any additional setup after loading the view, typically from a nib.
         
+        //getTwitchToken()
         getAppConfig()
         //testLoadTwitter()
+    }
+    
+    func getTwitchToken(){
+        let params = ["client_id": Constants.id, "client_secret": Constants.secret, "grant_type":"client_credentials"]
+            HTTP.POST("https://id.twitch.tv/oauth2/token?", parameters: params) { response in
+                if let err = response.error {
+                    print("error: \(err.localizedDescription)")
+                    return //also notify app of failure as needed
+                }
+                else{
+                    if let jsonObj = try! JSONSerialization.jsonObject(with: response.data, options: JSONSerialization.ReadingOptions()) as? [String: Any] {
+                        
+                        TwitchTokenManager.shared.accessToken = (jsonObj["access_token"] as? String ?? "")
+                        let test =
+                            TwitchTokenManager.shared.accessToken
+                        
+                        Twitch.Streams.getStreams(completionHandler: { result in
+                           switch (result) {
+                            case .success(let result):
+                                result.streamData
+                                print("")
+                               //self.videos = getVideosData.videoData
+                           case .failure(let data, _, _):
+                            //let desc = String(data!.description)
+                                print("The API call failed! Unable to get videos. Did you set an access token?")
+                            }
+                        })
+                            
+                            /*switch(result){
+                            case .success(GetStreamsData.init(object: )):
+                                break
+                            case .failure(nil, nil, nil):
+                                break
+                            }*/
+                        }
+                        
+                }
+        }
     }
     
     func getAppConfig(){
@@ -100,6 +145,25 @@ class PreSplashActivity: UIViewController, MediaCallbacks {
                 let delegate = UIApplication.shared.delegate as! AppDelegate
                 let manager = delegate.mediaManager
                 manager.getReviews(callbacks: self)
+            
+                DispatchQueue.main.async {
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    delegate.gcGames = self.games
+                    
+                    let uId = UserDefaults.standard.string(forKey: "userId")
+                    if(uId != nil){
+                        if(!uId!.isEmpty){
+                            self.downloadDBRef(uid: uId!)
+                            //self.performSegue(withIdentifier: "newLogin", sender: nil)
+                        }
+                        else{
+                            self.performSegue(withIdentifier: "newLogin", sender: nil)
+                        }
+                    }
+                    else{
+                        self.performSegue(withIdentifier: "newLogin", sender: nil)
+                    }
+                }
             }
         }
     
@@ -559,6 +623,10 @@ class PreSplashActivity: UIViewController, MediaCallbacks {
     }
     
     func onReviewsReceived(payload: [NewsObject]) {
+    }
+    
+    func onVideoLoaded(url: String) {
+        
     }
     
     func onMediaReceived(){

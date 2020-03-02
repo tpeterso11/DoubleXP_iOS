@@ -69,6 +69,7 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     @IBOutlet weak var searchButton: UIButton!
     //@IBOutlet weak var newNav: UIView!
     
+    @IBOutlet weak var clickArea: UIView!
     @IBOutlet weak var mediaButton: UIImageView!
     @IBOutlet weak var logOut: UIButton!
     @IBOutlet weak var menuCollection: UICollectionView!
@@ -205,6 +206,28 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToSearch(game: game)
         }
+    }
+    
+    @objc func navigateToCurrentUserProfile() {
+        stackDepth += 1
+        
+        let top = CGAffineTransform(translationX: -249, y: 0)
+        UIView.animate(withDuration: 0.4, delay: 0.0, options:[], animations: {
+            self.menuVie.transform = top
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
+                self.blur.alpha = 0.0
+            }, completion: { (finished: Bool) in
+                UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
+                    self.restoreBottomNav()
+                }, completion: { (finished: Bool) in
+                    self.stackDepth += 1
+                    Broadcaster.notify(NavigateToProfile.self) {
+                        $0.navigateToCurrentUserProfile()
+                    }
+                })
+            })
+        })
     }
     
     func navigateToCreateFrag() {
@@ -486,6 +509,8 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
             teamFragAdded = false
             profileAdded = false
         }
+        
+        updateNavColor(color: .darkGray)
     }
     
     @objc func mediaButtonClicked(_ sender: AnyObject?) {
@@ -499,6 +524,8 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
             profileAdded = false
             mediaAdded = true
         }
+        
+        updateNavColor(color: .darkGray)
     }
     
     @objc func teamButtonClicked(_ sender: AnyObject?) {
@@ -511,6 +538,8 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
             requestsAdded = false
             profileAdded = false
         }
+        
+        updateNavColor(color: .darkGray)
     }
     
     @objc func requestButtonClicked(_ sender: AnyObject?) {
@@ -523,6 +552,8 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
             teamFragAdded = false
             profileAdded = false
         }
+        
+        updateNavColor(color: .darkGray)
     }
     
     @objc func menuButtonClicked(_ sender: AnyObject?) {
@@ -542,14 +573,12 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
                     self.menuVie.transform = top
                     
                     let backTap = UITapGestureRecognizer(target: self, action: #selector(self.dismissMenu))
-                    self.blur.isUserInteractionEnabled = true
-                    self.blur.addGestureRecognizer(backTap)
+                    self.clickArea.isUserInteractionEnabled = true
+                    self.clickArea.addGestureRecognizer(backTap)
                 }, completion: nil)
             })
             
             menuVie.viewShowing = true
-            //menuVie.animateIn()\
-            //self.view.bringSubviewToFront(friendsLabel)
         }
     }
     
@@ -584,6 +613,16 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     func messageTextSubmitted(string: String, list: [String]?) {
     }
     
+    func updateNavColor(color: UIColor) {
+        UIView.transition(with: self.bottomNav, duration: 0.3, options: .curveEaseInOut, animations: {
+            self.bottomNav.backgroundColor = color
+            self.mainNavView.backgroundColor = color
+        }, completion: nil)
+    }
+    
+    func settingsProfileClicked(){
+        
+    }
     
     func navigateToMessagingFromMenu(uId: String){
         navigateToMessaging(groupChannelUrl: nil, otherUserId: uId)
@@ -604,6 +643,8 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
             if(current is Int){
                 if(current as? Int == 0){
                     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "settings", for: indexPath) as! MenuSettingsCell
+                    cell.tag = indexPath.item
+                    cell.profileButton.addTarget(self, action: #selector(navigateToCurrentUserProfile), for: .touchUpInside)
                     return cell
                 }
                 else if(current as? Int == 1){

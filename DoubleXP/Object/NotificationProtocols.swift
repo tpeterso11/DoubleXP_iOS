@@ -41,6 +41,8 @@ protocol NavigateToProfile: class {
     
     func navigateToMedia()
     
+    func navigateToCurrentUserProfile()
+    
     func navigateToMessaging(groupChannelUrl: String?, otherUserId: String?)
     
     func navigateToFreeAgentQuiz(team: TeamObject?, gcGame: GamerConnectGame, currentUser: User)
@@ -123,4 +125,10 @@ protocol LandingMenuCallbacks: class{
 protocol MediaCallbacks: class{
     func onReviewsReceived(payload: [NewsObject])
     func onMediaReceived()
+    
+    func onVideoLoaded(url: String)
+}
+
+protocol LandingUICallbacks: class{
+    func updateNavColor(color: UIColor)
 }

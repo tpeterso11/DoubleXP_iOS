@@ -1,4 +1,5 @@
 PODS:
+  - AIFlatSwitch (1.0.7)
   - Bartinter (0.0.5)
   - CollapsibleTableSectionViewController (1.0.1)
   - DynamicBlurView (3.0.1)
@@ -83,6 +84,7 @@ PODS:
   - GoogleUtilities/UserDefaults (6.3.2):
     - GoogleUtilities/Logger
   - GTMSessionFetcher/Core (1.3.0)
+  - Hero (1.5.0)
   - ImageLoader (0.14.0)
   - InputBarAccessoryView (4.2.2)
   - leveldb-library (1.22)
@@ -97,6 +99,21 @@ PODS:
     - nanopb/encode (= 0.3.9011)
   - nanopb/decode (0.3.9011)
   - nanopb/encode (0.3.9011)
+  - PINCache (3.0.1-beta.8):
+    - PINCache/Arc-exception-safe (= 3.0.1-beta.8)
+    - PINCache/Core (= 3.0.1-beta.8)
+  - PINCache/Arc-exception-safe (3.0.1-beta.8):
+    - PINCache/Core
+  - PINCache/Core (3.0.1-beta.8):
+    - PINOperation (~> 1.1.1)
+  - PINOperation (1.1.2)
+  - PINRemoteImage (3.0.0):
+    - PINRemoteImage/PINCache (= 3.0.0)
+  - PINRemoteImage/Core (3.0.0):
+    - PINOperation
+  - PINRemoteImage/PINCache (3.0.0):
+    - PINCache (= 3.0.1-beta.8)
+    - PINRemoteImage/Core
   - PopupDialog (1.0.0):
     - DynamicBlurView (~> 3.0.1)
   - SendBirdSDK (3.0.161)
@@ -112,6 +129,7 @@ PODS:
   - UnderLineTextField (2.1.0)
 
 DEPENDENCIES:
+  - AIFlatSwitch
   - Bartinter
   - CollapsibleTableSectionViewController (~> 1.0.0)
   - EMPageViewController
@@ -120,11 +138,13 @@ DEPENDENCIES:
   - Firebase/Auth
   - Firebase/Database
   - FoldingCell
+  - Hero
   - ImageLoader (~> 0.14)
   - lottie-ios
   - MessageKit
   - moa (~> 11.0)
   - MSPeekCollectionViewDelegateImplementation
+  - PINRemoteImage
   - PopupDialog (~> 1.0)
   - SendBirdSDK
   - SmoothButton
@@ -137,6 +157,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - AIFlatSwitch
     - Bartinter
     - CollapsibleTableSectionViewController
     - DynamicBlurView
@@ -157,6 +178,7 @@ SPEC REPOS:
     - GoogleDataTransportCCTSupport
     - GoogleUtilities
     - GTMSessionFetcher
+    - Hero
     - ImageLoader
     - InputBarAccessoryView
     - leveldb-library
@@ -166,6 +188,9 @@ SPEC REPOS:
     - moa
     - MSPeekCollectionViewDelegateImplementation
     - nanopb
+    - PINCache
+    - PINOperation
+    - PINRemoteImage
     - PopupDialog
     - SendBirdSDK
     - SmoothButton
@@ -178,6 +203,7 @@ SPEC REPOS:
     - UnderLineTextField
 
 SPEC CHECKSUMS:
+  AIFlatSwitch: fd56a5e6ab8769f0b52cef815c4f071e83050352
   Bartinter: 3c1fc3bcb631b066fdd78f7e01f1635fbafffdea
   CollapsibleTableSectionViewController: c41694de812a1039c5f8581c934cf0fc38e4e871
   DynamicBlurView: b1df5415f9bd31897549e5d7077e5ec120a4d636
@@ -198,6 +224,7 @@ SPEC CHECKSUMS:
   GoogleDataTransportCCTSupport: ef79a4728b864946a8aafdbab770d5294faf3b5f
   GoogleUtilities: 547a86735c6f0ee30ad17e94df4fc21f616b71cb
   GTMSessionFetcher: 43b8b64263023d4f32caa0b40f4c8bfa3c5f36d8
+  Hero: b7385b75e7259da62f4f85462f59a5082d66b058
   ImageLoader: 56f57e35d6ed26a74183dc2e472133b4b22eb7b9
   InputBarAccessoryView: 2b937602598e2fab3149f37f51dd7ad795653812
   leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
@@ -207,6 +234,9 @@ SPEC CHECKSUMS:
   moa: a26c4e97c7ac9345e87c4bb999e85116c8ec0310
   MSPeekCollectionViewDelegateImplementation: 3091e9512b3cd03facdea3c02e57673a4a06246a
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
+  PINCache: 534fd41d358d828dfdf227a0d327f3673a65e20b
+  PINOperation: 24b774353ca248fcf87d67b2d61eef42087c125a
+  PINRemoteImage: e2b89e19fb6e77ffc099f9d9f3b3fe1745e3f9f9
   PopupDialog: 28f29a1ffe9e1fab32fb258b53d56ca31670e8a2
   SendBirdSDK: fae108b5757e21250d7cd32f4ff023075d7c06ae
   SmoothButton: b3191c0bdba16ff40bdd2934db9ddd93edaa9c9f
@@ -218,6 +248,6 @@ SPEC CHECKSUMS:
   TwitterKit: 5e4f41d70b9abdb41df5467f52d7aa2c0fd26ebb
   UnderLineTextField: b3f5307b56962331e30a965e81b79aae2df1de83
 
-PODFILE CHECKSUM: 1d856a2ce660a4a0e98554b651902ed3a3fd4bb4
+PODFILE CHECKSUM: d31dcc5771838365b7181e7d141724c91fa2faa2
 
 COCOAPODS: 1.8.4
