@@ -7,6 +7,7 @@ target 'DoubleXP' do
   pod 'SwiftHTTP', '~> 3.0'
   pod 'ImageLoader', '~> 0.14'
   pod 'Firebase/Auth'
+  pod 'Firebase/Messaging'
   pod 'Firebase/Analytics'
   pod 'Firebase/Database'
   pod 'moa', '~> 11.0'

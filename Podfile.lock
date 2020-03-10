@@ -18,6 +18,9 @@ PODS:
   - Firebase/Database (6.13.0):
     - Firebase/CoreOnly
     - FirebaseDatabase (~> 6.1.2)
+  - Firebase/Messaging (6.13.0):
+    - Firebase/CoreOnly
+    - FirebaseMessaging (~> 4.1.9)
   - FirebaseAnalytics (6.1.6):
     - FirebaseCore (~> 6.4)
     - FirebaseInstanceID (~> 4.2)
@@ -27,6 +30,7 @@ PODS:
     - GoogleUtilities/Network (~> 6.0)
     - "GoogleUtilities/NSData+zlib (~> 6.0)"
     - nanopb (= 0.3.9011)
+  - FirebaseAnalyticsInterop (1.5.0)
   - FirebaseAuth (6.4.0):
     - FirebaseAuthInterop (~> 1.0)
     - FirebaseCore (~> 6.2)
@@ -54,6 +58,15 @@ PODS:
     - FirebaseCore (~> 6.0)
     - GoogleUtilities/Environment (~> 6.0)
     - GoogleUtilities/UserDefaults (~> 6.0)
+  - FirebaseMessaging (4.1.10):
+    - FirebaseAnalyticsInterop (~> 1.3)
+    - FirebaseCore (~> 6.2)
+    - FirebaseInstanceID (~> 4.1)
+    - GoogleUtilities/AppDelegateSwizzler (~> 6.2)
+    - GoogleUtilities/Environment (~> 6.2)
+    - GoogleUtilities/Reachability (~> 6.2)
+    - GoogleUtilities/UserDefaults (~> 6.2)
+    - Protobuf (>= 3.9.2, ~> 3.9)
   - FoldingCell (5.0.2)
   - GoogleAppMeasurement (6.1.6):
     - GoogleUtilities/AppDelegateSwizzler (~> 6.0)
@@ -116,6 +129,7 @@ PODS:
     - PINRemoteImage/Core
   - PopupDialog (1.0.0):
     - DynamicBlurView (~> 3.0.1)
+  - Protobuf (3.11.4)
   - SendBirdSDK (3.0.161)
   - SmoothButton (0.0.1)
   - SwiftHTTP (3.0.1)
@@ -138,6 +152,7 @@ DEPENDENCIES:
   - Firebase/Analytics
   - Firebase/Auth
   - Firebase/Database
+  - Firebase/Messaging
   - FoldingCell
   - Hero
   - ImageLoader (~> 0.14)
@@ -167,6 +182,7 @@ SPEC REPOS:
     - ExpyTableView
     - Firebase
     - FirebaseAnalytics
+    - FirebaseAnalyticsInterop
     - FirebaseAuth
     - FirebaseAuthInterop
     - FirebaseCore
@@ -174,6 +190,7 @@ SPEC REPOS:
     - FirebaseCoreDiagnosticsInterop
     - FirebaseDatabase
     - FirebaseInstanceID
+    - FirebaseMessaging
     - FoldingCell
     - GoogleAppMeasurement
     - GoogleDataTransport
@@ -194,6 +211,7 @@ SPEC REPOS:
     - PINOperation
     - PINRemoteImage
     - PopupDialog
+    - Protobuf
     - SendBirdSDK
     - SmoothButton
     - SwiftHTTP
@@ -214,6 +232,7 @@ SPEC CHECKSUMS:
   ExpyTableView: 52dde6e141056544c0b8e7b083a840c37ddb6132
   Firebase: 458d109512200d1aca2e1b9b6cf7d68a869a4a46
   FirebaseAnalytics: 45f36d9c429fc91d206283900ab75390cd05ee8a
+  FirebaseAnalyticsInterop: 3f86269c38ae41f47afeb43ebf32a001f58fcdae
   FirebaseAuth: 7d0f84873926f6648bbd1391a318dfb1a26b5e4f
   FirebaseAuthInterop: 0ffa57668be100582bb7643d4fcb7615496c41fc
   FirebaseCore: 307ea2508df730c5865334e41965bd9ea344b0e5
@@ -221,6 +240,7 @@ SPEC CHECKSUMS:
   FirebaseCoreDiagnosticsInterop: e9b1b023157e3a2fc6418b5cb601e79b9af7b3a0
   FirebaseDatabase: 963515d232ded06f36f6ce830507c94551866170
   FirebaseInstanceID: ebd2ea79ee38db0cb5f5167b17a0d387e1cc7b6e
+  FirebaseMessaging: 089b7a4991425783384acc8bcefcd78c0af913bd
   FoldingCell: f92eb5fb9842319e7cd08c71533c98408b785099
   GoogleAppMeasurement: dfe55efa543e899d906309eaaac6ca26d249862f
   GoogleDataTransport: 8e9b210c97d55fbff306cc5468ff91b9cb32dcf5
@@ -241,6 +261,7 @@ SPEC CHECKSUMS:
   PINOperation: 24b774353ca248fcf87d67b2d61eef42087c125a
   PINRemoteImage: e2b89e19fb6e77ffc099f9d9f3b3fe1745e3f9f9
   PopupDialog: 28f29a1ffe9e1fab32fb258b53d56ca31670e8a2
+  Protobuf: 176220c526ad8bd09ab1fb40a978eac3fef665f7
   SendBirdSDK: fae108b5757e21250d7cd32f4ff023075d7c06ae
   SmoothButton: b3191c0bdba16ff40bdd2934db9ddd93edaa9c9f
   SwiftHTTP: e94f1aa8cde58637dcc0100f6349de31a3337fde
@@ -252,6 +273,6 @@ SPEC CHECKSUMS:
   TwitterKit: 5e4f41d70b9abdb41df5467f52d7aa2c0fd26ebb
   UnderLineTextField: b3f5307b56962331e30a965e81b79aae2df1de83
 
-PODFILE CHECKSUM: ca3a264755852e55cf2940df8b5eb701aeb5cd3f
+PODFILE CHECKSUM: 5db48fd8cbdcb3bfb6c1f7474a66b99b85b71554
 
 COCOAPODS: 1.8.4

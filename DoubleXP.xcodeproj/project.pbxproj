@@ -324,6 +324,7 @@
 		305B520C2415D76F0064B605 /* expand_black.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = expand_black.png; sourceTree = "<group>"; };
 		305B520E2415D78A0064B605 /* expand_white2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = expand_white2.png; sourceTree = "<group>"; };
 		305B52102416B6580064B605 /* ArticleHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleHeaderCell.swift; sourceTree = "<group>"; };
+		305B5212241825D10064B605 /* DoubleXP.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DoubleXP.entitlements; sourceTree = "<group>"; };
 		305D8F0D23DFD03D007D0991 /* TestPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestPlayer.swift; sourceTree = "<group>"; };
 		305D8F0F23DFE605007D0991 /* live.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = live.png; sourceTree = "<group>"; };
 		305DA86E2400BE94002ED813 /* stop.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stop.png; sourceTree = "<group>"; };
@@ -734,6 +735,7 @@
 		4C4D88222205F32900AD7090 /* DoubleXP */ = {
 			isa = PBXGroup;
 			children = (
+				305B5212241825D10064B605 /* DoubleXP.entitlements */,
 				30A60D92236689FC004B2150 /* SubViews */,
 				30B583D7234FD01700736733 /* GoogleService-Info.plist */,
 				30B583D2234FCB9C00736733 /* Managers */,
@@ -1575,6 +1577,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = DoubleXP/DoubleXP.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = GU6KL76XP4;
@@ -1583,13 +1586,13 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = Encrypted.DoubleXP;
+				PRODUCT_BUNDLE_IDENTIFIER = com.encryptedcachellc.doublexp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "DoubleXP/DoubleXP-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -1599,6 +1602,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = DoubleXP/DoubleXP.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = GU6KL76XP4;
@@ -1607,12 +1611,12 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = Encrypted.DoubleXP;
+				PRODUCT_BUNDLE_IDENTIFIER = com.encryptedcachellc.doublexp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "DoubleXP/DoubleXP-Bridging-Header.h";
 				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
