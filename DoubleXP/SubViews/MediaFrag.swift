@@ -15,9 +15,14 @@ import SwiftHTTP
 import SwiftNotificationCenter
 import Hero
 import WebKit
+import SwiftRichString
 
-class MediaFrag: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, MediaCallbacks {
+class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, MediaCallbacks {
     
+    @IBOutlet weak var expandLabel: UILabel!
+    @IBOutlet weak var collapseButton: UIImageView!
+    @IBOutlet weak var expandButton: UIImageView!
+    @IBOutlet weak var articleBlur: UIVisualEffectView!
     @IBOutlet weak var testPlayer: WKWebView!
     @IBOutlet weak var articleOverlay: UIView!
     @IBOutlet weak var articleHeader: UIView!
@@ -37,25 +42,36 @@ class MediaFrag: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     var twitchCoverShowing = false
     var currentWV: WKWebView?
     var currentCell: NewsArticleCell?
+    var currentVideoCell: ArticleVideoCell?
+    var constraint : NSLayoutConstraint?
+    private var isExpanded = false
     
     struct Constants {
         static let secret = "uyvhqn68476njzzdvja9ulqsb8esn3"
         static let id = "aio1d4ucufi6bpzae0lxtndanh3nob"
     }
     
+    let styleBase = Style({
+        $0.color = UIColor.white
+    })
+    
+    let styleBaseDark = Style({
+        $0.color = UIColor.black
+    })
+    
+    let testAttr = Style({
+        $0.font = UIFont.boldSystemFont(ofSize: 20)
+        $0.color = UIColor.blue
+    })
+    
     @IBOutlet weak var header: UIView!
     @IBOutlet weak var twitchLoginButton: UIView!
     @IBOutlet weak var twitchCover: UIView!
     @IBOutlet weak var articleOverlayClose: UIImageView!
-    @IBOutlet weak var articleOverlaySourceImage: UIImageView!
-    @IBOutlet weak var articleOverlayBadge: UIImageView!
-    @IBOutlet weak var articleOverlaySource: UILabel!
-    @IBOutlet weak var articleOverlayAuthor: UILabel!
-    @IBOutlet weak var articleOverlaySub: UILabel!
-    @IBOutlet weak var articleOverlayTitle: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.pageName = "Media"
         
         options.append("popular")
         options.append("twitch")
@@ -72,10 +88,31 @@ class MediaFrag: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
         articles.append(contentsOf: delegate.mediaCache.newsCache)
+        
+        if(!delegate.navStack.contains(self)){
+            delegate.navStack.append(self)
+        }
 
         news.delegate = self
         news.dataSource = self
-    
+        
+        navDictionary = ["state": "backOnly"]
+        
+        delegate.currentLanding?.updateNavigation(currentFrag: self)
+        
+        self.constraint = NSLayoutConstraint(item: self.articleOverlay, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0.0, constant: 0)
+        
+        self.constraint?.isActive = true
+        
+        let expand = UITapGestureRecognizer(target: self, action: #selector(expandOverlay))
+        expandButton.isUserInteractionEnabled = true
+        expandButton.addGestureRecognizer(expand)
+        
+        //let close = UITapGestureRecognizer(target: self, action: #selector(closeOverlay))
+        //articleOverlayClose.isUserInteractionEnabled = true
+        //articleOverlayClose.addGestureRecognizer(close)
+        
+        //self.articleOverlay.roundCorners(corners: [.topLeft, .topRight], radius: 20)
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -107,30 +144,86 @@ class MediaFrag: UIViewController, UICollectionViewDelegate, UICollectionViewDat
             
             return cell
         }
-        /*else if(collectionView == articleCollection){
+        else if(collectionView == articleCollection){
             let current = self.articlePayload[indexPath.item]
             if(current is Int){
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "video", for: indexPath) as! ArticleVideoCell
                 cell.videoImage.image = self.selectedArticleImage
                 cell.videoImage.contentMode = .scaleAspectFill
                 cell.videoImage.clipsToBounds = true
+                cell.videoImage.isHidden = false
+            
                 return cell
             }
             else if(current is Bool){
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "empty", for: indexPath) as! EmptyCell
                 return cell
             }
+            else if(current is [String: String]){
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "header", for: indexPath) as! ArticleHeaderCell
+                let payload = current as! [String: String]
+                cell.articleTitle.text = payload["title"]
+                cell.articleSub.text = payload["sub"]
+                
+                let source = payload["source"]
+                if(source == "gs"){
+                    cell.sourceImage.image = #imageLiteral(resourceName: "gamespot_icon_ios.png")
+                }
+                else{
+                    cell.sourceImage.image = #imageLiteral(resourceName: "new_logo.png")
+                }
+                
+                let author = payload["author"]
+                switch (author) {
+                case "Kwatakye Raven":
+                    //cell..text = "DoubleXP"
+                    cell.authorLabel.text = author
+                    cell.authorBadge.image = #imageLiteral(resourceName: "mike_badge.png")
+                    break
+                case "Aaron Hodges":
+                    cell.authorLabel.text = author
+                    cell.authorBadge.image = #imageLiteral(resourceName: "hodges_badge.png")
+                    break
+                default:
+                    cell.authorLabel.text = author
+                    cell.authorBadge.image = #imageLiteral(resourceName: "unknown_badge.png")
+                }
+                
+                return cell
+            }
             else{
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "text", for: indexPath) as! ArticleTextCell
                 
+                /*if self.traitCollection.userInterfaceStyle == .dark {
+                     let groupStyle = StyleXML.init(base: styleBase, ["strong" : testAttr])
+                     let attr = (current as! String).htmlToAttributedString
+                                   
+                     cell.label.attributedText = attr?.string.set(style: groupStyle)
+                     cell.label.lineBreakMode = .byWordWrapping
+                } else {
+                     let groupStyle = StyleXML.init(base: styleBaseDark, ["strong" : testAttr])
+                     let attr = (current as! String).htmlToAttributedString
+                                   
+                     cell.label.attributedText = attr?.string.set(style: groupStyle)
+                     cell.label.lineBreakMode = .byWordWrapping
+                }*/
                 let groupStyle = StyleXML.init(base: styleBase, ["strong" : testAttr])
                 let attr = (current as! String).htmlToAttributedString
-                
+                              
                 cell.label.attributedText = attr?.string.set(style: groupStyle)
                 cell.label.lineBreakMode = .byWordWrapping
+                
+                if(self.isExpanded){
+                    cell.label.numberOfLines = 500
+                }
+                else{
+                    cell.label.numberOfLines = 4
+                    cell.label.lineBreakMode = .byTruncatingTail
+                }
+            
                 return cell
             }
-        }*/
+        }
         else{
             let current = self.articles[indexPath.item]
             if(current is NewsObject){
@@ -327,36 +420,87 @@ class MediaFrag: UIViewController, UICollectionViewDelegate, UICollectionViewDat
             if(current is NewsObject){
                 let cell = collectionView.cellForItem(at: indexPath) as! NewsArticleCell
                 self.selectedArticle = (current as! NewsObject)
-                self.currentWV = cell.cellWV
+                self.selectedArticleImage = cell.articleBack.image
                 self.currentCell = cell
+                self.currentWV = cell.cellWV
             
+                self.showArticle(article: self.selectedArticle)
                 //onVideoLoaded(url: "https://static-gamespotvideo.cbsistatic.com/vr/2019/04/23/kingsfieldiv1_700_1000.mp4")
                 
-                if(self.selectedArticle.source == "gs"){
+                
+                /*if(self.selectedArticle.source == "gs"){
                     let delegate = UIApplication.shared.delegate as! AppDelegate
                     delegate.mediaManager.downloadVideo(title: self.selectedArticle.title, url: selectedArticle.videoUrl, callbacks: self)
                 }
                 else{
                     onVideoLoaded(url: self.selectedArticle.videoUrl)
-                }
+                }*/
             }
         }
         
-        /*else{
+        else{
             let current = self.articlePayload[indexPath.item]
             if(current is Int){
-                let videoURL = (self.selectedArticle as NewsObject).videoUrl
-                let player = AVPlayer(url: URL(fileURLWithPath: videoURL))
-                player.playImmediately(atRate: 1.0)
+                self.currentVideoCell = (collectionView.cellForItem(at: indexPath) as! ArticleVideoCell)
                 
-                let playerViewController = AVPlayerViewController()
-                playerViewController.player = player
-
-                present(playerViewController, animated: true) {
-                  player.play()
+                //play video
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                
+                if(self.selectedArticle.source == "gs"){
+                    delegate.mediaManager.downloadVideo(title: self.selectedArticle.title, url: selectedArticle.videoUrl, callbacks: self)
+                }
+                else{
+                    self.onVideoLoaded(url: selectedArticle.videoUrl)
                 }
             }
-        }*/
+        }
+    }
+    
+    func showArticle(article: NewsObject){
+        self.articlePayload = [Any]()
+        
+        let headerPayload = ["title" : article.title, "sub": article.subTitle, "source": article.source, "author": article.author]
+        
+        if(!article.videoUrl.isEmpty){
+            self.articlePayload.append(headerPayload)
+            self.articlePayload.append(0)
+            self.articlePayload.append(true)
+        }
+        self.articlePayload.append(article.storyText)
+        self.articlePayload.append(false)
+        
+        if(!self.articleSet){
+            self.articleCollection.delegate = self
+            self.articleCollection.dataSource = self
+            
+            self.articleSet = true
+        }
+        else{
+            self.articleCollection.reloadData()
+        }
+        
+        self.expandButton.isHidden = false
+        self.expandLabel.isHidden = false
+        
+        let close = UITapGestureRecognizer(target: self, action: #selector(closeOverlay))
+        articleOverlayClose.isUserInteractionEnabled = true
+        articleOverlayClose.addGestureRecognizer(close)
+        
+        let top = CGAffineTransform(translationX: 0, y: -476)
+        UIView.animate(withDuration: 0.3, animations: {
+            self.articleBlur.alpha = 1
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.3, delay: 0.2, options: [], animations: {
+                self.constraint?.constant = self.view.frame.size.height / 2
+                
+                UIView.animate(withDuration: 0.5) {
+                    self.articleOverlay.alpha = 1
+                    self.view.bringSubviewToFront(self.articleOverlay)
+                    self.view.layoutIfNeeded()
+                }
+            
+            }, completion: nil)
+        })
     }
     
     func onReviewsReceived(payload: [NewsObject]) {
@@ -366,19 +510,15 @@ class MediaFrag: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     }
     
     func onVideoLoaded(url: String) {
-        let webConfiguration = WKWebViewConfiguration()
-        webConfiguration.allowsInlineMediaPlayback = false
-        webConfiguration.mediaTypesRequiringUserActionForPlayback = []
-        
         DispatchQueue.main.async() {
-            let webView = WKWebView(frame: .zero, configuration: webConfiguration)
 
             if let videoURL:URL = URL(string: url) {
                 let embedHTML = "<html><head><meta name='viewport' content='width=device-width, initial-scale=0.0, maximum-scale=1.0, minimum-scale=0.0'></head> <iframe width=\(self.currentCell!.bounds.width)\" height=\(self.currentCell!.bounds.width)\" src=\(url)?&playsinline=1\" frameborder=\"0\" allowfullscreen></iframe></html>"
 
                 //let html = "<video playsinline controls width=\"100%\" height=\"100%\" src=\"\(url)\"> </video>"
                 //self.testPlayer.loadHTMLString(embedHTML, baseURL: nil)
-                self.currentWV!.isHidden = false
+                //self.currentVideoCell?.videoImage.isHidden = true
+                //self.currentWV!.isHidden = false
                 self.currentWV!.loadHTMLString(embedHTML, baseURL: nil)
                 //let request:URLRequest = URLRequest(url: videoURL)
                 //self.testPlayer.load(request)
@@ -394,6 +534,37 @@ class MediaFrag: UIViewController, UICollectionViewDelegate, UICollectionViewDat
           print("height of webView is: \(height)")
         }
       })
+    }
+    
+    @objc func expandOverlay(){
+        self.isExpanded = true
+        self.expandButton.isHidden = true
+        self.expandLabel.isHidden = true
+        
+        self.constraint?.constant = self.view.frame.size.height
+        UIView.animate(withDuration: 0.5) {
+            self.view.layoutIfNeeded()
+            
+            self.articleCollection.reloadData()
+        }
+    }
+        
+    @objc func closeOverlay(){
+        self.isExpanded = false
+        self.constraint?.constant = 0
+        
+        UIView.animate(withDuration: 0.5, animations: {
+            self.view.layoutIfNeeded()
+            self.articleOverlay.alpha = 1
+            self.articleBlur.alpha = 0
+        })
+        
+        reloadView()
+    }
+    
+    private func reloadView(){
+        self.articleOverlay.setNeedsLayout()
+        self.articleOverlay.layoutIfNeeded()
     }
     
     func showTwitchLogin(){
@@ -440,13 +611,33 @@ class MediaFrag: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         else{
             let current = self.articlePayload[indexPath.item]
             if(current is Int){
-                return CGSize(width: (collectionView.bounds.width / 3 + 20), height: CGFloat(180))
+                return CGSize(width: (collectionView.bounds.width), height: CGFloat(150))
+            }
+            else if(current is [String: String]){
+                return CGSize(width: (self.articleCollection.bounds.width), height: CGFloat(90))
             }
             else if(current is Bool){
-                return CGSize(width: (collectionView.bounds.width), height: CGFloat(300))
+                let bol = current as! Bool
+                if(bol){
+                    return CGSize(width: (collectionView.bounds.width), height: CGFloat(10))
+                }
+                else{
+                    return CGSize(width: (collectionView.bounds.width), height: CGFloat(100))
+                }
             }
             else{
-                return CGSize(width: (collectionView.bounds.width), height: CGFloat(300))
+                if(self.isExpanded){
+                    return CGSize(width: (collectionView.bounds.width), height: CGFloat(200))
+                }
+                else{
+                    let groupStyle = StyleXML.init(base: styleBase, ["strong" : testAttr])
+                    let attr = (current as! String).htmlToAttributedString
+                    
+                    let labelString = NSAttributedString(string: self.selectedArticle.storyText)
+                    let cellRect = labelString.boundingRect(with: CGSize(width: collectionView.bounds.width, height: CGFloat(MAXFLOAT)), options: .usesLineFragmentOrigin, context: nil)
+                    
+                    return CGSize(width: (collectionView.bounds.width), height: cellRect.size.height)
+                }
             }
         }
     }

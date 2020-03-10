@@ -8,8 +8,10 @@
 
 import Foundation
 import UIKit
+import WebKit
 
 class ArticleVideoCell: UICollectionViewCell{
     
+    @IBOutlet weak var videoWV: WKWebView!
     @IBOutlet weak var videoImage: UIImageView!
 }

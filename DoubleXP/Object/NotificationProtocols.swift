@@ -51,7 +51,9 @@ protocol NavigateToProfile: class {
     
     func goBack()
     
-    func programmaticallyLoad(vc: UIViewController, fragName: String)
+    func programmaticallyLoad(vc: ParentVC, fragName: String)
+    
+    func updateNavigation(currentFrag: ParentVC)
 }
 
 protocol RequestsUpdate: class{
@@ -132,3 +134,9 @@ protocol MediaCallbacks: class{
 protocol LandingUICallbacks: class{
     func updateNavColor(color: UIColor)
 }
+
+protocol CurrentProfileCallbacks: class{
+    func checkChanges(updatedList: [GamerConnectGame]?)
+    func changesComplete()
+}
+

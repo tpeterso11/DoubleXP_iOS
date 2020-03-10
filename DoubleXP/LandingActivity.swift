@@ -49,7 +49,7 @@ protocol Profile {
     func goToProfile()
 }
 
-class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateToProfile, SearchCallbacks, LandingMenuCallbacks, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateToProfile, SearchCallbacks, LandingMenuCallbacks, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate {
     
     @IBOutlet weak var navigationView: UIView!
     @IBOutlet weak var navContainer: UIView!
@@ -67,6 +67,7 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     @IBOutlet weak var bottomNavSearch: UITextField!
     @IBOutlet weak var primaryBack: UIImageView!
     @IBOutlet weak var searchButton: UIButton!
+    var mainNavShowing = false
     //@IBOutlet weak var newNav: UIView!
     
     @IBOutlet weak var clickArea: UIView!
@@ -121,6 +122,11 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
         logOut.layer.masksToBounds = false
         logOut.layer.shadowPath = UIBezierPath(roundedRect: logOut.bounds, cornerRadius: logOut.layer.cornerRadius).cgPath
         
+        bottomNavSearch.addTarget(self, action: #selector(textFieldDidBeginEditing(_:)), for: .editingChanged)
+        //bottomNavSearch.addTarget(self, action: #selector(textFieldDidEndEditing(_:)), for: .editingChanged)
+        bottomNavSearch.delegate = self
+        bottomNavSearch.returnKeyType = .done
+        
         Broadcaster.register(LandingMenuCallbacks.self, observer: self)
     }
     
@@ -158,7 +164,7 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
             if(!stack.isEmpty){
                 Broadcaster.notify(NavigateToProfile.self) {
                     let vc = stack[self.stackDepth - 1] as! ParentVC
-                    $0.programmaticallyLoad(vc: stack[self.stackDepth - 1], fragName: vc.pageName!)
+                    $0.programmaticallyLoad(vc: stack[self.stackDepth - 1] as! ParentVC, fragName: vc.pageName!)
                 }
                 
                 if(stack.count > 1){
@@ -376,8 +382,43 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     func programmaticallyLoad(vc: UIViewController, fragName: String) {
     }
     
+    func updateNavigation(currentFrag: ParentVC){
+        let navOptions = currentFrag.navDictionary
+        
+        switch(navOptions!["state"]){
+            case "original":
+                restoreBottomNav()
+            break
+            
+            case "backOnly":
+                removeBottomNav(showNewNav: false, hideSearch: true, searchHint: nil, searchButtonText: nil, isMessaging: false)
+            break
+            
+            case "secondary":
+                removeBottomNav(showNewNav: true, hideSearch: true, searchHint: nil, searchButtonText: nil, isMessaging: false)
+            break
+            
+            case "search":
+                removeBottomNav(showNewNav: true, hideSearch: false, searchHint: navOptions!["searchHint"], searchButtonText: navOptions!["searchButton"], isMessaging: false)
+            break
+            
+            case "messaging":
+                removeBottomNav(showNewNav: true, hideSearch: false, searchHint: navOptions!["searchHint"], searchButtonText: navOptions!["searchButton"], isMessaging: true)
+            break
+            
+            case "none":
+                removeBottomNav(showNewNav: true, hideSearch: true, searchHint: nil, searchButtonText: nil, isMessaging: false)
+            break
+            
+            default:
+                removeBottomNav(showNewNav: false, hideSearch: false, searchHint: nil, searchButtonText: nil, isMessaging: false)
+            break
+        }
+    }
+    
     func removeBottomNav(showNewNav: Bool, hideSearch: Bool, searchHint: String?, searchButtonText: String?, isMessaging: Bool){
         if(showNewNav){
+            //remove nav icons
             mainNavView.slideOutBottom()
             
             if(!bottomNavSearch.isHidden && hideSearch){
@@ -387,9 +428,12 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
                 searchShowing = false
             }
             else{
+                //search is not showing and we want to show it
                 if(!searchShowing && hideSearch == false){
+                    bottomNavSearch.isHidden = false
                     bottomNavSearch.slideInBottomReset()
                     
+                    //apply title to search button and bring it in.
                     if(searchButtonText != nil){
                         searchButton.setTitle(searchButtonText, for: .normal)
                     }
@@ -404,6 +448,7 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
                     
                     searchShowing = true
                 }
+                //if search is already showing
                 else if(searchShowing && hideSearch == false){
                     if(searchButtonText != nil){
                         searchButton.setTitle(searchButtonText, for: .normal)
@@ -440,17 +485,44 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
             isSecondaryNavShowing = true
         }
         else if(isSecondaryNavShowing && hideSearch){
+            if(isSecondaryNavShowing){
+                secondaryNv.slideOutBottomSecond()
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    self.mainNavView.slideInBottomNav()
+                }
+            }
+            
+            if(hideSearch && searchShowing){
+                bottomNavSearch.slideOutBottom()
+                searchButton.slideOutBottom()
+            }
+            
             searchShowing = false
             if(!backButtonShowing){
                 primaryBack.slideInBottomSmall()
             }
         }
         else{
+            if(isSecondaryNavShowing){
+                secondaryNv.slideOutBottomSecond()
+            }
             isSecondaryNavShowing = false
             
-            searchShowing = true
-            bottomNavSearch.isHidden = false
-            searchButton.isHidden = false
+            if(hideSearch && searchShowing){
+                bottomNavSearch.slideOutBottom()
+                searchButton.slideOutBottom()
+            }
+            else if(!hideSearch && !searchShowing){
+                bottomNavSearch.isHidden = false
+                searchButton.isHidden = false
+                
+                searchShowing = true
+            }
+            
+            if(!mainNavShowing){
+                mainNavView.slideInBottomNav()
+            }
             
             if(!backButtonShowing){
                 primaryBack.slideInBottomSmall()
@@ -502,12 +574,13 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     @objc func homeButtonClicked(_ sender: AnyObject?) {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
-        if(appDelegate.currentFrag != "Home"){
+        if(appDelegate.currentFrag != "Home" && !homeAdded){
             navigateToHome()
             homeAdded = true
             requestsAdded = false
             teamFragAdded = false
             profileAdded = false
+            mediaAdded = false
         }
         
         updateNavColor(color: .darkGray)
@@ -516,7 +589,7 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     @objc func mediaButtonClicked(_ sender: AnyObject?) {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
-        if(appDelegate.currentFrag != "Media"){
+        if(appDelegate.currentFrag != "Media" && !mediaAdded){
             navigateToMedia()
             homeAdded = false
             requestsAdded = false
@@ -531,12 +604,13 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     @objc func teamButtonClicked(_ sender: AnyObject?) {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
-        if(appDelegate.currentFrag != "Team"){
+        if(appDelegate.currentFrag != "Team" && !teamFragAdded){
             navigateToTeams()
             teamFragAdded = true
             homeAdded = false
             requestsAdded = false
             profileAdded = false
+            mediaAdded = false
         }
         
         updateNavColor(color: .darkGray)
@@ -545,12 +619,13 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     @objc func requestButtonClicked(_ sender: AnyObject?) {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
-        if(appDelegate.currentFrag != "Requests"){
+        if(appDelegate.currentFrag != "Requests" && !requestsAdded){
             navigateToRequests()
             requestsAdded = true
             homeAdded = false
             teamFragAdded = false
             profileAdded = false
+            mediaAdded = false
         }
         
         updateNavColor(color: .darkGray)
@@ -578,6 +653,7 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
                 }, completion: nil)
             })
             
+            self.blur.isUserInteractionEnabled = true
             menuVie.viewShowing = true
         }
     }
@@ -618,6 +694,41 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
             self.bottomNav.backgroundColor = color
             self.mainNavView.backgroundColor = color
         }, completion: nil)
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) { // became first responder
+
+        //move textfields up
+        let myScreenRect: CGRect = UIScreen.main.bounds
+        let keyboardHeight : CGFloat = 500
+
+        UIView.beginAnimations( "animateView", context: nil)
+        var movementDuration:TimeInterval = 0.35
+        var needToMove: CGFloat = 0
+
+        var frame : CGRect = self.view.frame
+        if (textField.frame.origin.y + textField.frame.size.height + /*self.navigationController.navigationBar.frame.size.height + */UIApplication.shared.statusBarFrame.size.height > (myScreenRect.size.height - keyboardHeight)) {
+            needToMove = (textField.frame.origin.y + textField.frame.size.height + /*self.navigationController.navigationBar.frame.size.height +*/ UIApplication.shared.statusBarFrame.size.height) - (myScreenRect.size.height - keyboardHeight);
+        }
+
+        frame.origin.y = -needToMove
+        self.view.frame = frame
+        UIView.commitAnimations()
+    }
+
+    func textFieldDidEndEditing(_ textField: UITextField) {
+            //move textfields back down
+            UIView.beginAnimations( "animateView", context: nil)
+        var movementDuration:TimeInterval = 0.35
+            var frame : CGRect = self.view.frame
+            frame.origin.y = 0
+            self.view.frame = frame
+            UIView.commitAnimations()
     }
     
     func settingsProfileClicked(){
@@ -693,6 +804,9 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
+    }
+    
+    func programmaticallyLoad(vc: ParentVC, fragName: String) {
     }
     
 }

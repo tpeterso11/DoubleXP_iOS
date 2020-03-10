@@ -13,6 +13,7 @@ import MessageKit
 
 class NavigationPageController: EMPageViewController, EMPageViewControllerDataSource, NavigateToProfile {
     
+    
     func em_pageViewController(_ pageViewController: EMPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
         return nil
     }
@@ -43,11 +44,12 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         items.append(c)
     }
     
-    func programmaticallyLoad(vc: UIViewController, fragName: String){
+    func programmaticallyLoad(vc: ParentVC, fragName: String){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.currentFrag = fragName
         
-        selectViewController(vc, direction: .forward, animated: true, completion: nil)
+        delegate.currentLanding?.updateNavigation(currentFrag: vc)
+        selectViewController(vc, direction: .reverse, animated: true, completion: nil)
     }
     
     func navigateToProfile(uid: String){
@@ -265,5 +267,8 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
     }
     
      func removeBottomNav(showNewNav: Bool, hideSearch: Bool, searchHint: String?, searchButtonText: String?, isMessaging: Bool) {
+    }
+    
+    func updateNavigation(currentFrag: ParentVC) {
     }
 }

@@ -14,7 +14,7 @@ import MSPeekCollectionViewDelegateImplementation
 import SendBirdSDK
 import ExpyTableView
 
-class FADash: UIViewController, ExpyTableViewDelegate, ExpyTableViewDataSource, FACallbacks, UITableViewDelegate, UITableViewDataSource {
+class FADash: ParentVC, ExpyTableViewDelegate, ExpyTableViewDataSource, FACallbacks, UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var faList: UICollectionView!
     @IBOutlet weak var searchTeams: UIButton!
     @IBOutlet weak var createButton: UIButton!
@@ -35,6 +35,14 @@ class FADash: UIViewController, ExpyTableViewDelegate, ExpyTableViewDataSource, 
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        navDictionary = ["state": "backOnly"]
+        delegate.currentLanding?.updateNavigation(currentFrag: self)
+        if(!delegate.navStack.contains(self)){
+            delegate.navStack.append(self)
+        }
+        self.pageName = "Free Agent Dash"
         
         loadProfiles()
         searchTeams.addTarget(self, action: #selector(searchButtonClicked), for: .touchUpInside)

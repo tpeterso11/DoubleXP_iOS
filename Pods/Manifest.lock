@@ -120,6 +120,7 @@ PODS:
   - SmoothButton (0.0.1)
   - SwiftHTTP (3.0.1)
   - SwiftNotificationCenter (1.0.4)
+  - SwiftRichString (3.7.1)
   - SwiftTwitch (0.1.0):
     - Marshal (~> 1.2.7)
   - TwitchPlayer (0.2.3)
@@ -150,6 +151,7 @@ DEPENDENCIES:
   - SmoothButton
   - SwiftHTTP (~> 3.0)
   - SwiftNotificationCenter
+  - SwiftRichString
   - SwiftTwitch
   - TwitchPlayer
   - TwitterKit
@@ -196,6 +198,7 @@ SPEC REPOS:
     - SmoothButton
     - SwiftHTTP
     - SwiftNotificationCenter
+    - SwiftRichString
     - SwiftTwitch
     - TwitchPlayer
     - TwitterCore
@@ -242,12 +245,13 @@ SPEC CHECKSUMS:
   SmoothButton: b3191c0bdba16ff40bdd2934db9ddd93edaa9c9f
   SwiftHTTP: e94f1aa8cde58637dcc0100f6349de31a3337fde
   SwiftNotificationCenter: 760386da2ce03d3594cb5e96d1e22ec80b44b46f
+  SwiftRichString: 9a6a70b4fe2cf428e38348b5ada5400da74621fd
   SwiftTwitch: 40957abccac5d6d40d8e047224178364ebbaf20c
   TwitchPlayer: 60e9999dec4f74121685eec0b6e9843c2b44d794
   TwitterCore: 8cbc9ad34d91c63a0035ea05bfbfc0d7ca72a28c
   TwitterKit: 5e4f41d70b9abdb41df5467f52d7aa2c0fd26ebb
   UnderLineTextField: b3f5307b56962331e30a965e81b79aae2df1de83
 
-PODFILE CHECKSUM: d31dcc5771838365b7181e7d141724c91fa2faa2
+PODFILE CHECKSUM: ca3a264755852e55cf2940df8b5eb701aeb5cd3f
 
 COCOAPODS: 1.8.4

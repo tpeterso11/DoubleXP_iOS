@@ -12,7 +12,7 @@ import ImageLoader
 import moa
 import MSPeekCollectionViewDelegateImplementation
 
-class TeamNeedsSelection: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+class TeamNeedsSelection: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     var team: TeamObject? = nil
     
     
@@ -25,6 +25,16 @@ class TeamNeedsSelection: UIViewController, UICollectionViewDataSource, UICollec
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        navDictionary = ["state": "backOnly"]
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser
+    
+        delegate.currentLanding?.updateNavigation(currentFrag: self)
+        self.pageName = "Team Needs Selection"
+        if(!delegate.navStack.contains(self)){
+            delegate.navStack.append(self)
+        }
         
         completeButton.addTarget(self, action: #selector(nextButtonClicked), for: .touchUpInside)
         

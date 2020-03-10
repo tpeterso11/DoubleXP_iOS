@@ -46,13 +46,15 @@ class TeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate {
         faDashButton.applyGradient(colours:  [#colorLiteral(red: 0.5893185735, green: 0.04998416454, blue: 0.09506303817, alpha: 1), #colorLiteral(red: 0.715370357, green: 0.04661592096, blue: 0.1113757268, alpha: 1)], orientation: .horizontal)
         teamSearchButton.applyGradient(colours:  [#colorLiteral(red: 0.3333333433, green: 0.3333333433, blue: 0.3333333433, alpha: 1), #colorLiteral(red: 0.4791436791, green: 0.4813652635, blue: 0.4867808223, alpha: 1)], orientation: .horizontal)
         
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let currentLanding = appDelegate.currentLanding
-        currentLanding?.removeBottomNav(showNewNav: false, hideSearch: true, searchHint: nil, searchButtonText: nil, isMessaging: false)
-        
         //headerView.roundCorners(corners: [.topLeft, .topRight], radius: 25)
+        navDictionary = ["state": "backOnly"]
         
-        appDelegate.navStack.append(self)
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.currentLanding?.updateNavigation(currentFrag: self)
+        
+        if(!appDelegate.navStack.contains(self)){
+            appDelegate.navStack.append(self)
+        }
         self.pageName = "Team"
         
         populateList()

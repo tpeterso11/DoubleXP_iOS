@@ -37,11 +37,16 @@ class TeamBuildFA: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        navDictionary = ["state": "backOnly"]
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        currentUser = delegate.currentUser
     
-        self.pageName = "Team Build Free Agent"
-        delegate.navStack.append(self)
+        delegate.currentLanding?.updateNavigation(currentFrag: self)
+        if(!delegate.navStack.contains(self)){
+            delegate.navStack.append(self)
+        }
+        
+        self.pageName = "Team Build FA"
+        currentUser = delegate.currentUser
         
         for game in delegate.gcGames{
             if(game.gameName == team!.games[0]){

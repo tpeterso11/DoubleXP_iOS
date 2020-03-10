@@ -9,7 +9,7 @@ import UIKit
 import Firebase
 import ExpyTableView
 
-class TeamBuildFAResults: UIViewController, ExpyTableViewDelegate, ExpyTableViewDataSource, UITableViewDelegate, UITableViewDataSource, TeamCallbacks{
+class TeamBuildFAResults: ParentVC, ExpyTableViewDelegate, ExpyTableViewDataSource, UITableViewDelegate, UITableViewDataSource, TeamCallbacks{
     
     var team: TeamObject?
     var currentUser: User?
@@ -44,6 +44,13 @@ class TeamBuildFAResults: UIViewController, ExpyTableViewDelegate, ExpyTableView
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
         currentUser = delegate.currentUser
+        
+        navDictionary = ["state": "backOnly"]
+        delegate.currentLanding?.updateNavigation(currentFrag: self)
+        if(!delegate.navStack.contains(self)){
+            delegate.navStack.append(self)
+        }
+        self.pageName = "Team FA Results"
         
         doSearch(needs: team!.selectedTeamNeeds)
         //self.view.sendSubviewToBack(self.clickArea)

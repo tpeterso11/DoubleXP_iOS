@@ -51,9 +51,10 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
             }, completion: nil)
         })
         
+        navDictionary = ["state": "backOnly"]
+        
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let currentLanding = appDelegate.currentLanding
-        currentLanding?.removeBottomNav(showNewNav: false, hideSearch: true, searchHint: nil, searchButtonText: nil, isMessaging: false)
+        appDelegate.currentLanding?.updateNavigation(currentFrag: self)
         
         appDelegate.navStack.append(self)
         

@@ -22,6 +22,7 @@ ${PODS_ROOT}/SendBirdSDK/SendBirdSDK.framework
 ${PODS_ROOT}/SendBirdSDK/SendBirdSDK.framework.dSYM
 ${BUILT_PRODUCTS_DIR}/SwiftHTTP/SwiftHTTP.framework
 ${BUILT_PRODUCTS_DIR}/SwiftNotificationCenter/SwiftNotificationCenter.framework
+${BUILT_PRODUCTS_DIR}/SwiftRichString/SwiftRichString.framework
 ${BUILT_PRODUCTS_DIR}/SwiftTwitch/SwiftTwitch.framework
 ${BUILT_PRODUCTS_DIR}/TwitchPlayer/TwitchPlayer.framework
 ${PODS_ROOT}/TwitterCore/iOS/TwitterCore.framework

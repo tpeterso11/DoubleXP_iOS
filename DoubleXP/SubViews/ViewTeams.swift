@@ -12,7 +12,7 @@ import ImageLoader
 import moa
 import MSPeekCollectionViewDelegateImplementation
 
-class ViewTeams: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITableViewDelegate,
+class ViewTeams: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITableViewDelegate,
 UITableViewDataSource {
     @IBOutlet weak var searchField: UITextField!
     @IBOutlet weak var searchButton: UIButton!
@@ -51,6 +51,14 @@ UITableViewDataSource {
         gcGameList.layer.shadowPath = UIBezierPath(roundedRect: gcGameList.bounds, cornerRadius: gcGameList.layer.cornerRadius).cgPath
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
+        navDictionary = ["state": "search", "searchHint": "Find A Team", "searchButton": "Search"]
+        delegate.currentLanding?.updateNavigation(currentFrag: self)
+        
+        if(!delegate.navStack.contains(self)){
+            delegate.navStack.append(self)
+        }
+        self.pageName = "View Teams"
+        
         gcGames.append(contentsOf: delegate.gcGames)
         //if(searchField.text != nil && !searchField.text!.isEmpty){
         //    searchButton.addTarget(self, action: #selector(search), for: .touchUpInside)

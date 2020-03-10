@@ -15,17 +15,14 @@ class ProfileGamesCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout
     @IBOutlet weak var gameList: UICollectionView!
     var gcGames = [GamerConnectGame]()
     var gamesPlayed = [GamerConnectGame]()
+    var callbacks : CurrentProfileCallbacks!
     
-    func setUi(){
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        gcGames.append(contentsOf: delegate.gcGames)
+    func setUi(list: [GamerConnectGame], callbacks: CurrentProfileCallbacks){
+        self.callbacks = callbacks
+        self.gamesPlayed = list
         
-        let currentUser = delegate.currentUser!
-        for game in gcGames{
-            if(currentUser.games.contains(game.gameName)){
-                gamesPlayed.append(game)
-            }
-        }
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        self.gcGames.append(contentsOf: appDelegate.gcGames)
         
         gameList.delegate = self
         gameList.dataSource = self
@@ -93,6 +90,7 @@ class ProfileGamesCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout
             }, completion: nil)
         }
         
+        self.callbacks.checkChanges(updatedList: self.gamesPlayed)
     }
     
    func collectionView(_ collectionView: UICollectionView,

@@ -46,6 +46,10 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
         self.pageName = "Home"
         
         self.updatesStatusBarAppearanceAutomatically = true
+        
+        navDictionary = ["state": "original"]
+        
+        appDelegate.currentLanding?.updateNavigation(currentFrag: self)
     }
     
     private func animateView(){

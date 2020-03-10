@@ -11,4 +11,7 @@ import UIKit
 
 class ParentVC: UIViewController{
     var pageName: String?
+    
+    var navDictionary: [String: String]?
+    //state : original, secondary, search, none
 }

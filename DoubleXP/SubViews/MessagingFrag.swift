@@ -32,19 +32,20 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
         super.viewDidLoad()
         
         manager = MessagingManager()
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let currentUser = appDelegate.currentUser
-        manager!.setup(sendBirdId: currentUser!.sendBirdId, currentUser: currentUser!, messagingCallbacks: self)
+        navDictionary = ["state": "messaging", "searchHint": "Message this user.", "sendButton": "Send"]
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser
         
-        if(!appDelegate.navStack.contains(self)){
-            appDelegate.navStack.append(self)
+        delegate.currentLanding?.updateNavigation(currentFrag: self)
+        if(!delegate.navStack.contains(self)){
+            delegate.navStack.append(self)
         }
+        
+        manager!.setup(sendBirdId: currentUser!.sendBirdId, currentUser: currentUser!, messagingCallbacks: self)
         
         self.pageName = "Messaging"
         
         Broadcaster.register(SearchCallbacks.self, observer: self)
-        
-        appDelegate.currentLanding!.removeBottomNav(showNewNav: true, hideSearch: false, searchHint: "Message this user.", searchButtonText: "Send", isMessaging: true)
     }
     
     func connectionSuccessful() {

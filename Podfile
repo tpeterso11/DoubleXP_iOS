@@ -27,6 +27,7 @@ target 'DoubleXP' do
   pod 'ExpyTableView'
   pod 'PINRemoteImage'
   pod 'AIFlatSwitch'
+  pod 'SwiftRichString'
   pod 'PopupDialog', '~> 1.0'
   pod 'UnderLineTextField', '~> 2.1'
 

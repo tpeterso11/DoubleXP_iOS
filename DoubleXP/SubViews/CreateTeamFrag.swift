@@ -49,11 +49,16 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         switches.append(pcSwitch)
         switches.append(nintendoSwitch)
         
+        navDictionary = ["state": "backOnly"]
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+    
+        delegate.currentLanding?.updateNavigation(currentFrag: self)
         self.pageName = "Create Team"
+        if(!delegate.navStack.contains(self)){
+            delegate.navStack.append(self)
+        }
         
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let currentLanding = appDelegate.currentLanding
-        gcGames = appDelegate.gcGames
+        gcGames = delegate.gcGames
         
         psSwitch.addTarget(self, action: #selector(psSwitchChanged), for: UIControl.Event.valueChanged)
         xboxSwitch.addTarget(self, action: #selector(xboxSwitchChanged), for: UIControl.Event.valueChanged)

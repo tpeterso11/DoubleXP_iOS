@@ -33,12 +33,17 @@ class TeamBuildFrag: ParentVC, UITableViewDataSource, UITableViewDelegate, TeamC
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        
+        navDictionary = ["state": "backOnly"]
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+    
+        delegate.currentLanding?.updateNavigation(currentFrag: self)
+        if(!delegate.navStack.contains(self)){
+            delegate.navStack.append(self)
+        }
         self.pageName = "Team Build"
         
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        appDelegate.navStack.append(self)
-        
-        currentUser = appDelegate.currentUser
+        currentUser = delegate.currentUser
         
         let teamManager = TeamManager()
         if teamManager.isTeamCaptain(user: currentUser!, team: self.team!){

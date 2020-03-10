@@ -40,9 +40,9 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
         super.viewDidLoad()
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let currentLanding = appDelegate.currentLanding
-        currentLanding?.removeBottomNav(showNewNav: true, hideSearch: false, searchHint: "Search for player", searchButtonText: "Search", isMessaging: false)
-        
+        navDictionary = ["state": "search", "searchHint": "Search for player", "searchButton": "Search"]
+
+        appDelegate.currentLanding?.updateNavigation(currentFrag: self)
         appDelegate.navStack.append(self)
         
         self.pageName = "GC Search"
