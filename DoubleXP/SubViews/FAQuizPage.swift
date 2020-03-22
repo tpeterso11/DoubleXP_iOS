@@ -81,7 +81,9 @@ class FAQuizPage: UIViewController, UICollectionViewDataSource, UICollectionView
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! OptionCell
         let current = self.options[indexPath.item]
         cell.answer.text = current
-        cell.answerDesc.text = self.optionDescriptions[indexPath.item]
+        if(!self.optionDescriptions.isEmpty){
+            cell.answerDesc.text = self.optionDescriptions[indexPath.item]
+        }
         
         cell.contentView.layer.cornerRadius = 20.0
         cell.contentView.layer.borderWidth = 1.0

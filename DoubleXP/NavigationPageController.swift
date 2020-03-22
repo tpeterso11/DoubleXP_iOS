@@ -95,6 +95,10 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
     func navigateToHome(){
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "gamerConnectFrag") as! GamerConnectFrag
         
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        currentViewController.pageName = "Home"
+        appDelegate.addToNavStack(vc: currentViewController)
+        
         selectViewController(currentViewController, direction: .reverse, animated: true, completion: nil)
     }
     

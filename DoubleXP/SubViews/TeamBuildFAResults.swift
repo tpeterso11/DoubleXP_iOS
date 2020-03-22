@@ -47,10 +47,9 @@ class TeamBuildFAResults: ParentVC, ExpyTableViewDelegate, ExpyTableViewDataSour
         
         navDictionary = ["state": "backOnly"]
         delegate.currentLanding?.updateNavigation(currentFrag: self)
-        if(!delegate.navStack.contains(self)){
-            delegate.navStack.append(self)
-        }
+        
         self.pageName = "Team FA Results"
+        delegate.addToNavStack(vc: self)
         
         doSearch(needs: team!.selectedTeamNeeds)
         //self.view.sendSubviewToBack(self.clickArea)

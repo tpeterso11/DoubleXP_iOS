@@ -13,6 +13,7 @@ import moa
 import MSPeekCollectionViewDelegateImplementation
 import FoldingCell
 import Bartinter
+import FBSDKCoreKit
 
 class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, ProfileCallbacks {
     var uid: String = ""
@@ -70,7 +71,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.currentLanding?.updateNavigation(currentFrag: self)
-        appDelegate.navStack.append(self)
+        appDelegate.addToNavStack(vc: self)
         
         headerView.clipsToBounds = true
         //mainLayout.roundCorners(corners: [.topLeft, .topRight], radius: 20)
@@ -93,6 +94,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     }
     
     @objc func acceptClicked(_ sender: AnyObject?) {
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Friend Profile - Friend Request Accepted"))
         let manager = FriendsManager()
         if(self.userForProfile != nil){
             let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -108,6 +110,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     }
     
     @objc func declineClicked(_ sender: AnyObject?) {
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Friend Profile - Friend Request Declined"))
         let manager = FriendsManager()
         if(self.userForProfile != nil){
             let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -423,6 +426,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     }
     
     @objc func connectButtonClicked(_ sender: AnyObject?) {
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Friend Profile - Friend Request Sent"))
         let friendsManager = FriendsManager()
         
         if(self.userForProfile != nil){
@@ -433,6 +437,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     }
     
     private func showDrawerAndOverlay(){
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Friend Profile - Action Drawer Opened"))
         UIView.animate(withDuration: 0.7, animations: {
             self.actionOverlay.effect = UIBlurEffect(style: .regular)
         } )
@@ -448,6 +453,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     }
     
     @objc private func dismissDrawerAndOverlay(){
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Friend Profile - Action Drawer Closed"))
         let top = CGAffineTransform(translationX: 0, y: 0)
         UIView.animate(withDuration: 0.4, delay: 0.0, options: [], animations: {
               self.actionDrawer.transform = top
@@ -524,10 +530,12 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         var duration = 0.0
         let cellIsCollapsed = cellHeights[indexPath.row] == Const.closeCellHeight
         if cellIsCollapsed {
+            AppEvents.logEvent(AppEvents.Name(rawValue: "Friend Profile - View Stats (Open)"))
             cellHeights[indexPath.row] = Const.openCellHeight
             cell.unfold(true, animated: true, completion: nil)
             duration = 0.6
         } else {
+            AppEvents.logEvent(AppEvents.Name(rawValue: "Friend Profile - View Stats (Close)"))
             cellHeights[indexPath.row] = Const.closeCellHeight
             cell.unfold(false, animated: true, completion: nil)
             duration = 0.3

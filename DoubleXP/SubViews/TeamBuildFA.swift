@@ -41,11 +41,10 @@ class TeamBuildFA: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         let delegate = UIApplication.shared.delegate as! AppDelegate
     
         delegate.currentLanding?.updateNavigation(currentFrag: self)
-        if(!delegate.navStack.contains(self)){
-            delegate.navStack.append(self)
-        }
         
         self.pageName = "Team Build FA"
+        delegate.addToNavStack(vc: self)
+        
         currentUser = delegate.currentUser
         
         for game in delegate.gcGames{

@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import FBSDKCoreKit
 
 class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, CurrentProfileCallbacks, UITextFieldDelegate{
     
@@ -48,12 +49,10 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         gcGames = appDelegate.gcGames
-        
-        if(!appDelegate.navStack.contains(self)){
-            appDelegate.navStack.append(self)
-        }
-        
         self.pageName = "Profile"
+        
+        appDelegate.addToNavStack(vc: self)
+        
         self.saveButton.addTarget(self, action: #selector(saveButtonClicked), for: .touchUpInside)
         self.saveButton.isUserInteractionEnabled = false
         
@@ -66,6 +65,8 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         }
         
         setup()
+        
+        AppEvents.logEvent(AppEvents.Name(rawValue: "User Profile"))
     }
     
     private func setup(){
@@ -82,7 +83,8 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         
         profileCollection.dataSource = self
         profileCollection.delegate = self
-        //self.payload.append("import")
+        
+        self.bio = appDelegate.currentUser?.bio
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -301,6 +303,8 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         
         let manager = ProfileManage()
         manager.saveChanges(bio: self.bio ?? "", games: games, ps: self.ps, pc: self.pc, xBox: self.xbox, nintendo: self.nintendo, callbacks: self)
+        
+        AppEvents.logEvent(AppEvents.Name(rawValue: "User Profile - Profile Updated"))
     }
     
     func changesComplete() {

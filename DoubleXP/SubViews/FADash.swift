@@ -14,16 +14,17 @@ import MSPeekCollectionViewDelegateImplementation
 import SendBirdSDK
 import ExpyTableView
 
-class FADash: ParentVC, ExpyTableViewDelegate, ExpyTableViewDataSource, FACallbacks, UITableViewDelegate, UITableViewDataSource {
+class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var faList: UICollectionView!
     @IBOutlet weak var searchTeams: UIButton!
     @IBOutlet weak var createButton: UIButton!
-    @IBOutlet weak var profileList: ExpyTableView!
+    @IBOutlet weak var profileList: UITableView!
     private var profilePayload: [FreeAgentObject] = [FreeAgentObject]()
     private var quizPayload = [[String]]()
     
     private var registered = [Int]()
     
+    @IBOutlet weak var clickArea: UIView!
     @IBOutlet weak var blur: UIVisualEffectView!
     @IBOutlet weak var quizView: UIView!
     @IBOutlet weak var quizTable: UITableView!
@@ -32,6 +33,14 @@ class FADash: ParentVC, ExpyTableViewDelegate, ExpyTableViewDataSource, FACallba
     @IBOutlet weak var createEmpty: UIButton!
     
     private var quizOverlayShowing = false
+    private var profilesLoaded = false
+    
+    enum Const {
+           static let closeCellHeight: CGFloat = 90
+           static let openCellHeight: CGFloat = 185
+           static let rowsCount = 1
+    }
+    var cellHeights: [CGFloat] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,12 +48,14 @@ class FADash: ParentVC, ExpyTableViewDelegate, ExpyTableViewDataSource, FACallba
         let delegate = UIApplication.shared.delegate as! AppDelegate
         navDictionary = ["state": "backOnly"]
         delegate.currentLanding?.updateNavigation(currentFrag: self)
-        if(!delegate.navStack.contains(self)){
-            delegate.navStack.append(self)
-        }
-        self.pageName = "Free Agent Dash"
         
-        loadProfiles()
+        self.pageName = "Free Agent Dash"
+        delegate.addToNavStack(vc: self)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            self.loadProfiles()
+        }
+        
         searchTeams.addTarget(self, action: #selector(searchButtonClicked), for: .touchUpInside)
         createButton.addTarget(self, action: #selector(createButtonClicked), for: .touchUpInside)
     }
@@ -74,13 +85,17 @@ class FADash: ParentVC, ExpyTableViewDelegate, ExpyTableViewDataSource, FACallba
             }
             
             if(!self.profilePayload.isEmpty){
-                let manager = FreeAgentManager()
-                manager.cacheProfiles(profiles: self.profilePayload)
-                
-                self.profileList.delegate = self
-                self.profileList.dataSource = self
-                
-                self.reload(tableView: self.profileList)
+                if(!self.profilesLoaded){
+                    let manager = FreeAgentManager()
+                    manager.cacheProfiles(profiles: self.profilePayload)
+                    
+                    self.setup()
+                }
+                else{
+                    UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                        self.profileList.reloadData()
+                    }, completion: nil)
+                }
             }
             else{
                 self.createEmpty.addTarget(self, action: #selector(self.createButtonClicked), for: .touchUpInside)
@@ -97,125 +112,60 @@ class FADash: ParentVC, ExpyTableViewDelegate, ExpyTableViewDataSource, FACallba
         }
     }
     
-    func tableView(_ tableView: ExpyTableView, expandableCellForSection section: Int) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as! FreeAgentDashCell
-        let current = profilePayload[section]
-        cell.gameName.text = current.game
+    private func setup() {
+        cellHeights = Array(repeating: Const.closeCellHeight, count: (self.profilePayload.count))
+        profileList.estimatedRowHeight = Const.closeCellHeight
+        profileList.rowHeight = UITableView.automaticDimension
         
-        var backUrl = ""
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        let games = delegate.gcGames!
-        for game in games{
-            if(game.gameName == current.game){
-                backUrl = game.imageUrl
-                break
-            }
+        if #available(iOS 10.0, *) {
+            profileList.refreshControl = UIRefreshControl()
+            profileList.refreshControl?.addTarget(self, action: #selector(refreshHandler), for: .valueChanged)
         }
         
-        cell.gameBack.moa.url = backUrl
-        cell.gameBack.contentMode = .scaleAspectFill
-        cell.gameBack.clipsToBounds = true
+        self.profileList.delegate = self
+        self.profileList.dataSource = self
         
-        cell.roundCorners(corners: [.topLeft, .topRight], radius: 10.0)
-        
-        return cell
+        let top = CGAffineTransform(translationX: 0, y: -10)
+        UIView.animate(withDuration: 0.8, animations: {
+            self.profileList.alpha = 1
+            self.profileList.transform = top
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                self.reload(tableView: self.profileList)
+            }, completion: nil)
+        })
+    }
+    
+    @objc func refreshHandler() {
+        let deadlineTime = DispatchTime.now() + .seconds(1)
+        DispatchQueue.main.asyncAfter(deadline: deadlineTime, execute: { [weak self] in
+            if #available(iOS 10.0, *) {
+                self?.profileList.refreshControl?.endRefreshing()
+            }
+            self?.profileList.reloadData()
+        })
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if(tableView == profileList){
-            return 3
+            return self.profilePayload.count
         }
         else{
             return quizPayload.count
         }
     }
     
-    func tableView(_ tableView: ExpyTableView, canExpandSection section: Int) -> Bool {
-        return true //Return false if you want your section not to be expandable
-    }
-    
-    func numberOfSections(in tableView: UITableView) -> Int {
-        if(tableView == profileList){
-            return profilePayload.count
-        }
-        else{
-            return 1
-        }
-    }
-    
-    func tableView(_ tableView: ExpyTableView, expyState state: ExpyState, changeForSection section: Int) {
-    
-        switch state {
-        case .willExpand:
-            print("WILL EXPAND")
-            
-        case .willCollapse:
-            print("WILL COLLAPSE")
-            
-        case .didExpand:
-            self.registered.append(section)
-            print("DID EXPAND")
-            
-        case .didCollapse:
-            if(self.registered.contains(section)){
-                self.registered.remove(at: self.registered.index(of: section)!)
-            }
-            print("DID COLLAPSE")
-        }
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if(tableView == profileList){
-            //If you don't deselect the row here, seperator of the above cell of the selected cell disappears.
-            //Check here for detail: https://stackoverflow.com/questions/18924589/uitableviewcell-separator-disappearing-in-ios7
-            
-            tableView.deselectRow(at: indexPath, animated: false)
-            
-            if(indexPath.row == 1){
-                self.showQuiz(position: indexPath.section)
-            }
-            else{
-                if(self.registered.contains(indexPath.section)){
-                    let button = UIButton()
-                    button.tag = indexPath.section
-                    deleteButtonClicked(button)
-                }
-                else{
-                    self.registered.append(indexPath.section)
-                }
-            }
-            
-            //This solution obviously has side effects, you can implement your own solution from the given link.
-            //This is not a bug of ExpyTableView hence, I think, you should solve it with the proper way for your implementation.
-            //If you have a generic solution for this, please submit a pull request or open an issue.
-            
-            print("DID SELECT row: \(indexPath.row), section: \(indexPath.section)")
-        }
-        else{
-            self.showQuiz(position: indexPath.item)
-        }
-    }
-    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if(tableView == profileList){
-            let cell = tableView.dequeueReusableCell(withIdentifier: "expanded", for: indexPath) as! FreeAgentDashExpanded
+            let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as! FADashFoldingCell
+            let current = profilePayload[indexPath.item]
+            cell.coverLabel.text = current.game
+            cell.underLabel.text = current.gamerTag
             
-            if(indexPath.row == 1){
-                cell.action.text = "View Quiz"
-                //cell.actionIcon.image = #imageLiteral(resourceName: "message.png")
-            }
-            else if(indexPath.row == 2){
-                //cell.backgroundColor = #colorLiteral(red: 0.5893185735, green: 0.04998416454, blue: 0.09506303817, alpha: 1)
-                //cell.action.textColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
-                cell.action.text = "Delete"
-            }
-            else{
-                //cell.backgroundColor = #colorLiteral(red: 0.5893185735, green: 0.04998416454, blue: 0.09506303817, alpha: 1)
-                //cell.action.textColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
-                cell.action.text = "Delete"
-                //cell.actionIcon.image = #imageLiteral(resourceName: "information.png")
-            }
-            //cell.friendName.text = current.gamerTag
+            cell.tag = indexPath.item
+            cell.deleteButton.addTarget(self, action: #selector(deleteButtonClicked), for: .touchUpInside)
+            cell.quizButton.addTarget(self, action: #selector(quizButtonClicked), for: .touchUpInside)
+            
             return cell
         }
         else{
@@ -225,33 +175,67 @@ class FADash: ParentVC, ExpyTableViewDelegate, ExpyTableViewDataSource, FACallba
             
             cell.question.text = current[0]
             cell.answer.text = current[1]
-            
 
             return cell
         }
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    func tableView(_ tableView : UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if(tableView == profileList){
-            if(indexPath.row == 1){
-                return CGFloat(60)
+            guard case let cell as FADashFoldingCell = cell else {
+                return
             }
-            if(indexPath.row == 2){
-                return CGFloat(60)
+
+            cell.backgroundColor = .clear
+
+            if cellHeights[indexPath.row] == Const.closeCellHeight {
+                cell.unfold(false, animated: false, completion: nil)
+            } else {
+                cell.unfold(true, animated: false, completion: nil)
             }
-            if(indexPath.row == 3){
-                return CGFloat(60)
-            }
-            return CGFloat(60)
+        }
+    }
+    
+    func tableView(_ tableView : UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if(tableView == profileList){
+            return cellHeights[indexPath.row]
         }
         else{
-            //let current = self.profilePayload[indexPath.item]
-            //if(current is String){
-            //    return CGFloat(50)
-            //}
-            //else{
-                return CGFloat(100)
-            //}
+            return CGFloat(100)
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if(tableView == profileList){
+            let cell = tableView.cellForRow(at: indexPath) as! FADashFoldingCell
+            if cell.isAnimating() {
+                return
+            }
+
+            var duration = 0.0
+            let cellIsCollapsed = cellHeights[indexPath.row] == Const.closeCellHeight
+            if cellIsCollapsed {
+                cellHeights[indexPath.row] = Const.openCellHeight
+                cell.unfold(true, animated: true, completion: nil)
+                duration = 0.6
+            } else {
+                cellHeights[indexPath.row] = Const.closeCellHeight
+                cell.unfold(false, animated: true, completion: nil)
+                duration = 0.3
+            }
+
+            UIView.animate(withDuration: duration, delay: 0, options: .curveEaseOut, animations: { () -> Void in
+                tableView.beginUpdates()
+                tableView.endUpdates()
+                
+                // fix https://github.com/Ramotion/folding-cell/issues/169
+                if cell.frame.maxY > tableView.frame.maxY {
+                    tableView.scrollToRow(at: indexPath, at: UITableView.ScrollPosition.bottom, animated: true)
+                }
+            }, completion: nil)
+        }
+        else{
+            self.showQuiz(position: indexPath.item)
         }
     }
     
@@ -283,6 +267,10 @@ class FADash: ParentVC, ExpyTableViewDelegate, ExpyTableViewDataSource, FACallba
                 })
             }, completion: nil)
         })
+        
+        //let closeTap = UITapGestureRecognizer(target: self, action: #selector(dismissMenu))
+        //clickArea.isUserInteractionEnabled = true
+        //clickArea.addGestureRecognizer(closeTap)
     }
     
     @objc func searchButtonClicked(_ sender: AnyObject?) {
@@ -301,9 +289,9 @@ class FADash: ParentVC, ExpyTableViewDelegate, ExpyTableViewDataSource, FACallba
                 profiles.remove(at: profiles.index(of: profile)!)
             }
         }
-        self.profilePayload.remove(at: indexPath.section)
+        self.profilePayload.remove(at: indexPath.item)
         
-        self.profileList.deleteSections([indexPath.section], with: .fade)
+        self.profileList.deleteRows(at: [indexPath], with: .fade)
     }
     
     func reload(tableView: UITableView) {
@@ -331,6 +319,8 @@ class FADash: ParentVC, ExpyTableViewDelegate, ExpyTableViewDataSource, FACallba
                 //self.view.sendSubviewToBack(self.clickArea)
             }, completion: nil)
         })
+        
+        clickArea.isUserInteractionEnabled = false
     }
     
     @objc func deleteButtonClicked(_ sender: AnyObject?) {
@@ -338,7 +328,13 @@ class FADash: ParentVC, ExpyTableViewDelegate, ExpyTableViewDataSource, FACallba
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let currentUser = delegate.currentUser
         
-        let indexPath = IndexPath(item: 0, section: (sender?.tag)!)
+        let indexPath = IndexPath(item: (sender?.tag)!, section: 0)
         manager.deleteProfile(faObject: profilePayload[(sender?.tag)!], indexPath: indexPath, currentUser: currentUser!, callbacks: self)
+    }
+    
+    @objc func quizButtonClicked(_ sender: AnyObject?) {
+        if(sender?.tag != nil){
+            showQuiz(position: sender!.tag)
+        }
     }
 }

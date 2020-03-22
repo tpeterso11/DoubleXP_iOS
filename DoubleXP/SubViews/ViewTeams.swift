@@ -11,9 +11,10 @@ import Firebase
 import ImageLoader
 import moa
 import MSPeekCollectionViewDelegateImplementation
+import SwiftNotificationCenter
 
-class ViewTeams: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITableViewDelegate,
-UITableViewDataSource {
+class ViewTeams: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITableViewDelegate, UITableViewDataSource, SearchCallbacks {
+    
     @IBOutlet weak var searchField: UITextField!
     @IBOutlet weak var searchButton: UIButton!
     @IBOutlet weak var gcGameList: UICollectionView!
@@ -54,21 +55,26 @@ UITableViewDataSource {
         navDictionary = ["state": "search", "searchHint": "Find A Team", "searchButton": "Search"]
         delegate.currentLanding?.updateNavigation(currentFrag: self)
         
-        if(!delegate.navStack.contains(self)){
-            delegate.navStack.append(self)
-        }
         self.pageName = "View Teams"
+        delegate.addToNavStack(vc: self)
         
         gcGames.append(contentsOf: delegate.gcGames)
+        
+        Broadcaster.register(SearchCallbacks.self, observer: self)
         //if(searchField.text != nil && !searchField.text!.isEmpty){
         //    searchButton.addTarget(self, action: #selector(search), for: .touchUpInside)
         //}
     }
     
-    @objc func search(_ sender: AnyObject?) {
-        let top = CGAffineTransform(translationX: 0, y: 40)
-        let returnV = CGAffineTransform(translationX: 0, y: 0)
+    func search(searchString: String?) {
+        let color = UIColor(named: "darkOpacity")
+        UIView.transition(with: self.cover, duration: 0.3, options: .curveEaseInOut, animations: {
+            self.cover.backgroundColor = color
+            self.cover.backgroundColor = color
+        }, completion: nil)
+        
         UIView.animate(withDuration: 0.5, animations: {
+            self.searchingText.text = "one sec..."
             self.cover.alpha = 1
             self.instructionView.alpha = 0
             self.teamResults.alpha = 0
@@ -77,10 +83,10 @@ UITableViewDataSource {
              UIView.animate(withDuration: 0.8, animations: {
                 self.searchingText.alpha = 1
                 self.spinner.alpha = 1
-                self.spinner.transform = top
+                self.spinner.startAnimating()
             }, completion: { (finished: Bool) in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    self.doSearch(teamName: self.searchField.text!, gameName: nil)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    self.doSearch(teamName: searchString, gameName: self.chosenGame)
                 }
             })
         })
@@ -91,32 +97,33 @@ UITableViewDataSource {
         let currentUser = delegate.currentUser
         
         let ref = Database.database().reference().child("Free Agents V2").child(currentUser!.uId)
-            ref.observeSingleEvent(of: .value, with: { (snapshot) in
-                if(snapshot.exists()){
-                    for agent in snapshot.children{
-                        let currentObj = agent as! DataSnapshot
-                        for profile in currentObj.children{
-                            let currentProfile = profile as! DataSnapshot
-                            let dict = currentProfile.value as! [String: Any]
-                            let game = dict["game"] as? String ?? ""
-                            let consoles = dict["consoles"] as? [String] ?? [String]()
-                            let gamerTag = dict["gamerTag"] as? String ?? ""
-                            let competitionId = dict["competitionId"] as? String ?? ""
-                            let userId = dict["userId"] as? String ?? ""
-                            let questions = dict["questions"] as? [[String]] ?? [[String]]()
-                            
-                            let result = FreeAgentObject(gamerTag: gamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
-                            self.profiles.append(result)
-                        }
-                    }
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            self.profiles = [FreeAgentObject]()
+            
+            if(snapshot.exists()){
+                for profile in snapshot.children{
+                    let currentProfile = profile as! DataSnapshot
+                    let dict = currentProfile.value as! [String: Any]
+                    let game = dict["game"] as? String ?? ""
+                    let consoles = dict["consoles"] as? [String] ?? [String]()
+                    let gamerTag = dict["gamerTag"] as? String ?? ""
+                    let competitionId = dict["competitionId"] as? String ?? ""
+                    let userId = dict["userId"] as? String ?? ""
+                    let questions = dict["questions"] as? [[String]] ?? [[String]]()
+                    
+                    let result = FreeAgentObject(gamerTag: gamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
+                    self.profiles.append(result)
                 }
+            }
         }) { (error) in
             print(error.localizedDescription)
         }
     }
     
     private func doSearch(teamName: String?, gameName: String?){
-        self.teams = [TeamObject]()
+        self.teams.removeAll()
+        self.teamResults.reloadData()
+        
         let ref = Database.database().reference().child("Teams")
             ref.observeSingleEvent(of: .value, with: { (snapshot) in
                 for team in snapshot.children{
@@ -216,20 +223,39 @@ UITableViewDataSource {
                     
                     self.setupComplete = true
                 }
+                else if(!self.teams.isEmpty){
+                    UIView.animate(withDuration: 0.5, animations: {
+                        self.searchingText.alpha = 1
+                        self.spinner.alpha = 1
+                        //self.teamResults.transform = returnV
+                    }, completion: { (finished: Bool) in
+                         UIView.animate(withDuration: 0.8, animations: {
+                            self.teamResults.alpha = 1
+                            self.cover.alpha = 0
+                        }, completion: { (finished: Bool) in
+                            self.cellHeights = Array(repeating: Const.closeCellHeight, count: (self.teams.count))
+                            self.teamResults.performBatchUpdates({
+                                let indexSet = IndexSet(integersIn: 0...0)
+                                self.teamResults.reloadSections(indexSet, with: .fade)
+                             }, completion: nil)
+                        })
+                    })
+                }
                 else{
-                    self.cellHeights = Array(repeating: Const.closeCellHeight, count: (self.teams.count))
-                    self.teamResults.reloadData()
+                    self.showEmpty()
+                    //self.showEmpty()
                 }
         }) { (error) in
             print(error.localizedDescription)
+            self.showError()
         }
     }
     
     private func addThisTeam(teamName: String?, gameName: String?, games: [String]?, currentTeamName: String?) -> Bool{
         var add = false
         
-        if(teamName != nil){
-            if(teamName == currentTeamName){
+        if(teamName != nil && currentTeamName != nil){
+            if(teamName!.caseInsensitiveCompare(currentTeamName!.trimmingCharacters(in: .whitespacesAndNewlines)) == .orderedSame){
                 add = true
             }
         }
@@ -253,13 +279,28 @@ UITableViewDataSource {
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let game = delegate.gcGames[indexPath.item]
-        cell.backgroundImage.moa.url = game.imageUrl
-        cell.backgroundImage.contentMode = .scaleAspectFill
-        cell.backgroundImage.clipsToBounds = true
+        cell.searchName = game.gameName
+        
+        if(game.cachedImage.imageData != nil){
+            cell.backgroundImage.image = game.cachedImage
+            cell.backgroundImage.contentMode = .scaleAspectFill
+            cell.backgroundImage.clipsToBounds = true
+        }
+        else{
+            cell.backgroundImage.moa.onSuccess = { image in
+                game.cachedImage = image
+                
+              return image
+            }
+
+            cell.backgroundImage.moa.url = game.imageUrl
+            cell.backgroundImage.contentMode = .scaleAspectFill
+            cell.backgroundImage.clipsToBounds = true
+        }
         
         cell.hook.text = game.secondaryName
         
-        if(chosenGame == game.secondaryName){
+        if(self.chosenGame == game.gameName){
             cell.cover.isHidden = false
             cell.isUserInteractionEnabled = false
         }
@@ -287,10 +328,20 @@ UITableViewDataSource {
         let cell = self.gcGameList.cellForItem(at: indexPath) as! homeGCCell
         cell.cover.isHidden = false
         
-        self.gcGameList.reloadData()
-        self.chosenGame = self.gcGames[indexPath.item].secondaryName
+        let current = self.gcGames[indexPath.item]
+        current.cachedImage = cell.backgroundImage.image ?? UIImage()
         
-        self.doSearch(teamName: nil, gameName: self.gcGames[indexPath.item].gameName)
+        //self.gcGameList.reloadItems(at: [indexPath])
+        self.gcGameList.reloadData()
+        for cell in self.gcGameList.visibleCells{
+            if((cell as! homeGCCell).searchName != self.chosenGame){
+                (cell as! homeGCCell).cover.isHidden = true
+            }
+        }
+        
+        self.chosenGame = self.gcGames[indexPath.item].gameName
+        
+        self.search(searchString: nil)
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -298,7 +349,7 @@ UITableViewDataSource {
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         
             
-        return CGSize(width: collectionView.bounds.size.width - 40, height: CGFloat(80))
+        return CGSize(width: collectionView.bounds.size.width - 10, height: CGFloat(80))
     }
     
     func tableView(_: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -330,9 +381,10 @@ UITableViewDataSource {
         
         let current = self.teams[indexPath.item]
         
-        cell.gameBack.moa.url = current.imageUrl
-        cell.gameBack.contentMode = .scaleAspectFill
-        cell.gameBack.clipsToBounds = true
+        cell.gameBack.backgroundColor = UIColor(named: "whiteBackToDarkGrey")
+        //cell.gameBack.moa.url = current.imageUrl
+        //cell.gameBack.contentMode = .scaleAspectFill
+        //cell.gameBack.clipsToBounds = true
         
         cell.underImage.moa.url = current.imageUrl
         cell.underImage.contentMode = .scaleAspectFill
@@ -352,6 +404,7 @@ UITableViewDataSource {
         if(!contained){
             cell.setUI(team: current, profiles: self.profiles, gameName: current.games[0], indexPath: indexPath, collectionView: teamResults)
         }
+        
         
         cell.layoutMargins = UIEdgeInsets.zero
         cell.separatorInset = UIEdgeInsets.zero
@@ -422,15 +475,68 @@ UITableViewDataSource {
         self.teamResults.dataSource = self
         self.teamResults.delegate = self
         
-        let top = CGAffineTransform(translationX: 0, y: -10)
         UIView.animate(withDuration: 0.5, animations: {
-           self.cover.alpha = 0
-           self.teamResults.alpha = 1
-           //self.teamResults.transform = top
+            self.searchingText.alpha = 1
+            self.spinner.alpha = 1
+            //self.teamResults.transform = returnV
         }, completion: { (finished: Bool) in
-            DispatchQueue.main.async(execute: {
+             UIView.animate(withDuration: 0.8, animations: {
+                self.teamResults.alpha = 1
+                self.cover.alpha = 0
+            }, completion: { (finished: Bool) in
                 self.reload(tableView: self.teamResults)
             })
-       })
+        })
+    }
+    
+    private func showEmpty(){
+        self.spinner.alpha = 0
+        
+        let color = UIColor(named: "darkOpacity")
+        UIView.transition(with: self.cover, duration: 0.3, options: .curveEaseInOut, animations: {
+            self.cover.backgroundColor = color
+            self.cover.backgroundColor = color
+        }, completion: nil)
+        
+        self.searchingText.text = "no teams available right now..."
+        UIView.animate(withDuration: 0.5, animations: {
+            self.cover.alpha = 1
+            self.searchingText.alpha = 1
+            //self.teamResults.transform = returnV
+        }, completion: { (finished: Bool) in
+             UIView.animate(withDuration: 0.8, animations: {
+                self.teamResults.alpha = 0
+                self.searchingText.alpha = 1
+            }, completion: nil)
+        })
+    }
+    
+    private func showError(){
+        self.searchingText.text = "we had an issue getting teams for you..."
+        
+        let color = UIColor(named: "redAlpha")
+        UIView.transition(with: self.cover, duration: 0.3, options: .curveEaseInOut, animations: {
+            self.cover.backgroundColor = color
+            self.cover.backgroundColor = color
+        }, completion: nil)
+        
+        UIView.animate(withDuration: 0.5, animations: {
+            self.spinner.alpha = 0
+            self.cover.alpha = 1
+            self.searchingText.alpha = 1
+            //self.teamResults.transform = returnV
+        }, completion: { (finished: Bool) in
+             UIView.animate(withDuration: 0.8, animations: {
+                self.teamResults.alpha = 0
+                self.searchingText.alpha = 1
+            }, completion: nil)
+        })
+    }
+    
+    func searchSubmitted(searchString: String) {
+        self.search(searchString: searchString.trimmingCharacters(in: .whitespacesAndNewlines))
+    }
+    
+    func messageTextSubmitted(string: String, list: [String]?) {
     }
 }

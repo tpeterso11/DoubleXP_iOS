@@ -10,5 +10,7 @@ import UIKit
 
 class MediaCategoryCell: UICollectionViewCell{
     
+    @IBOutlet weak var categoryContents: UILabel!
+    @IBOutlet weak var categoryImg: UIImageView!
     @IBOutlet weak var mediaCategory: UILabel!
 }

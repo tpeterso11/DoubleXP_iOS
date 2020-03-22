@@ -12,6 +12,7 @@ import ImageLoader
 import moa
 import SwiftNotificationCenter
 import MSPeekCollectionViewDelegateImplementation
+import FBSDKCoreKit
 
 class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,  UICollectionViewDelegateFlowLayout, SearchCallbacks {
     
@@ -24,6 +25,7 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
     var searchPC = true
     var set = false
     
+    @IBOutlet weak var searchingText: UILabel!
     @IBOutlet weak var gameHeaderImage: UIImageView!
     @IBOutlet weak var gamerConnectResults: UICollectionView!
     @IBOutlet weak var psSwitch: UISwitch!
@@ -43,9 +45,9 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
         navDictionary = ["state": "search", "searchHint": "Search for player", "searchButton": "Search"]
 
         appDelegate.currentLanding?.updateNavigation(currentFrag: self)
-        appDelegate.navStack.append(self)
         
         self.pageName = "GC Search"
+        appDelegate.addToNavStack(vc: self)
         
         if(game != nil){
             //gameHeaderImage.alpha = 0
@@ -223,6 +225,8 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        AppEvents.logEvent(AppEvents.Name(rawValue: "GC Search - Profile Accessed"))
+        
         let current = returnedUsers[indexPath.item]
         
         let uid = current.uId
@@ -232,6 +236,23 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
     }
     
     private func searchUsers(userName: String?){
+        if(self.searchPS){
+            AppEvents.logEvent(AppEvents.Name(rawValue: "GC Search - Console: PS, Game: " + self.game!.gameName))
+        }
+        if(self.searchXbox){
+            AppEvents.logEvent(AppEvents.Name(rawValue: "GC Search - Console: XBox, Game: " + self.game!.gameName))
+        }
+        if(self.searchPC){
+            AppEvents.logEvent(AppEvents.Name(rawValue: "GC Search - Console: PC, Game: " + self.game!.gameName))
+        }
+        if(self.searchNintendo){
+            AppEvents.logEvent(AppEvents.Name(rawValue: "GC Search - Console: Nintendo, Game: " + self.game!.gameName))
+        }
+        
+        if(userName != nil){
+            AppEvents.logEvent(AppEvents.Name(rawValue: "GC Search - User"))
+        }
+        
         if(self.loadingView.alpha == 0){
             self.searchProgress.startAnimating()
             
@@ -489,7 +510,6 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
                 self.gamerConnectResults.dataSource = self
                 
                 self.set = true
-                
                 self.searchProgress.stopAnimating()
                 UIView.animate(withDuration: 0.8, animations: {
                     self.loadingView.alpha = 0
@@ -546,6 +566,12 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
         
         }) { (error) in
             print(error.localizedDescription)
+            AppEvents.logEvent(AppEvents.Name(rawValue: "GamerConnect Search "))
+
+            UIView.transition(with: self.loadingView, duration: 0.3, options: .curveEaseInOut, animations: {
+                self.loadingView.backgroundColor = #colorLiteral(red: 0.6423664689, green: 0, blue: 0.04794860631, alpha: 0.6023116438)
+                self.searchingText.text = "error loading results. please try again later."
+            }, completion: nil)
         }
     }
     

@@ -57,11 +57,18 @@ class ViewTeamsFoldingCell: FoldingCell, UICollectionViewDataSource, UICollectio
         
         self.profiles.append(contentsOf: profiles)
         
-        if(!team.selectedTeamNeeds.isEmpty){
-            self.selectedNeeds.append("needs_header_one")
-            self.selectedNeeds.append(contentsOf: team.selectedTeamNeeds)
-            needsCollection.delegate = self
-            needsCollection.dataSource = self
+        
+        if(!team.teamNeeds.isEmpty){
+            if(!team.selectedTeamNeeds.isEmpty){
+                self.selectedNeeds.append("needs_header_one")
+                self.selectedNeeds.append(contentsOf: team.selectedTeamNeeds)
+                needsCollection.isHidden = false
+                needsCollection.delegate = self
+                needsCollection.dataSource = self
+            }
+        }
+        else{
+            needsCollection.isHidden = true
         }
         
         var contained = false
@@ -76,7 +83,7 @@ class ViewTeamsFoldingCell: FoldingCell, UICollectionViewDataSource, UICollectio
         }
         
         //if this user has a game profile for this game AND the current teams' team needs are not empty
-        if(contained && !self.currentTeam!.selectedTeamNeeds.isEmpty){
+        if(contained && (!self.currentTeam!.teamNeeds.isEmpty && !self.currentTeam!.selectedTeamNeeds.isEmpty)){
             if(self.currentTeam!.selectedTeamNeeds.contains((containedProfile?.questions[0][0])!)){
                 //match team needs
                 self.sendButton.tag = indexPath.item
@@ -96,7 +103,7 @@ class ViewTeamsFoldingCell: FoldingCell, UICollectionViewDataSource, UICollectio
             }
             //else need to handle change to "You do not fit this teams needs"
         }
-        else if(contained && (self.currentTeam!.teamNeeds.isEmpty || self.currentTeam!.selectedTeamNeeds.isEmpty)){
+        else if(contained && (self.currentTeam!.teamNeeds.isEmpty || (!self.currentTeam!.teamNeeds.isEmpty && self.currentTeam!.selectedTeamNeeds.isEmpty))){
             //if this user has a game profile for this game AND there are no team needs. Anyone can join.
             self.sendButton.tag = indexPath.item
             self.sendButton.addTarget(self, action: #selector(sendRequest), for: .touchUpInside)
@@ -106,7 +113,7 @@ class ViewTeamsFoldingCell: FoldingCell, UICollectionViewDataSource, UICollectio
         }
         else{
             //if this gamer does not have a game profile for this game AND there are team needs.
-            if(!contained && !self.currentTeam!.selectedTeamNeeds.isEmpty){
+            if(!contained && (!self.currentTeam!.teamNeeds.isEmpty && !self.currentTeam!.selectedTeamNeeds.isEmpty)){
                 self.statusText.text = " you do not have a profile that matches this teams needs."
                 self.createButton.isHidden = false
                 self.sendButton.alpha = 0.4
@@ -116,7 +123,6 @@ class ViewTeamsFoldingCell: FoldingCell, UICollectionViewDataSource, UICollectio
             }
             else{
                 //if not contained and no team needs, they still need a profile to request
-                self.statusText.text = " you do not have a profile that matches this teams needs."
                 self.createButton.isHidden = false
                 self.sendButton.alpha = 0.4
                 self.sendButton.isUserInteractionEnabled = false
@@ -174,7 +180,7 @@ class ViewTeamsFoldingCell: FoldingCell, UICollectionViewDataSource, UICollectio
     }
     
     @objc func createProfile(_ sender: AnyObject?) {
-        let indexPath = IndexPath(item: 0, section: (sender?.tag)!)
+        let indexPath = IndexPath(item: (sender?.tag)!, section: 0)
         self.currentCollection?.selectRow(at: indexPath, animated: true, scrollPosition: .none)
         self.currentCollection?.delegate?.tableView!(self.currentCollection!, didSelectRowAt: indexPath)
         

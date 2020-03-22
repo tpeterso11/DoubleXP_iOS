@@ -54,10 +54,8 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
     
         delegate.currentLanding?.updateNavigation(currentFrag: self)
         self.pageName = "Create Team"
-        if(!delegate.navStack.contains(self)){
-            delegate.navStack.append(self)
-        }
         
+        delegate.addToNavStack(vc: self)
         gcGames = delegate.gcGames
         
         psSwitch.addTarget(self, action: #selector(psSwitchChanged), for: UIControl.Event.valueChanged)

@@ -9,8 +9,10 @@
 import UIKit
 import Firebase
 import ImageLoader
+import ValidationComponents
+import FBSDKCoreKit
 
-class RegisterActivity: UIViewController {
+class RegisterActivity: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var headerImage: UIImageView!
     
     @IBOutlet weak var emailField: UITextField!
@@ -20,30 +22,57 @@ class RegisterActivity: UIViewController {
     @IBOutlet weak var xboxSwitch: UISwitch!
     @IBOutlet weak var nintendoSwitch: UISwitch!
     @IBOutlet weak var pcSwitch: UISwitch!
-    @IBOutlet weak var nextButton: UIImageView!
+    @IBOutlet weak var nextButton: UIButton!
+    
+    private var emailEntered = false
+    private var passwordEntered = false
+    private var consoleChosen = false
+    private var switches = [UISwitch]()
+    
     @IBOutlet weak var backX: UIImageView!
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        let theImage = headerImage.image!
-        let filter = CIFilter(name: "CIColorInvert")
-        filter?.setValue(CIImage(image: theImage), forKey: kCIInputImageKey)
-        let newImage = UIImage(ciImage: (filter?.outputImage)!)
-        headerImage.image = newImage
         
-        let xImage = closeX.image!
-        let xFilter = CIFilter(name: "CIColorInvert")
-        xFilter?.setValue(CIImage(image: xImage), forKey: kCIInputImageKey)
-        let newXImage = UIImage(ciImage: (xFilter?.outputImage)!)
-        closeX.image = newXImage
-        
-        let singleTap = UITapGestureRecognizer(target: self, action: #selector(nextButtonClicked))
-        nextButton.isUserInteractionEnabled = true
-        nextButton.addGestureRecognizer(singleTap)
+        nextButton.addTarget(self, action: #selector(nextButtonClicked(_:)), for: .touchUpInside)
         
         let backTap = UITapGestureRecognizer(target: self, action: #selector(backButtonClicked))
         backX.isUserInteractionEnabled = true
         backX.addGestureRecognizer(backTap)
+        
+        emailField.returnKeyType = .done
+        emailField.delegate = self
+        passwordField.returnKeyType = .done
+        passwordField.delegate = self
+        
+        switches.append(psSwitch)
+        switches.append(xboxSwitch)
+        switches.append(pcSwitch)
+        switches.append(nintendoSwitch)
+        
+        psSwitch.addTarget(self, action: #selector(psSwitchChanged), for: UIControl.Event.valueChanged)
+        xboxSwitch.addTarget(self, action: #selector(xboxSwitchChanged), for: UIControl.Event.valueChanged)
+        nintendoSwitch.addTarget(self, action: #selector(nintendoSwitchChanged), for: UIControl.Event.valueChanged)
+        pcSwitch.addTarget(self, action: #selector(pcSwitchChanged), for: UIControl.Event.valueChanged)
+        
+        checkNextButton()
+        
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Register"))
+    }
+    
+    @objc func psSwitchChanged(stationSwitch: UISwitch) {
+        checkNextButton()
+    }
+    
+    @objc func xboxSwitchChanged(stationSwitch: UISwitch) {
+        checkNextButton()
+    }
+    
+    @objc func pcSwitchChanged(stationSwitch: UISwitch) {
+        checkNextButton()
+    }
+    
+    @objc func nintendoSwitchChanged(stationSwitch: UISwitch) {
+        checkNextButton()
     }
     
     func registerUser(email: String, pass: String){
@@ -75,21 +104,76 @@ class RegisterActivity: UIViewController {
                 ref.child("consoles").child("pc").setValue(self.pcSwitch.isOn)
                 ref.child("platform").child("ios")
                 ref.child("model").child(self.modelIdentifier())
-                //ref.child("messagingNotifications").setValue(true)
+                ref.child("notifications").setValue("true")
                 
                 DispatchQueue.main.async {
-                    let delegate = UIApplication.shared.delegate as! AppDelegate!
-                    delegate?.currentUser = user
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    delegate.currentUser = user
                     
                     if(!user.pc && !user.xbox && !user.ps && !user.nintendo){
+                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - No GC"))
                         self.performSegue(withIdentifier: "registerNoGC", sender: nil)
                     }
                     else{
+                        if(user.pc){
+                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PC User"))
+                        }
+                        if(user.xbox){
+                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - xBox User"))
+                        }
+                        if(user.ps){
+                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PS User"))
+                        }
+                        if(user.nintendo){
+                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Nintendo User"))
+                        }
+                        
+                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - GC"))
                         self.performSegue(withIdentifier: "registerGC", sender: nil)
                     }
                 }
             }
         }
+    }
+    
+    func checkNextButton(){
+        if(self.emailEntered && passwordEntered && checkSwitches()){
+            self.nextButton.alpha = 1
+        }
+        else{
+            self.nextButton.alpha = 0.3
+        }
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool
+    {
+        textField.resignFirstResponder()
+        return true
+    }
+    
+    @objc func textFieldDidChange(_ textField: UITextField) {
+        if(textField == self.emailField && textField.text?.count ?? 0 > 5){
+            self.emailEntered = true
+            checkNextButton()
+        }
+        else{
+            if(textField.text?.count ?? 0 > 5){
+                self.passwordEntered = true
+                checkNextButton()
+            }
+        }
+    }
+    
+    private func checkSwitches() -> Bool{
+        var switchOn = false
+        for uiSwitch in self.switches{
+            if(uiSwitch.isOn){
+                switchOn = true
+                break
+            }
+        }
+        
+        return switchOn
     }
     
     private func modelIdentifier() -> String {
@@ -100,19 +184,38 @@ class RegisterActivity: UIViewController {
     }
     
     @objc func nextButtonClicked(_ sender: AnyObject?) {
-        /*let email = emailField.text ?? ""
+        let email = emailField.text ?? ""
         let pass = passwordField.text ?? ""
         
-        if(!email.isEmpty && !pass.isEmpty){
+        let rule = EmailValidationPredicate()
+        
+        if(!email.isEmpty && !pass.isEmpty && rule.evaluate(with: email)){
             registerUser(email: email, pass: pass)
         }
         else{
+            if(!rule.evaluate(with: email)){
+                let message = "Must enter a valid email to continue."
+                let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+                alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                self.display(alertController: alertController)
+                
+                return
+            }
+            
+            if(pass.isEmpty){
+                let message = "Must enter a password to continue."
+                let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+                alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                self.display(alertController: alertController)
+                
+                return
+            }
+            
             let message = "Must enter a valid email and/or password to continue."
             let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             self.display(alertController: alertController)
-        }*/
-        self.performSegue(withIdentifier: "registerGC", sender: nil)
+        }
     }
     
     @objc func backButtonClicked(_ sender: AnyObject?) {

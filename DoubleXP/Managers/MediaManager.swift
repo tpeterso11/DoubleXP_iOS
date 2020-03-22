@@ -22,7 +22,7 @@ class MediaManager {
         HTTP.GET("http://www.gamespot.com/api/reviews/?api_key=6e61e45d268953e5164c5c434c36ee6607b82f1c&format=json&limit=50&sort=publish_date:desc") { response in
         if let err = response.error {
             DispatchQueue.main.async {
-                callbacks.onMediaReceived()
+                callbacks.onMediaReceived(category: "error")
             }
             print("error: \(err.localizedDescription)")
             return //also notify app of failure as needed
@@ -71,8 +71,7 @@ class MediaManager {
                             }
                         }
                     }
-                 print("Mah nigga...you got " + String(self.gamespotReviews.count) + " reviews")
-                self.getGameSpotNews(callbacks: callbacks)
+                    self.getDXPReviews(callbacks: callbacks)
                 }
             }
         }
@@ -82,7 +81,7 @@ class MediaManager {
         HTTP.GET("http://www.gamespot.com/api/articles/?api_key=6e61e45d268953e5164c5c434c36ee6607b82f1c&format=json&limit=50&sort=publish_date:desc") { response in
         if let err = response.error {
             DispatchQueue.main.async {
-                callbacks.onMediaReceived()
+                callbacks.onMediaReceived(category: "error")
             }
             print("error: \(err.localizedDescription)")
             return //also notify app of failure as needed
@@ -175,8 +174,13 @@ class MediaManager {
                             }
                         }
                     }
-                    print("Mah nigga...you got " + String(self.news.count) + " articles")
-                    self.getDXPReviews(callbacks: callbacks)
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                let cache = delegate.mediaCache
+                cache.setNewsCache(payload: self.news)
+                
+                callbacks.onMediaReceived(category: "news")
+                    //print("Mah nigga...you got " + String(self.news.count) + " articles")
+                    //self.getDXPReviews(callbacks: callbacks)
                 }
             }
         }
@@ -186,7 +190,7 @@ class MediaManager {
        HTTP.GET(url) { response in
         if let err = response.error {
             DispatchQueue.main.async {
-                callbacks.onMediaReceived()
+                callbacks.onMediaReceived(category: "error")
             }
             print("error: \(err.localizedDescription)")
             return //also notify app of failure as needed
@@ -218,7 +222,7 @@ class MediaManager {
     HTTP.GET("http://doublexpstorage.tech/app-json/dxp_reviews.json") { response in
     if let err = response.error {
         DispatchQueue.main.async {
-            callbacks.onMediaReceived()
+            callbacks.onMediaReceived(category: "error")
         }
         print("error: \(err.localizedDescription)")
         return //also notify app of failure as needed
@@ -266,9 +270,8 @@ class MediaManager {
                 self.reviews.append(contentsOf: self.dxpReviews)
                 self.reviews.append(contentsOf: self.gamespotReviews)
                 
-                cache.setNewsCache(payload: self.news)
                 cache.setReviewsCache(payload: self.reviews)
-                //callbacks.onMediaReceived()
+                callbacks.onMediaReceived(category: "reviews")
             }
                 }
             }

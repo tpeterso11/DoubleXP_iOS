@@ -10,6 +10,10 @@ import UIKit
 import SwiftHTTP
 import ImageLoader
 import SwiftNotificationCenter
+import FBSDKCoreKit
+import GiphyUISDK
+import GiphyCoreSDK
+import moa
 
 typealias Runnable = () -> ()
 
@@ -49,8 +53,9 @@ protocol Profile {
     func goToProfile()
 }
 
-class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateToProfile, SearchCallbacks, LandingMenuCallbacks, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate {
+class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile, SearchCallbacks, LandingMenuCallbacks, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate {
     
+    @IBOutlet weak var gifButton: UIImageView!
     @IBOutlet weak var navigationView: UIView!
     @IBOutlet weak var navContainer: UIView!
     @IBOutlet weak var teamButton: UIImageView!
@@ -81,13 +86,20 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     private var requestsAdded = false
     private var teamFragAdded = false
     private var profileAdded = false
-    private var homeAdded = false
+    private var homeAdded = true
     private var mediaAdded = false
     private var isSecondaryNavShowing = false
     var stackDepth = 0
     var searchShowing = true
     var backButtonShowing = false
     var menuItems = [Any]()
+    var constraint : NSLayoutConstraint?
+    var messagingDeckHeight: CGFloat?
+    
+    var bottomNavHeight = CGFloat()
+    
+    private var giphyKey = "KCFi8XVyX2VzniYepciJJnEPUc8H4Hpk"
+    let giphy = GiphyViewController()
 
     
     override func viewDidLoad() {
@@ -106,6 +118,27 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
         primaryBack.addGestureRecognizer(singleTap2)
         
         stackDepth = appDelegate.navStack.count
+        
+        Giphy.configure(apiKey: giphyKey)
+        giphy.layout = .waterfall
+        giphy.mediaTypeConfig = [.gifs, .emoji]
+        giphy.rating = .ratedPG13
+        giphy.renditionType = .fixedWidth
+        giphy.shouldLocalizeSearch = false
+        giphy.showConfirmationScreen = true
+        GiphyViewController.trayHeightMultiplier = 0.7
+        
+        if (self.traitCollection.userInterfaceStyle == .dark) {
+            giphy.theme = .dark
+        }
+        else{
+            giphy.theme = .light
+        }
+        
+        giphy.delegate = self
+        
+        self.constraint = NSLayoutConstraint(item: self.secondaryNv, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0.0, constant: 0)
+        self.constraint?.isActive = true
         
         menuVie.alpha = 1.0
         menuVie.layer.shadowColor = UIColor.black.cgColor
@@ -127,20 +160,48 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
         bottomNavSearch.delegate = self
         bottomNavSearch.returnKeyType = .done
         
+        logOut.addTarget(self, action: #selector(logout), for: .touchUpInside)
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillDisappear),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
+        
+        let gifTap = UITapGestureRecognizer(target: self, action: #selector(gifClicked))
+        gifButton.isUserInteractionEnabled = true
+        gifButton.addGestureRecognizer(gifTap)
+        
+        //self.view.bringSubviewToFront(self.giphy)
         Broadcaster.register(LandingMenuCallbacks.self, observer: self)
     }
     
     @objc func searchClicked(_ sender: AnyObject?) {
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing Search Clicked"))
         if(!bottomNavSearch.text!.isEmpty){
             Broadcaster.notify(SearchCallbacks.self) {
                 $0.searchSubmitted(searchString: bottomNavSearch.text!)
             }
             
             bottomNavSearch.text = ""
+            self.view!.endEditing(true)
         }
     }
     
+    @objc func gifClicked(_ sender: AnyObject?) {
+        present(giphy, animated: true, completion: nil)
+    }
+    
     @objc func sendMessage(_ sender: AnyObject?) {
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Messaging - Send Message"))
         var count = 0
         if(!bottomNavSearch.text!.isEmpty && count < 1){
             count += 1
@@ -149,38 +210,81 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
             }
             
             bottomNavSearch.text = ""
+            self.view!.endEditing(true)
         }
     }
     
     @objc func backButtonClicked(_ sender: AnyObject?) {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         if(menuVie.viewShowing){
             dismissMenu()
         }
+        else if(appDelegate.currentMediaFrag != nil){
+            if(appDelegate.currentMediaFrag!.articleOpen){
+                appDelegate.currentMediaFrag!.closeOverlay()
+                appDelegate.currentMediaFrag = nil
+            }
+            else if(appDelegate.currentMediaFrag!.channelOpen){
+                appDelegate.currentMediaFrag!.closeChannel()
+                appDelegate.currentMediaFrag = nil
+            }
+            else{
+                var stack = appDelegate.navStack
+                stackDepth -= 1
+                
+                let current = Array(stack)[self.stackDepth].value
+                let key = Array(stack)[self.stackDepth - 1].value
+                
+                if(stack.count > 0 && key != nil){
+                    Broadcaster.notify(NavigateToProfile.self) {
+                        $0.programmaticallyLoad(vc: key, fragName: key.pageName!)
+                        updateNavigation(currentFrag: key)
+                    }
+                    
+                    if(stack.count > 1){
+                        stack.removeValue(forKey: current.pageName!)
+                        appDelegate.navStack = stack
+                    }
+                    
+                    if(stack.count == 1){
+                        restoreBottomNav()
+                    }
+                }
+            }
+        }
         else{
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
             var stack = appDelegate.navStack
             stackDepth -= 1
             
-            if(!stack.isEmpty){
+            let current = Array(stack)[self.stackDepth].value
+            let key = Array(stack)[self.stackDepth - 1].value
+            
+            if(stack.count > 0 && key != nil){
                 Broadcaster.notify(NavigateToProfile.self) {
-                    let vc = stack[self.stackDepth - 1] as! ParentVC
-                    $0.programmaticallyLoad(vc: stack[self.stackDepth - 1] as! ParentVC, fragName: vc.pageName!)
+                    $0.programmaticallyLoad(vc: key, fragName: key.pageName!)
                 }
                 
                 if(stack.count > 1){
-                    stack.removeLast()
+                    stack.removeValue(forKey: current.pageName!)
+                    appDelegate.navStack = stack
                 }
                 
                 if(stack.count == 1){
                     restoreBottomNav()
                 }
             }
-            
-            appDelegate.navStack = stack
+            else{
+                Broadcaster.notify(NavigateToProfile.self) {
+                    $0.navigateToHome()
+                }
+            }
         }
     }
     
     func navigateToProfile(uid: String){
+        restoreBottomTabs()
+        
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Profile"))
         stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToProfile(uid: uid)
@@ -188,6 +292,7 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     }
     
     func navigateToRequests(){
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Requests"))
         stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToRequests()
@@ -195,19 +300,27 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     }
     
     func navigateToHome(){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.navStack = KeepOrderDictionary<String, ParentVC>()
+        
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To GamerConnect"))
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToHome()
         }
     }
     
     func navigateToTeams() {
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Teams"))
         stackDepth += 1
-       Broadcaster.notify(NavigateToProfile.self) {
-           $0.navigateToTeams()
-       }
+        Broadcaster.notify(NavigateToProfile.self) {
+            $0.navigateToTeams()
+        }
     }
     
     func navigateToSearch(game: GamerConnectGame){
+        restoreBottomTabs()
+        
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Search"))
         stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToSearch(game: game)
@@ -215,6 +328,9 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     }
     
     @objc func navigateToCurrentUserProfile() {
+        restoreBottomTabs()
+        
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Current User Profile"))
         stackDepth += 1
         
         let top = CGAffineTransform(translationX: -249, y: 0)
@@ -237,6 +353,9 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     }
     
     func navigateToCreateFrag() {
+        restoreBottomTabs()
+        
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Create Team"))
         stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToCreateFrag()
@@ -244,6 +363,9 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     }
     
     func navigateToTeamDashboard(team: TeamObject, newTeam: Bool) {
+        restoreBottomTabs()
+        
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Dashboard"))
         stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToTeamDashboard(team: team, newTeam: newTeam)
@@ -251,6 +373,7 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     }
     
     func navigateToTeamNeeds(team: TeamObject) {
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Needs"))
         stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToTeamNeeds(team: team)
@@ -258,6 +381,7 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     }
     
     func navigateToTeamBuild(team: TeamObject) {
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Build"))
         stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToTeamBuild(team: team)
@@ -265,6 +389,7 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     }
     
     func navigateToMedia() {
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Media"))
         stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToMedia()
@@ -272,6 +397,7 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     }
     
     func navigateToTeamFreeAgentSearch(team: TeamObject){
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Search"))
         stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToTeamFreeAgentSearch(team: team)
@@ -279,6 +405,7 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     }
     
     func navigateToTeamFreeAgentResults(team: TeamObject){
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Results"))
         stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToTeamFreeAgentResults(team: team)
@@ -286,6 +413,9 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     }
     
     func navigateToTeamFreeAgentDash(){
+        restoreBottomTabs()
+        
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Dash"))
         stackDepth += 1
        Broadcaster.notify(NavigateToProfile.self) {
            $0.navigateToTeamFreeAgentDash()
@@ -293,6 +423,7 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     }
     
     func navigateToTeamFreeAgentFront(){
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Quiz Front"))
         stackDepth += 1
        Broadcaster.notify(NavigateToProfile.self) {
            $0.navigateToTeamFreeAgentFront()
@@ -300,6 +431,7 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     }
     
     func navigateToFreeAgentQuiz(user: User!, team: TeamObject?, game: GamerConnectGame!) {
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Quiz - " + game.gameName))
         stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToFreeAgentQuiz(team: team, gcGame: game, currentUser: user)
@@ -307,6 +439,7 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     }
     
     func navigateToFreeAgentQuiz(team: TeamObject?, gcGame: GamerConnectGame, currentUser: User){
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Quiz - " + (team?.teamName ?? "")))
         stackDepth += 1
           Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToFreeAgentQuiz(team: team, gcGame: gcGame, currentUser: currentUser)
@@ -314,6 +447,16 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     }
     
     func navigateToMessaging(groupChannelUrl: String?, otherUserId: String?){
+        self.bottomNavHeight = self.bottomNav.bounds.height + 60
+        restoreBottomTabs()
+        
+        if(groupChannelUrl != nil){
+            AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Messaging Team"))
+        }
+        else{
+            AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Messaging User"))
+        }
+    
         stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
           $0.navigateToMessaging(groupChannelUrl: groupChannelUrl, otherUserId: otherUserId)
@@ -321,6 +464,10 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     }
     
     func menuNavigateToMessaging(uId: String) {
+        self.bottomNavHeight = self.bottomNav.bounds.height + 60
+        restoreBottomTabs()
+        
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing Menu - Messaging User"))
         menuVie.viewShowing = false
         
         let top = CGAffineTransform(translationX: -249, y: 0)
@@ -330,19 +477,16 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
             UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
                 self.blur.alpha = 0.0
             }, completion: { (finished: Bool) in
-                UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
-                    self.restoreBottomNav()
-                }, completion: { (finished: Bool) in
                     self.stackDepth += 1
                     Broadcaster.notify(NavigateToProfile.self) {
                       $0.navigateToMessaging(groupChannelUrl: nil, otherUserId: uId)
-                    }
-                })
+                }
             })
         })
     }
     
     func menuNavigateToProfile(uId: String){
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing Menu - Friend Profile"))
         menuVie.viewShowing = false
         self.restoreBottomNav()
         
@@ -364,6 +508,9 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     }
     
     func navigateToViewTeams(){
+        restoreBottomTabs()
+        
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - View Teams"))
         stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
           $0.navigateToViewTeams()
@@ -416,20 +563,56 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
         }
     }
     
+    
     func removeBottomNav(showNewNav: Bool, hideSearch: Bool, searchHint: String?, searchButtonText: String?, isMessaging: Bool){
         if(showNewNav){
-            //remove nav icons
-            mainNavView.slideOutBottom()
-            
-            if(!bottomNavSearch.isHidden && hideSearch){
-                bottomNavSearch.slideOutBottom()
-                searchButton.slideOutBottom()
+            //show bottom nav WITH textfield. (Messaging Uses this first method)
+            if(!bottomNavSearch.isHidden && !hideSearch){
+                bottomNavSearch.isHidden = false
                 
-                searchShowing = false
+                if(searchButtonText != nil){
+                    searchButton.setTitle(searchButtonText, for: .normal)
+                }
+                
+                if(searchHint != nil){
+                    bottomNavSearch.attributedPlaceholder = NSAttributedString(string: searchHint!,
+                                                                               attributes: [NSAttributedString.Key.foregroundColor: UIColor(named:"dark") ?? UIColor.darkGray])
+                }
+                else{
+                    bottomNavSearch.attributedPlaceholder = NSAttributedString(string: "Search",
+                    attributes: [NSAttributedString.Key.foregroundColor: UIColor(named:"dark")  ?? UIColor.darkGray])
+                }
+                
+                if(isMessaging){
+                    searchButton.addTarget(self, action: #selector(sendMessage), for: .touchUpInside)
+                    self.gifButton.isHidden = false
+                }
+                else{
+                    searchButton.addTarget(self, action: #selector(searchClicked), for: .touchUpInside)
+                    self.gifButton.isHidden = true
+                }
+                
+                if(!backButtonShowing && !hideSearch){
+                    primaryBack.slideInBottomSmall()
+                    backButtonShowing = true
+                }
+                
+                UIView.animate(withDuration: 0.3, delay: 0.2, options: [], animations: {
+                    self.constraint?.constant = self.bottomNav.bounds.height + 60
+                    
+                    UIView.animate(withDuration: 0.5) {
+                        //self.articleOverlay.alpha = 1
+                        //self.view.bringSubviewToFront(self.secondaryNv)
+                        self.view.layoutIfNeeded()
+                        
+                        self.isSecondaryNavShowing = true
+                    }
+                
+                }, completion: nil)
             }
-            else{
+            /*else{
                 //search is not showing and we want to show it
-                if(!searchShowing && hideSearch == false){
+                if(bottomNavSearch.isHidden && hideSearch == false){
                     bottomNavSearch.isHidden = false
                     bottomNavSearch.slideInBottomReset()
                     
@@ -445,11 +628,9 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
                     else{
                         searchButton.addTarget(self, action: #selector(searchClicked), for: .touchUpInside)
                     }
-                    
-                    searchShowing = true
                 }
                 //if search is already showing
-                else if(searchShowing && hideSearch == false){
+                else if(!bottomNavSearch.isHidden && hideSearch == false){
                     if(searchButtonText != nil){
                         searchButton.setTitle(searchButtonText, for: .normal)
                     }
@@ -461,8 +642,6 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
                     else{
                         searchButton.addTarget(self, action: #selector(searchClicked), for: .touchUpInside)
                     }
-                    
-                    searchShowing = true
                 }
                 else{
                     bottomNavSearch.isHidden = hideSearch
@@ -477,30 +656,27 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
                 bottomNavSearch.placeholder = "Search"
             }
             
-            if(!backButtonShowing){
-                secondaryNv.slideInBottom()
-                secondaryNv.isHidden = false
-            }
+            //if(!backButtonShowing){
+            //    secondaryNv.slideInBottom()
+            //    secondaryNv.isHidden = false
+            //}
             
-            isSecondaryNavShowing = true
+            isSecondaryNavShowing = true*/
         }
-        else if(isSecondaryNavShowing && hideSearch){
+        else if(isSecondaryNavShowing){
             if(isSecondaryNavShowing){
-                secondaryNv.slideOutBottomSecond()
+                UIView.animate(withDuration: 0.3, delay: 0.2, options: [], animations: {
+                    self.constraint?.constant = 0
+                    
+                    UIView.animate(withDuration: 0.5) {
+                        //self.articleOverlay.alpha = 1
+                        //self.view.bringSubviewToFront(self.secondaryNv)
+                        self.view.layoutIfNeeded()
+                        
+                        self.isSecondaryNavShowing = false
+                    }
                 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    self.mainNavView.slideInBottomNav()
-                }
-            }
-            
-            if(hideSearch && searchShowing){
-                bottomNavSearch.slideOutBottom()
-                searchButton.slideOutBottom()
-            }
-            
-            searchShowing = false
-            if(!backButtonShowing){
-                primaryBack.slideInBottomSmall()
+                }, completion: nil)
             }
         }
         else{
@@ -509,32 +685,43 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
             }
             isSecondaryNavShowing = false
             
-            if(hideSearch && searchShowing){
-                bottomNavSearch.slideOutBottom()
-                searchButton.slideOutBottom()
-            }
-            else if(!hideSearch && !searchShowing){
-                bottomNavSearch.isHidden = false
-                searchButton.isHidden = false
+            //if(hideSearch && searchShowing){
+            //    bottomNavSearch.slideOutBottom()
+            //    searchButton.slideOutBottom()
+            //}
+            //else if(!hideSearch && !searchShowing){
+            //    bottomNavSearch.isHidden = false
+            //    searchButton.isHidden = false
                 
-                searchShowing = true
-            }
+            //    searchShowing = true
+            //}
             
             if(!mainNavShowing){
                 mainNavView.slideInBottomNav()
+                mainNavShowing = true
             }
             
             if(!backButtonShowing){
                 primaryBack.slideInBottomSmall()
+                backButtonShowing = true
             }
         }
     }
     
     func restoreBottomNav(){
         if(isSecondaryNavShowing == true){
-            secondaryNv.slideOutBottomSecond()
-            primaryBack.slideOutBottomSmall()
-            mainNavView.slideInBottomNav()
+            UIView.animate(withDuration: 0.3, delay: 0.2, options: [], animations: {
+                self.constraint?.constant = 0
+                
+                UIView.animate(withDuration: 0.5) {
+                    //self.articleOverlay.alpha = 1
+                    //self.view.bringSubviewToFront(self.secondaryNv)
+                    self.view.layoutIfNeeded()
+                    
+                    self.isSecondaryNavShowing = false
+                }
+            
+            }, completion: nil)
         }
         else{
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -572,9 +759,8 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     }
     
     @objc func homeButtonClicked(_ sender: AnyObject?) {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
-        if(appDelegate.currentFrag != "Home" && !homeAdded){
+        if(!homeAdded){
             navigateToHome()
             homeAdded = true
             requestsAdded = false
@@ -587,9 +773,8 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     }
     
     @objc func mediaButtonClicked(_ sender: AnyObject?) {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
-        if(appDelegate.currentFrag != "Media" && !mediaAdded){
+        if(!mediaAdded){
             navigateToMedia()
             homeAdded = false
             requestsAdded = false
@@ -602,9 +787,8 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     }
     
     @objc func teamButtonClicked(_ sender: AnyObject?) {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
-        if(appDelegate.currentFrag != "Team" && !teamFragAdded){
+        if(!teamFragAdded){
             navigateToTeams()
             teamFragAdded = true
             homeAdded = false
@@ -617,9 +801,8 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     }
     
     @objc func requestButtonClicked(_ sender: AnyObject?) {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
-        if(appDelegate.currentFrag != "Requests" && !requestsAdded){
+        if(!requestsAdded){
             navigateToRequests()
             requestsAdded = true
             homeAdded = false
@@ -672,7 +855,6 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     }
     
     @objc func dismissMenu(){
-        self.restoreBottomNav()
         menuVie.viewShowing = false
         
         let top = CGAffineTransform(translationX: -249, y: 0)
@@ -731,11 +913,73 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
             UIView.commitAnimations()
     }
     
+    @objc func keyboardWillShow(_ notification: Notification) {
+        if(isSecondaryNavShowing){
+            if let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+                let keyboardRectangle = keyboardFrame.cgRectValue
+                let keyboardHeight = keyboardRectangle.height
+                
+                extendBottom(height: keyboardHeight)
+            }
+        }
+    }
+    
+    @objc func keyboardWillDisappear() {
+        if(isSecondaryNavShowing){
+            if(self.messagingDeckHeight != nil){
+                restoreBottom(height: self.messagingDeckHeight!)
+            }
+        }
+    }
+    
+    func extendBottom(height: CGFloat){
+        let top = CGAffineTransform(translationX: 0, y: 50)
+        UIView.animate(withDuration: 0.3, animations: {
+            self.searchButton.alpha = 1
+            self.bottomNavSearch.transform = top
+            
+            self.messagingDeckHeight = height + 120
+            self.constraint?.constant = self.messagingDeckHeight!
+            
+            UIView.animate(withDuration: 0.5) {
+                //self.articleOverlay.alpha = 1
+                //self.view.bringSubviewToFront(self.secondaryNv)
+                self.view.layoutIfNeeded()
+            }
+        
+        }, completion: nil)
+    }
+    
+    func restoreBottom(height: CGFloat){
+        let top = CGAffineTransform(translationX: 0, y: 0)
+        UIView.animate(withDuration: 0.3, animations: {
+            self.searchButton.alpha = 0
+            self.bottomNavSearch.transform = top
+            self.constraint?.constant = self.bottomNav.bounds.height + 60
+            
+            UIView.animate(withDuration: 0.5) {
+                //self.articleOverlay.alpha = 1
+                //self.view.sendSubviewToBack(self.secondaryNv)
+                self.view.layoutIfNeeded()
+            }
+        
+        }, completion: nil)
+    }
+    
+    private func restoreBottomTabs(){
+        requestsAdded = false
+        homeAdded = false
+        teamFragAdded = false
+        profileAdded = false
+        mediaAdded = false
+    }
+    
     func settingsProfileClicked(){
         
     }
     
     func navigateToMessagingFromMenu(uId: String){
+        self.bottomNavHeight = self.bottomNav.bounds.height + 60
         navigateToMessaging(groupChannelUrl: nil, otherUserId: uId)
     }
     
@@ -809,5 +1053,29 @@ class LandingActivity: UIViewController, EMPageViewControllerDelegate, NavigateT
     func programmaticallyLoad(vc: ParentVC, fragName: String) {
     }
     
+    @objc func logout(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.currentUser = nil
+        
+        UserDefaults.standard.removeObject(forKey: "userId")
+        
+        self.performSegue(withIdentifier: "logout", sender: nil)
+    }
+    
 }
 
+extension LandingActivity: GiphyDelegate {
+   func didSelectMedia(giphyViewController: GiphyViewController, media: GPHMedia)   {
+   
+        // your user tapped a GIF!
+        giphyViewController.dismiss(animated: true, completion: nil)
+        
+        Broadcaster.notify(SearchCallbacks.self) {
+            $0.messageTextSubmitted(string: "DXPGif" + media.url(rendition: .downsizedLarge, fileType: .gif)!, list: nil)
+        }
+   }
+   
+   func didDismiss(controller: GiphyViewController?) {
+        // your user dismissed the controller without selecting a GIF.
+   }
+}

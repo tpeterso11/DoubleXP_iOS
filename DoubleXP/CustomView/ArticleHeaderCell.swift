@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class ArticleHeaderCell: UICollectionViewCell{
+class ArticleHeaderCell: UITableViewCell{
     @IBOutlet weak var authorBadge: UIImageView!
     @IBOutlet weak var sourceImage: UIImageView!
     @IBOutlet weak var articleTitle: UILabel!

@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import UIKit
 
 class GamerConnectGame: NSObject, NSCoding {
     var _imageUrl:String? = nil
@@ -70,6 +71,16 @@ class GamerConnectGame: NSObject, NSCoding {
         }
     }
     
+    var _gameModes:[String]? = nil
+    var gameModes:[String] {
+        get {
+            return (_gameModes)!
+        }
+        set (newVal) {
+            _gameModes = newVal
+        }
+    }
+    
     var _secondaryName:String? = nil
     var secondaryName:String {
         get {
@@ -77,6 +88,16 @@ class GamerConnectGame: NSObject, NSCoding {
         }
         set (newVal) {
             _secondaryName = newVal
+        }
+    }
+    
+    var _cachedImage: UIImage? = nil
+    var cachedImage: UIImage {
+        get {
+            return (_cachedImage) ?? UIImage()
+        }
+        set (newVal) {
+            _cachedImage = newVal
         }
     }
     
@@ -101,6 +122,7 @@ class GamerConnectGame: NSObject, NSCoding {
         self.statsAvailable = (decoder.decodeObject(forKey: "statsAvailable") as! Bool)
         self.teamNeeds = (decoder.decodeObject(forKey: "teamNeeds") as! [String])
         self.secondaryName = (decoder.decodeObject(forKey: "secondaryName") as! String)
+        self.gameModes = (decoder.decodeObject(forKey: "gameModes") as! [String])
     }
     
     func encode(with coder: NSCoder) {
@@ -111,5 +133,6 @@ class GamerConnectGame: NSObject, NSCoding {
         coder.encode(self.statsAvailable, forKey: "statsAvailable")
         coder.encode(self.teamNeeds, forKey: "teamNeeds")
         coder.encode(self.secondaryName, forKey: "secondaryName")
+        coder.encode(self.gameModes, forKey: "gameModes")
     }
 }

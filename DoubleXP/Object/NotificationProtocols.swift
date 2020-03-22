@@ -126,7 +126,7 @@ protocol LandingMenuCallbacks: class{
 
 protocol MediaCallbacks: class{
     func onReviewsReceived(payload: [NewsObject])
-    func onMediaReceived()
+    func onMediaReceived(category: String)
     
     func onVideoLoaded(url: String)
 }

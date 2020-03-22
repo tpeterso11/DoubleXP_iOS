@@ -12,6 +12,7 @@ import ImageLoader
 import moa
 import MSPeekCollectionViewDelegateImplementation
 import Bartinter
+import FBSDKCoreKit
 
 class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, MSPeekImplementationDelegate {
     @IBOutlet weak var gcGameScroll: UICollectionView!
@@ -39,11 +40,8 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         gcGames = appDelegate.gcGames
         
-        if(!appDelegate.navStack.contains(self)){
-            appDelegate.navStack.append(self)
-        }
-        
         self.pageName = "Home"
+        appDelegate.addToNavStack(vc: self)
         
         self.updatesStatusBarAppearanceAutomatically = true
         
@@ -96,13 +94,16 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
             if(indexPath.item == 0){
                 cell.gamerTag.text = "allthesaints011"
                 cell.xBox.isHidden = true
+                AppEvents.logEvent(AppEvents.Name(rawValue: "GC-Connect Toussaint Click"))
             }
             if(indexPath.item == 1){
                 cell.gamerTag.text = "fitboy_"
                 cell.xBox.isHidden = true
+                AppEvents.logEvent(AppEvents.Name(rawValue: "GC-Connect Hodges Click"))
             }
             if(indexPath.item == 2){
                 cell.gamerTag.text = "Kwatakye Raven"
+                AppEvents.logEvent(AppEvents.Name(rawValue: "GC-Connect Mike Click"))
             }
             
             
@@ -127,6 +128,7 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
             cell.backgroundImage.clipsToBounds = true
             
             cell.hook.text = game.hook
+            AppEvents.logEvent(AppEvents.Name(rawValue: "GC-Connect " + game.gameName + " Click"))
             
             cell.contentView.layer.cornerRadius = 2.0
             cell.contentView.layer.borderWidth = 1.0

@@ -14,7 +14,7 @@ import TwitterKit
 import SwiftTwitch
 import Marshal
 
-class PreSplashActivity: UIViewController, MediaCallbacks {
+class PreSplashActivity: UIViewController {
     private var data: [NewsObject]!
     private var games: [GamerConnectGame]!
     
@@ -28,51 +28,15 @@ class PreSplashActivity: UIViewController, MediaCallbacks {
         games = [GamerConnectGame]()
         // Do any additional setup after loading the view, typically from a nib.
         
+        //let social = SocialMediaManager()
+        //social.getTopStreams()
         //getTwitchToken()
         getAppConfig()
         //testLoadTwitter()
     }
     
-    func getTwitchToken(){
-        let params = ["client_id": Constants.id, "client_secret": Constants.secret, "grant_type":"client_credentials"]
-            HTTP.POST("https://id.twitch.tv/oauth2/token?", parameters: params) { response in
-                if let err = response.error {
-                    print("error: \(err.localizedDescription)")
-                    return //also notify app of failure as needed
-                }
-                else{
-                    if let jsonObj = try! JSONSerialization.jsonObject(with: response.data, options: JSONSerialization.ReadingOptions()) as? [String: Any] {
-                        
-                        TwitchTokenManager.shared.accessToken = (jsonObj["access_token"] as? String ?? "")
-                        let test =
-                            TwitchTokenManager.shared.accessToken
-                        
-                        Twitch.Streams.getStreams(completionHandler: { result in
-                           switch (result) {
-                            case .success(let result):
-                                result.streamData
-                                print("")
-                               //self.videos = getVideosData.videoData
-                           case .failure(let data, _, _):
-                            //let desc = String(data!.description)
-                                print("The API call failed! Unable to get videos. Did you set an access token?")
-                            }
-                        })
-                            
-                            /*switch(result){
-                            case .success(GetStreamsData.init(object: )):
-                                break
-                            case .failure(nil, nil, nil):
-                                break
-                            }*/
-                        }
-                        
-                }
-        }
-    }
-    
     func getAppConfig(){
-        HTTP.GET("http://doublexpstorage.tech/app-json/appconfig.json") { response in
+        HTTP.GET("http://doublexpstorage.tech/app-json/tes.json") { response in
             if let err = response.error {
                 print("error: \(err.localizedDescription)")
                 return //also notify app of failure as needed
@@ -81,6 +45,7 @@ class PreSplashActivity: UIViewController, MediaCallbacks {
                 if let jsonObj = try! JSONSerialization.jsonObject(with: response.data, options: JSONSerialization.ReadingOptions()) as? [[String: Any]] {
                     
                     let appProps = NSMutableDictionary()
+                    var games = [TwitchChannelObj]()
                     for item in jsonObj {
                         var name = ""
                         var newValue = ""
@@ -88,6 +53,33 @@ class PreSplashActivity: UIViewController, MediaCallbacks {
                             for (key, value) in configDict {
                                 if(key == "name"){
                                     name = (value as? String)!
+                                }
+                                else if(key == "games"){
+                                    if let gamesDict = value as? [[String: String]]{
+                                        for game in gamesDict{
+                                            let gameName = game["name"]
+                                            let developer = game["developer"]
+                                            let developerLight = game["developerLogoLight"]
+                                            let developerDark = game["developerLogoDark"]
+                                            let description = game["gameDescription"]
+                                            let imageUrlIOS = game["imageUrlIOS"]
+                                            let twitchId = game["twitch_id"]
+                                            let isGCGame = game["isGCGame"]
+                                            let gcGameName = game["gcGameName"]
+                                            
+                                            let channel = TwitchChannelObj(gameName: gameName ?? "", imageUrIOS: imageUrlIOS ?? "", twitchID: twitchId ?? "")
+                                            channel.developer = developer ?? ""
+                                            channel.developerLogoDarkUrl = developerDark ?? ""
+                                            channel.developerLogoLightUrl = developerLight ?? ""
+                                            channel.gameDescription = description ?? ""
+                                            channel.gcGameName = gcGameName ?? ""
+                                            channel.isGCGame = isGCGame ?? ""
+                                            
+                                            games.append(channel)
+                                        }
+                                        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                                        appDelegate.twitchChannels = games
+                                    }
                                 }
                                 else{
                                     appProps.setValue(value, forKeyPath: name)
@@ -107,7 +99,7 @@ class PreSplashActivity: UIViewController, MediaCallbacks {
     }
     
     func loadGCGames(){
-        HTTP.GET("https://firebasestorage.googleapis.com/v0/b/gameterminal-767f7.appspot.com/o/config%2FgcGames.json?alt=media&token=c0985b72-c141-499d-ac49-8ea8db3adaa0") { response in
+        HTTP.GET("http://doublexpstorage.tech/app-json/gcGames.json") { response in
             if let err = response.error {
                 print("error: \(err.localizedDescription)")
                 return //also notify app of failure as needed
@@ -122,6 +114,7 @@ class PreSplashActivity: UIViewController, MediaCallbacks {
                             var imageUrl = ""
                             var developer = ""
                             var secondaryName = ""
+                            var gameModes = [String]()
                             var statsAvailable = false
                             var teamNeeds = [String]()
                             if let gameDict = game as? NSDictionary {
@@ -132,19 +125,17 @@ class PreSplashActivity: UIViewController, MediaCallbacks {
                                 statsAvailable = (gameDict.value(forKey: "statsAvailable") as? Bool)!
                                 teamNeeds = (gameDict.value(forKey: "teamNeeds") as? [String]) ?? [String]()
                                 secondaryName = (gameDict.value(forKey: "secondaryName") as? String ?? "")
+                                gameModes = (gameDict).value(forKey: "gameModes") as? [String] ?? [String]()
                                 
                                 let newGame  = GamerConnectGame(imageUrl: imageUrl, gameName: gameName, developer: developer, hook: hook, statsAvailable: statsAvailable, teamNeeds: teamNeeds)
                                 newGame.secondaryName = secondaryName
+                                newGame.gameModes = gameModes
                                 self.games.append(newGame)
                                 }
                             }
                         }
                     }
                 }
-            
-                let delegate = UIApplication.shared.delegate as! AppDelegate
-                let manager = delegate.mediaManager
-                manager.getReviews(callbacks: self)
             
                 DispatchQueue.main.async {
                     let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -618,34 +609,6 @@ class PreSplashActivity: UIViewController, MediaCallbacks {
                 
             }) { (error) in
                 print(error.localizedDescription)
-            }
-        }
-    }
-    
-    func onReviewsReceived(payload: [NewsObject]) {
-    }
-    
-    func onVideoLoaded(url: String) {
-        
-    }
-    
-    func onMediaReceived(){
-        DispatchQueue.main.async {
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-            delegate.gcGames = self.games
-            
-            let uId = UserDefaults.standard.string(forKey: "userId")
-            if(uId != nil){
-                if(!uId!.isEmpty){
-                    self.downloadDBRef(uid: uId!)
-                    //self.performSegue(withIdentifier: "newLogin", sender: nil)
-                }
-                else{
-                    self.performSegue(withIdentifier: "newLogin", sender: nil)
-                }
-            }
-            else{
-                self.performSegue(withIdentifier: "newLogin", sender: nil)
             }
         }
     }

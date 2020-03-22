@@ -107,9 +107,7 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
     
         delegate.currentLanding?.updateNavigation(currentFrag: self)
         self.pageName = "Team Dashboard"
-        if(!delegate.navStack.contains(self)){
-            delegate.navStack.append(self)
-        }
+        delegate.addToNavStack(vc: self)
     
         teamLabel.text = team?.teamName
         
@@ -348,7 +346,7 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
             }
         }
         else{
-            return CGSize(width: collectionView.bounds.width - 10, height: CGFloat(50))
+            return CGSize(width: collectionView.bounds.width, height: CGFloat(50))
         }
     }
     

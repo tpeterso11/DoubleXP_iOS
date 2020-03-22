@@ -12,6 +12,7 @@ import ImageLoader
 import moa
 import SwiftHTTP
 import SwiftNotificationCenter
+import FBSDKCoreKit
 
 class FAQuizConsoles: UIViewController{
     @IBOutlet weak var ps4Switch: UISwitch!
@@ -45,6 +46,21 @@ class FAQuizConsoles: UIViewController{
             return
         }
         
+        var chosenConsole = ""
+        if(ps4Switch.isOn){
+            chosenConsole = "ps"
+        }
+        if(xboxSwitch.isOn){
+            chosenConsole = "xbox"
+        }
+        if(pcSwitch.isOn){
+            chosenConsole = "pc"
+        }
+        if(nintendoSwitch.isOn){
+            chosenConsole = "nintendo"
+        }
+        
+        AppEvents.logEvent(AppEvents.Name(rawValue: "FA Quiz - Console Chosen - " + chosenConsole))
         interviewManager?.setConsoles(console: selectedConsole)
     }
     

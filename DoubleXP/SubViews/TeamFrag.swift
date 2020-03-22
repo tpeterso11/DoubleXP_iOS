@@ -52,10 +52,8 @@ class TeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.currentLanding?.updateNavigation(currentFrag: self)
         
-        if(!appDelegate.navStack.contains(self)){
-            appDelegate.navStack.append(self)
-        }
         self.pageName = "Team"
+        appDelegate.addToNavStack(vc: self)
         
         populateList()
     }

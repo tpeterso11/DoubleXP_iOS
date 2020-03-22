@@ -10,6 +10,7 @@ import UIKit
 import Firebase
 import ImageLoader
 import UnderLineTextField
+import FBSDKCoreKit
 
 class LoginController: UIViewController {
     private var data: [NewsObject]!
@@ -30,6 +31,8 @@ class LoginController: UIViewController {
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(registerClicked))
         registerText.isUserInteractionEnabled = true
         registerText.addGestureRecognizer(singleTap)
+        
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Login"))
     }
     
     @objc func loginButtonClicked(_ sender: AnyObject?) {
@@ -325,10 +328,13 @@ class LoginController: UIViewController {
                 let delegate = UIApplication.shared.delegate as! AppDelegate
                 delegate.currentUser = user
                 
+                AppEvents.logEvent(AppEvents.Name(rawValue: "Successful Login"))
+                
                 self.performSegue(withIdentifier: "loginSuccessful", sender: nil)
             }
             
             }) { (error) in
+                AppEvents.logEvent(AppEvents.Name(rawValue: "Login Error"))
                 print(error.localizedDescription)
         }
     }

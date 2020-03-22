@@ -2,9 +2,15 @@ PODS:
   - AIFlatSwitch (1.0.7)
   - Bartinter (0.0.5)
   - CollapsibleTableSectionViewController (1.0.1)
+  - DeepDiff (2.3.1)
   - DynamicBlurView (3.0.1)
   - EMPageViewController (3.0.0)
   - ExpyTableView (1.1)
+  - FBSDKCoreKit/Basics (6.2.0)
+  - FBSDKCoreKit/Core (6.2.0):
+    - FBSDKCoreKit/Basics
+  - FBSDKCoreKit/Swift (6.2.0):
+    - FBSDKCoreKit/Core
   - Firebase/Analytics (6.13.0):
     - Firebase/Core
   - Firebase/Auth (6.13.0):
@@ -68,6 +74,10 @@ PODS:
     - GoogleUtilities/UserDefaults (~> 6.2)
     - Protobuf (>= 3.9.2, ~> 3.9)
   - FoldingCell (5.0.2)
+  - Giphy (1.2.2):
+    - DeepDiff
+    - libwebp
+    - PINCache
   - GoogleAppMeasurement (6.1.6):
     - GoogleUtilities/AppDelegateSwizzler (~> 6.0)
     - GoogleUtilities/MethodSwizzler (~> 6.0)
@@ -101,6 +111,15 @@ PODS:
   - ImageLoader (0.14.0)
   - InputBarAccessoryView (4.2.2)
   - leveldb-library (1.22)
+  - libwebp (1.1.0):
+    - libwebp/demux (= 1.1.0)
+    - libwebp/mux (= 1.1.0)
+    - libwebp/webp (= 1.1.0)
+  - libwebp/demux (1.1.0):
+    - libwebp/webp
+  - libwebp/mux (1.1.0):
+    - libwebp/demux
+  - libwebp/webp (1.1.0)
   - lottie-ios (3.1.5)
   - Marshal (1.2.7)
   - MessageKit (3.0.0):
@@ -137,11 +156,15 @@ PODS:
   - SwiftRichString (3.7.1)
   - SwiftTwitch (0.1.0):
     - Marshal (~> 1.2.7)
+  - SwiftyGif (5.2.0)
   - TwitchPlayer (0.2.3)
   - TwitterCore (3.2.0)
   - TwitterKit (3.4.2):
     - TwitterCore (>= 3.2.0)
   - UnderLineTextField (2.1.0)
+  - ValidationComponents (0.3.0):
+    - ValidationToolkit (~> 0.4.1)
+  - ValidationToolkit (0.4.1)
 
 DEPENDENCIES:
   - AIFlatSwitch
@@ -149,11 +172,13 @@ DEPENDENCIES:
   - CollapsibleTableSectionViewController (~> 1.0.0)
   - EMPageViewController
   - ExpyTableView
+  - FBSDKCoreKit/Swift
   - Firebase/Analytics
   - Firebase/Auth
   - Firebase/Database
   - Firebase/Messaging
   - FoldingCell
+  - Giphy
   - Hero
   - ImageLoader (~> 0.14)
   - lottie-ios
@@ -168,18 +193,22 @@ DEPENDENCIES:
   - SwiftNotificationCenter
   - SwiftRichString
   - SwiftTwitch
+  - SwiftyGif
   - TwitchPlayer
   - TwitterKit
   - UnderLineTextField (~> 2.1)
+  - ValidationComponents
 
 SPEC REPOS:
   trunk:
     - AIFlatSwitch
     - Bartinter
     - CollapsibleTableSectionViewController
+    - DeepDiff
     - DynamicBlurView
     - EMPageViewController
     - ExpyTableView
+    - FBSDKCoreKit
     - Firebase
     - FirebaseAnalytics
     - FirebaseAnalyticsInterop
@@ -192,6 +221,7 @@ SPEC REPOS:
     - FirebaseInstanceID
     - FirebaseMessaging
     - FoldingCell
+    - Giphy
     - GoogleAppMeasurement
     - GoogleDataTransport
     - GoogleDataTransportCCTSupport
@@ -201,6 +231,7 @@ SPEC REPOS:
     - ImageLoader
     - InputBarAccessoryView
     - leveldb-library
+    - libwebp
     - lottie-ios
     - Marshal
     - MessageKit
@@ -218,18 +249,23 @@ SPEC REPOS:
     - SwiftNotificationCenter
     - SwiftRichString
     - SwiftTwitch
+    - SwiftyGif
     - TwitchPlayer
     - TwitterCore
     - TwitterKit
     - UnderLineTextField
+    - ValidationComponents
+    - ValidationToolkit
 
 SPEC CHECKSUMS:
   AIFlatSwitch: fd56a5e6ab8769f0b52cef815c4f071e83050352
   Bartinter: 3c1fc3bcb631b066fdd78f7e01f1635fbafffdea
   CollapsibleTableSectionViewController: c41694de812a1039c5f8581c934cf0fc38e4e871
+  DeepDiff: e5ae6c50d0321568e4508cec5930b9f10bb293fc
   DynamicBlurView: b1df5415f9bd31897549e5d7077e5ec120a4d636
   EMPageViewController: 8e0abc2b2f53f56a83044527eadbb56bd71ae3e3
   ExpyTableView: 52dde6e141056544c0b8e7b083a840c37ddb6132
+  FBSDKCoreKit: a7bb9f5ac56c1e11d5f8ae0b90a3610f8744b43a
   Firebase: 458d109512200d1aca2e1b9b6cf7d68a869a4a46
   FirebaseAnalytics: 45f36d9c429fc91d206283900ab75390cd05ee8a
   FirebaseAnalyticsInterop: 3f86269c38ae41f47afeb43ebf32a001f58fcdae
@@ -242,6 +278,7 @@ SPEC CHECKSUMS:
   FirebaseInstanceID: ebd2ea79ee38db0cb5f5167b17a0d387e1cc7b6e
   FirebaseMessaging: 089b7a4991425783384acc8bcefcd78c0af913bd
   FoldingCell: f92eb5fb9842319e7cd08c71533c98408b785099
+  Giphy: 0fd5898a9100716fa031e342ec919aca876fb3f3
   GoogleAppMeasurement: dfe55efa543e899d906309eaaac6ca26d249862f
   GoogleDataTransport: 8e9b210c97d55fbff306cc5468ff91b9cb32dcf5
   GoogleDataTransportCCTSupport: ef79a4728b864946a8aafdbab770d5294faf3b5f
@@ -251,6 +288,7 @@ SPEC CHECKSUMS:
   ImageLoader: 56f57e35d6ed26a74183dc2e472133b4b22eb7b9
   InputBarAccessoryView: 2b937602598e2fab3149f37f51dd7ad795653812
   leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
+  libwebp: 946cb3063cea9236285f7e9a8505d806d30e07f3
   lottie-ios: 32bf84389337d86fbc8b12266e88452e0abf1dee
   Marshal: ef480864a6af10a63f67be7e55bb5d8fe67a16d9
   MessageKit: e892a9ca49ebe6d82684d3a93ad84021fa23e2c6
@@ -268,11 +306,14 @@ SPEC CHECKSUMS:
   SwiftNotificationCenter: 760386da2ce03d3594cb5e96d1e22ec80b44b46f
   SwiftRichString: 9a6a70b4fe2cf428e38348b5ada5400da74621fd
   SwiftTwitch: 40957abccac5d6d40d8e047224178364ebbaf20c
+  SwiftyGif: b85c6b33a9411859d9e1db998b6a8214aea942df
   TwitchPlayer: 60e9999dec4f74121685eec0b6e9843c2b44d794
   TwitterCore: 8cbc9ad34d91c63a0035ea05bfbfc0d7ca72a28c
   TwitterKit: 5e4f41d70b9abdb41df5467f52d7aa2c0fd26ebb
   UnderLineTextField: b3f5307b56962331e30a965e81b79aae2df1de83
+  ValidationComponents: fad1f9e9d7fbf3e10c893c880ef9d27627e90382
+  ValidationToolkit: ce8e9c1a5d49eddc3266a009d46df5ea22042dbc
 
-PODFILE CHECKSUM: 5db48fd8cbdcb3bfb6c1f7474a66b99b85b71554
+PODFILE CHECKSUM: ebd556038705e7f0afe533105a92ead27f621ecb
 
 COCOAPODS: 1.8.4

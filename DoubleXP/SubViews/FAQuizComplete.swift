@@ -9,6 +9,7 @@
 import UIKit
 import Firebase
 import SwiftNotificationCenter
+import FBSDKCoreKit
 
 class FAQuizComplete: ParentVC{
     @IBOutlet weak var viewTeams: UIButton!
@@ -23,10 +24,12 @@ class FAQuizComplete: ParentVC{
     }
     
     @objc func viewTamsClicked(_ sender: AnyObject?) {
+        AppEvents.logEvent(AppEvents.Name(rawValue: "FA Quiz - Navigate To Teams"))
         LandingActivity().navigateToViewTeams()
     }
     
     @objc func finishClicked(_ sender: AnyObject?) {
+         AppEvents.logEvent(AppEvents.Name(rawValue: "FA Quiz - FA Dash"))
         LandingActivity().navigateToTeamFreeAgentDash()
     }
 }

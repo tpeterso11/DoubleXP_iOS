@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import WebKit
 
-class ArticleVideoCell: UICollectionViewCell{
+class ArticleVideoCell: UITableViewCell{
     
     @IBOutlet weak var videoWV: WKWebView!
     @IBOutlet weak var videoImage: UIImageView!

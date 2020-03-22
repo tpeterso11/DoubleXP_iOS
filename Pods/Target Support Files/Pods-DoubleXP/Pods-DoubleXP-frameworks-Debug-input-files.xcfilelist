@@ -2,9 +2,11 @@ ${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-frameworks.sh
 ${BUILT_PRODUCTS_DIR}/AIFlatSwitch/AIFlatSwitch.framework
 ${BUILT_PRODUCTS_DIR}/Bartinter/Bartinter.framework
 ${BUILT_PRODUCTS_DIR}/CollapsibleTableSectionViewController/CollapsibleTableSectionViewController.framework
+${BUILT_PRODUCTS_DIR}/DeepDiff/DeepDiff.framework
 ${BUILT_PRODUCTS_DIR}/DynamicBlurView/DynamicBlurView.framework
 ${BUILT_PRODUCTS_DIR}/EMPageViewController/EMPageViewController.framework
 ${BUILT_PRODUCTS_DIR}/ExpyTableView/ExpyTableView.framework
+${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework
 ${BUILT_PRODUCTS_DIR}/FoldingCell/FoldingCell.framework
 ${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework
 ${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework
@@ -25,11 +27,15 @@ ${BUILT_PRODUCTS_DIR}/SwiftHTTP/SwiftHTTP.framework
 ${BUILT_PRODUCTS_DIR}/SwiftNotificationCenter/SwiftNotificationCenter.framework
 ${BUILT_PRODUCTS_DIR}/SwiftRichString/SwiftRichString.framework
 ${BUILT_PRODUCTS_DIR}/SwiftTwitch/SwiftTwitch.framework
+${BUILT_PRODUCTS_DIR}/SwiftyGif/SwiftyGif.framework
 ${BUILT_PRODUCTS_DIR}/TwitchPlayer/TwitchPlayer.framework
 ${PODS_ROOT}/TwitterCore/iOS/TwitterCore.framework
 ${PODS_ROOT}/TwitterKit/iOS/TwitterKit.framework
 ${BUILT_PRODUCTS_DIR}/UnderLineTextField/UnderLineTextField.framework
+${BUILT_PRODUCTS_DIR}/ValidationComponents/ValidationComponents.framework
+${BUILT_PRODUCTS_DIR}/ValidationToolkit/ValidationToolkit.framework
 ${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework
+${BUILT_PRODUCTS_DIR}/libwebp/libwebp.framework
 ${BUILT_PRODUCTS_DIR}/lottie-ios/Lottie.framework
 ${BUILT_PRODUCTS_DIR}/moa/moa.framework
 ${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework

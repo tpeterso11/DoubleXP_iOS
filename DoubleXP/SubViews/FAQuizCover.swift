@@ -12,8 +12,9 @@ import ImageLoader
 import moa
 import SwiftHTTP
 import SwiftNotificationCenter
+import FBSDKCoreKit
 
-class FAQuizCover: UIViewController, FreeAgentQuizNav{
+class FAQuizCover: ParentVC, FreeAgentQuizNav{
     var question: FAQuestion?
     var gcGame: GamerConnectGame?
     var questions = [FAQuestion]()
@@ -58,14 +59,20 @@ class FAQuizCover: UIViewController, FreeAgentQuizNav{
         startButton.layer.masksToBounds = false
         startButton.layer.shadowPath = UIBezierPath(roundedRect: startButton.bounds, cornerRadius: startButton.cornerRadius).cgPath
         
-        topView.layer.masksToBounds = false
-        topView.layer.shadowOffset = CGSize(width: 0, height: 20)
-        topView.layer.shadowRadius = 10
-        topView.layer.shadowOpacity = 0.5
+        navDictionary = ["state": "backOnly"]
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.currentLanding?.updateNavigation(currentFrag: self)
+        
+        self.pageName = "FA Quiz Front"
+        appDelegate.addToNavStack(vc: self)
+        
+        AppEvents.logEvent(AppEvents.Name(rawValue: "FA Quiz Front"))
     }
     
     @objc func startButtonClicked(_ sender: AnyObject?) {
         self.interviewManager?.showFirstQuestion()
+        AppEvents.logEvent(AppEvents.Name(rawValue: "FA Quiz Front - Start Button"))
     }
     
     func showEmpty() {
@@ -74,10 +81,12 @@ class FAQuizCover: UIViewController, FreeAgentQuizNav{
     }
     
     @objc func dashButtonClicked(_ sender: AnyObject?) {
+        AppEvents.logEvent(AppEvents.Name(rawValue: "FA Quiz Front - Dash Button - Navigate to FA Dash"))
         LandingActivity().navigateToTeamFreeAgentDash()
     }
     
     @objc func doneButtonClicked(_ sender: AnyObject?) {
+        AppEvents.logEvent(AppEvents.Name(rawValue: "FA Quiz Front - Done Button - Navigate to FA Dash"))
         LandingActivity().navigateToTeamFreeAgentDash()
     }
     
@@ -102,6 +111,7 @@ class FAQuizCover: UIViewController, FreeAgentQuizNav{
             
             self.interviewManager?.getQuiz(url: self.currentUrl, secondary: false, callbacks: self)
         }) { (error) in
+            AppEvents.logEvent(AppEvents.Name(rawValue: "FA Quiz Front - Error Loading Quiz"))
             print(error.localizedDescription)
         }
     }

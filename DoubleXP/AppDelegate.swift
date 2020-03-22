@@ -10,6 +10,7 @@ import UIKit
 import CoreData
 import Firebase
 import TwitterKit
+import FBSDKCoreKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
@@ -21,11 +22,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var selectedGCGame: GamerConnectGame?
     var currentUser: User?
     var currentLanding: LandingActivity?
+    var currentMediaFrag: MediaFrag?
     var currentFrag: String = ""
     var interviewManager = InterviewManager()
     var mediaManager = MediaManager()
-    var navStack = [UIViewController]()
+    var navStack = KeepOrderDictionary<String, ParentVC>() //pageNames
     var mediaCache = MediaCache()
+    var twitchChannels = [TwitchChannelObj]()
     
     private var apnsToken: String = ""
     private var fcmToken: String = ""
@@ -63,6 +66,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 
         return true
     }
+    
+    func addToNavStack(vc: ParentVC){
+        if(self.navStack.get(key: vc.pageName!) != nil){
+            self.rebuildNavStack(vc: vc)
+        }
+        else{
+            self.navStack[vc.pageName!] = vc
+        }
+    }
+    
+    private func rebuildNavStack(vc: ParentVC){
+        switch(vc.pageName){
+        case "Home":
+            self.navStack[vc.pageName!] = vc
+        case "View Teams":
+            self.navStack = KeepOrderDictionary<String, ParentVC>()
+            self.navStack["Home"] = GamerConnectFrag()
+            self.navStack["Team"] = TeamFrag()
+            self.navStack[vc.pageName!] = vc
+            break
+        default:
+            self.navStack = KeepOrderDictionary<String, ParentVC>()
+        }
+    }
 
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
@@ -80,6 +107,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        AppEvents.activateApp()
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
@@ -215,3 +243,142 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     }
 }
 
+public struct KeepOrderDictionary<Key, Value> where Key : Hashable
+{
+    public private(set) var values: [Value]
+
+    fileprivate var keyToIndexMap: [Key:Int]
+    fileprivate var indexToKeyMap: [Int:Key]
+
+    public init()
+    {
+        self.values = [Value]()
+        self.keyToIndexMap = [Key:Int]()
+        self.indexToKeyMap = [Int:Key]()
+    }
+
+    public var count: Int
+    {   return values.count}
+
+    public mutating func add(key: Key, _ value: Value)
+    {
+        if let index = keyToIndexMap[key]
+        {   values[index] = value}
+        else
+        {
+            values.append(value)
+            keyToIndexMap[key] = values.count - 1
+            indexToKeyMap[values.count - 1] = key
+        }
+    }
+
+    public mutating func add(index: Int, _ value: Value) -> Bool
+    {
+        if let key = indexToKeyMap[index]
+        {
+            add(key: key, value)
+            return true
+        }
+
+        return false
+    }
+
+    public func get(key: Key) -> (Key, Value)?
+    {
+        if let index = keyToIndexMap[key]
+        {   return (key, values[index])}
+
+        return nil
+    }
+
+    public func get(index: Int) -> (Key, Value)?
+    {
+        if let key = indexToKeyMap[index]
+        {   return (key, values[index])}
+
+        return nil
+    }
+
+    public mutating func removeValue(forKey key: Key) -> Bool
+    {
+        guard let index = keyToIndexMap[key] else
+        {   return false}
+
+        values.remove(at: index)
+
+        keyToIndexMap.removeValue(forKey: key)
+        indexToKeyMap.removeValue(forKey: index)
+
+        return true
+    }
+
+    public mutating func removeValue(at index: Int) -> Bool
+    {
+        guard let key = indexToKeyMap[index] else
+        {   return false}
+
+        values.remove(at: index)
+
+        keyToIndexMap.removeValue(forKey: key)
+        indexToKeyMap.removeValue(forKey: index)
+
+        return true
+    }
+}
+
+extension KeepOrderDictionary
+{
+    public subscript(key: Key) -> Value?
+        {
+        get
+        {   return get(key: key)?.1}
+
+        set
+        {
+            if let newValue = newValue
+            {   add(key: key, newValue)}
+            else
+            {   let _ = removeValue(forKey: key)}
+        }
+    }
+
+    public subscript(index: Int) -> Value?
+        {
+        get
+        {   return get(index: index)?.1}
+
+        set
+        {
+            if let newValue = newValue
+            {   let _ = add(index: index, newValue)}
+        }
+    }
+}
+
+extension KeepOrderDictionary : ExpressibleByDictionaryLiteral
+{
+    public init(dictionaryLiteral elements: (Key, Value)...)
+    {
+        self.init()
+        for entry in elements
+        {   add(key: entry.0, entry.1)}
+    }
+}
+
+extension KeepOrderDictionary : Sequence
+{
+    public typealias Iterator = IndexingIterator<[(key: Key, value: Value)]>
+
+    public func makeIterator() -> KeepOrderDictionary.Iterator
+    {
+        var content = [(key: Key, value: Value)]()
+
+        for i in 0 ..< count
+        {
+            if let value: Value = self[i], let key: Key = indexToKeyMap[i]
+            {     content.append((key: key, value: value))}
+        }
+
+        return content.makeIterator()
+    }
+}

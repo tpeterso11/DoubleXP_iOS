@@ -1,5 +1,5 @@
 # Uncomment the next line to define a global platform for your project
-platform :ios, '9.0'
+platform :ios, '12.0'
 
 target 'DoubleXP' do
   # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
@@ -30,7 +30,11 @@ target 'DoubleXP' do
   pod 'AIFlatSwitch'
   pod 'SwiftRichString'
   pod 'PopupDialog', '~> 1.0'
+  pod 'FBSDKCoreKit/Swift'
+  pod 'ValidationComponents'
   pod 'UnderLineTextField', '~> 2.1'
+  pod 'Giphy'
+  pod 'SwiftyGif'
 
   # Pods for DoubleXP
 

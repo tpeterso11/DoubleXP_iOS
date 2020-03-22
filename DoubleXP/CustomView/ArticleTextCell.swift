@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class ArticleTextCell: UICollectionViewCell{
+class ArticleTextCell: UITableViewCell{
     @IBOutlet weak var label: UILabel!
     
 }

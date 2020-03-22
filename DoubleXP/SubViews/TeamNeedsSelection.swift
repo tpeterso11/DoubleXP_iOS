@@ -32,9 +32,7 @@ class TeamNeedsSelection: ParentVC, UICollectionViewDataSource, UICollectionView
     
         delegate.currentLanding?.updateNavigation(currentFrag: self)
         self.pageName = "Team Needs Selection"
-        if(!delegate.navStack.contains(self)){
-            delegate.navStack.append(self)
-        }
+        delegate.addToNavStack(vc: self)
         
         completeButton.addTarget(self, action: #selector(nextButtonClicked), for: .touchUpInside)
         

@@ -11,6 +11,7 @@ import Firebase
 import SwiftHTTP
 import ImageLoader
 import moa
+import FBSDKCoreKit
 
 class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     var availableGames = [GamerConnectGame]()
@@ -55,6 +56,8 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         gcRegisterBack.isUserInteractionEnabled = true
         gcRegisterBack.addGestureRecognizer(singleTapBack)
         gcRegisterBack.transform = CGAffineTransform(scaleX: -1, y: 1)
+        
+        AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register"))
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
@@ -374,6 +377,8 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         let sendUp = ["gamerTag": gamerTag, "gameName": gameName, "console": console]
         ref.child("gamerTags").childByAutoId().setValue(sendUp)
         
+        AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Profile Saved - " + gameName))
+        
         count += 1
     }
     
@@ -536,6 +541,8 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         HTTP.GET(url) { response in
             if let err = response.error {
                 print("error: \(err.localizedDescription)")
+                AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Division Extended Stats Failed"))
+
                 self.scrollToNextCell()
                 return //also notify app of failure as needed
             }
@@ -557,6 +564,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                         statObj._statUrl = url
                         
                         self.saveAndProceed(statObj: statObj)
+                        AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Division Extended Stats Received"))
                     }
                 }
             }
@@ -569,6 +577,8 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         HTTP.GET(url) { response in
             if let err = response.error {
                 print("error: \(err.localizedDescription)")
+                AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Siege Extended Stats Failed"))
+
                 self.scrollToNextCell()
                 return //also notify app of failure as needed
             }
@@ -589,6 +599,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                         statObj._statUrl = url
                         
                         self.saveAndProceed(statObj: statObj)
+                        AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Siege Extended Stats Received"))
                     }
                 }
             }
@@ -620,5 +631,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         user?.games = self.selectedGames
         
         self.performSegue(withIdentifier: "gcSkip", sender: nil)
+        
+        AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Successful Registration"))
     }
 }

@@ -14,6 +14,7 @@ import MSPeekCollectionViewDelegateImplementation
 import SendBirdSDK
 import MessageKit
 import SwiftNotificationCenter
+import SwiftyGif
 
 class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewDelegate, UITableViewDataSource {
     var currentUser: User?
@@ -23,10 +24,16 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
     var chatMessages = [Any]()
     var mentionedUsers = [String]()
 
+    @IBOutlet weak var tapInstruc: UILabel!
+    @IBOutlet weak var emptyTeam: UIView!
+    @IBOutlet weak var emptyUser: UIView!
+    @IBOutlet weak var emptyHeader: UILabel!
+    @IBOutlet weak var emptyOverlay: UIView!
     @IBOutlet weak var messagingView: UITableView!
     //@IBOutlet weak var sendButton: UIButton!
     
     var estimatedHeight: CGFloat?
+    private var emptyShowing = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,15 +44,47 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
         let currentUser = delegate.currentUser
         
         delegate.currentLanding?.updateNavigation(currentFrag: self)
-        if(!delegate.navStack.contains(self)){
-            delegate.navStack.append(self)
-        }
+        
+        self.pageName = "Messaging"
+        delegate.addToNavStack(vc: self)
         
         manager!.setup(sendBirdId: currentUser!.sendBirdId, currentUser: currentUser!, messagingCallbacks: self)
         
-        self.pageName = "Messaging"
-        
         Broadcaster.register(SearchCallbacks.self, observer: self)
+        
+        animateView()
+    }
+    
+    private func animateView(){
+        self.emptyShowing = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let currentLanding = appDelegate.currentLanding!
+            let top = CGAffineTransform(translationX: 0, y: -10)
+            let top2 = CGAffineTransform(translationX: 0, y: -currentLanding.bottomNavHeight + 60)
+            UIView.animate(withDuration: 0.8, animations: {
+                self.emptyOverlay.alpha = 1
+            }, completion: { (finished: Bool) in
+                UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                    self.emptyHeader.transform = top
+                    self.emptyHeader.alpha = 1
+                    
+                    if(self.groupChannelUrl != nil){
+                        self.emptyTeam.alpha = 1
+                        self.emptyTeam.transform = top
+                    }
+                    else{
+                        self.emptyUser.transform = top
+                        self.emptyUser.alpha = 1
+                    }
+                }, completion: { (finished: Bool) in
+                    UIView.animate(withDuration: 0.8, delay: 0.8, options: [], animations: {
+                        self.tapInstruc.alpha = 1
+                        self.tapInstruc.transform = top2
+                    }, completion: nil)
+                })
+            })
+        }
     }
     
     func connectionSuccessful() {
@@ -162,11 +201,20 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
         let count = messages.count
         
         if(count == 0){
-            //show empty, show first message
+            
         }
         else{
+            if(self.emptyShowing){
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    UIView.animate(withDuration: 0.5, animations: {
+                        self.emptyOverlay.alpha = 0
+                    }, completion: nil)
+                }
+                self.emptyShowing = false
+            }
+            
             chatMessages = [ChatMessage]()
-            chatMessages.append(0)
+            chatMessages.append(1)
             for message in messages{
                 let date = NSDate(timeIntervalSince1970: TimeInterval(message.createdAt))
                 let formatter = DateFormatter()
@@ -186,19 +234,6 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
                 
                 chatMessages.append(chatMessage)
             }
-            
-            let testOne = ChatMessage(message: "Boolgkakmkfaknfdalfndljfnd dnafljdnfdljnfl adnfldfnadljf nadfljdanf", timeStamp: "dfadf")
-            testOne.senderString = currentUser!.uId
-            
-            let testTwo = ChatMessage(message: "Boolgkakmkfaknfdalfndljfnd dnafljdnfdljnfl adnfldfnadljf nadfljdanfalkfnadlngdlgndlgndlkgndalkgndalgndalgndngdalkngdalkngldakndalkgndlkgndlknglakgnanglshgshfgksdhfgksdfhg ljnljnjfsndlfjndgngnfla", timeStamp: "dfadf")
-            testTwo.senderString = currentUser!.uId
-            
-            let testThree = ChatMessage(message: "Boolgkakmkfaknfdalfndljfnd dnafljdnfdljnfl adnfldfnadljf nadfljdanfalkfnadlngdlgndlgndlkgndalkgndalgndalgndngdalkngdalkngldakndalkgndlkgndlknglakgnanglshgshfgksdhfgksdfhg ljnljnjfsndlfjndgngnfla", timeStamp: "dfadf")
-            testThree.senderString = ""
-            
-            //chatMessages.append(testOne)
-            chatMessages.append(testTwo)
-            chatMessages.append(testThree)
             
             chatMessages.append(0)
             
@@ -242,7 +277,9 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
     }
     
     private func addMessage(chatMessage: ChatMessage){
+        self.chatMessages.remove(at: self.chatMessages.count - 1)
         self.chatMessages.append(chatMessage)
+        self.chatMessages.append(0)
         self.messagingView.reloadData()
         scrollToBottom()
     }
@@ -278,36 +315,78 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
         else{
             let message = current as! ChatMessage
             if(message.senderString == self.currentUser!.uId){
-                let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! TestCell
-                cell.message.text = message.message
+                if(message.message.contains("DXPGif")){
+                    let bit = "DXPGif"
+                    let strippedUrl = message.message.substring(from: bit.count, length: message.message.count)
+                    
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "userGif", for: indexPath) as! GifCellUser
+                    let manager = SwiftyGifManager(memoryLimit: 5)
+                    cell.gifImage.setGifFromURL(URL(string: strippedUrl)!)
+                    manager.addImageView(cell.gifImage)
+                    
+                    cell.gifImage.contentMode = .scaleAspectFit
+                    cell.gifImage.layer.masksToBounds = true
+                    cell.gifImage.layer.cornerRadius = 15
+                    
                 
-                cell.message.layer.masksToBounds = true
-                cell.message.layer.cornerRadius = 15
-                
-                /*cell.message.layer.masksToBounds = false
-                cell.message.layer.shadowRadius = 2.0
-                cell.message.layer.shadowOpacity = 0.2
-                cell.message.layer.shadowOffset = CGSize(width: 1, height: 2)*/
-                return cell
+                    return cell
+                }
+                else{
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! TestCell
+                    cell.message.text = message.message
+                    
+                    cell.message.layer.masksToBounds = true
+                    cell.message.layer.cornerRadius = 15
+                    
+                    /*cell.message.layer.masksToBounds = false
+                    cell.message.layer.shadowRadius = 2.0
+                    cell.message.layer.shadowOpacity = 0.2
+                    cell.message.layer.shadowOffset = CGSize(width: 1, height: 2)*/
+                    return cell
+                }
             }
             else{
-                let cell = tableView.dequeueReusableCell(withIdentifier: "otherCell", for: indexPath) as! TestCell
-                cell.message.text = message.message
-                
-                cell.message.layer.masksToBounds = true
-                cell.message.layer.cornerRadius = 15
-                
-                for friend in currentUser!.friends{
-                    if(friend.uid == self.otherUserId){
-                        cell.tagLabel.text = "@" + friend.gamerTag
+                if(message.message.contains("DXPGif")){
+                    let bit = "DXPGif"
+                    let strippedUrl = message.message.substring(from: bit.count, length: message.message.count)
+                    
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "otherGif", for: indexPath) as! GifCellUser
+                    let manager = SwiftyGifManager(memoryLimit: 5)
+                    cell.gifImage.setGifFromURL(URL(string: strippedUrl)!)
+                    manager.addImageView(cell.gifImage)
+                    
+                    for friend in currentUser!.friends{
+                        if(friend.uid == self.otherUserId){
+                            cell.gifImageSender.text = "@" + friend.gamerTag
+                        }
                     }
-                }
+                    
+                    //cell.gifImage.contentMode = .scaleAspectFit
+                    cell.gifImage.layer.masksToBounds = true
+                    cell.gifImage.layer.cornerRadius = 15
+                    
                 
-                /*cell.message.layer.masksToBounds = false
-                cell.message.layer.shadowRadius = 2.0
-                cell.message.layer.shadowOpacity = 0.2
-                cell.message.layer.shadowOffset = CGSize(width: 1, height: 2)*/
-                return cell
+                    return cell
+                }
+                else{
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "otherCell", for: indexPath) as! TestCell
+                    cell.message.text = message.message
+                    
+                    cell.message.layer.masksToBounds = true
+                    cell.message.layer.cornerRadius = 15
+                    
+                    for friend in currentUser!.friends{
+                        if(friend.uid == self.otherUserId){
+                            cell.tagLabel.text = "@" + friend.gamerTag
+                        }
+                    }
+                    
+                    /*cell.message.layer.masksToBounds = false
+                    cell.message.layer.shadowRadius = 2.0
+                    cell.message.layer.shadowOpacity = 0.2
+                    cell.message.layer.shadowOffset = CGSize(width: 1, height: 2)*/
+                    return cell
+                }
             }
         }
     }
@@ -335,18 +414,18 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-
-        let outerColor = UIColor(white: 1.0, alpha: 0.0).cgColor
-        let innerColor = UIColor(white: 1.0, alpha: 1.0).cgColor
+        
+        let outerColor = UIColor(named: "whiteBackToDarkGrey")?.cgColor
+        let innerColor = UIColor(named: "whiteBackToDarkGrey")?.cgColor
 
         var colors = [CGColor]()
 
         if scrollView.contentOffset.y + scrollView.contentInset.top <= 0 {
-            colors = [innerColor, innerColor, innerColor, outerColor]
+            colors = [(innerColor ?? UIColor.white.cgColor), innerColor ?? UIColor.white.cgColor, innerColor ?? UIColor.white.cgColor, outerColor ?? UIColor.white.cgColor]
         } else if scrollView.contentOffset.y + scrollView.frame.size.height >= scrollView.contentSize.height {
-            colors = [outerColor, innerColor, innerColor, innerColor]
+            colors = [outerColor ?? UIColor.white.cgColor, innerColor ?? UIColor.white.cgColor, innerColor ?? UIColor.white.cgColor, innerColor ?? UIColor.white.cgColor]
         } else {
-            colors = [outerColor, innerColor, innerColor, outerColor]
+            colors = [outerColor ?? UIColor.white.cgColor, innerColor ?? UIColor.white.cgColor, innerColor ?? UIColor.white.cgColor, outerColor ?? UIColor.white.cgColor]
         }
 
         if let mask = scrollView.layer.mask as? CAGradientLayer {
@@ -380,5 +459,17 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
         message.data = currentUser!.uId
         
         manager?.sendMessage(chatMessage: message, list: list)
+        /*let date = Date()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM.dd.yyyy"
+        let result = formatter.string(from: date)
+        let chatMessage = ChatMessage(message: string, timeStamp: result)
+        chatMessage.senderString = currentUser!.uId
+        chatMessage.data = list?[0] ?? ""
+        
+        //self.chatMessages.append(chatMessage)
+        //chatMessages.append(0)
+        
+        addMessage(chatMessage: chatMessage)*/
     }
 }

@@ -153,39 +153,136 @@ class SocialMediaManager{
        })
     }
     
-    /*
-     var gameArray = [String]()
-     gameArray.append("Tom Clancy's Rainbow Six: Siege")
-     
-     Twitch.Games.getGames(tokenManager: TwitchTokenManager.shared, gameIds: nil, gameNames: gameArray){
-        switch $0 {
-        case .success(let getVideosData):
-            print(getVideosData.gameData.count)
-           //self.videos = getVideosData.videoData
-        case .failure(let data, _, _):
-            print("The API call failed! Unable to get videos. Did you set an access token?")
-            if let data = data,
-                let jsonObject = try? JSONSerialization.jsonObject(with: data, options: .allowFragments),
-                let jsonDict = jsonObject as? [String: Any]{
-                print(jsonDict)
+    func getTopStreams(){
+        var streams = [TwitchStreamObject]()
+        TwitchTokenManager.shared.accessToken = token
+        
+        Twitch.Streams.getStreams(tokenManager: TwitchTokenManager.shared, after: nil, before: nil, communityIds: nil, first: 50, gameIds: nil, languages: nil, userIds: nil, userNames: nil){
+            switch $0 {
+            case .success(let getStreamsData):
+                print(getStreamsData)
+               //self.videos = getVideosData.videoData
+            case .failure(let data, _, _):
+                print("The API call failed! Unable to get videos. Did you set an access token?")
+                if let data = data{
+                    if let jsonObj = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? NSDictionary {
+                    
+                    if let resultArray = jsonObj!.value(forKey: "data") as? NSArray {
+                        for stream in resultArray{
+                            var startedAt = ""
+                            var thumbnail = ""
+                            var handle = ""
+                            var id = ""
+                            var title = ""
+                            var userId = ""
+                            var type = ""
+                            var viewerCount = 0
+                            if let gameDict = stream as? NSDictionary {
+                                startedAt = (gameDict.value(forKey: "started_at") as? String)!
+                                handle = (gameDict.value(forKey: "user_name") as? String)!
+                                thumbnail = (gameDict.value(forKey: "thumbnail_url") as? String)!
+                                id = (gameDict.value(forKey: "id") as? String)!
+                                title = (gameDict.value(forKey: "title") as? String)!
+                                userId = (gameDict.value(forKey: "user_id") as? String)!
+                                type = (gameDict.value(forKey: "type") as? String)!
+                                viewerCount = ((gameDict.value(forKey: "viewer_count") as? Int)!)
+                                
+                                let newStream  = TwitchStreamObject(handle: handle)
+                                newStream.id = id
+                                newStream.thumbnail = thumbnail
+                                newStream.title = title
+                                newStream.userId = userId
+                                newStream.type = type
+                                newStream.startedAt = startedAt
+                                newStream.viewerCount = viewerCount
+                                
+                                streams.append(newStream)
+                                }
+                            }
+                        //callbacks.onStreamsLoaded(streams: streams)
+                        }
+                    }
+                }
             }
-            //self.videos = [VideoData]()
         }
-    }*/
+    }
     
-    /*Twitch.Videos.getVideos(videoIds: nil, userId: nil, gameId: manager.getTwitchGameId(gameName: team!.games[0])) {
-        switch $0 {
-        case .success(let getVideosData):
-            print(getVideosData.videoData.count)
-           //self.videos = getVideosData.videoData
-        case .failure(let data, _, _):
-            print("The API call failed! Unable to get videos. Did you set an access token?")
-            if let data = data,
-                let jsonObject = try? JSONSerialization.jsonObject(with: data, options: .allowFragments),
-                let jsonDict = jsonObject as? [String: Any]{
-                print(jsonDict)
+    func getChannelTopStreams(currentChannel: TwitchChannelObj, callbacks: SocialMediaManagerCallback){
+        var streams = [TwitchStreamObject]()
+        TwitchTokenManager.shared.accessToken = token
+        
+        Twitch.Streams.getStreams(tokenManager: TwitchTokenManager.shared, after: nil, before: nil, communityIds: nil, first: 20, gameIds: [currentChannel.twitchID], languages: nil, userIds: nil, userNames: nil){
+            switch $0 {
+            case .success(let getStreamsData):
+                print(getStreamsData)
+               //self.videos = getVideosData.videoData
+            case .failure(let data, _, _):
+                print("The API call failed! Unable to get videos. Did you set an access token?")
+                if let data = data{
+                    if let jsonObj = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? NSDictionary {
+                    
+                    if let resultArray = jsonObj!.value(forKey: "data") as? NSArray {
+                        for stream in resultArray{
+                            var startedAt = ""
+                            var thumbnail = ""
+                            var handle = ""
+                            var id = ""
+                            var title = ""
+                            var userId = ""
+                            var type = ""
+                            var viewerCount = 0
+                            if let gameDict = stream as? NSDictionary {
+                                startedAt = (gameDict.value(forKey: "started_at") as? String)!
+                                handle = (gameDict.value(forKey: "user_name") as? String)!
+                                thumbnail = (gameDict.value(forKey: "thumbnail_url") as? String)!
+                                id = (gameDict.value(forKey: "id") as? String)!
+                                title = (gameDict.value(forKey: "title") as? String)!
+                                userId = (gameDict.value(forKey: "user_id") as? String)!
+                                type = (gameDict.value(forKey: "type") as? String)!
+                                viewerCount = ((gameDict.value(forKey: "viewer_count") as? Int)!)
+                                
+                                let newStream  = TwitchStreamObject(handle: handle)
+                                newStream.id = id
+                                newStream.thumbnail = thumbnail
+                                newStream.title = title
+                                newStream.userId = userId
+                                newStream.type = type
+                                newStream.startedAt = startedAt
+                                newStream.viewerCount = viewerCount
+                                
+                                streams.append(newStream)
+                                }
+                            }
+                            callbacks.onStreamsLoaded(streams: streams)
+                        }
+                    }
+                }
             }
-            //self.videos = [VideoData]()
         }
-    }*/
+    }
+    
+    func getChannelTopVideos(currentChannel: TwitchChannelObj, callbacks: SocialMediaManagerCallback){
+        var streams = [TwitchStreamObject]()
+        TwitchTokenManager.shared.accessToken = token
+        
+        Twitch.Videos.getVideos(tokenManager: TwitchTokenManager.shared, videoIds: nil, userId: nil, gameId: currentChannel.twitchID, after: nil, before: nil, first: nil, language: nil, period: Twitch.Videos.Period.day, sortType: nil, videoType: nil, completionHandler: {
+            switch $0 {
+                case .success(let getStreamsData):
+                    print(getStreamsData)
+                    for video in getStreamsData.videoData{
+                        let newStream  = TwitchStreamObject(handle: video.id)
+                            newStream.id = video.id
+                            newStream.thumbnail = video.thumbnailURLString
+                            newStream.title = video.title
+                            newStream.userId = video.ownerId
+                            newStream.viewerCount = video.viewCount
+                                
+                            streams.append(newStream)
+                        }
+                callbacks.onStreamsLoaded(streams: streams)
+            case .failure(_, _, _):
+                callbacks.onStreamsLoaded(streams: streams)
+            }
+        })
+    }
 }

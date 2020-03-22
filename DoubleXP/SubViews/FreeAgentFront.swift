@@ -12,13 +12,14 @@ import ImageLoader
 import moa
 import MSPeekCollectionViewDelegateImplementation
 
-class FreeAgentFront: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, MSPeekImplementationDelegate {
+class FreeAgentFront: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, MSPeekImplementationDelegate {
     var user: User!
     var team: TeamObject?
     var games = [GamerConnectGame]()
     var chosenGame = ""
     var currentPos = 0
     
+    @IBOutlet weak var continueButton: UIButton!
     @IBOutlet weak var nextButton: UIImageView!
     @IBOutlet weak var gcGameList: UICollectionView!
     
@@ -34,8 +35,15 @@ class FreeAgentFront: UIViewController, UICollectionViewDataSource, UICollection
         
         handleNextButton(activate: false)
         
-        chosenGame = "NBA 2K20"
-        handleNextButton(activate: true)
+        navDictionary = ["state": "backOnly"]
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.currentLanding?.updateNavigation(currentFrag: self)
+        
+        self.pageName = "Free Agent Front"
+        delegate.addToNavStack(vc: self)
+        
+        continueButton.addTarget(self, action: #selector(nextClicked), for: .touchUpInside)
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -51,6 +59,13 @@ class FreeAgentFront: UIViewController, UICollectionViewDataSource, UICollection
         cell.backgroundImage.clipsToBounds = true
         
         cell.hook.text = games[indexPath.item].gameName
+        
+        if(self.chosenGame == games[indexPath.item].gameName){
+            cell.cover.isHidden = false
+        }
+        else{
+            cell.cover.isHidden = true
+        }
         
         return cell
     }
@@ -71,8 +86,8 @@ class FreeAgentFront: UIViewController, UICollectionViewDataSource, UICollection
         
         for gameCell in gcGameList.visibleCells {
             if (cell != gameCell as! homeGCCell){
-                (gameCell as! faQuizGameCell).cover.isHidden = true
-                (gameCell as! faQuizGameCell).gameName.textColor = UIColor.black
+                (gameCell as! homeGCCell).cover.isHidden = true
+                //(gameCell as! homeGCCell).gameName.textColor = UIColor.black
             }
         }
         
@@ -83,20 +98,18 @@ class FreeAgentFront: UIViewController, UICollectionViewDataSource, UICollection
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        return CGSize(width: 280, height: 180)
+        return CGSize(width: 280, height: 140)
     }
     
     private func handleNextButton(activate: Bool){
         if(activate){
-            nextButton.alpha = 1
+            continueButton.alpha = 1
             
-            let singleTap = UITapGestureRecognizer(target: self, action: #selector(nextClicked))
-            nextButton.isUserInteractionEnabled = true
-            nextButton.addGestureRecognizer(singleTap)
+            continueButton.isUserInteractionEnabled = true
         }
         else{
-            nextButton.alpha = 0.4
-            nextButton.isUserInteractionEnabled = false
+            continueButton.alpha = 0.4
+            continueButton.isUserInteractionEnabled = false
         }
     }
     

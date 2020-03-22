@@ -9,6 +9,6 @@
 import Foundation
 import UIKit
 
-class EmptyCell: UICollectionViewCell{
+class EmptyCell: UITableViewCell{
     
 }

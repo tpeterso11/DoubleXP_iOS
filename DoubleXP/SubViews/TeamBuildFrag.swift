@@ -38,10 +38,9 @@ class TeamBuildFrag: ParentVC, UITableViewDataSource, UITableViewDelegate, TeamC
         let delegate = UIApplication.shared.delegate as! AppDelegate
     
         delegate.currentLanding?.updateNavigation(currentFrag: self)
-        if(!delegate.navStack.contains(self)){
-            delegate.navStack.append(self)
-        }
+    
         self.pageName = "Team Build"
+        delegate.addToNavStack(vc: self)
         
         currentUser = delegate.currentUser
         
@@ -158,10 +157,10 @@ class TeamBuildFrag: ParentVC, UITableViewDataSource, UITableViewDelegate, TeamC
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let teamManager = TeamManager()
         if(team!.teamNeeds.isEmpty || !teamManager.isTeamCaptain(user: delegate.currentUser!, team: self.team!)){
-            delegate.currentLanding?.navigateToTeamFreeAgentSearch(team: self.team!)
+            delegate.currentLanding?.navigateToTeamFreeAgentResults(team: self.team!)
         }
         else{
-            delegate.currentLanding?.navigateToTeamFreeAgentResults(team: self.team!)
+            delegate.currentLanding?.navigateToTeamFreeAgentSearch(team: self.team!)
         }
     }
     
