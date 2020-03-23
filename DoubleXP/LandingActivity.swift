@@ -248,6 +248,12 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                     
                     if(stack.count == 1){
                         restoreBottomNav()
+                        
+                        self.homeAdded = true
+                        self.requestsAdded = false
+                        self.mediaAdded = false
+                        self.teamFragAdded = false
+                        self.profileAdded = false
                     }
                 }
             }
@@ -300,9 +306,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     }
     
     func navigateToHome(){
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        appDelegate.navStack = KeepOrderDictionary<String, ParentVC>()
-        
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To GamerConnect"))
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToHome()
@@ -314,6 +317,14 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToTeams()
+        }
+    }
+    
+    func navigateToInvite() {
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Invite"))
+        stackDepth += 1
+        Broadcaster.notify(NavigateToProfile.self) {
+            $0.navigateToInvite()
         }
     }
     

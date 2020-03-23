@@ -103,7 +103,7 @@ class TeamBuildFA: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
             UIView.transition(with: self.saveChanges, duration: 0.3, options: .curveEaseInOut, animations: {
               self.saveChanges.backgroundColor = .green
               self.saveChanges.setTitle("saved.", for: .normal)
-              self.saveChanges.setTitleColor(.white, for: .normal)
+                self.saveChanges.setTitleColor(UIColor(named: "stayWhite"), for: .normal)
             })
             //color fill green
             
@@ -111,7 +111,7 @@ class TeamBuildFA: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
             UIView.transition(with: self.saveChanges, duration: 0.3, options: .curveEaseInOut, animations: {
               self.saveChanges.backgroundColor = .red
               self.saveChanges.setTitle("error.", for: .normal)
-              self.saveChanges.setTitleColor(.white, for: .normal)
+              self.saveChanges.setTitleColor(UIColor(named: "stayWhite"), for: .normal)
             })
             //color fill red
             print(error.localizedDescription)
@@ -179,8 +179,15 @@ class TeamBuildFA: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
 
-        let outerColor = UIColor(white: 1.0, alpha: 0.0).cgColor
-        let innerColor = UIColor(white: 1.0, alpha: 1.0).cgColor
+        let outerColor: CGColor!
+        let innerColor: CGColor!
+        if self.traitCollection.userInterfaceStyle == .dark {
+            outerColor = UIColor.darkGray.cgColor
+            innerColor = UIColor.darkGray.cgColor
+        } else {
+            outerColor = UIColor.white.cgColor
+            innerColor = UIColor.white.cgColor
+        }
 
         var colors = [CGColor]()
 

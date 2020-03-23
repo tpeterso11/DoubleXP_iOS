@@ -68,15 +68,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     }
     
     func addToNavStack(vc: ParentVC){
-        if(self.navStack.get(key: vc.pageName!) != nil){
-            self.rebuildNavStack(vc: vc)
-        }
-        else{
-            self.navStack[vc.pageName!] = vc
-        }
+        //if(self.navStack.get(key: vc.pageName!) != nil){
+        //    self.rebuildNavStack(vc: vc)
+        //}
+        //else{
+           self.navStack[vc.pageName!] = vc
+        //}
+    }
+    
+    func resetStack(vc: ParentVC){
+        let homeController = GamerConnectFrag()
+        homeController.pageName = "Home"
+        homeController.navDictionary = ["state": "original"]
+        
+        self.navStack = KeepOrderDictionary<String, ParentVC>()
+        self.navStack["Home"] = homeController
+        self.navStack[vc.pageName!] = vc
     }
     
     private func rebuildNavStack(vc: ParentVC){
+        let homeController = GamerConnectFrag()
+        
         switch(vc.pageName){
         case "Home":
             self.navStack[vc.pageName!] = vc
@@ -87,7 +99,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
             self.navStack[vc.pageName!] = vc
             break
         default:
-            self.navStack = KeepOrderDictionary<String, ParentVC>()
+            print("none")
+            //self.navStack = KeepOrderDictionary<String, ParentVC>()
         }
     }
 

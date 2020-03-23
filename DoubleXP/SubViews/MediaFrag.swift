@@ -156,14 +156,6 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         
         self.news?.collectionViewLayout = TestCollection()
         
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        self.pageName = "Media"
-        delegate.addToNavStack(vc: self)
-        
-        navDictionary = ["state": "backOnly"]
-        
-        delegate.currentLanding?.updateNavigation(currentFrag: self)
-        
         self.constraint = NSLayoutConstraint(item: self.articleOverlay, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0.0, constant: 0)
         
         self.channelConstraint = NSLayoutConstraint(item: self.twitchChannelOverlay, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0.0, constant: 0)

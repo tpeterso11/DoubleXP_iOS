@@ -54,6 +54,8 @@ protocol NavigateToProfile: class {
     func programmaticallyLoad(vc: ParentVC, fragName: String)
     
     func updateNavigation(currentFrag: ParentVC)
+    
+    func navigateToInvite()
 }
 
 protocol RequestsUpdate: class{

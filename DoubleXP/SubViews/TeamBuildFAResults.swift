@@ -9,7 +9,7 @@ import UIKit
 import Firebase
 import ExpyTableView
 
-class TeamBuildFAResults: ParentVC, ExpyTableViewDelegate, ExpyTableViewDataSource, UITableViewDelegate, UITableViewDataSource, TeamCallbacks{
+class TeamBuildFAResults: ParentVC, UITableViewDelegate, UITableViewDataSource, TeamCallbacks{
     
     var team: TeamObject?
     var currentUser: User?
@@ -34,8 +34,8 @@ class TeamBuildFAResults: ParentVC, ExpyTableViewDelegate, ExpyTableViewDataSour
     var currentQuizPos = 0
     var cellHeights: [CGFloat] = []
     enum Const {
-           static let closeCellHeight: CGFloat = 125
-           static let openCellHeight: CGFloat = 205
+           static let closeCellHeight: CGFloat = 88
+           static let openCellHeight: CGFloat = 175
            static let rowsCount = 1
     }
     
@@ -153,9 +153,20 @@ class TeamBuildFAResults: ParentVC, ExpyTableViewDelegate, ExpyTableViewDataSour
     }
     
      private func setup() {
+        cellHeights = Array(repeating: Const.closeCellHeight, count: self.finalList.count)
+        
+        self.faResults.estimatedRowHeight = Const.closeCellHeight
+        self.faResults.rowHeight = UITableView.automaticDimension
+        
+        if #available(iOS 10.0, *) {
+            self.faResults.refreshControl = UIRefreshControl()
+            self.faResults.refreshControl?.addTarget(self, action: #selector(refreshHandler), for: .valueChanged)
+        }
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             self.faResults.dataSource = self
             self.faResults.delegate = self
+            self.reload(tableView: self.faResults)
             
             let top2 = CGAffineTransform(translationX: 0, y: -10)
             
@@ -166,100 +177,97 @@ class TeamBuildFAResults: ParentVC, ExpyTableViewDelegate, ExpyTableViewDataSour
         }
     }
     
-    func tableView(_ tableView: ExpyTableView, expandableCellForSection section: Int) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as! FreeAgentExpandingResultCell
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let current = self.finalList[section]
-        cell.gamerTag.text = current.gamerTag
-        
-        return cell
-    }
-    
-    func tableView(_ tableView: ExpyTableView, canExpandSection section: Int) -> Bool {
-      return true //Return false if you want your section not to be expandable
-    }
-    
-    func numberOfSections(in tableView: UITableView) -> Int {
-        if(tableView == faResults){
-            return self.finalList.count
-        }
-        else{
-            return 1
-        }
+    @objc func refreshHandler() {
+        let deadlineTime = DispatchTime.now() + .seconds(1)
+        DispatchQueue.main.asyncAfter(deadline: deadlineTime, execute: { [weak self] in
+            if #available(iOS 10.0, *) {
+                self?.faResults.refreshControl?.endRefreshing()
+            }
+            self?.faResults.reloadData()
+        })
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if(tableView == faResults){
-            return 3
+            return self.finalList.count
         }
         else{
             return quizPayload.count
         }
     }
     
-    func tableView(_ tableView: ExpyTableView, expyState state: ExpyState, changeForSection section: Int) {
-    
-        switch state {
-        case .willExpand:
-            self.expandedCells.append(section)
-            print("WILL EXPAND")
-            
-        case .willCollapse:
-            self.expandedCells.remove(at: self.expandedCells.index(of: section)!)
-            print("WILL COLLAPSE")
-            
-        case .didExpand:
-            print("DID EXPAND")
-            
-        case .didCollapse:
-            print("DID COLLAPSE")
+    func tableView(_: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        guard case let cell as RequestsFoldingCell = cell else {
+            return
         }
+
+        cell.backgroundColor = .clear
+
+        if cellHeights[indexPath.row] == Const.closeCellHeight {
+            cell.unfold(false, animated: false, completion: nil)
+        } else {
+            cell.unfold(true, animated: false, completion: nil)
+        }
+
+        //cell.number = indexPath.row
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if(tableView == faResults){
-            //If you don't deselect the row here, seperator of the above cell of the selected cell disappears.
-            //Check here for detail: https://stackoverflow.com/questions/18924589/uitableviewcell-separator-disappearing-in-ios7
-            
-            tableView.deselectRow(at: indexPath, animated: false)
-            
-            if(indexPath.row == 1){
-                self.showQuiz(position: indexPath.section)
+        if(tableView == self.faResults){
+            let cell = tableView.cellForRow(at: indexPath) as! FAResultsFoldingCell
+
+            if cell.isAnimating() {
+                return
             }
-            else{
-                let button = UIButton()
-                button.tag = indexPath.section
-                inviteClicked(button)
+
+            var duration = 0.0
+            let cellIsCollapsed = cellHeights[indexPath.row] == Const.closeCellHeight
+            if cellIsCollapsed {
+                cellHeights[indexPath.row] = Const.openCellHeight
+                cell.unfold(true, animated: true, completion: nil)
+                duration = 0.6
+            } else {
+                cellHeights[indexPath.row] = Const.closeCellHeight
+                cell.unfold(false, animated: true, completion: nil)
+                duration = 0.3
             }
-            
-            //This solution obviously has side effects, you can implement your own solution from the given link.
-            //This is not a bug of ExpyTableView hence, I think, you should solve it with the proper way for your implementation.
-            //If you have a generic solution for this, please submit a pull request or open an issue.
-            
-            print("DID SELECT row: \(indexPath.row), section: \(indexPath.section)")
+
+            UIView.animate(withDuration: duration, delay: 0, options: .curveEaseOut, animations: { () -> Void in
+                tableView.beginUpdates()
+                tableView.endUpdates()
+                
+                // fix https://github.com/Ramotion/folding-cell/issues/169
+                if cell.frame.maxY > tableView.frame.maxY {
+                    tableView.scrollToRow(at: indexPath, at: UITableView.ScrollPosition.bottom, animated: true)
+                }
+            }, completion: nil)
         }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if(tableView == faResults){
-            let cell = tableView.dequeueReusableCell(withIdentifier: "expanded", for: indexPath) as! FreeAgentExpandingActionCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! FAResultsFoldingCell
+            let current = self.finalList[indexPath.item]
+            cell.gamerTag.text = current.gamerTag
             
-            if(indexPath.row == 1){
-                cell.action.text = "View Quiz"
-                //cell.actionIcon.image = #imageLiteral(resourceName: "message.png")
+            var currentGame: GamerConnectGame?
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            for game in delegate.gcGames{
+                if(game.gameName == current.game){
+                    currentGame = game
+                }
             }
-            else if(indexPath.row == 2){
-                cell.backgroundColor = #colorLiteral(red: 0.5893185735, green: 0.04998416454, blue: 0.09506303817, alpha: 1)
-                cell.action.textColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
-                cell.action.text = "Invite"
-            }
-            else{
-                cell.backgroundColor = #colorLiteral(red: 0.5893185735, green: 0.04998416454, blue: 0.09506303817, alpha: 1)
-                cell.action.textColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
-                cell.action.text = "Invite"
-                //cell.actionIcon.image = #imageLiteral(resourceName: "information.png")
-            }
-            //cell.friendName.text = current.gamerTag
+            
+            cell.quizButton.tag = indexPath.item
+            cell.inviteButton.tag = indexPath.item
+            
+            cell.gameBack.moa.url = currentGame?.imageUrl
+            cell.gameBack.contentMode = .scaleAspectFill
+            cell.gameBack.clipsToBounds = true
+            
+            cell.quizButton.addTarget(self, action: #selector(quizClicked), for: .touchUpInside)
+            cell.inviteButton.addTarget(self, action: #selector(inviteClicked), for: .touchUpInside)
+            
             return cell
         }
         else{
@@ -296,16 +304,7 @@ class TeamBuildFAResults: ParentVC, ExpyTableViewDelegate, ExpyTableViewDataSour
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if(tableView == faResults){
-            if(indexPath.row == 1){
-                return CGFloat(40)
-            }
-            if(indexPath.row == 2){
-                return CGFloat(40)
-            }
-            if(indexPath.row == 3){
-                return CGFloat(40)
-            }
-            return CGFloat(80)
+            return cellHeights[indexPath.row]
         }
         else{
             let current = self.quizPayload[indexPath.item]
@@ -320,10 +319,6 @@ class TeamBuildFAResults: ParentVC, ExpyTableViewDelegate, ExpyTableViewDataSour
             }
         }
     }
-    
-    /*func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 100
-    }*/
     
     @objc func quizClicked(_ sender: AnyObject?) {
         showQuiz(position: (sender?.tag)!)
@@ -449,12 +444,10 @@ class TeamBuildFAResults: ParentVC, ExpyTableViewDelegate, ExpyTableViewDataSour
     }
     
     func reload(tableView: UITableView) {
-        if(tableView == quizTable){
-            let contentOffset = tableView.contentOffset
-            tableView.reloadData()
-            tableView.layoutIfNeeded()
-            tableView.setContentOffset(contentOffset, animated: false)
-        }
+        let contentOffset = tableView.contentOffset
+        tableView.reloadData()
+        tableView.layoutIfNeeded()
+        tableView.setContentOffset(contentOffset, animated: false)
     }
     
     @objc func dismissMenu(){

@@ -47,13 +47,6 @@ class TeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate {
         teamSearchButton.applyGradient(colours:  [#colorLiteral(red: 0.3333333433, green: 0.3333333433, blue: 0.3333333433, alpha: 1), #colorLiteral(red: 0.4791436791, green: 0.4813652635, blue: 0.4867808223, alpha: 1)], orientation: .horizontal)
         
         //headerView.roundCorners(corners: [.topLeft, .topRight], radius: 25)
-        navDictionary = ["state": "backOnly"]
-        
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        appDelegate.currentLanding?.updateNavigation(currentFrag: self)
-        
-        self.pageName = "Team"
-        appDelegate.addToNavStack(vc: self)
         
         populateList()
     }

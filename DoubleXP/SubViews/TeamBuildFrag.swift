@@ -65,6 +65,7 @@ class TeamBuildFrag: ParentVC, UITableViewDataSource, UITableViewDelegate, TeamC
             }
         }
         
+        inviteButton.addTarget(self, action: #selector(inviteOptionClicked), for: .touchUpInside)
         freeAgentButton.addTarget(self, action: #selector(faButtonClicked), for: .touchUpInside)
     }
     
@@ -164,6 +165,11 @@ class TeamBuildFrag: ParentVC, UITableViewDataSource, UITableViewDelegate, TeamC
         }
     }
     
+    
+    @objc func inviteOptionClicked(_ sender: AnyObject?) {
+           let delegate = UIApplication.shared.delegate as! AppDelegate
+           delegate.currentLanding?.navigateToInvite()
+       }
     
     @objc func inviteButtonClicked(_ sender: AnyObject?) {
         let indexPath = IndexPath(item: (sender?.tag)!, section: 0)

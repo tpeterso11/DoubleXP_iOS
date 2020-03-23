@@ -74,20 +74,47 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
     }
     
+    func navigateToInvite(){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "invite") as! InviteFrag
+        
+        selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
+    }
+    
     func navigateToRequests(){
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "requests") as! Requests
+        currentViewController.pageName = "Requests"
+        currentViewController.navDictionary = ["state": "backOnly"]
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.addToNavStack(vc: currentViewController)
+        appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
+        appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
         
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
     }
     
     func navigateToMedia(){
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "mediaFrag") as! MediaFrag
+        currentViewController.pageName = "Media"
+        currentViewController.navDictionary = ["state": "backOnly"]
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.addToNavStack(vc: currentViewController)
+        appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
+        appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
         
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
     }
     
     func navigateToTeams(){
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "teamFrag") as! TeamFrag
+        currentViewController.pageName = "Teams"
+        currentViewController.navDictionary = ["state": "backOnly"]
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.addToNavStack(vc: currentViewController)
+        appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
+        appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
         
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
     }
@@ -97,7 +124,9 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         currentViewController.pageName = "Home"
+        currentViewController.navDictionary = ["state": "original"]
         appDelegate.addToNavStack(vc: currentViewController)
+        appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
         
         selectViewController(currentViewController, direction: .reverse, animated: true, completion: nil)
     }
@@ -275,4 +304,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
     
     func updateNavigation(currentFrag: ParentVC) {
     }
+    
+    
+    
 }

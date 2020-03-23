@@ -56,8 +56,8 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.currentLanding?.updateNavigation(currentFrag: self)
         
-        self.pageName = "Requests"
-        appDelegate.addToNavStack(vc: self)
+        //self.pageName = "Requests"
+        //appDelegate.addToNavStack(vc: self)
     }
     
     private func animateView(){
