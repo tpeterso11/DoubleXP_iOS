@@ -5,6 +5,7 @@ ${BUILT_PRODUCTS_DIR}/CollapsibleTableSectionViewController/CollapsibleTableSect
 ${BUILT_PRODUCTS_DIR}/DeepDiff/DeepDiff.framework
 ${BUILT_PRODUCTS_DIR}/DynamicBlurView/DynamicBlurView.framework
 ${BUILT_PRODUCTS_DIR}/EMPageViewController/EMPageViewController.framework
+${BUILT_PRODUCTS_DIR}/ElongationPreview/ElongationPreview.framework
 ${BUILT_PRODUCTS_DIR}/ExpyTableView/ExpyTableView.framework
 ${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework
 ${BUILT_PRODUCTS_DIR}/FoldingCell/FoldingCell.framework
@@ -21,8 +22,10 @@ ${BUILT_PRODUCTS_DIR}/PINOperation/PINOperation.framework
 ${BUILT_PRODUCTS_DIR}/PINRemoteImage/PINRemoteImage.framework
 ${BUILT_PRODUCTS_DIR}/PopupDialog/PopupDialog.framework
 ${BUILT_PRODUCTS_DIR}/Protobuf/protobuf.framework
+${BUILT_PRODUCTS_DIR}/RAMPaperSwitch/RAMPaperSwitch.framework
 ${PODS_ROOT}/SendBirdSDK/SendBirdSDK.framework
 ${PODS_ROOT}/SendBirdSDK/SendBirdSDK.framework.dSYM
+${BUILT_PRODUCTS_DIR}/SoftUIView/SoftUIView.framework
 ${BUILT_PRODUCTS_DIR}/SwiftHTTP/SwiftHTTP.framework
 ${BUILT_PRODUCTS_DIR}/SwiftNotificationCenter/SwiftNotificationCenter.framework
 ${BUILT_PRODUCTS_DIR}/SwiftRichString/SwiftRichString.framework

@@ -78,6 +78,17 @@ class LoginController: UIViewController {
             let uId = snapshot.key
             let gamerTag = value?["gamerTag"] as? String ?? ""
             let bio = value?["bio"] as? String ?? ""
+            
+            let search = value?["search"] as? String ?? ""
+            if(search.isEmpty){
+                ref.child("search").setValue("true")
+            }
+            
+            let notifications = value?["notifications"] as? String ?? ""
+            if(notifications.isEmpty){
+                ref.child("notifications").setValue("true")
+            }
+            
             var sentRequests = [FriendRequestObject]()
             
             //if sent requests have not been converted, we convert NOW.
@@ -278,6 +289,12 @@ class LoginController: UIViewController {
                 let mostUsedAttacker = dict["mostUsedAttacker"] as? String ?? ""
                 let mostUsedDefender = dict["mostUsedDefender"] as? String ?? ""
                 let gearScore = dict["gearScore"] as? String ?? ""
+                let codKills = dict["codKills"] as? String ?? ""
+                let codKd = dict["codKd"] as? String ?? ""
+                let codLevel = dict["codLevel"] as? String ?? ""
+                let codBestKills = dict["codBestKills"] as? String ?? ""
+                let codWins = dict["codWins"] as? String ?? ""
+                let codWlRatio = dict["codWlRatio"] as? String ?? ""
                 
                 let currentStat = StatObject(gameName: gameName)
                 currentStat.authorized = authorized
@@ -296,6 +313,12 @@ class LoginController: UIViewController {
                 currentStat.mostUsedAttacker = mostUsedAttacker
                 currentStat.mostUsedDefender = mostUsedDefender
                 currentStat.gearScore = gearScore
+                currentStat.codKills = codKills
+                currentStat.codKd = codKd
+                currentStat.codLevel = codLevel
+                currentStat.codBestKills = codBestKills
+                currentStat.codWins = codWins
+                currentStat.codWlRatio = codWlRatio
                 
                 currentStats.append(currentStat)
             }
@@ -323,6 +346,8 @@ class LoginController: UIViewController {
             user.xbox = xbox
             user.nintendo = nintendo
             user.bio = bio
+            user.search = search
+            user.notifications = notifications
             
             DispatchQueue.main.async {
                 let delegate = UIApplication.shared.delegate as! AppDelegate

@@ -21,6 +21,11 @@ class GCInfoCell: UICollectionViewCell{
     @IBOutlet weak var gamerTagAllTag: UILabel!
     @IBOutlet weak var gamerTagCover: UIView!
     @IBOutlet weak var gamerTagCoverEmblem: UIImageView!
+    @IBOutlet weak var psTag: UILabel!
+    @IBOutlet weak var switchTag: UILabel!
+    @IBOutlet weak var pcTag: UILabel!
+    @IBOutlet weak var xboxTag: UILabel!
+    
     
     @IBOutlet weak var progressSpinner: UIActivityIndicatorView!
     func consoleSwitchIsOn() -> Bool{

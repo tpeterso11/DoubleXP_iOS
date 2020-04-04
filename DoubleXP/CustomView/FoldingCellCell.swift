@@ -178,6 +178,51 @@ class FoldingCellCell: FoldingCell, UICollectionViewDelegate, UICollectionViewDa
             return cell
         }
         
+        if(!keys.contains(current.gameName + "codKd") && !current.codKd.isEmpty){
+            keys.append(current.gameName + "codKd")
+            
+            cell.statLabel.text = "K/D"
+            cell.stat.text = current.codKd
+            
+            return cell
+        }
+        
+        if(!keys.contains(current.gameName + "codKills") && !current.codKills.isEmpty){
+            keys.append(current.gameName + "codKills")
+            
+            cell.statLabel.text = "Kills"
+            cell.stat.text = current.codKills
+            
+            return cell
+        }
+        
+        if(!keys.contains(current.gameName + "codWins") && !current.codWins.isEmpty){
+            keys.append(current.gameName + "codWins")
+            
+            cell.statLabel.text = "Wins"
+            cell.stat.text = current.codWins
+            
+            return cell
+        }
+        
+        if(!keys.contains(current.gameName + "codLevel") && !current.codLevel.isEmpty){
+            keys.append(current.gameName + "codLevel")
+            
+            cell.statLabel.text = "Level"
+            cell.stat.text = current.codLevel
+            
+            return cell
+        }
+        
+        if(!keys.contains(current.gameName + "codWlRatio") && !current.codWlRatio.isEmpty){
+            keys.append(current.gameName + "codWlRatio")
+            
+            cell.statLabel.text = "W/L Ratio"
+            cell.stat.text = current.codWlRatio
+            
+            return cell
+        }
+        
         return cell
     }
     

@@ -18,41 +18,12 @@ class SocialMediaManager{
         return self.token
     }
     
-    
-    func getTwitterHandle(developer: String) -> String{
-        switch developer {
-        case "2K Sports":
-            return "2K"
-        case "Ubisoft":
-            return "ubisoft"
-        case "Rockstar":
-            return "rockstargames"
-        default:
-            return ""
-        }
-    }
-    
-    func getTwitchGameId(gameName: String) -> String{
-        switch gameName{
-        case "Red Dead Redemption 2":
-            return "493959"
-        case "NBA 2K20":
-            return "513319"
-        case "The Division 2":
-            return "504463"
-        case "Rainbow Six Siege":
-            return "460630"
-        default:
-            return ""
-        }
-    }
-    
-    func loadTwitchStreams(team: TeamObject, callbacks: SocialMediaManagerCallback){
+    func loadTwitchStreams(team: TeamObject, gcGame: GamerConnectGame, callbacks: SocialMediaManagerCallback){
         var streams = [TwitchStreamObject]()
         TwitchTokenManager.shared.accessToken = token
         
         var ids = [String]()
-        ids.append(getTwitchGameId(gameName: team.games[0]))
+        ids.append(gcGame.twitchHandle)
         
         Twitch.Streams.getStreams(tokenManager: TwitchTokenManager.shared, after: nil, before: nil, communityIds: nil, first: 5, gameIds: ids, languages: nil, userIds: nil, userNames: nil){
             switch $0 {
@@ -104,7 +75,7 @@ class SocialMediaManager{
         }
     }
     
-    func loadTweets(team: TeamObject, callbacks: SocialMediaManagerCallback){
+    func loadTweets(team: TeamObject, gcGame: GamerConnectGame, callbacks: SocialMediaManagerCallback){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         var tweets = [TweetObject]()
         
@@ -115,7 +86,7 @@ class SocialMediaManager{
            }
         }
        
-        let parameters = ["screen_name": getTwitterHandle(developer: gcGame!.developer), "count": "10", "include_entities": "true"]
+        let parameters = ["screen_name": gcGame?.twitterHandle, "count": "10", "include_entities": "true"]
         var error : NSError?
         let req = TWTRAPIClient().urlRequest(withMethod: "GET", urlString: "https://api.twitter.com/1.1/statuses/user_timeline.json", parameters: parameters, error: &error)
         TWTRAPIClient().sendTwitterRequest(req, completion: { (response, data, error) in
@@ -153,10 +124,66 @@ class SocialMediaManager{
        })
     }
     
+    
+    func getTopGames(callbacks: SocialMediaManagerCallback){
+        var channels = [TwitchChannelObj]()
+        
+        TwitchTokenManager.shared.accessToken = token
+        Twitch.Games.getTopGames(completionHandler: {
+            switch $0 {
+                case .success(let getGames):
+                    DispatchQueue.main.async {
+                        for game in getGames.gameData{
+                            let obj = TwitchChannelObj(gameName: game.name, imageUrIOS: game.boxArtURLString, twitchID: game.id)
+                            let delegate = UIApplication.shared.delegate as! AppDelegate
+                            for gcGame in delegate.gcGames{
+                                if(gcGame.gameName == game.name){
+                                    obj.isGCGame = "true"
+                                    obj.gcGameName = gcGame.gameName
+                                }
+                            }
+                            channels.append(obj)
+                        }
+                        callbacks.onChannelsLoaded(channels: channels)
+                    }
+                    break;
+                case .failure(_, _, _): break
+                callbacks.onChannelsLoaded(channels: channels)
+            }
+        })
+    }
+    
+    func getGame(){
+        var channels = [TwitchChannelObj]()
+        
+        TwitchTokenManager.shared.accessToken = token
+        Twitch.Games.getGames(gameIds: nil, gameNames: ["Call of Duty: Modern Warfare"], completionHandler: {
+            switch $0 {
+                case .success(let getGames):
+                    DispatchQueue.main.async {
+                        for game in getGames.gameData{
+                            let obj = TwitchChannelObj(gameName: game.name, imageUrIOS: game.boxArtURLString, twitchID: game.id)
+                            let delegate = UIApplication.shared.delegate as! AppDelegate
+                            for gcGame in delegate.gcGames{
+                                if(gcGame.gameName == game.name){
+                                    obj.isGCGame = "true"
+                                    obj.gcGameName = gcGame.gameName
+                                }
+                            }
+                            channels.append(obj)
+                        }
+                        //callbacks.onChannelsLoaded(channels: channels)
+                    }
+                    break;
+                case .failure(_, _, _): break
+                //callbacks.onChannelsLoaded(channels: channels)
+            }
+        })
+    }
+    
     func getTopStreams(){
         var streams = [TwitchStreamObject]()
         TwitchTokenManager.shared.accessToken = token
-        
         Twitch.Streams.getStreams(tokenManager: TwitchTokenManager.shared, after: nil, before: nil, communityIds: nil, first: 50, gameIds: nil, languages: nil, userIds: nil, userNames: nil){
             switch $0 {
             case .success(let getStreamsData):
@@ -279,10 +306,13 @@ class SocialMediaManager{
                                 
                             streams.append(newStream)
                         }
-                callbacks.onStreamsLoaded(streams: streams)
+                    callbacks.onStreamsLoaded(streams: streams)
+                    break;
             case .failure(_, _, _):
                 callbacks.onStreamsLoaded(streams: streams)
+                break;
             }
         })
     }
 }
+

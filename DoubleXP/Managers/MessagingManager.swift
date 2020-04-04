@@ -110,13 +110,41 @@ class MessagingManager: UIViewController, SBDConnectionDelegate, SBDUserEventDel
             }
 
             self.currentChannel = groupChannel
-            SBDMain.add(self as SBDChannelDelegate, identifier: "CHANNEL_HANDLER")
             
-            if(team){
-                //register push notifications
+            var contained = false
+            if(groupChannel?.members != nil){
+                for member in groupChannel!.members!{
+                    if((member as! SBDMember).userId == self.currentUser!.uId){
+                        contained = true
+                        break
+                    }
+                }
             }
             
-            self.loadGroupMessages(groupChannel: self.currentChannel!)
+            if(!contained){
+                self.currentChannel!.join(completionHandler: { (error) in
+                    guard error == nil else {   // Error.
+                        return
+                    }
+                    
+                    SBDMain.add(self as SBDChannelDelegate, identifier: "CHANNEL_HANDLER")
+                    
+                    if(team){
+                        //register push notifications
+                    }
+                    
+                    self.loadGroupMessages(groupChannel: self.currentChannel!)
+                })
+            }
+            else{
+                SBDMain.add(self as SBDChannelDelegate, identifier: "CHANNEL_HANDLER")
+                
+                if(team){
+                    //register push notifications
+                }
+                
+                self.loadGroupMessages(groupChannel: self.currentChannel!)
+            }
         }
     }
     
@@ -142,7 +170,7 @@ class MessagingManager: UIViewController, SBDConnectionDelegate, SBDUserEventDel
         }
     }
     
-    func sendMessage(chatMessage: ChatMessage, list: [String]?){
+    func sendMessage(chatMessage: ChatMessage, list: [String]?, team: Bool){
         var params = SBDUserMessageParams(message: chatMessage.message)
         params!.message = chatMessage.message
         params!.data = chatMessage.data
@@ -154,6 +182,65 @@ class MessagingManager: UIViewController, SBDConnectionDelegate, SBDUserEventDel
         currentChannel?.sendUserMessage(with: params!) { (userMessage, error) in
             guard error == nil else {   // Error.
                 return
+            }
+            
+            if(!team){
+                let messageQueue = Database.database().reference().child("Users").child(chatMessage.recipientId)
+                messageQueue.observeSingleEvent(of: .value, with: { (snapshot) in
+                    
+                    let messagesArray = snapshot.childSnapshot(forPath: "messagingNotifications")
+                    if(messagesArray.exists()){
+                        var messages = [MeesageQueueObj]()
+                        var contained = false
+                        for friend in messagesArray.children{
+                            let currentObj = friend as! DataSnapshot
+                            let dict = currentObj.value as? [String: Any]
+                            
+                            if(dict != nil){
+                                let senderId = dict?["senderId"] as? String ?? ""
+                                let type = dict?["type"] as? String ?? ""
+                                
+                                if(senderId == chatMessage.recipientId){
+                                    contained = true
+                                }
+                            
+                                let message = MeesageQueueObj(senderId: senderId, type: type)
+                                messages.append(message)
+                            }
+                        }
+                        
+                        if(!contained){
+                            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                            let messageObj = MeesageQueueObj(senderId: appDelegate.currentUser!.uId, type: "user")
+                            messages.append(messageObj)
+                            
+                            var outgoing = [[String: String]]()
+                            for message in messages{
+                                let outMess = ["senderId": message.senderId]
+                                outgoing.append(outMess)
+                            }
+                            
+                            messageQueue.child("messagingNotifications").setValue(outgoing)
+                        }
+                    }
+                    else{
+                        var messages = [MeesageQueueObj]()
+                        
+                        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                        let messageObj = MeesageQueueObj(senderId: appDelegate.currentUser!.uId, type: "user")
+                        messages.append(messageObj)
+                        
+                        var outgoing = [[String: String]]()
+                        for message in messages{
+                            let outMess = ["senderId": message.senderId]
+                            outgoing.append(outMess)
+                        }
+                        
+                        messageQueue.child("messagingNotifications").setValue(outgoing)
+                    }
+                }) { (error) in
+                    print(error.localizedDescription)
+                }
             }
             
             self.messagingCallbacks!.messageSentSuccessfully(chatMessage: chatMessage, sender: userMessage!.sender!)

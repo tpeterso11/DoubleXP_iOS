@@ -108,11 +108,11 @@ class TeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate {
             let top = CGAffineTransform(translationX: 0, y: 30)
             let top2 = CGAffineTransform(translationX: 0, y: -30)
             
-            UIView.animate(withDuration: 0.8, animations: {
+            UIView.animate(withDuration: 0.5, animations: {
                     self.teamList.alpha = 1
                     self.teamList.transform = top
                 }, completion: { (finished: Bool) in
-                    UIView.animate(withDuration: 0.8, delay: 0.2, options: [], animations: {
+                    UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
                         self.buttonLayout.transform = top2
                         self.buttonLayout.alpha = 1
                 }, completion: nil)

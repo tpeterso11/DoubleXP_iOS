@@ -27,6 +27,10 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
     @IBOutlet weak var gameName: UILabel!
     @IBOutlet weak var dashButton: UIButton!
     @IBOutlet weak var startButton: UIButton!
+    @IBOutlet weak var empty: UIView!
+    @IBOutlet weak var emptyText: UILabel!
+    @IBOutlet weak var emptyFAButton: UIButton!
+    var maxProfiles = 0
     
     
     override func awakeFromNib() {
@@ -37,6 +41,9 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
         super.viewDidLoad()
         
         setImage()
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        
         getQuestions()
         
         gameName.text = gcGame?.gameName
@@ -61,7 +68,6 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
         
         navDictionary = ["state": "backOnly"]
         
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.currentLanding?.updateNavigation(currentFrag: self)
         
         self.pageName = "FA Quiz Front"
@@ -76,8 +82,10 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
     }
     
     func showEmpty() {
-        //empty.isHidden = false
-        dashButton.addTarget(self, action: #selector(dashButtonClicked), for: .touchUpInside)
+        empty.isHidden = false
+        
+        
+        //dashButton.addTarget(self, action: #selector(dashButtonClicked), for: .touchUpInside)
     }
     
     @objc func dashButtonClicked(_ sender: AnyObject?) {

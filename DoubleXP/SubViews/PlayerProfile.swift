@@ -41,11 +41,14 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     @IBOutlet weak var actionButtonText: UILabel!
     @IBOutlet weak var actionOverlay: UIVisualEffectView!
     @IBOutlet weak var actionDrawer: UIView!
-    @IBOutlet weak var acceptButton: UIView!
-    @IBOutlet weak var declineButton: UIView!
     @IBOutlet weak var bottomBlur: UIVisualEffectView!
     @IBOutlet weak var userStatsLabel: UILabel!
     @IBOutlet weak var tapInstructions: UILabel!
+    @IBOutlet weak var sentOverlay: UIView!
+    @IBOutlet weak var sentText: UILabel!
+    @IBOutlet weak var declineButton: UIButton!
+    @IBOutlet weak var acceptButton: UIButton!
+    @IBOutlet weak var clickArea: UIView!
     
     
     var sections = [Section]()
@@ -65,17 +68,14 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         }
     
         loadUserInfo(uid: uid)
-        self.pageName = "Profile"
-        
-        navDictionary = ["state": "none"]
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        appDelegate.currentLanding?.updateNavigation(currentFrag: self)
-        appDelegate.addToNavStack(vc: self)
+        if(appDelegate.currentUser!.uId == self.uid){
+            bottomBlur.isHidden = true
+            actionButton.isHidden = true
+        }
         
         headerView.clipsToBounds = true
-        //mainLayout.roundCorners(corners: [.topLeft, .topRight], radius: 20)
-        actionDrawer.roundCorners(corners: [.topLeft, .topRight], radius: 40)
         
         self.actionOverlay.effect = nil
         actionOverlay.isHidden = false
@@ -229,6 +229,12 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 let mostUsedAttacker = dict["mostUsedAttacker"] as? String ?? ""
                 let mostUsedDefender = dict["mostUsedDefender"] as? String ?? ""
                 let gearScore = dict["gearScore"] as? String ?? ""
+                let codKills = dict["codKills"] as? String ?? ""
+                let codKd = dict["codKd"] as? String ?? ""
+                let codLevel = dict["codLevel"] as? String ?? ""
+                let codBestKills = dict["codBestKills"] as? String ?? ""
+                let codWins = dict["codWins"] as? String ?? ""
+                let codWlRatio = dict["codWlRatio"] as? String ?? ""
                 
                 let currentStat = StatObject(gameName: gameName)
                 currentStat.authorized = authorized
@@ -247,6 +253,12 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 currentStat.mostUsedAttacker = mostUsedAttacker
                 currentStat.mostUsedDefender = mostUsedDefender
                 currentStat.gearScore = gearScore
+                currentStat.codKills = codKills
+                currentStat.codKd = codKd
+                currentStat.codLevel = codLevel
+                currentStat.codBestKills = codBestKills
+                currentStat.codWins = codWins
+                currentStat.codWlRatio = codWlRatio
                 
                 self.objects.append(currentStat)
             }
@@ -326,16 +338,8 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                     actionButton.isUserInteractionEnabled = true
                     actionButton.addGestureRecognizer(singleTap)
                     
-                    acceptButton.applyGradient(colours:  [#colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1), #colorLiteral(red: 0.4666666687, green: 0.7647058964, blue: 0.2666666806, alpha: 1)], orientation: .horizontal)
-                    declineButton.applyGradient(colours:  [#colorLiteral(red: 0.521568656, green: 0.1098039225, blue: 0.05098039284, alpha: 1), #colorLiteral(red: 0.7450980544, green: 0.1568627506, blue: 0.07450980693, alpha: 1)], orientation: .horizontal)
-                    
-                    let acceptTap = UITapGestureRecognizer(target: self, action: #selector(acceptClicked))
-                    acceptButton.isUserInteractionEnabled = true
-                    acceptButton.addGestureRecognizer(acceptTap)
-                    
-                    let declineTap = UITapGestureRecognizer(target: self, action: #selector(declineClicked))
-                    declineButton.isUserInteractionEnabled = true
-                    declineButton.addGestureRecognizer(declineTap)
+                    acceptButton.addTarget(self, action: #selector(acceptClicked), for: .touchUpInside)
+                    declineButton.addTarget(self, action: #selector(declineClicked), for: .touchUpInside)
                     break
                 }
             }
@@ -375,6 +379,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         else{
             self.table.dataSource = self
             self.table.delegate = self
+            self.table.contentInset = UIEdgeInsets(top: 0,left: 0,bottom: 50,right: 0)
             
             let top = CGAffineTransform(translationX: 0, y: -10)
             UIView.animate(withDuration: 0.8, animations: {
@@ -432,24 +437,25 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         if(self.userForProfile != nil){
             let delegate = UIApplication.shared.delegate as! AppDelegate
             let currentUser = delegate.currentUser
-            friendsManager.sendRequestFromProfile(currentUser: currentUser!, otherUser: userForProfile!)
+            friendsManager.sendRequestFromProfile(currentUser: currentUser!, otherUser: userForProfile!, callbacks: self)
         }
     }
     
     private func showDrawerAndOverlay(){
         AppEvents.logEvent(AppEvents.Name(rawValue: "Friend Profile - Action Drawer Opened"))
-        UIView.animate(withDuration: 0.7, animations: {
-            self.actionOverlay.effect = UIBlurEffect(style: .regular)
+        UIView.animate(withDuration: 0.3, animations: {
+            self.actionOverlay.alpha = 1
         } )
         
-        let top = CGAffineTransform(translationX: 0, y: -135)
-        UIView.animate(withDuration: 0.4, delay: 1.3, options: [], animations: {
+        let top = CGAffineTransform(translationX: 0, y: -180)
+        UIView.animate(withDuration: 0.5, animations: {
+            self.actionDrawer.alpha = 1
               self.actionDrawer.transform = top
         }, completion: nil)
         
-        let singleTap = UITapGestureRecognizer(target: self, action: #selector(dismissDrawerAndOverlay))
-        actionOverlay.isUserInteractionEnabled = true
-        actionOverlay.addGestureRecognizer(singleTap)
+        //let singleTap = UITapGestureRecognizer(target: self, action: #selector(dismissDrawerAndOverlay))
+        //clickArea.isUserInteractionEnabled = true
+        //clickArea.addGestureRecognizer(singleTap)
     }
     
     @objc private func dismissDrawerAndOverlay(){
@@ -459,7 +465,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
               self.actionDrawer.transform = top
         }, completion: nil)
         
-        UIView.animate(withDuration: 0.7, delay: 0.5,animations: {
+        UIView.animate(withDuration: 0.5, delay: 0.5,animations: {
             self.actionOverlay.effect = nil
         } )
         
@@ -550,6 +556,25 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 tableView.scrollToRow(at: indexPath, at: UITableView.ScrollPosition.bottom, animated: true)
             }
         }, completion: nil)
+    }
+    
+    func onFriendRequested(){
+        let top = CGAffineTransform(translationX: 0, y: -40)
+        UIView.animate(withDuration: 0.5, animations: {
+            self.sentOverlay.alpha = 1
+            self.updateToPending()
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                self.sentText.transform = top
+                self.sentText.alpha = 1
+            }, completion: { (finished: Bool) in
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    UIView.animate(withDuration: 0.5, delay: 0.8, options: [], animations: {
+                        self.sentOverlay.alpha = 0
+                    }, completion: nil)
+                }
+            })
+        })
     }
     
     private func roundCorners(cornerRadius: Double, view: UIView) {
@@ -713,6 +738,26 @@ struct Section {
         if(!stat.totalRankedLosses.isEmpty){
             count += 1
         }
+        
+        if(!stat.codKd.isEmpty){
+            count += 1
+        }
+        if(!stat.codWins.isEmpty){
+            count += 1
+        }
+        if(!stat.codWlRatio.isEmpty){
+            count += 1
+        }
+        if(!stat.codKills.isEmpty){
+            count += 1
+        }
+        if(!stat.codBestKills.isEmpty){
+            count += 1
+        }
+        if(!stat.codLevel.isEmpty){
+            count += 1
+        }
+        
         
         return count
     }

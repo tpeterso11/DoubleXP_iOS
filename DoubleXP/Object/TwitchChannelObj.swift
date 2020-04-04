@@ -80,6 +80,18 @@ class TwitchChannelObj: NSObject, NSCoding {
         }
     }
     
+    func isGCGame(game: String) -> Bool{
+        switch(gameName){
+            case "Call of Duty: Modern Warfare":
+                return true
+        
+            
+            default:
+                return false
+        }
+    }
+    
+    
     var _isGCGame: String = ""
     var isGCGame: String {
         get {

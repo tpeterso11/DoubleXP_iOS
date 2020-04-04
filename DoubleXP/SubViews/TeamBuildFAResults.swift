@@ -45,12 +45,6 @@ class TeamBuildFAResults: ParentVC, UITableViewDelegate, UITableViewDataSource, 
         let delegate = UIApplication.shared.delegate as! AppDelegate
         currentUser = delegate.currentUser
         
-        navDictionary = ["state": "backOnly"]
-        delegate.currentLanding?.updateNavigation(currentFrag: self)
-        
-        self.pageName = "Team FA Results"
-        delegate.addToNavStack(vc: self)
-        
         doSearch(needs: team!.selectedTeamNeeds)
         //self.view.sendSubviewToBack(self.clickArea)
     }

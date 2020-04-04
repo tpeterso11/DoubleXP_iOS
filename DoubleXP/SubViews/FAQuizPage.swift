@@ -49,6 +49,21 @@ class FAQuizPage: UIViewController, UICollectionViewDataSource, UICollectionView
         if(!question!.option5.isEmpty){
             options.append(question!.option5)
         }
+        if(!question!.option6.isEmpty){
+            options.append(question!.option6)
+        }
+        if(!question!.option7.isEmpty){
+            options.append(question!.option7)
+        }
+        if(!question!.option8.isEmpty){
+            options.append(question!.option8)
+        }
+        if(!question!.option9.isEmpty){
+            options.append(question!.option9)
+        }
+        if(!question!.option10.isEmpty){
+            options.append(question!.option10)
+        }
         
         if(!question!.option1Description.isEmpty){
             optionDescriptions.append(question!.option1Description)
@@ -64,6 +79,21 @@ class FAQuizPage: UIViewController, UICollectionViewDataSource, UICollectionView
         }
         if(!question!.option5Description.isEmpty){
             optionDescriptions.append(question!.option5Description)
+        }
+        if(!question!.option6Description.isEmpty){
+            optionDescriptions.append(question!.option6Description)
+        }
+        if(!question!.option7Description.isEmpty){
+            optionDescriptions.append(question!.option7Description)
+        }
+        if(!question!.option8Description.isEmpty){
+            optionDescriptions.append(question!.option8Description)
+        }
+        if(!question!.option9Description.isEmpty){
+            optionDescriptions.append(question!.option9Description)
+        }
+        if(!question!.option10Description.isEmpty){
+            optionDescriptions.append(question!.option10Description)
         }
         
         questionOptions.delegate = self

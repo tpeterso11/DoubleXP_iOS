@@ -158,7 +158,7 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
     
     private func getHomeUid(position: Int) -> String{
         if(position == 0){
-            return "JOHLpZPWCaScVQ5JgiaoP9xPn9R2"
+            return "lD6mtUk4ZshjQ7EHLtRUf7v22Xs2"
         }
         
         if(position == 1){

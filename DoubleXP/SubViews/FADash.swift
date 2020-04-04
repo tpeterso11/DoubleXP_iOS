@@ -45,13 +45,6 @@ class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        navDictionary = ["state": "backOnly"]
-        delegate.currentLanding?.updateNavigation(currentFrag: self)
-        
-        self.pageName = "Free Agent Dash"
-        delegate.addToNavStack(vc: self)
-        
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             self.loadProfiles()
         }
@@ -162,7 +155,7 @@ class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource 
             cell.coverLabel.text = current.game
             cell.underLabel.text = current.gamerTag
             
-            cell.tag = indexPath.item
+            cell.quizButton.tag = indexPath.item
             cell.deleteButton.addTarget(self, action: #selector(deleteButtonClicked), for: .touchUpInside)
             cell.quizButton.addTarget(self, action: #selector(quizButtonClicked), for: .touchUpInside)
             
@@ -233,9 +226,6 @@ class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource 
                     tableView.scrollToRow(at: indexPath, at: UITableView.ScrollPosition.bottom, animated: true)
                 }
             }, completion: nil)
-        }
-        else{
-            self.showQuiz(position: indexPath.item)
         }
     }
     
@@ -333,6 +323,7 @@ class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource 
     }
     
     @objc func quizButtonClicked(_ sender: AnyObject?) {
+        var position = sender?.tag
         if(sender?.tag != nil){
             showQuiz(position: sender!.tag)
         }

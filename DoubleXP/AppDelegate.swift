@@ -68,12 +68,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     }
     
     func addToNavStack(vc: ParentVC){
-        //if(self.navStack.get(key: vc.pageName!) != nil){
-        //    self.rebuildNavStack(vc: vc)
-        //}
-        //else{
-           self.navStack[vc.pageName!] = vc
-        //}
+        self.navStack[vc.pageName!] = vc
+    }
+    
+    func clearAndAddToNavStack(vc: ParentVC){
+        self.navStack = KeepOrderDictionary<String, ParentVC>()
+        self.navStack.add(index: 0, vc)
+        
+        self.currentLanding?.stackDepth = self.navStack.count
     }
     
     func resetStack(vc: ParentVC){

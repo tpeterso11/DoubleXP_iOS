@@ -56,6 +56,8 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         self.saveButton.addTarget(self, action: #selector(saveButtonClicked), for: .touchUpInside)
         self.saveButton.isUserInteractionEnabled = false
         
+        self.cancelButton.addTarget(self, action: #selector(cancelButtonClicked), for: .touchUpInside)
+        
         let currentUser = appDelegate.currentUser!
         
         for game in gcGames{
@@ -305,6 +307,11 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         manager.saveChanges(bio: self.bio ?? "", games: games, ps: self.ps, pc: self.pc, xBox: self.xbox, nintendo: self.nintendo, callbacks: self)
         
         AppEvents.logEvent(AppEvents.Name(rawValue: "User Profile - Profile Updated"))
+    }
+    
+    @objc func cancelButtonClicked(_ sender: AnyObject?) {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.currentLanding!.navigateToHome()
     }
     
     func changesComplete() {

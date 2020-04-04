@@ -192,6 +192,66 @@ class StatObject: NSObject, NSCoding {
         }
     }
     
+    var _codLevel = ""
+    var codLevel: String {
+        get {
+            return (_codLevel)
+        }
+        set (newVal) {
+            _codLevel = newVal
+        }
+    }
+    
+    var _codKd = ""
+    var codKd: String {
+        get {
+            return (_codKd)
+        }
+        set (newVal) {
+            _codKd = newVal
+        }
+    }
+    
+    var _codWins = ""
+    var codWins: String {
+        get {
+            return (_codWins)
+        }
+        set (newVal) {
+            _codWins = newVal
+        }
+    }
+    
+    var _codWlRatio = ""
+    var codWlRatio: String {
+        get {
+            return (_codWlRatio)
+        }
+        set (newVal) {
+            _codWlRatio = newVal
+        }
+    }
+    
+    var _codKills = ""
+    var codKills: String {
+        get {
+            return (_codKills)
+        }
+        set (newVal) {
+            _codKills = newVal
+        }
+    }
+    
+    var _codBestKills = ""
+    var codBestKills: String {
+        get {
+            return (_codBestKills)
+        }
+        set (newVal) {
+            _codBestKills = newVal
+        }
+    }
+    
     func getStatCount() -> Int{
         var count = 0
         

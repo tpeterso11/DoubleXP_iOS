@@ -13,9 +13,16 @@ import moa
 import MSPeekCollectionViewDelegateImplementation
 import UnderLineTextField
 import SendBirdSDK
+import NotificationCenter
+import FBSDKCoreKit
 
 class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate, MSPeekImplementationDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, MessagingCallbacks {
     
+    @IBOutlet weak var cancelButton: UIButton!
+    @IBOutlet weak var drawerBack: UIView!
+    @IBOutlet weak var gcEnterDone: UIButton!
+    @IBOutlet weak var gcGamertagEntry: UnderLineTextField!
+    @IBOutlet weak var gcEnterDrawer: UIView!
     @IBOutlet weak var gcGameScroll: UICollectionView!
     @IBOutlet weak var psSwitch: UISwitch!
     @IBOutlet weak var xboxSwitch: UISwitch!
@@ -25,15 +32,22 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
     @IBOutlet weak var bottomView: UIView!
     @IBOutlet weak var createButton: UIButton!
     @IBOutlet weak var teamName: UnderLineTextField!
+    @IBOutlet weak var loadingView: UIView!
     private var tempPayload = [String: Any]()
     private var setupTeamObj: TeamObject?
     private var selectedCells = [String]()
+    var gcHeight: CGFloat?
     
     var switches = [UISwitch]()
     var consoleChecked = false
-    var gamerTagChosen = false
+    var teamNameChosen = false
+    var gamertagEntered = false
     var chosenGame = ""
     var chosenConsole = ""
+    var enteredTag = ""
+    var startHeight: CGFloat = 240
+    private var drawerOpen = false
+    private var clicked = false
     
     var gcGames = [GamerConnectGame]()
     override func viewDidLoad() {
@@ -49,13 +63,7 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         switches.append(pcSwitch)
         switches.append(nintendoSwitch)
         
-        navDictionary = ["state": "backOnly"]
         let delegate = UIApplication.shared.delegate as! AppDelegate
-    
-        delegate.currentLanding?.updateNavigation(currentFrag: self)
-        self.pageName = "Create Team"
-        
-        delegate.addToNavStack(vc: self)
         gcGames = delegate.gcGames
         
         psSwitch.addTarget(self, action: #selector(psSwitchChanged), for: UIControl.Event.valueChanged)
@@ -67,6 +75,20 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         
         checkNextActivation()
         
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillDisappear),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
+        
         teamName.delegate = self
         teamName.returnKeyType = UIReturnKeyType.done
         textFieldShouldReturn(teamName)
@@ -75,6 +97,15 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
     func textFieldShouldReturn(_ textField: UITextField!) -> Bool {
         textField.resignFirstResponder()
         return true
+    }
+    
+    @objc func keyboardWillDisappear() {
+        if(drawerOpen){
+            let top = CGAffineTransform(translationX: 0, y: -240)
+            UIView.animate(withDuration: 0.5, animations: {
+                self.gcEnterDrawer.transform = top
+            }, completion: nil)
+        }
     }
     
     private func animateView(){
@@ -91,14 +122,26 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
     }
     
     @objc func textFieldDidChange(_ textField: UITextField) {
-        if(textField.text != nil){
+        if(textField.text != nil && textField == teamName){
             if textField.text!.count >= 3 {
-                gamerTagChosen = true
+                teamNameChosen = true
                 checkNextActivation()
             }
             else{
-                gamerTagChosen = false
+                teamNameChosen = false
                 checkNextActivation()
+            }
+        }
+        else if(textField.text != nil && textField == gcGamertagEntry){
+            if textField.text!.count >= 3 {
+                gamertagEntered = true
+                gcEnterDone.alpha = 1
+                gcEnterDone.isUserInteractionEnabled = true
+            }
+            else{
+                gamertagEntered = false
+                gcEnterDone.alpha = 0.3
+                gcEnterDone.isUserInteractionEnabled = false
             }
         }
     }
@@ -160,7 +203,7 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
     
     
     private func checkNextActivation(){
-        if(consoleChecked && gamerTagChosen){
+        if(consoleChecked && teamNameChosen){
             createButton.alpha = 1
             
             createButton.isUserInteractionEnabled = true
@@ -174,15 +217,116 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
     }
     
     @objc func createButtonClicked(_ sender: AnyObject?) {
-       var selected = [String]()
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        if(delegate.currentUser!.games.contains(self.chosenGame)){
+            showLoading(tag: true)
+        }
+        else{
+            showDrawer()
+        }
+    }
+    
+    @objc private func handleClick(){
+        self.enteredTag = self.gcGamertagEntry.text!
+        
+        dismissDrawer()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            if(!self.enteredTag.isEmpty){
+                self.showLoading(tag: false)
+            }
+        }
+    }
+    
+    private func showLoading(tag: Bool){
+        UIView.animate(withDuration: 0.8, animations: {
+            self.loadingView.alpha = 1
+        }, completion: { (finished: Bool) in
+            if(tag){
+                self.createTeamTag()
+            }
+            else{
+                self.saveNewProfile()
+                self.createTeamNoTag()
+            }
+        })
+    }
+    
+    private func saveNewProfile(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let user = delegate.currentUser
+        let userRef = Database.database().reference().child("Users").child(user!.uId)
+        userRef.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                var gamerTags = [GamerProfile]()
+                let gamerTagsArray = snapshot.childSnapshot(forPath: "gamerTags")
+                for gamerTagObj in gamerTagsArray.children {
+                    let currentObj = gamerTagObj as! DataSnapshot
+                    let dict = currentObj.value as! [String: Any]
+                    let currentTag = dict["gamerTag"] as? String ?? ""
+                    let currentGame = dict["game"] as? String ?? ""
+                    let console = dict["console"] as? String ?? ""
+                    
+                    let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
+                    gamerTags.append(currentGamerTagObj)
+                }
+                
+                var profilesUp = [[String: String]]()
+                for profile in gamerTags{
+                    let current = ["gamerTag": profile.gamerTag, "gameName": profile.game, "console": profile.console]
+                    profilesUp.append(current)
+                }
+                
+                let sendUp = ["gamerTag": self.enteredTag, "gameName": self.chosenGame, "console": self.chosenConsole]
+                profilesUp.append(sendUp)
+                
+                userRef.child("gamerTags").setValue(profilesUp)
+    
+                AppEvents.logEvent(AppEvents.Name(rawValue: "Create Frag - New Profile Created"))
+            }
+        }) { (error) in
+            print(error.localizedDescription)
+        }
+    }
+    
+    private func createTeamNoTag(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let user = delegate.currentUser
+        
+        var selected = [String]()
         selected.append(self.chosenGame)
         
         var consoles = [String]()
         consoles.append(self.chosenConsole)
         
-        let delegate = UIApplication.shared.delegate as! AppDelegate!
+        var teammateTags = [String]()
+        teammateTags.append(self.enteredTag)
+        
+        var teammateIds = [String]()
+        teammateIds.append(user?.uId ?? "")
+        
+        let currentGame = getGameInfo(selectedGame: chosenGame)
+        
+        var teammates = [TeammateObject]()
+        let captain = TeammateObject(gamerTag: self.enteredTag, date: "", uid: user!.uId)
+        teammates.append(captain)
+        
+        let newTeam = TeamObject(teamName: teamName.text!, teamId: randomAlphaNumericString(length: 12), games: selected, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: self.enteredTag, teamInvites: [TeamInviteObject](), teamChat: "", teamInviteTags: [String](), teamNeeds: currentGame?.teamNeeds ?? [String](), selectedTeamNeeds: [String](), imageUrl: currentGame?.imageUrl ?? "")
+        newTeam.teammates = teammates
+        
+        createTeam(team: newTeam)
+    }
+    
+    private func createTeamTag(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        var selected = [String]()
+        selected.append(self.chosenGame)
+        
+        var consoles = [String]()
+        consoles.append(self.chosenConsole)
+        
         let manager = GamerProfileManager()
-        let user = delegate?.currentUser
+        let user = delegate.currentUser
         
         var teammateTags = [String]()
         teammateTags.append(manager.getGamerTagForGame(gameName: chosenGame))
@@ -201,6 +345,68 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         
         createTeam(team: newTeam)
     }
+    
+    private func showDrawer(){
+        UIView.animate(withDuration: 0.5, animations: {
+            self.drawerBack.alpha = 1
+        }, completion: { (finished: Bool) in
+            let top = CGAffineTransform(translationX: 0, y: -240)
+            
+            UIView.animate(withDuration: 0.5, animations: {
+                self.gcEnterDrawer.transform = top
+            }, completion: nil)
+        })
+        
+        self.drawerOpen = true
+        gcGamertagEntry.returnKeyType = .done
+        gcGamertagEntry.delegate = self
+        gcGamertagEntry.addTarget(self, action: #selector(textFieldDidChange), for: UIControl.Event.editingChanged)
+        gcEnterDone.addTarget(self, action: #selector(handleClick), for: .touchUpInside)
+        gcEnterDone.alpha = 0.3
+        gcEnterDone.isUserInteractionEnabled = false
+        
+        cancelButton.addTarget(self, action: #selector(dismissDrawer), for: .touchUpInside)
+        
+        checkNextActivation()
+        
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Create Frag - Drawer Open"))
+    }
+    
+    @objc func keyboardWillShow(_ notification: Notification) {
+        if(drawerOpen){
+            if let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+                let keyboardRectangle = keyboardFrame.cgRectValue
+                let keyboardHeight = keyboardRectangle.height
+                
+                self.gcHeight = keyboardHeight
+                
+                extendBottom(height: self.gcHeight!)
+            }
+        }
+    }
+    
+    private func extendBottom(height: CGFloat){
+        let top = CGAffineTransform(translationX: 0, y: -self.gcHeight! - 100)
+        UIView.animate(withDuration: 0.8, animations: {
+            self.gcEnterDrawer.transform = top
+        }, completion: nil)
+    }
+    
+    @objc private func dismissDrawer(){
+        let top = CGAffineTransform(translationX: 0, y: 0)
+        UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+            self.gcEnterDrawer.transform = top
+        }, completion: { (finished: Bool) in
+                UIView.animate(withDuration: 0.5) {
+                self.drawerBack.alpha = 0
+            }
+        })
+    }
+    
+    // work on if channel creation fails
+    // make sure on settings, if game is added, new profile is made.
+    // test sending and receving requests.
+    // and then a little more logging and we're DONE!
     
     private func createTeam(team: TeamObject){
         self.setupTeamObj = team
@@ -316,10 +522,12 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
     }
 
     func connectionSuccessful() {
-        let manager = MessagingManager()
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let user = appDelegate.currentUser
-        manager.createTeamChannel(userId: user!.uId, callbacks: self)
+        DispatchQueue.main.async {
+            let manager = MessagingManager()
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let user = appDelegate.currentUser
+            manager.createTeamChannel(userId: user!.uId, callbacks: self)
+        }
     }
     
     func createTeamChannelSuccessful(groupChannel: SBDGroupChannel) {
@@ -348,6 +556,8 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         else{
             currentLanding?.navigateToTeamDashboard(team: self.setupTeamObj!, newTeam: true)
         }
+        
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Create Frag - Team Created With Chat"))
     }
     
     func messageSuccessfullyReceived(message: SBDUserMessage) {

@@ -14,6 +14,7 @@ import FBSDKCoreKit
 import GiphyUISDK
 import GiphyCoreSDK
 import moa
+import Firebase
 
 typealias Runnable = () -> ()
 
@@ -73,8 +74,10 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     @IBOutlet weak var primaryBack: UIImageView!
     @IBOutlet weak var searchButton: UIButton!
     var mainNavShowing = false
+    var bannerShowing = false
     //@IBOutlet weak var newNav: UIView!
     
+    @IBOutlet weak var notificationLabel: UILabel!
     @IBOutlet weak var clickArea: UIView!
     @IBOutlet weak var mediaButton: UIImageView!
     @IBOutlet weak var logOut: UIButton!
@@ -95,6 +98,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     var menuItems = [Any]()
     var constraint : NSLayoutConstraint?
     var messagingDeckHeight: CGFloat?
+    @IBOutlet weak var notificationDrawer: UIView!
     
     var bottomNavHeight = CGFloat()
     
@@ -182,6 +186,196 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         
         //self.view.bringSubviewToFront(self.giphy)
         Broadcaster.register(LandingMenuCallbacks.self, observer: self)
+        
+        addFriendsRef()
+        addPendingFriendsRef()
+        addMessagingRef()
+        
+        /*let allNewChildrenRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId)
+        allNewChildrenRef.observe(.childAdded, with: { (snapshot) in
+            if(appDelegate.currentUser!.pendingRequests.isEmpty && snapshot.hasChild("pending_requests")){
+                let child = snapshot.childSnapshot(forPath: "pending_requests")
+                
+                var pendingRequests = [FriendRequestObject]()
+                
+                for friend in child.children{
+                    let currentObj = friend as! DataSnapshot
+                    let dict = currentObj.value as! [String: Any]
+                    let gamerTag = dict["gamerTag"] as? String ?? ""
+                    let date = dict["date"] as? String ?? ""
+                    let uid = dict["uid"] as? String ?? ""
+                    
+                    let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
+                    pendingRequests.append(newFriend)
+                }
+                
+                if(!pendingRequests.isEmpty && appDelegate.currentUser!.pendingRequests.count < pendingRequests.count){
+                    appDelegate.currentUser?.pendingRequests = pendingRequests
+                    
+                    let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.navigateToRequests))
+                    self.showAlert(alertText: "you have a new friend request!", tap: drawerTap)
+                }
+            }
+        })*/
+        
+        
+        /*DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            let current = ["gamerTag": "test", "date": "today", "uid": "123"] as [String : String]
+            
+            newMessageRef.setValue([current])
+        }*/
+    }
+    
+    private func showAlert(alertText: String, tap: UITapGestureRecognizer){
+        if(self.bannerShowing){
+            //skip.
+        }
+        else{
+            self.bannerShowing = true
+            self.notificationLabel.text = alertText
+            
+            self.notificationDrawer.isUserInteractionEnabled = true
+            self.notificationDrawer.addGestureRecognizer(tap)
+            
+            let top = CGAffineTransform(translationX: 0, y: -130)
+            UIView.animate(withDuration: 0.8, delay: 0.0, options:[], animations: {
+                self.notificationDrawer.transform = top
+            }, completion: { (finished: Bool) in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                    let down = CGAffineTransform(translationX: 0, y: 0)
+                    UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
+                        self.notificationDrawer.transform = down
+                    }, completion: { (finished: Bool) in
+                        self.bannerShowing = false
+                        self.notificationDrawer.isUserInteractionEnabled = false
+                    })
+                }
+            })
+        }
+    }
+    
+    private func showMessageAlertQueue(array: [MeesageQueueObj]){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        
+        if(!array.isEmpty && appDelegate.currentUser!.notifications == "true"){
+            var mutable = [MeesageQueueObj]()
+            mutable.append(contentsOf: array)
+            
+            let current = mutable[0]
+            self.bannerShowing = true
+            self.notificationLabel.text = "you have a new message."
+            
+            let top = CGAffineTransform(translationX: 0, y: -130)
+            UIView.animate(withDuration: 0.8, delay: 0.0, options:[], animations: {
+                self.notificationDrawer.transform = top
+            }, completion: { (finished: Bool) in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                    let down = CGAffineTransform(translationX: 0, y: 0)
+                    UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
+                        self.notificationDrawer.transform = down
+                    }, completion: { (finished: Bool) in
+                        self.notificationDrawer.isUserInteractionEnabled = false
+                        
+                        mutable.remove(at: 0)
+                        
+                        let messageQueue = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("messagingNotifications")
+                        
+                        var upList = [[String: String]]()
+                        for message in mutable{
+                            let newMessage = ["senderId": message.senderId]
+                            upList.append(newMessage)
+                        }
+                        
+                        messageQueue.setValue(upList)
+                        
+                        if(!array.isEmpty){
+                            self.showMessageAlertQueue(array: mutable)
+                        }
+                    })
+                }
+            })
+        }
+        else{
+            let messageQueue = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("messagingNotifications")
+            
+            var upList = [[String: String]]()
+            messageQueue.setValue(upList)
+        }
+    }
+    
+    private func addMessagingRef(){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        
+        let newMessageRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("messagingNotifications")
+            newMessageRef.observe(.value, with: { (snapshot) in
+                var messageArray = [MeesageQueueObj]()
+                for message in snapshot.children{
+                    let currentObj = message as! DataSnapshot
+                    let dict = currentObj.value as! [String: Any]
+                    let senderId = dict["senderId"] as? String ?? ""
+                    
+                    let messageObj = MeesageQueueObj(senderId: senderId, type: "user")
+                    messageArray.append( messageObj)
+                }
+                
+                if(!messageArray.isEmpty){
+                    let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.navigateToRequests))
+                    self.showMessageAlertQueue(array: messageArray)
+                }
+            })
+    }
+    
+    private func addFriendsRef(){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        
+        let friendsRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("friends")
+        friendsRef.observe(.value, with: { (snapshot) in
+            var friendsArray = [FriendObject]()
+            for friend in snapshot.children{
+                let currentObj = friend as! DataSnapshot
+                let dict = currentObj.value as! [String: Any]
+                let gamerTag = dict["gamerTag"] as? String ?? ""
+                let date = dict["date"] as? String ?? ""
+                let uid = dict["uid"] as? String ?? ""
+                
+                let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
+                friendsArray.append(newFriend)
+            }
+            
+            if(!friendsArray.isEmpty && appDelegate.currentUser!.friends.count < friendsArray.count){
+                appDelegate.currentUser!.friends = friendsArray
+                
+                let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.navigateToRequests))
+                self.showAlert(alertText: "someone just added you back!", tap: drawerTap)
+            }
+        })
+    }
+    
+    private func addPendingFriendsRef(){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        
+        let pendingFriendsRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("pending_friends")
+        pendingFriendsRef.observe(.value, with: { (snapshot) in
+            var pendingRequests = [FriendRequestObject]()
+            
+            for friend in snapshot.children{
+                let currentObj = friend as! DataSnapshot
+                let dict = currentObj.value as! [String: Any]
+                let gamerTag = dict["gamerTag"] as? String ?? ""
+                let date = dict["date"] as? String ?? ""
+                let uid = dict["uid"] as? String ?? ""
+                
+                let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
+                pendingRequests.append(newFriend)
+            }
+            
+            if(!pendingRequests.isEmpty && appDelegate.currentUser!.pendingRequests.count < pendingRequests.count){
+                appDelegate.currentUser?.pendingRequests = pendingRequests
+                
+                let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.navigateToRequests))
+                self.showAlert(alertText: "you have a new friend request!", tap: drawerTap)
+            }
+        })
     }
     
     @objc func searchClicked(_ sender: AnyObject?) {
@@ -297,7 +491,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         }
     }
     
-    func navigateToRequests(){
+    @objc func navigateToRequests(){
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Requests"))
         stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
@@ -370,6 +564,18 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToCreateFrag()
+        }
+    }
+    
+    @objc func navigateToSettings() {
+        dismissMenu()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Settings"))
+            self.stackDepth += 1
+            Broadcaster.notify(NavigateToProfile.self) {
+                $0.navigateToSettings()
+            }
         }
     }
     
@@ -457,7 +663,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
           }
     }
     
-    func navigateToMessaging(groupChannelUrl: String?, otherUserId: String?){
+    @objc func navigateToMessaging(groupChannelUrl: String?, otherUserId: String?){
         self.bottomNavHeight = self.bottomNav.bounds.height + 60
         restoreBottomTabs()
         
@@ -859,6 +1065,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         self.menuItems.append(0)
         self.menuItems.append("Friends")
         self.menuItems.append(1)
+        self.menuItems.append(2)
         
         if let flowLayout = menuCollection?.collectionViewLayout as? UICollectionViewFlowLayout {
            flowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
@@ -985,10 +1192,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         mediaAdded = false
     }
     
-    func settingsProfileClicked(){
-        
-    }
-    
     func navigateToMessagingFromMenu(uId: String){
         self.bottomNavHeight = self.bottomNav.bounds.height + 60
         navigateToMessaging(groupChannelUrl: nil, otherUserId: uId)
@@ -1011,9 +1214,18 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "settings", for: indexPath) as! MenuSettingsCell
                     cell.tag = indexPath.item
                     cell.profileButton.addTarget(self, action: #selector(navigateToCurrentUserProfile), for: .touchUpInside)
+                    
+                    let settingsTap = UITapGestureRecognizer(target: self, action: #selector(navigateToSettings))
+                    cell.settingsButton.isUserInteractionEnabled = true
+                    cell.settingsButton.addGestureRecognizer(settingsTap)
+                    
                     return cell
                 }
                 else if(current as? Int == 1){
+                    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "myProfile", for: indexPath) as! MenuMyProfileCell
+                    return cell
+                }
+                else if(current as? Int == 2){
                     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "friendsList", for: indexPath) as! MenuFriendsList
                     cell.loadContent()
                     return cell
@@ -1044,6 +1256,9 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                     return CGSize(width: collectionView.bounds.size.width, height: CGFloat(50))
                 }
                 else if(current as? Int == 1){
+                    return CGSize(width: collectionView.bounds.size.width, height: CGFloat(300))
+                }
+                else if(current as? Int == 2){
                     return CGSize(width: collectionView.bounds.size.width, height: CGFloat(400))
                 }
                 
@@ -1058,7 +1273,29 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
+        let current = menuItems[indexPath.item]
+        if(current is Int){
+            if((current as! Int) ==  1){
+                restoreBottomTabs()
+                menuVie.viewShowing = false
+                
+                let top = CGAffineTransform(translationX: -249, y: 0)
+                UIView.animate(withDuration: 0.4, delay: 0.0, options:[], animations: {
+                    self.menuVie.transform = top
+                }, completion: { (finished: Bool) in
+                    UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
+                        self.blur.alpha = 0.0
+                    }, completion: { (finished: Bool) in
+                        self.stackDepth += 1
+                    
+                        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing Menu - Messaging User"))
+                    
+                        let delegate = UIApplication.shared.delegate as! AppDelegate
+                        self.navigateToProfile(uid: delegate.currentUser!.uId)
+                    })
+                })
+            }
+        }
     }
     
     func programmaticallyLoad(vc: ParentVC, fragName: String) {

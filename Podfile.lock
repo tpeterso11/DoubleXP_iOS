@@ -4,6 +4,7 @@ PODS:
   - CollapsibleTableSectionViewController (1.0.1)
   - DeepDiff (2.3.1)
   - DynamicBlurView (3.0.1)
+  - ElongationPreview (2.1.0)
   - EMPageViewController (3.0.0)
   - ExpyTableView (1.1)
   - FBSDKCoreKit/Basics (6.2.0)
@@ -149,8 +150,10 @@ PODS:
   - PopupDialog (1.0.0):
     - DynamicBlurView (~> 3.0.1)
   - Protobuf (3.11.4)
+  - RAMPaperSwitch (3.1.0)
   - SendBirdSDK (3.0.161)
   - SmoothButton (0.0.1)
+  - SoftUIView (0.0.1)
   - SwiftHTTP (3.0.1)
   - SwiftNotificationCenter (1.0.4)
   - SwiftRichString (3.7.1)
@@ -170,6 +173,7 @@ DEPENDENCIES:
   - AIFlatSwitch
   - Bartinter
   - CollapsibleTableSectionViewController (~> 1.0.0)
+  - ElongationPreview
   - EMPageViewController
   - ExpyTableView
   - FBSDKCoreKit/Swift
@@ -187,8 +191,10 @@ DEPENDENCIES:
   - MSPeekCollectionViewDelegateImplementation
   - PINRemoteImage
   - PopupDialog (~> 1.0)
+  - RAMPaperSwitch
   - SendBirdSDK
   - SmoothButton
+  - SoftUIView
   - SwiftHTTP (~> 3.0)
   - SwiftNotificationCenter
   - SwiftRichString
@@ -206,6 +212,7 @@ SPEC REPOS:
     - CollapsibleTableSectionViewController
     - DeepDiff
     - DynamicBlurView
+    - ElongationPreview
     - EMPageViewController
     - ExpyTableView
     - FBSDKCoreKit
@@ -243,8 +250,10 @@ SPEC REPOS:
     - PINRemoteImage
     - PopupDialog
     - Protobuf
+    - RAMPaperSwitch
     - SendBirdSDK
     - SmoothButton
+    - SoftUIView
     - SwiftHTTP
     - SwiftNotificationCenter
     - SwiftRichString
@@ -263,6 +272,7 @@ SPEC CHECKSUMS:
   CollapsibleTableSectionViewController: c41694de812a1039c5f8581c934cf0fc38e4e871
   DeepDiff: e5ae6c50d0321568e4508cec5930b9f10bb293fc
   DynamicBlurView: b1df5415f9bd31897549e5d7077e5ec120a4d636
+  ElongationPreview: 84b401d349bfcf855e94d6cc6b95d609260b6d96
   EMPageViewController: 8e0abc2b2f53f56a83044527eadbb56bd71ae3e3
   ExpyTableView: 52dde6e141056544c0b8e7b083a840c37ddb6132
   FBSDKCoreKit: a7bb9f5ac56c1e11d5f8ae0b90a3610f8744b43a
@@ -300,8 +310,10 @@ SPEC CHECKSUMS:
   PINRemoteImage: e2b89e19fb6e77ffc099f9d9f3b3fe1745e3f9f9
   PopupDialog: 28f29a1ffe9e1fab32fb258b53d56ca31670e8a2
   Protobuf: 176220c526ad8bd09ab1fb40a978eac3fef665f7
+  RAMPaperSwitch: 4ab6358e37cc90060693f10fb60fb6b73f6492c3
   SendBirdSDK: fae108b5757e21250d7cd32f4ff023075d7c06ae
   SmoothButton: b3191c0bdba16ff40bdd2934db9ddd93edaa9c9f
+  SoftUIView: f5ab13bf6bf9370455dd918877f25d81ddfa16eb
   SwiftHTTP: e94f1aa8cde58637dcc0100f6349de31a3337fde
   SwiftNotificationCenter: 760386da2ce03d3594cb5e96d1e22ec80b44b46f
   SwiftRichString: 9a6a70b4fe2cf428e38348b5ada5400da74621fd
@@ -314,6 +326,6 @@ SPEC CHECKSUMS:
   ValidationComponents: fad1f9e9d7fbf3e10c893c880ef9d27627e90382
   ValidationToolkit: ce8e9c1a5d49eddc3266a009d46df5ea22042dbc
 
-PODFILE CHECKSUM: ebd556038705e7f0afe533105a92ead27f621ecb
+PODFILE CHECKSUM: 81b7b961aed98ac74dd53a2da7b6ff651220b26c
 
 COCOAPODS: 1.8.4

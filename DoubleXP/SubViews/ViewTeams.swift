@@ -52,12 +52,6 @@ class ViewTeams: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate,
         gcGameList.layer.shadowPath = UIBezierPath(roundedRect: gcGameList.bounds, cornerRadius: gcGameList.layer.cornerRadius).cgPath
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        navDictionary = ["state": "search", "searchHint": "Find A Team", "searchButton": "Search"]
-        delegate.currentLanding?.updateNavigation(currentFrag: self)
-        
-        self.pageName = "View Teams"
-        delegate.addToNavStack(vc: self)
-        
         gcGames.append(contentsOf: delegate.gcGames)
         
         Broadcaster.register(SearchCallbacks.self, observer: self)

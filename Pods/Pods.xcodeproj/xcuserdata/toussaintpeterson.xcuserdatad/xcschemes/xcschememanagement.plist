@@ -34,6 +34,11 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>ElongationPreview.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>ExpyTableView.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -209,12 +214,22 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>RAMPaperSwitch.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>SendBirdSDK.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 		</dict>
 		<key>SmoothButton.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>SoftUIView.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>

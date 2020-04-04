@@ -51,6 +51,26 @@ class GamerConnectGame: NSObject, NSCoding {
         }
     }
     
+    var _twitterHandle:String? = nil
+    var twitterHandle:String {
+        get {
+            return (_twitterHandle)!
+        }
+        set (newVal) {
+            _twitterHandle = newVal
+        }
+    }
+    
+    var _twitchHandle:String? = nil
+    var twitchHandle:String {
+        get {
+            return (_twitchHandle)!
+        }
+        set (newVal) {
+            _twitchHandle = newVal
+        }
+    }
+    
     var _statsAvailable:Bool? = nil
     var statsAvailable:Bool {
         get {
@@ -101,7 +121,8 @@ class GamerConnectGame: NSObject, NSCoding {
         }
     }
     
-    init(imageUrl: String, gameName: String, developer: String, hook: String, statsAvailable: Bool, teamNeeds: [String])
+    init(imageUrl: String, gameName: String, developer: String, hook: String, statsAvailable: Bool, teamNeeds: [String],
+         twitterHandle: String, twitchHandle: String)
     {
         super.init()
         self.imageUrl = imageUrl
@@ -110,6 +131,8 @@ class GamerConnectGame: NSObject, NSCoding {
         self.hook = hook
         self.statsAvailable = statsAvailable
         self.teamNeeds = teamNeeds
+        self.twitterHandle = twitterHandle
+        self.twitchHandle = twitchHandle
     }
     
     required init(coder decoder: NSCoder)
@@ -123,6 +146,8 @@ class GamerConnectGame: NSObject, NSCoding {
         self.teamNeeds = (decoder.decodeObject(forKey: "teamNeeds") as! [String])
         self.secondaryName = (decoder.decodeObject(forKey: "secondaryName") as! String)
         self.gameModes = (decoder.decodeObject(forKey: "gameModes") as! [String])
+        self.twitterHandle = (decoder.decodeObject(forKey: "twitterHandle") as! String)
+        self.twitchHandle = (decoder.decodeObject(forKey: "twitchHandle") as! String)
     }
     
     func encode(with coder: NSCoder) {
@@ -134,5 +159,7 @@ class GamerConnectGame: NSObject, NSCoding {
         coder.encode(self.teamNeeds, forKey: "teamNeeds")
         coder.encode(self.secondaryName, forKey: "secondaryName")
         coder.encode(self.gameModes, forKey: "gameModes")
+        coder.encode(self.twitterHandle, forKey: "twitterHandle")
+        coder.encode(self.twitchHandle, forKey: "twitchHandle")
     }
 }

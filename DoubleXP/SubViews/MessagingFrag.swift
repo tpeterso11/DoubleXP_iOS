@@ -34,6 +34,7 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
     
     var estimatedHeight: CGFloat?
     private var emptyShowing = false
+    private var messagesSet = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,6 +54,7 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
         Broadcaster.register(SearchCallbacks.self, observer: self)
         
         animateView()
+        self.emptyShowing = true
     }
     
     private func animateView(){
@@ -180,7 +182,7 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
                     
                     var newArray = [[String: Any]]()
                     for chatObj in array{
-                        let newOject = ["channelUrl": chatObj.chatUrl, "otherUser": chatObj.otherUser, "otherUserId": chatObj.otherUserId, "legacy": "false"] as [String : Any]
+                        let newOject = ["channelUrl": chatObj.chatUrl, "otherUser": chatObj.otherUserId, "otherUserId": chatObj.otherUserId, "legacy": "false"] as [String : Any]
                         newArray.append(newOject)
                     }
                     ref.child("messaging").setValue(newArray)
@@ -195,6 +197,13 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
         }) { (error) in
             print(error.localizedDescription)
         }
+    }
+    
+    func reload(tableView: UITableView) {
+        let contentOffset = tableView.contentOffset
+        tableView.reloadData()
+        tableView.layoutIfNeeded()
+        tableView.setContentOffset(contentOffset, animated: false)
     }
     
     private func convertMessages(messages: [SBDUserMessage]){
@@ -240,14 +249,85 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
             messagingView.delegate = self
             messagingView.dataSource = self
             
+            self.messagesSet = true
+            
             messagingView.reloadData()
             messagingView.layoutIfNeeded()
             messagingView.heightAnchor.constraint(equalToConstant: messagingView.contentSize.height).isActive = true
+            
+            reload(tableView: messagingView)
+            
             scrollToBottom()
         }
     }
     
     func createTeamChannelSuccessful(groupChannel: SBDGroupChannel) {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = appDelegate.currentUser
+        let ref = Database.database().reference().child("Users").child(currentUser!.uId)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                var array = [ChatObject]()
+                let messagingArray = snapshot.childSnapshot(forPath: "messaging")
+                for channel in messagingArray.children{
+                    let currentObj = channel as! DataSnapshot
+                    let dict = currentObj.value as! [String: Any]
+                    let channelUrl = dict["channelUrl"] as? String ?? ""
+                    let otherUser = dict["otherUser"] as? String ?? ""
+                    let otherUserId = dict["otherUserId"] as? String ?? ""
+                    
+                    let chatObj = ChatObject(chatUrl: channelUrl, otherUser: otherUser)
+                    chatObj.otherUserId = otherUserId
+                    array.append(chatObj)
+                }
+                
+                let current = ChatObject(chatUrl: groupChannel.channelUrl, otherUser: self.otherUserId!)
+                array.append(current)
+                
+                var sendUp = [[String: String]]()
+                for channel in array{
+                    let currentOne = ["channelUrl": channel.chatUrl, "otherUser": channel.otherUser, "otherUserId": self.otherUserId ?? ""]
+                    
+                    sendUp.append(currentOne)
+                }
+                
+                ref.child("messaging").setValue(sendUp)
+                
+                let ref = Database.database().reference().child("Users").child(self.otherUserId!)
+                ref.observeSingleEvent(of: .value, with: { (snapshot) in
+                    if(snapshot.exists()){
+                        var array = [ChatObject]()
+                        let messagingArray = snapshot.childSnapshot(forPath: "messaging")
+                        for channel in messagingArray.children{
+                            let currentObj = channel as! DataSnapshot
+                            let dict = currentObj.value as! [String: Any]
+                            let channelUrl = dict["channelUrl"] as? String ?? ""
+                            let otherUser = dict["otherUser"] as? String ?? ""
+                            let otherUserId = dict["otherUserId"] as? String ?? ""
+                            
+                            let chatObj = ChatObject(chatUrl: channelUrl, otherUser: otherUser)
+                            chatObj.otherUserId = otherUserId
+                            array.append(chatObj)
+                        }
+                        
+                        let current = ChatObject(chatUrl: groupChannel.channelUrl, otherUser: appDelegate.currentUser!.uId)
+                        array.append(current)
+                        
+                        var sendUp = [[String: String]]()
+                        for channel in array{
+                            let currentOne = ["channelUrl": channel.chatUrl, "otherUser": currentUser!.uId, "otherUserId": currentUser!.uId]
+                            
+                            sendUp.append(currentOne)
+                        }
+                        
+                        ref.child("messaging").setValue(sendUp)
+                        
+                    }
+                })
+            }
+        }) { (error) in
+            print(error.localizedDescription)
+        }
     }
     
     func messageSuccessfullyReceived(message: SBDUserMessage) {
@@ -257,7 +337,6 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
                    let result = formatter.string(from: date as Date)
         
         let chatMessage = ChatMessage(message: message.message!, timeStamp: result)
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         //let currentUser = appDelegate.currentUser
         //let chatMessage1 = MockMessage(text: message.message!, user: currentUser!, messageId: "", date: Date.init())
         //chatMessage.data = message.data ?? ""
@@ -277,11 +356,32 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
     }
     
     private func addMessage(chatMessage: ChatMessage){
-        self.chatMessages.remove(at: self.chatMessages.count - 1)
+        if(self.emptyShowing){
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.emptyOverlay.alpha = 0
+                }, completion: nil)
+            }
+            self.emptyShowing = false
+        }
+        
+        if(!self.chatMessages.isEmpty){
+            self.chatMessages.remove(at: self.chatMessages.count - 1)
+        }
         self.chatMessages.append(chatMessage)
         self.chatMessages.append(0)
-        self.messagingView.reloadData()
-        scrollToBottom()
+        
+        if(self.messagesSet){
+            self.messagingView.reloadData()
+            scrollToBottom()
+        }
+        else{
+            messagingView.delegate = self
+            messagingView.dataSource = self
+            reload(tableView: messagingView)
+            
+            self.messagesSet = true
+        }
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -458,7 +558,17 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
         message.senderString = currentUser!.uId
         message.data = currentUser!.uId
         
-        manager?.sendMessage(chatMessage: message, list: list)
+        if(otherUserId != nil){
+            message.recipientId = otherUserId!
+            message.type = "user"
+        }
+        else{
+            message.recipientId = groupChannelUrl!
+            message.type = "team"
+        }
+        
+        
+        manager?.sendMessage(chatMessage: message, list: list, team: self.groupChannelUrl != nil)
         /*let date = Date()
         let formatter = DateFormatter()
         formatter.dateFormat = "MMMM.dd.yyyy"
@@ -471,5 +581,44 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
         //chatMessages.append(0)
         
         addMessage(chatMessage: chatMessage)*/
+    }
+}
+
+extension UITableView {
+    func scrollToBottomRow() {
+        DispatchQueue.main.async {
+            guard self.numberOfSections > 0 else { return }
+
+            // Make an attempt to use the bottom-most section with at least one row
+            var section = max(self.numberOfSections - 1, 0)
+            var row = max(self.numberOfRows(inSection: section) - 1, 0)
+            var indexPath = IndexPath(row: row, section: section)
+
+            // Ensure the index path is valid, otherwise use the section above (sections can
+            // contain 0 rows which leads to an invalid index path)
+            while !self.indexPathIsValid(indexPath) {
+                section = max(section - 1, 0)
+                row = max(self.numberOfRows(inSection: section) - 1, 0)
+                indexPath = IndexPath(row: row, section: section)
+
+                // If we're down to the last section, attempt to use the first row
+                if indexPath.section == 0 {
+                    indexPath = IndexPath(row: 0, section: 0)
+                    break
+                }
+            }
+
+            // In the case that [0, 0] is valid (perhaps no data source?), ensure we don't encounter an
+            // exception here
+            guard self.indexPathIsValid(indexPath) else { return }
+
+            self.scrollToRow(at: indexPath, at: .bottom, animated: true)
+        }
+    }
+
+    func indexPathIsValid(_ indexPath: IndexPath) -> Bool {
+        let section = indexPath.section
+        let row = indexPath.row
+        return section < self.numberOfSections && row < self.numberOfRows(inSection: section)
     }
 }

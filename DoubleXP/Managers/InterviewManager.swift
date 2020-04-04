@@ -123,6 +123,16 @@ class InterviewManager{
                         var option4Description = ""
                         var option5 = ""
                         var option5Description = ""
+                        var option6 = ""
+                        var option6Description = ""
+                        var option7 = ""
+                        var option7Description = ""
+                        var option8 = ""
+                        var option8Description = ""
+                        var option9 = ""
+                        var option9Description = ""
+                        var option10 = ""
+                        var option10Description = ""
                         var required = ""
                         var questionDescription = ""
                         var acceptMultiple = ""
@@ -170,6 +180,36 @@ class InterviewManager{
                                 if(key == "option5Description"){
                                     option5Description = (value as? String) ?? ""
                                 }
+                                if(key == "option6"){
+                                    option6 = (value as? String) ?? ""
+                                }
+                                if(key == "option6Description"){
+                                    option6Description = (value as? String) ?? ""
+                                }
+                                if(key == "option7"){
+                                    option7 = (value as? String) ?? ""
+                                }
+                                if(key == "option7Description"){
+                                    option7Description = (value as? String) ?? ""
+                                }
+                                if(key == "option8"){
+                                    option8 = (value as? String) ?? ""
+                                }
+                                if(key == "option8Description"){
+                                    option8Description = (value as? String) ?? ""
+                                }
+                                if(key == "option9"){
+                                    option9 = (value as? String) ?? ""
+                                }
+                                if(key == "option9Description"){
+                                    option9Description = (value as? String) ?? ""
+                                }
+                                if(key == "option10"){
+                                    option10 = (value as? String) ?? ""
+                                }
+                                if(key == "option10Description"){
+                                    option10Description = (value as? String) ?? ""
+                                }
                                 if(key == "required"){
                                     required = (value as? String) ?? ""
                                 }
@@ -214,6 +254,16 @@ class InterviewManager{
                         faQuestion.option5 = option5
                         faQuestion.option5Description = option5Description
                         faQuestion.question5SetURL = question5SetURL
+                        faQuestion.option6 = option6
+                        faQuestion.option6Description = option6Description
+                        faQuestion.option7 = option7
+                        faQuestion.option7Description = option7Description
+                        faQuestion.option8 = option8
+                        faQuestion.option8Description = option8Description
+                        faQuestion.option9 = option9
+                        faQuestion.option9Description = option9Description
+                        faQuestion.option10 = option10
+                        faQuestion.option10Description = option10Description
                         faQuestion.required = required
                         faQuestion.acceptMultiple = acceptMultiple
                         faQuestion.questionDescription = questionDescription
@@ -267,7 +317,21 @@ class InterviewManager{
             callbacks.onInitialQuizLoaded()
         }
         else{
-            callbacks.showEmpty()
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            var maxProfiles = 1
+            
+            let appProps = delegate.appProperties
+            if(appProps.value(forKey: "max_profiles") as? String != nil){
+                maxProfiles = Int((appProps.value(forKey: "max_profiles") as? String)!)!
+            }
+            
+            if(maxProfiles > 1){
+                self.currentQuestionIndex = 0
+                callbacks.onInitialQuizLoaded()
+            }
+            else{
+                callbacks.showEmpty()
+            }
         }
     }
     

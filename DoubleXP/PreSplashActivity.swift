@@ -29,7 +29,7 @@ class PreSplashActivity: UIViewController {
         // Do any additional setup after loading the view, typically from a nib.
         
         //let social = SocialMediaManager()
-        //social.getTopStreams()
+        //social.getGame()
         //getTwitchToken()
         getAppConfig()
         //testLoadTwitter()
@@ -51,6 +51,9 @@ class PreSplashActivity: UIViewController {
                         var newValue = ""
                         if let configDict = item as? [String: Any]{
                             for (key, value) in configDict {
+                                //check the payload. in every object, there is a key, and a value.
+                                //open every object. the key is the actual name, the value is in the value object as an ns string.
+                                //ex. in the object you get back, object 2, key is enabled. value(any), open it, see that the payload is "false". Find a way to parse that.
                                 if(key == "name"){
                                     name = (value as? String)!
                                 }
@@ -77,11 +80,18 @@ class PreSplashActivity: UIViewController {
                                             
                                             games.append(channel)
                                         }
-                                        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-                                        appDelegate.twitchChannels = games
+                                        DispatchQueue.main.async {
+                                            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                                            appDelegate.twitchChannels = games
+                                        }
                                     }
                                 }
                                 else{
+                                    if(name.isEmpty){
+                                        name = key
+                                    }
+                                    var name2 = name
+                                    var value2 = value as? String
                                     appProps.setValue(value, forKeyPath: name)
                                 }
                             }
@@ -91,10 +101,30 @@ class PreSplashActivity: UIViewController {
                         let appDelegate = UIApplication.shared.delegate as! AppDelegate
                         appDelegate.appProperties = appProps
                     }
-                    
+                    self.destroyCache()
                     self.loadGCGames()
                 }
             }
+        }
+    }
+    
+    private func destroyCache() {
+        let fileManager = FileManager.default
+        let documentsUrl =  fileManager.urls(for: FileManager.SearchPathDirectory.cachesDirectory, in: FileManager.SearchPathDomainMask.userDomainMask).first! as NSURL
+        let documentsPath = documentsUrl.path
+        let bundleIdentifier = Bundle.main.bundleIdentifier! as String
+        do {
+            if let documentPath = documentsPath
+            {
+                let fileNames = try fileManager.contentsOfDirectory(atPath: "\(documentPath)/\(bundleIdentifier)")
+                for fileName in fileNames {
+                    let filePathName = "\(documentPath)/\(bundleIdentifier)/\(fileName)"
+                    try fileManager.removeItem(atPath: filePathName)
+                }
+            }
+
+        } catch {
+            print("Could not clear: \(error)")
         }
     }
     
@@ -114,20 +144,25 @@ class PreSplashActivity: UIViewController {
                             var imageUrl = ""
                             var developer = ""
                             var secondaryName = ""
+                            var twitterHandle = ""
+                            var twitchHandle = ""
                             var gameModes = [String]()
                             var statsAvailable = false
                             var teamNeeds = [String]()
                             if let gameDict = game as? NSDictionary {
-                                hook = (gameDict.value(forKey: "hook") as? String)!
-                                gameName = (gameDict.value(forKey: "gameName") as? String)!
-                                imageUrl = (gameDict.value(forKey: "headerImageUrlXXHDPI") as? String)!
-                                developer = (gameDict.value(forKey: "developer") as? String)!
-                                statsAvailable = (gameDict.value(forKey: "statsAvailable") as? Bool)!
+                                hook = (gameDict.value(forKey: "hook") as? String ?? "")
+                                gameName = (gameDict.value(forKey: "gameName") as? String ?? "")
+                                imageUrl = (gameDict.value(forKey: "headerImageUrlXXHDPI") as? String ?? "")
+                                developer = (gameDict.value(forKey: "developer") as? String ?? "")
+                                statsAvailable = (gameDict.value(forKey: "statsAvailable") as? Bool ?? false)
                                 teamNeeds = (gameDict.value(forKey: "teamNeeds") as? [String]) ?? [String]()
                                 secondaryName = (gameDict.value(forKey: "secondaryName") as? String ?? "")
                                 gameModes = (gameDict).value(forKey: "gameModes") as? [String] ?? [String]()
+                                twitterHandle = (gameDict).value(forKey: "twitterHandle") as? String ?? ""
+                                twitchHandle = (gameDict).value(forKey: "twitchHandle") as? String ?? ""
                                 
-                                let newGame  = GamerConnectGame(imageUrl: imageUrl, gameName: gameName, developer: developer, hook: hook, statsAvailable: statsAvailable, teamNeeds: teamNeeds)
+                                let newGame  = GamerConnectGame(imageUrl: imageUrl, gameName: gameName, developer: developer, hook: hook, statsAvailable: statsAvailable, teamNeeds: teamNeeds,
+                                                                twitterHandle: twitterHandle, twitchHandle: twitchHandle)
                                 newGame.secondaryName = secondaryName
                                 newGame.gameModes = gameModes
                                 self.games.append(newGame)
@@ -170,6 +205,17 @@ class PreSplashActivity: UIViewController {
             let uId = snapshot.key
             let gamerTag = value?["gamerTag"] as? String ?? ""
             let bio = value?["bio"] as? String ?? ""
+        
+            let search = value?["search"] as? String ?? ""
+            if(search.isEmpty){
+                ref.child("search").setValue("true")
+            }
+            
+            let notifications = value?["notifications"] as? String ?? ""
+            if(notifications.isEmpty){
+                ref.child("notifications").setValue("true")
+            }
+            
             var sentRequests = [FriendRequestObject]()
             
             //if sent requests have not been converted, we convert NOW.
@@ -371,6 +417,12 @@ class PreSplashActivity: UIViewController {
                 let mostUsedAttacker = dict["mostUsedAttacker"] as? String ?? ""
                 let mostUsedDefender = dict["mostUsedDefender"] as? String ?? ""
                 let gearScore = dict["gearScore"] as? String ?? ""
+                let codKills = dict["codKills"] as? String ?? ""
+                let codKd = dict["codKd"] as? String ?? ""
+                let codLevel = dict["codLevel"] as? String ?? ""
+                let codBestKills = dict["codBestKills"] as? String ?? ""
+                let codWins = dict["codWins"] as? String ?? ""
+                let codWlRatio = dict["codWlRatio"] as? String ?? ""
                 
                 let currentStat = StatObject(gameName: gameName)
                 currentStat.authorized = authorized
@@ -389,16 +441,22 @@ class PreSplashActivity: UIViewController {
                 currentStat.mostUsedAttacker = mostUsedAttacker
                 currentStat.mostUsedDefender = mostUsedDefender
                 currentStat.gearScore = gearScore
+                currentStat.codKills = codKills
+                currentStat.codKd = codKd
+                currentStat.codLevel = codLevel
+                currentStat.codBestKills = codBestKills
+                currentStat.codWins = codWins
+                currentStat.codWlRatio = codWlRatio
                 
                 currentStats.append(currentStat)
             }
             
             let consoleArray = snapshot.childSnapshot(forPath: "consoles")
-            let dict = consoleArray.value as! [String: Bool]
-            let nintendo = dict["nintendo"] ?? false
-            let ps = dict["ps"] ?? false
-            let xbox = dict["xbox"] ?? false
-            let pc = dict["pc"] ?? false
+            let dict = consoleArray.value as? [String: Bool]
+            let nintendo = dict?["nintendo"] ?? false
+            let ps = dict?["ps"] ?? false
+            let xbox = dict?["xbox"] ?? false
+            let pc = dict?["pc"] ?? false
             
             let user = User(uId: uId)
             user.gamerTags = gamerTags
@@ -416,6 +474,8 @@ class PreSplashActivity: UIViewController {
             user.xbox = xbox
             user.nintendo = nintendo
             user.bio = bio
+            user.search = search
+            user.notifications = notifications
             
             DispatchQueue.main.async {
                 let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -619,4 +679,64 @@ class PreSplashActivity: UIViewController {
             let _ = controller.view
         }
     }
+}
+
+extension String {
+  
+  /**
+   Returns a new string made from the receiver by replacing characters which are
+   reserved in a URI query with percent encoded characters.
+   
+   The following characters are not considered reserved in a URI query
+   by RFC 3986:
+   
+   - Alpha "a...z" "A...Z"
+   - Numberic "0...9"
+   - Unreserved "-._~"
+   
+   In addition the reserved characters "/" and "?" have no reserved purpose in the
+   query component of a URI so do not need to be percent escaped.
+   
+   - Returns: The encoded string, or nil if the transformation is not possible.
+ */
+  
+  public func stringByAddingPercentEncodingForRFC3986() -> String? {
+    let unreserved = "-._~/?"
+    let allowedCharacterSet = NSMutableCharacterSet.alphanumeric()
+    allowedCharacterSet.addCharacters(in: unreserved)
+    return addingPercentEncoding(withAllowedCharacters: allowedCharacterSet as CharacterSet)
+  }
+  
+  /**
+   Returns a new string made from the receiver by replacing characters which are
+   reserved in HTML forms (media type application/x-www-form-urlencoded) with
+   percent encoded characters.
+   
+   The W3C HTML5 specification, section 4.10.22.5 URL-encoded form
+   data percent encodes all characters except the following:
+   
+   - Space (0x20) is replaced by a "+" (0x2B)
+   - Bytes in the range 0x2A, 0x2D, 0x2E, 0x30-0x39, 0x41-0x5A, 0x5F, 0x61-0x7A
+     (alphanumeric + "*-._")
+   - Parameter plusForSpace: Boolean, when true replaces space with a '+'
+   otherwise uses percent encoding (%20). Default is false.
+   
+   - Returns: The encoded string, or nil if the transformation is not possible.
+   */
+
+  public func stringByAddingPercentEncodingForFormData(plusForSpace: Bool=false) -> String? {
+    let unreserved = "*-._"
+    let allowedCharacterSet = NSMutableCharacterSet.alphanumeric()
+    allowedCharacterSet.addCharacters(in: unreserved)
+    
+    if plusForSpace {
+        allowedCharacterSet.addCharacters(in: " ")
+    }
+    
+    var encoded = addingPercentEncoding(withAllowedCharacters: allowedCharacterSet as CharacterSet)
+    if plusForSpace {
+        encoded = encoded?.replacingOccurrences(of: " ", with: "+")
+    }
+    return encoded
+  }
 }

@@ -26,14 +26,6 @@ class TeamNeedsSelection: ParentVC, UICollectionViewDataSource, UICollectionView
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navDictionary = ["state": "backOnly"]
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        let currentUser = delegate.currentUser
-    
-        delegate.currentLanding?.updateNavigation(currentFrag: self)
-        self.pageName = "Team Needs Selection"
-        delegate.addToNavStack(vc: self)
-        
         completeButton.addTarget(self, action: #selector(nextButtonClicked), for: .touchUpInside)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {

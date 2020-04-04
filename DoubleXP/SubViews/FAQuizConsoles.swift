@@ -76,8 +76,8 @@ class FAQuizConsoles: UIViewController{
     }
     @objc func xboxSwitchChanged(xSwitch: UISwitch) {
         if(xSwitch.isOn){
-            selectedConsole = "XBox"
-            checkSwitches(selected: "XBox")
+            selectedConsole = "xbox"
+            checkSwitches(selected: "xbox")
         }
         else{
             selectedConsole = ""

@@ -35,6 +35,9 @@ target 'DoubleXP' do
   pod 'UnderLineTextField', '~> 2.1'
   pod 'Giphy'
   pod 'SwiftyGif'
+  pod 'SoftUIView'
+  pod 'ElongationPreview'
+  pod 'RAMPaperSwitch'
 
   # Pods for DoubleXP
 

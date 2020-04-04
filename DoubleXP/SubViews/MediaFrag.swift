@@ -398,11 +398,18 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
             else if(current is TwitchChannelObj){
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "channelCell", for: indexPath) as! TwitchChannelCell
                 cell.gameName.text = (current as! TwitchChannelObj).gameName
-                cell.image.moa.url = (current as! TwitchChannelObj).imageUrlIOS
+                
+                let str = (current as! TwitchChannelObj).imageUrlIOS
+                let replaced = str.replacingOccurrences(of: "{width}x{height}", with: "800x500")
+                
+                cell.image.moa.url = replaced
+                cell.image.contentMode = .scaleAspectFill
+                cell.image.clipsToBounds = true
+                
+                
                 //cell.image.contentMode = .scaleAspectFill
                 //cxell.image.clipsToBounds = true
                 
-                cell.devLogo.moa.url = (current as! TwitchChannelObj).developerLogoLightUrl
                 cell.contentView.layer.cornerRadius = 10.0
                 cell.contentView.layer.borderWidth = 1.0
                 cell.contentView.layer.borderColor = UIColor.clear.cgColor
@@ -484,20 +491,26 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                             self.articles = [Any]()
                             
-                            let delegate = UIApplication.shared.delegate as! AppDelegate
+                            self.news?.collectionViewLayout = UICollectionViewFlowLayout()
+                            
+                            let manager = SocialMediaManager()
+                            manager.getTopGames(callbacks: self)
+                            /*let delegate = UIApplication.shared.delegate as! AppDelegate
                             self.articles.append(contentsOf: delegate.twitchChannels)
                             self.articles.append(0)
                             
-                            self.news?.collectionViewLayout = UICollectionViewFlowLayout()
-                            
-                            self.news.performBatchUpdates({
+                            self.news.reloadData()
+                            UIView.animate(withDuration: 0.8, delay: 1, options: [], animations: {
+                                self.loadingView.alpha = 0
+                            }, completion: nil)*/
+                            /*self.news.performBatchUpdates({
                                 let indexSet = IndexSet(integersIn: 0...0)
                                 self.news.reloadSections(indexSet)
                             }, completion: { (finished: Bool) in
                                 UIView.animate(withDuration: 0.8, delay: 1, options: [], animations: {
                                     self.loadingView.alpha = 0
                                 }, completion: nil)
-                            })
+                            })*/
                         }
                     })
                 break;
@@ -756,19 +769,18 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     func showChannel(channel: TwitchChannelObj){
         self.articleOverlay.alpha = 0
         self.twitchChannelOverlay.alpha = 1
-        self.channelOverlayImage.image = self.currentTwitchImage
-        self.channelOverlayDesc.text = channel.gameDescription
-        if(!(channel.isGCGame == "true")){
-            self.channelDXPLogo.isHidden = true
-            self.connectButton.isHidden = true
-            self.connectButton.isUserInteractionEnabled = false
-            self.gcTag.isHidden = true
-        }
-        else{
+        self.channelOverlayDesc.text = channel.gameName
+        if(channel.isGCGame(game: channel.gameName)){
             self.channelDXPLogo.isHidden = false
             self.connectButton.isHidden = false
             self.connectButton.isUserInteractionEnabled = true
             self.gcTag.isHidden = false
+        }
+        else{
+            self.channelDXPLogo.isHidden = true
+            self.connectButton.isHidden = true
+            self.connectButton.isUserInteractionEnabled = false
+            self.gcTag.isHidden = true
         }
         
         let close = UITapGestureRecognizer(target: self, action: #selector(closeChannel))
@@ -1093,6 +1105,18 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     }
     
     func onTweetsLoaded(tweets: [TweetObject]) {
+    }
+    
+    func onChannelsLoaded(channels: [TwitchChannelObj]) {
+        DispatchQueue.main.async {
+            self.articles.append(contentsOf: channels)
+            self.articles.append(0)
+            
+            self.news.reloadData()
+            UIView.animate(withDuration: 0.8, delay: 1, options: [], animations: {
+                self.loadingView.alpha = 0
+            }, completion: nil)
+        }
     }
     
     func onStreamsLoaded(streams: [TwitchStreamObject]) {

@@ -17,6 +17,7 @@ import WebKit
 import TwitchPlayer
 
 class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, SocialMediaManagerCallback {
+    
     var team: TeamObject? = nil
     var tweets = [Any]()
     var streams = [Any]()
@@ -40,6 +41,7 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
     @IBOutlet weak var tweetStreamSegment: UISegmentedControl!
     @IBOutlet weak var webview: WKWebView!
     @IBOutlet weak var twitchPlayer: TestPlayer!
+    var gcGame: GamerConnectGame!
     var dataSet = "twitter"
     @IBOutlet weak var spinner: UIActivityIndicatorView!
     
@@ -62,7 +64,7 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
                         self.tweetCollection.alpha = 1
                     }) { (finished) in
                         
-                        self.manager.loadTwitchStreams(team: self.team!, callbacks: self)
+                        self.manager.loadTwitchStreams(team: self.team!, gcGame: self.gcGame, callbacks: self)
                     }
             }
         case 1:
@@ -82,7 +84,7 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
                     self.tweetCollection.alpha = 1
                 }) { (finished) in
                     
-                    self.manager.loadTweets(team: self.team!, callbacks: self)
+                    self.manager.loadTweets(team: self.team!, gcGame: self.gcGame, callbacks: self)
                 }
             }
 
@@ -101,13 +103,8 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
         super.viewDidLoad()
         
         //setup nav
-        navDictionary = ["state": "backOnly"]
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let currentUser = delegate.currentUser
-    
-        delegate.currentLanding?.updateNavigation(currentFrag: self)
-        self.pageName = "Team Dashboard"
-        delegate.addToNavStack(vc: self)
     
         teamLabel.text = team?.teamName
         
@@ -136,11 +133,17 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
             self.loadingStatus.alpha = 1
             self.spinner.startAnimating()
         }, completion: nil)
+        
+        for game in delegate.gcGames{
+            if(game.gameName == team!.games[0]){
+                self.gcGame = game
+            }
+        }
     }
     
     private func getTwitch(){
         let manager = SocialMediaManager()
-        manager.loadTwitchStreams(team: team!, callbacks: self)
+        manager.loadTwitchStreams(team: team!, gcGame: self.gcGame, callbacks: self)
     }
     
     private func buildRoster(){
@@ -291,7 +294,7 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
     
     private func loadSocial() {
         let manager = SocialMediaManager()
-        manager.loadTwitchStreams(team: self.team!, callbacks: self)
+        manager.loadTwitchStreams(team: self.team!, gcGame: self.gcGame, callbacks: self)
     }
     
     func onTweetsLoaded(tweets: [TweetObject]) {
@@ -318,7 +321,7 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
         self.streams = streams
         self.streams.insert("label", at: 0)
         
-        self.manager.loadTweets(team: self.team!, callbacks: self)
+        self.manager.loadTweets(team: self.team!, gcGame: self.gcGame, callbacks: self)
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -402,4 +405,7 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
     
     //sEWJZFZjZAIaxwZUrzdd2JPeI (consumer API key)
     //K2yk5yy8AHmyC4mMFHecB1WBoowFnf4uMs4ET7zEjFe06hWmCm (consumer API secret)
+    
+    func onChannelsLoaded(channels: [TwitchChannelObj]) {
+    }
 }

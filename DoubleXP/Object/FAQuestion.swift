@@ -194,6 +194,156 @@ class FAQuestion: NSObject, NSCoding {
         }
     }
     
+    var _option6 = ""
+    var option6:String {
+        get {
+            return (_option6)
+        }
+        set (newVal) {
+            _option6 = newVal
+        }
+    }
+
+    var _option6Description = ""
+    var option6Description: String {
+        get {
+            return (_option6Description)
+        }
+        set (newVal) {
+            _option6Description = newVal
+        }
+    }
+    
+    var _question6SetURL = ""
+    var question6SetURL: String {
+        get {
+            return (_question6SetURL)
+        }
+        set (newVal) {
+            _question6SetURL = newVal
+        }
+    }
+    
+    var _option7 = ""
+    var option7:String {
+        get {
+            return (_option7)
+        }
+        set (newVal) {
+            _option7 = newVal
+        }
+    }
+
+    var _option7Description = ""
+    var option7Description: String {
+        get {
+            return (_option7Description)
+        }
+        set (newVal) {
+            _option7Description = newVal
+        }
+    }
+    
+    var _question7SetURL = ""
+    var question7SetURL: String {
+        get {
+            return (_question7SetURL)
+        }
+        set (newVal) {
+            _question7SetURL = newVal
+        }
+    }
+    
+    var _option8 = ""
+    var option8:String {
+        get {
+            return (_option8)
+        }
+        set (newVal) {
+            _option8 = newVal
+        }
+    }
+
+    var _option8Description = ""
+    var option8Description: String {
+        get {
+            return (_option8Description)
+        }
+        set (newVal) {
+            _option8Description = newVal
+        }
+    }
+    
+    var _question8SetURL = ""
+    var question8SetURL: String {
+        get {
+            return (_question8SetURL)
+        }
+        set (newVal) {
+            _question8SetURL = newVal
+        }
+    }
+    
+    var _option9 = ""
+    var option9:String {
+        get {
+            return (_option9)
+        }
+        set (newVal) {
+            _option9 = newVal
+        }
+    }
+
+    var _option9Description = ""
+    var option9Description: String {
+        get {
+            return (_option9Description)
+        }
+        set (newVal) {
+            _option9Description = newVal
+        }
+    }
+    
+    var _question9SetURL = ""
+    var question9SetURL: String {
+        get {
+            return (_question9SetURL)
+        }
+        set (newVal) {
+            _question9SetURL = newVal
+        }
+    }
+    
+    var _option10 = ""
+    var option10:String {
+        get {
+            return (_option10)
+        }
+        set (newVal) {
+            _option10 = newVal
+        }
+    }
+
+    var _option10Description = ""
+    var option10Description: String {
+        get {
+            return (_option10Description)
+        }
+        set (newVal) {
+            _option10Description = newVal
+        }
+    }
+    
+    var _question10SetURL = ""
+    var question10SetURL: String {
+        get {
+            return (_question10SetURL)
+        }
+        set (newVal) {
+            _question10SetURL = newVal
+        }
+    }
+    
     var _required = ""
     var required: String {
         get {

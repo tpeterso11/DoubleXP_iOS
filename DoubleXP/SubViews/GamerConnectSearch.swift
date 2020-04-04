@@ -38,16 +38,10 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
     @IBOutlet weak var loadingView: UIView!
     @IBOutlet weak var searchProgress: UIActivityIndicatorView!
     
+    var currentUser: User!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        navDictionary = ["state": "search", "searchHint": "Search for player", "searchButton": "Search"]
-
-        appDelegate.currentLanding?.updateNavigation(currentFrag: self)
-        
-        self.pageName = "GC Search"
-        appDelegate.addToNavStack(vc: self)
         
         if(game != nil){
             //gameHeaderImage.alpha = 0
@@ -62,22 +56,22 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
             searchPC = false
             
             let delegate = UIApplication.shared.delegate as! AppDelegate
-            let user = delegate.currentUser
+            currentUser = delegate.currentUser
             
-            if(user != nil){
-                if(user!.ps){
+            if(currentUser != nil){
+                if(currentUser!.ps){
                     psSwitch.isOn = true
                     searchPS = true
                 }
-                if(user!.xbox){
+                if(currentUser!.xbox){
                     xboxSwitch.isOn = true
                     searchXbox = true
                 }
-                if(user!.nintendo){
+                if(currentUser!.nintendo){
                     nintendoSwitch.isOn = true
                     searchNintendo = true
                 }
-                if(user!.pc){
+                if(currentUser!.pc){
                     pcSwitch.isOn = true
                     searchPC = true
                 }
@@ -272,295 +266,248 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
             // Get user value
             for user in snapshot.children{
                 let value = (user as! DataSnapshot).value as? NSDictionary
-                let games = value?["games"] as? [String] ?? [String]()
                 
-                if(games.contains(self.game!.gameName) && userName == nil){
-                    let uId = (user as! DataSnapshot).key
-                    let gamerTag = value?["gamerTag"] as? String ?? ""
-                    let bio = value?["bio"] as? String ?? ""
-                    let sentRequests = value?["sentRequests"] as? [FriendRequestObject] ?? [FriendRequestObject]()
-                    
-                    var friends = [FriendObject]()
-                    let friendsArray = snapshot.childSnapshot(forPath: "friends")
-                    for friend in friendsArray.children{
-                        let currentObj = friend as! DataSnapshot
-                        let dict = currentObj.value as! [String: Any]
-                        let gamerTag = dict["gamerTag"] as? String ?? ""
-                        let date = dict["date"] as? String ?? ""
-                        let uid = dict["uid"] as? String ?? ""
-                        
-                        let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
-                        friends.append(newFriend)
-                    }
-                    
+                
+                let search = value?["search"] as? String ?? "true"
+                
+                if(search == "true"){
                     let games = value?["games"] as? [String] ?? [String]()
-                    var gamerTags = [GamerProfile]()
-                    let gamerTagsArray = (user as! DataSnapshot).childSnapshot(forPath: "gamerTags")
-                    for gamerTagObj in gamerTagsArray.children {
-                        let currentObj = gamerTagObj as! DataSnapshot
-                        let dict = currentObj.value as! [String: Any]
-                        let currentTag = dict["gamerTag"] as? String ?? ""
-                        let currentGame = dict["game"] as? String ?? ""
-                        let console = dict["console"] as? String ?? ""
+                    
+                    if(games.contains(self.game!.gameName) && userName == nil){
+                        let uId = (user as! DataSnapshot).key
+                        let gamerTag = value?["gamerTag"] as? String ?? ""
+                        let bio = value?["bio"] as? String ?? ""
+                        let sentRequests = value?["sentRequests"] as? [FriendRequestObject] ?? [FriendRequestObject]()
                         
-                        let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
-                        gamerTags.append(currentGamerTagObj)
-                    }
-                    
-                    let consoleArray = (user as! DataSnapshot).childSnapshot(forPath: "consoles")
-                    let dict = consoleArray.value as? [String: Bool]
-                    let nintendo = dict?["nintendo"] ?? false
-                    let ps = dict?["ps"] ?? false
-                    let xbox = dict?["xbox"] ?? false
-                    let pc = dict?["pc"] ?? false
-                    
-                    let returnedUser = User(uId: uId)
-                    returnedUser.gamerTags = gamerTags
-                    returnedUser.games = games
-                    returnedUser.friends = friends
-                    returnedUser.sentRequests = sentRequests
-                    returnedUser.gamerTag = gamerTag
-                    returnedUser.pc = pc
-                    returnedUser.ps = ps
-                    returnedUser.xbox = xbox
-                    returnedUser.nintendo = nintendo
-                    returnedUser.bio = bio
-                    
-                    //if the returned user plays the game being searched AND the returned users gamertag
-                    //does not equal the current users gamertag, then add to list.
-                    let gamerProfileManager = GamerProfileManager()
-                    if(returnedUser.games.contains(self.game!.gameName) && gamerProfileManager.getGamerTagForOtherUserForGame(gameName: self.game!.gameName, returnedUser: returnedUser) != gamerProfileManager.getGamerTagForGame(gameName: self.game!.gameName)){
+                        var friends = [FriendObject]()
+                        let friendsArray = snapshot.childSnapshot(forPath: "friends")
+                        for friend in friendsArray.children{
+                            let currentObj = friend as! DataSnapshot
+                            let dict = currentObj.value as! [String: Any]
+                            let gamerTag = dict["gamerTag"] as? String ?? ""
+                            let date = dict["date"] as? String ?? ""
+                            let uid = dict["uid"] as? String ?? ""
+                            
+                            let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
+                            friends.append(newFriend)
+                        }
                         
-                        if(self.searchPS && returnedUser.ps){
-                            self.addUserToList(returnedUser: returnedUser)
+                        let games = value?["games"] as? [String] ?? [String]()
+                        var gamerTags = [GamerProfile]()
+                        let gamerTagsArray = (user as! DataSnapshot).childSnapshot(forPath: "gamerTags")
+                        for gamerTagObj in gamerTagsArray.children {
+                            let currentObj = gamerTagObj as! DataSnapshot
+                            let dict = currentObj.value as! [String: Any]
+                            let currentTag = dict["gamerTag"] as? String ?? ""
+                            let currentGame = dict["game"] as? String ?? ""
+                            let console = dict["console"] as? String ?? ""
+                            
+                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
+                            gamerTags.append(currentGamerTagObj)
                         }
-                        else if(self.searchPC && returnedUser.pc){
-                            self.addUserToList(returnedUser: returnedUser)
-                        }
-                        else if(self.searchXbox && returnedUser.xbox){
-                            self.addUserToList(returnedUser: returnedUser)
-                        }
-                        else if(self.searchNintendo && returnedUser.nintendo){
-                            self.addUserToList(returnedUser: returnedUser)
-                        }
-                    }
-                    
-                }
-                else if(userName != nil){
-                    let trimmedUser = userName!.trimmingCharacters(in: .whitespacesAndNewlines)
-                    var gamerTag = (value?["gamerTag"] as? String) ?? ""
-                    if(!gamerTag.isEmpty){
-                        gamerTag = gamerTag.trimmingCharacters(in: .whitespacesAndNewlines)
-                    }
-                    
-                    var gamerTags = [GamerProfile]()
-                    let gamerTagsArray = (user as! DataSnapshot).childSnapshot(forPath: "gamerTags")
-                    for gamerTagObj in gamerTagsArray.children {
-                        let currentObj = gamerTagObj as! DataSnapshot
-                        let dict = currentObj.value as! [String: Any]
-                        let currentTag = dict["gamerTag"] as? String ?? ""
-                        let currentGame = dict["game"] as? String ?? ""
-                        let console = dict["console"] as? String ?? ""
                         
-                        let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
-                        gamerTags.append(currentGamerTagObj)
-                    }
-                    
-                    var contained = false
-                    //check legacy users first
-                    if(gamerTag == trimmedUser){
-                        contained = true
-                    }
-                    
-                    //if not legacy, or not found, check gamertags one more time
-                    if(!contained){
-                        for gamerTagObj in gamerTags{
-                            if(gamerTagObj.gamerTag == trimmedUser){
-                                contained = true
-                                break
+                        let consoleArray = (user as! DataSnapshot).childSnapshot(forPath: "consoles")
+                        let dict = consoleArray.value as? [String: Bool]
+                        let nintendo = dict?["nintendo"] ?? false
+                        let ps = dict?["ps"] ?? false
+                        let xbox = dict?["xbox"] ?? false
+                        let pc = dict?["pc"] ?? false
+                        
+                        let returnedUser = User(uId: uId)
+                        returnedUser.gamerTags = gamerTags
+                        returnedUser.games = games
+                        returnedUser.friends = friends
+                        returnedUser.sentRequests = sentRequests
+                        returnedUser.gamerTag = gamerTag
+                        returnedUser.pc = pc
+                        returnedUser.ps = ps
+                        returnedUser.xbox = xbox
+                        returnedUser.nintendo = nintendo
+                        returnedUser.bio = bio
+                        
+                        //if the returned user plays the game being searched AND the returned users gamertag
+                        //does not equal the current users gamertag, then add to list.
+                        
+                        if(returnedUser.games.contains(self.game!.gameName) && self.currentUser.uId != returnedUser.uId){
+                            
+                            if(self.searchPS && returnedUser.ps){
+                                self.addUserToList(returnedUser: returnedUser)
                             }
-                        }
-                    }
-                    
-                    if(contained){
-                    let gamerProfileManager = GamerProfileManager()
-                    
-                    if(userName != nil){
-                        if(!gamerTag.isEmpty && gamerTag == trimmedUser && (gamerProfileManager.getGamerTagForGame(gameName: self.game!.gameName) != userName)){
-                            
-                            let uId = (user as! DataSnapshot).key
-                            let bio = value?["bio"] as? String ?? ""
-                            let sentRequests = value?["sentRequests"] as? [FriendRequestObject] ?? [FriendRequestObject]()
-                            
-                            var friends = [FriendObject]()
-                            let friendsArray = snapshot.childSnapshot(forPath: "friends")
-                            for friend in friendsArray.children{
-                                let currentObj = friend as! DataSnapshot
-                                let dict = currentObj.value as! [String: Any]
-                                let gamerTag = dict["gamerTag"] as? String ?? ""
-                                let date = dict["date"] as? String ?? ""
-                                let uid = dict["uid"] as? String ?? ""
-                                
-                                let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
-                                friends.append(newFriend)
+                            else if(self.searchPC && returnedUser.pc){
+                                self.addUserToList(returnedUser: returnedUser)
                             }
-                            
-                            let games = value?["games"] as? [String] ?? [String]()
-                            var gamerTags = [GamerProfile]()
-                            let gamerTagsArray = (user as! DataSnapshot).childSnapshot(forPath: "gamerTags")
-                            for gamerTagObj in gamerTagsArray.children {
-                                let currentObj = gamerTagObj as! DataSnapshot
-                                let dict = currentObj.value as! [String: Any]
-                                let currentTag = dict["gamerTag"] as? String ?? ""
-                                let currentGame = dict["game"] as? String ?? ""
-                                let console = dict["console"] as? String ?? ""
-                                
-                                let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
-                                gamerTags.append(currentGamerTagObj)
+                            else if(self.searchXbox && returnedUser.xbox){
+                                self.addUserToList(returnedUser: returnedUser)
                             }
-                            
-                            let consoleArray = (user as! DataSnapshot).childSnapshot(forPath: "consoles")
-                            let dict = consoleArray.value as? [String: Bool]
-                            let nintendo = dict?["nintendo"] ?? false
-                            let ps = dict?["ps"] ?? false
-                            let xbox = dict?["xbox"] ?? false
-                            let pc = dict?["pc"] ?? false
-                            
-                            let returnedUser = User(uId: uId)
-                            returnedUser.gamerTags = gamerTags
-                            returnedUser.games = games
-                            returnedUser.friends = friends
-                            returnedUser.sentRequests = sentRequests
-                            returnedUser.gamerTag = gamerTag
-                            returnedUser.pc = pc
-                            returnedUser.ps = ps
-                            returnedUser.xbox = xbox
-                            returnedUser.nintendo = nintendo
-                            returnedUser.bio = bio
-                            
-                            self.returnedUsers.append(returnedUser)
-                            
-                            if(!self.set){
-                                self.gamerConnectResults.delegate = self
-                                self.gamerConnectResults.dataSource = self
-                                
-                                self.set = true
-                                
-                                self.searchProgress.stopAnimating()
-                                UIView.animate(withDuration: 0.8, animations: {
-                                    self.loadingView.alpha = 0
-                                }, completion: { (finished: Bool) in
-                                    UIView.animate(withDuration: 0.8, delay: 0.5, options: [], animations: {
-                                        if(!self.returnedUsers.isEmpty){
-                                            self.searchEmpty.isHidden = true
-                                            let top = CGAffineTransform(translationX: 0, y: -30)
-                                            
-                                            self.gamerConnectResults.alpha = 1
-                                            self.gamerConnectResults.transform = top
-                                            
-                                            UIView.animate(withDuration: 0.8, animations: {
-                                                self.gamerConnectResults.delegate = self
-                                                self.gamerConnectResults.dataSource = self
-                                            }, completion: nil)
-                                        }
-                                        else{
-                                            self.searchEmpty.isHidden = false
-                                            
-                                            self.searchEmptyText.text = "No users returned for your chosen game."
-                                            self.searchEmptySub.text = "No worries, try your search again later."
-                                        }
-                                    }, completion: nil)
-                                })
+                            else if(self.searchNintendo && returnedUser.nintendo){
+                                self.addUserToList(returnedUser: returnedUser)
                             }
                             else{
-                                if(!self.loadingView.isHidden){
-                                    self.searchProgress.stopAnimating()
-                                    UIView.animate(withDuration: 0.8, animations: {
-                                        self.loadingView.alpha = 0
-                                    }, completion: { (finished: Bool) in
-                                        self.gamerConnectResults.reloadData()
-                                        
-                                        if(!self.returnedUsers.isEmpty){
-                                            self.searchEmpty.isHidden = true
-                                        }
-                                        else{
-                                            self.searchEmpty.isHidden = false
-                                            
-                                            if(userName != nil){
-                                                self.searchEmptyText.text = "No users returned with that name."
-                                                self.searchEmptySub.text = "No worries.\nMake sure you typed their naame correctly, and try again."
-                                            }
-                                            else{
-                                                self.searchEmptyText.text = "No users returned for your chosen game."
-                                                self.searchEmptySub.text = "No worries, try your search again later."
-                                            }
-                                        }
-                                    })
+                                for profile in returnedUser.gamerTags{
+                                    if(profile.game == self.game?.gameName){
+                                        self.addUserToList(returnedUser: returnedUser)
+                                    }
                                 }
                             }
+                        }
+                        
+                    }
+                    else if(userName != nil){
+                        let trimmedUser = userName!.trimmingCharacters(in: .whitespacesAndNewlines)
+                        var gamerTag = (value?["gamerTag"] as? String) ?? ""
+                        if(!gamerTag.isEmpty){
+                            gamerTag = gamerTag.trimmingCharacters(in: .whitespacesAndNewlines)
+                        }
+                        
+                        var gamerTags = [GamerProfile]()
+                        let gamerTagsArray = (user as! DataSnapshot).childSnapshot(forPath: "gamerTags")
+                        for gamerTagObj in gamerTagsArray.children {
+                            let currentObj = gamerTagObj as! DataSnapshot
+                            let dict = currentObj.value as! [String: Any]
+                            let currentTag = dict["gamerTag"] as? String ?? ""
+                            let currentGame = dict["game"] as? String ?? ""
+                            let console = dict["console"] as? String ?? ""
                             
-                            return
+                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
+                            gamerTags.append(currentGamerTagObj)
+                        }
+                        
+                        var contained = false
+                        //check legacy users first
+                        if(gamerTag == trimmedUser){
+                            contained = true
+                        }
+                        
+                        //if not legacy, or not found, check gamertags one more time
+                        if(!contained){
+                            for gamerTagObj in gamerTags{
+                                if(gamerTagObj.gamerTag == trimmedUser){
+                                    contained = true
+                                    break
+                                }
+                            }
+                        }
+                        
+                        if(contained){
+                        let gamerProfileManager = GamerProfileManager()
+                        
+                        if(userName != nil){
+                            if(!gamerTag.isEmpty && gamerTag == trimmedUser && (gamerProfileManager.getGamerTagForGame(gameName: self.game!.gameName) != userName)){
+                                
+                                let uId = (user as! DataSnapshot).key
+                                let bio = value?["bio"] as? String ?? ""
+                                let sentRequests = value?["sentRequests"] as? [FriendRequestObject] ?? [FriendRequestObject]()
+                                
+                                var friends = [FriendObject]()
+                                let friendsArray = snapshot.childSnapshot(forPath: "friends")
+                                for friend in friendsArray.children{
+                                    let currentObj = friend as! DataSnapshot
+                                    let dict = currentObj.value as! [String: Any]
+                                    let gamerTag = dict["gamerTag"] as? String ?? ""
+                                    let date = dict["date"] as? String ?? ""
+                                    let uid = dict["uid"] as? String ?? ""
+                                    
+                                    let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
+                                    friends.append(newFriend)
+                                }
+                                
+                                let games = value?["games"] as? [String] ?? [String]()
+                                var gamerTags = [GamerProfile]()
+                                let gamerTagsArray = (user as! DataSnapshot).childSnapshot(forPath: "gamerTags")
+                                for gamerTagObj in gamerTagsArray.children {
+                                    let currentObj = gamerTagObj as! DataSnapshot
+                                    let dict = currentObj.value as! [String: Any]
+                                    let currentTag = dict["gamerTag"] as? String ?? ""
+                                    let currentGame = dict["game"] as? String ?? ""
+                                    let console = dict["console"] as? String ?? ""
+                                    
+                                    let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
+                                    gamerTags.append(currentGamerTagObj)
+                                }
+                                
+                                let consoleArray = (user as! DataSnapshot).childSnapshot(forPath: "consoles")
+                                let dict = consoleArray.value as? [String: Bool]
+                                let nintendo = dict?["nintendo"] ?? false
+                                let ps = dict?["ps"] ?? false
+                                let xbox = dict?["xbox"] ?? false
+                                let pc = dict?["pc"] ?? false
+                                
+                                let returnedUser = User(uId: uId)
+                                returnedUser.gamerTags = gamerTags
+                                returnedUser.games = games
+                                returnedUser.friends = friends
+                                returnedUser.sentRequests = sentRequests
+                                returnedUser.gamerTag = gamerTag
+                                returnedUser.pc = pc
+                                returnedUser.ps = ps
+                                returnedUser.xbox = xbox
+                                returnedUser.nintendo = nintendo
+                                returnedUser.bio = bio
+                                
+                                self.returnedUsers.append(returnedUser)
+                            }
                         }
                     }
                 }
             }
-    
-            if(!self.set){
-                self.gamerConnectResults.delegate = self
-                self.gamerConnectResults.dataSource = self
-                
-                self.set = true
+        }
+        
+        if(!self.set){
+            self.gamerConnectResults.delegate = self
+            self.gamerConnectResults.dataSource = self
+            
+            self.set = true
+            
+            self.searchProgress.stopAnimating()
+            UIView.animate(withDuration: 0.8, animations: {
+                self.loadingView.alpha = 0
+            }, completion: { (finished: Bool) in
+                UIView.animate(withDuration: 0.8, delay: 0.5, options: [], animations: {
+                    if(!self.returnedUsers.isEmpty){
+                        self.searchEmpty.isHidden = true
+                        let top = CGAffineTransform(translationX: 0, y: -30)
+                        
+                        self.gamerConnectResults.alpha = 1
+                        self.gamerConnectResults.transform = top
+                        
+                        UIView.animate(withDuration: 0.8, animations: {
+                            self.gamerConnectResults.delegate = self
+                            self.gamerConnectResults.dataSource = self
+                        }, completion: nil)
+                    }
+                    else{
+                        self.searchEmpty.isHidden = false
+                        
+                        self.searchEmptyText.text = "No users returned for your chosen game."
+                        self.searchEmptySub.text = "No worries, try your search again later."
+                    }
+                }, completion: nil)
+            })
+        }
+        else{
+            if(!self.loadingView.isHidden){
                 self.searchProgress.stopAnimating()
                 UIView.animate(withDuration: 0.8, animations: {
                     self.loadingView.alpha = 0
                 }, completion: { (finished: Bool) in
-                    UIView.animate(withDuration: 0.8, delay: 0.5, options: [], animations: {
-                        if(!self.returnedUsers.isEmpty){
-                            self.searchEmpty.isHidden = true
-                            let top = CGAffineTransform(translationX: 0, y: -30)
-                            
-                            self.gamerConnectResults.alpha = 1
-                            self.gamerConnectResults.transform = top
-                            
-                            UIView.animate(withDuration: 0.8, animations: {
-                                self.gamerConnectResults.delegate = self
-                                self.gamerConnectResults.dataSource = self
-                            }, completion: nil)
+                    self.gamerConnectResults.reloadData()
+                    
+                    if(!self.returnedUsers.isEmpty){
+                        self.searchEmpty.isHidden = true
+                    }
+                    else{
+                        self.searchEmpty.isHidden = false
+                        
+                        if(userName != nil){
+                            self.searchEmptyText.text = "No users returned with that name."
+                            self.searchEmptySub.text = "No worries.\nMake sure you typed their naame correctly, and try again."
                         }
                         else{
-                            self.searchEmpty.isHidden = false
-                            
                             self.searchEmptyText.text = "No users returned for your chosen game."
                             self.searchEmptySub.text = "No worries, try your search again later."
                         }
-                    }, completion: nil)
+                    }
                 })
-            }
-            else{
-                if(!self.loadingView.isHidden){
-                    self.searchProgress.stopAnimating()
-                    UIView.animate(withDuration: 0.8, animations: {
-                        self.loadingView.alpha = 0
-                    }, completion: { (finished: Bool) in
-                        self.gamerConnectResults.reloadData()
-                        
-                        if(!self.returnedUsers.isEmpty){
-                            self.searchEmpty.isHidden = true
-                        }
-                        else{
-                            self.searchEmpty.isHidden = false
-                            
-                            if(userName != nil){
-                                self.searchEmptyText.text = "No users returned with that name."
-                                self.searchEmptySub.text = "No worries.\nMake sure you typed their naame correctly, and try again."
-                            }
-                            else{
-                                self.searchEmptyText.text = "No users returned for your chosen game."
-                                self.searchEmptySub.text = "No worries, try your search again later."
-                            }
-                        }
-                    })
-                }
             }
         }
         

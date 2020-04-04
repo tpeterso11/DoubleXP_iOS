@@ -56,6 +56,8 @@ protocol NavigateToProfile: class {
     func updateNavigation(currentFrag: ParentVC)
     
     func navigateToInvite()
+    
+    func navigateToSettings()
 }
 
 protocol RequestsUpdate: class{
@@ -114,11 +116,14 @@ protocol ProfileCallbacks: class{
     func onFriendAdded()
     
     func onFriendDeclined()
+    
+    func onFriendRequested()
 }
 
 protocol SocialMediaManagerCallback: class {
     func onTweetsLoaded(tweets: [TweetObject])
     func onStreamsLoaded(streams: [TwitchStreamObject])
+    func onChannelsLoaded(channels: [TwitchChannelObj])
 }
 
 protocol LandingMenuCallbacks: class{

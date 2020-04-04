@@ -152,6 +152,26 @@ class User: NSObject, NSCoding, SenderType {
         }
     }
     
+    var _search = "true"
+    var search: String {
+        get {
+            return (_search)
+        }
+        set (newVal) {
+            _search = newVal
+        }
+    }
+    
+    var _notifications = "true"
+    var notifications: String {
+        get {
+            return (_notifications)
+        }
+        set (newVal) {
+            _notifications = newVal
+        }
+    }
+    
     var _sentRequests = [FriendRequestObject]()
     var sentRequests: [FriendRequestObject] {
         get {
@@ -271,6 +291,8 @@ class User: NSObject, NSCoding, SenderType {
         self.stats = (decoder.decodeObject(forKey: "stats") as! [StatObject])
         self.chatObjects = (decoder.decodeObject(forKey: "chatObjects") as! [ChatObject])
         self.sendBirdId = (decoder.decodeObject(forKey: "sendBirdId") as! String)
+        self.search = (decoder.decodeObject(forKey: "search") as! String)
+        self.notifications = (decoder.decodeObject(forKey: "notifications") as! String)
     }
     
     func encode(with coder: NSCoder) {
@@ -287,6 +309,8 @@ class User: NSObject, NSCoding, SenderType {
         coder.encode(self.bio, forKey: "bio")
         coder.encode(self.sendBirdId, forKey: "sendBirdId")
         coder.encode(self.chatObjects, forKey: "chatObjects")
+        coder.encode(self.search, forKey: "search")
+        coder.encode(self.notifications, forKey: "notifications")
     }
 }
 

@@ -30,7 +30,7 @@ class FriendsManager{
     }
     
     
-    func sendRequestFromProfile(currentUser: User, otherUser: User){
+    func sendRequestFromProfile(currentUser: User, otherUser: User, callbacks: ProfileCallbacks){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let currentUser = delegate.currentUser
         
@@ -84,7 +84,7 @@ class FriendsManager{
             }
             sendingRef.setValue(sendList)
             
-            self.updateLists(user: currentUser!)
+            self.updateLists(user: currentUser!, callbacks: callbacks)
         }
     }
     
@@ -93,9 +93,9 @@ class FriendsManager{
         let currentUser = delegate.currentUser
         let manager = GamerProfileManager()
         
-        //Other User First
+        //Us First
         //First, lets remove the friend request
-        let ref = Database.database().reference().child("Users").child(otherUserRequest.uid)
+        let ref = Database.database().reference().child("Users").child(currentUserUid)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             if(snapshot.exists()){
                 let value = snapshot.value as? NSDictionary
@@ -127,8 +127,8 @@ class FriendsManager{
                     
                     if(!pendingRequests.isEmpty){
                         for request in pendingRequests{
-                            if(request.uid == currentUserUid){
-                                pendingRequests = pendingRequests.filter { $0 != request}
+                            if(request.uid == otherUserRequest.uid){
+                                pendingRequests.remove(at: pendingRequests.index(of: request)!)
                                 break
                             }
                         }
@@ -148,19 +148,20 @@ class FriendsManager{
                 //var friends = value?["friends"] as? [String] ?? [String]()
                 let currentFriends = value?["friends"] as? NSDictionary
                 var friends = [String: FriendObject]()
-                
-                for friend in currentFriends!{
-                    let dict = friend.value as! [String: String]
-                    let newFriend = FriendObject(gamerTag: dict["gamerTag"]!, date: dict["date"]!, uid: dict["uId"]!)
-                    
-                    friends[newFriend.uid] = newFriend
-                }
-                
                 var contained = false
-                for friend in friends{
-                    if(friend.key == currentUser!.uId){
-                        contained = true
-                        break
+                if(currentFriends != nil){
+                    for friend in currentFriends!{
+                        let dict = friend.value as! [String: String]
+                        let newFriend = FriendObject(gamerTag: dict["gamerTag"]!, date: dict["date"]!, uid: dict["uId"]!)
+                        
+                        friends[newFriend.uid] = newFriend
+                    }
+                    
+                    for friend in friends{
+                        if(friend.key == otherUserRequest.uid){
+                            contained = true
+                            break
+                        }
                     }
                 }
                 
@@ -170,9 +171,9 @@ class FriendsManager{
                     formatter.dateFormat = "MMMM.dd.yyyy"
                     let result = formatter.string(from: date)
                     
-                    let newFriend = FriendObject(gamerTag: manager.getGamerTag(user: currentUser!), date: result, uid: currentUser!.uId)
+                    let newFriend = FriendObject(gamerTag: otherUserRequest.gamerTag, date: result, uid: otherUserRequest.uid)
                     
-                    friends[currentUser!.uId] = newFriend
+                    friends[otherUserRequest.uid] = newFriend
                     
                     var sendList = [[String: Any]]()
                     for teammate in friends{
@@ -192,13 +193,13 @@ class FriendsManager{
     }
     
     private func updateCurrentUserProfile(otherUserRequest: FriendRequestObject, currentUserUid: String, callbacks: ProfileCallbacks){
-        //Now Current User
+        //Other User
         //First, lets remove the sent request
-        let ref = Database.database().reference().child("Users").child(currentUserUid)
+        let ref = Database.database().reference().child("Users").child(otherUserRequest.uid)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             if(snapshot.exists()){
-                let delegate = UIApplication.shared.delegate as! AppDelegate!
-                let currentUser = delegate?.currentUser
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                let currentUser = delegate.currentUser
                 let manager = GamerProfileManager()
                 
                 let value = snapshot.value as? NSDictionary
@@ -216,7 +217,7 @@ class FriendsManager{
                 }
                 
                 for request in tempArray{
-                    if(request.uid == otherUserRequest.uid){
+                    if(request.uid == currentUserUid){
                         tempArray.remove(at: tempArray.index(of: request)!)
                         break
                     }
@@ -234,20 +235,21 @@ class FriendsManager{
                 
                 //Next, let's add the other user to the CURRENT user's friends.
                 let currentFriends = value?["friends"] as? NSDictionary
-                var friends = [String: FriendObject]()
-                
-                for friend in currentFriends!{
-                    let dict = friend.value as! [String: String]
-                    let newFriend = FriendObject(gamerTag: dict["gamerTag"]!, date: dict["date"]!, uid: dict["uId"]!)
-                    
-                    friends[newFriend.uid] = newFriend
-                }
-                
                 var contained = false
-                for friend in friends{
-                    if(friend.key == currentUser!.uId){
-                        contained = true
-                        break
+                var friends = [String: FriendObject]()
+                if(currentFriends != nil){
+                    for friend in currentFriends!{
+                        let dict = friend.value as! [String: String]
+                        let newFriend = FriendObject(gamerTag: dict["gamerTag"]!, date: dict["date"]!, uid: dict["uId"]!)
+                        
+                        friends[newFriend.uid] = newFriend
+                    }
+                    
+                    for friend in friends{
+                        if(friend.key == currentUser!.uId){
+                            contained = true
+                            break
+                        }
                     }
                 }
                 
@@ -267,7 +269,7 @@ class FriendsManager{
                         sendList.append(current)
                     }
                     
-                    ref.child("friends").setValue(friends)
+                    ref.child("friends").setValue(sendList)
                 }
                 
                 callbacks.onFriendAdded()
@@ -378,7 +380,7 @@ class FriendsManager{
         }
     }
     
-    private func updateLists(user: User){
+    private func updateLists(user: User, callbacks: ProfileCallbacks){
         //updates the current lists for the current user.
         let sendingRef = Database.database().reference().child("Users").child(user.uId).child("sent_requests")
         let friendsRef = Database.database().reference().child("Users").child(user.uId).child("friends")
@@ -448,20 +450,22 @@ class FriendsManager{
         }) { (error) in
             print(error.localizedDescription)
         }
+        
+        callbacks.onFriendRequested()
     }
     
     func checkListsForUser(user: User, currentUser: User) -> Bool{
         var contained = false
         
         for request in currentUser.pendingRequests{
-            if(request.uid == currentUser.uId){
+            if(request.uid == user.uId){
                 contained = true
                 return contained
             }
         }
         
         for request in currentUser.sentRequests{
-            if(request.uid == currentUser.uId){
+            if(request.uid == user.uId){
                 contained = true
                 return contained
             }
