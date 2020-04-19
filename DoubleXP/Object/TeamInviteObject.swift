@@ -39,12 +39,23 @@ class TeamInviteObject: GenericRequestObject, NSCoding {
         }
     }
     
-    init(gamerTag: String, date: String, uid: String)
+    var _teamName = ""
+    var teamName: String {
+        get {
+            return (_teamName)
+        }
+        set (newVal) {
+            _teamName = newVal
+        }
+    }
+    
+    init(gamerTag: String, date: String, uid: String, teamName: String)
     {
         super.init()
         self.gamerTag = gamerTag
         self.date = date
         self.uid = uid
+        self.teamName = teamName
     }
     
     required init(coder decoder: NSCoder)
@@ -53,12 +64,14 @@ class TeamInviteObject: GenericRequestObject, NSCoding {
         self.gamerTag = (decoder.decodeObject(forKey: "gamerTag") as! String)
         self.date = (decoder.decodeObject(forKey: "date") as! String)
         self.uid = (decoder.decodeObject(forKey: "uid") as! String)
+        self.teamName = (decoder.decodeObject(forKey: "teamName") as! String)
     }
     
     func encode(with coder: NSCoder) {
         coder.encode(self.gamerTag, forKey: "gamerTag")
         coder.encode(self.date, forKey: "date")
         coder.encode(self.uid, forKey: "uid")
+        coder.encode(self.teamName, forKey: "teamName")
     }
     
 }

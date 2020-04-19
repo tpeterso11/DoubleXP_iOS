@@ -35,8 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
 @implementation FIROAuthCredential
 
 - (nullable instancetype)initWithProvider:(NSString *)provider {
-  [FIRAuthExceptionUtils raiseMethodNotImplementedExceptionWithReason:
-      @"Please call the designated initializer."];
+  [FIRAuthExceptionUtils
+      raiseMethodNotImplementedExceptionWithReason:@"Please call the designated initializer."];
   return nil;
 }
 
@@ -72,7 +72,6 @@ NS_ASSUME_NONNULL_BEGIN
   }
   return self;
 }
-
 
 - (nullable instancetype)initWithVerifyAssertionResponse:(FIRVerifyAssertionResponse *)response {
   if (response.oauthIDToken.length || response.oauthAccessToken.length ||
@@ -120,7 +119,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
   [aCoder encodeObject:self.IDToken forKey:@"IDToken"];
-  [aCoder encodeObject:self.IDToken forKey:@"rawNonce"];
+  [aCoder encodeObject:self.rawNonce forKey:@"rawNonce"];
   [aCoder encodeObject:self.accessToken forKey:@"accessToken"];
   [aCoder encodeObject:self.pendingToken forKey:@"pendingToken"];
   [aCoder encodeObject:self.secret forKey:@"secret"];

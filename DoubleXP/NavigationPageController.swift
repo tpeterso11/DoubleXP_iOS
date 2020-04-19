@@ -33,9 +33,13 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
 
         selectViewController(currentViewController, direction: .forward, animated: false, completion: nil)
         
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        currentViewController.pageName = "Home"
+        currentViewController.navDictionary = ["state": "original"]
+        appDelegate.clearAndAddToNavStack(vc: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "Home"
+        
         Broadcaster.register(NavigateToProfile.self, observer: self)
-        
-        
     }
     
     fileprivate func populateItems() {
@@ -50,6 +54,8 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         
         delegate.currentLanding?.updateNavigation(currentFrag: vc)
         selectViewController(vc, direction: .reverse, animated: true, completion: nil)
+        
+        vc.reloadView()
     }
     
     func navigateToProfile(uid: String){
@@ -61,7 +67,25 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         appDelegate.addToNavStack(vc: currentViewController)
         appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
         appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "Profile"
+        appDelegate.currentMediaFrag = nil
         currentViewController.uid = uid
+        
+        selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
+    }
+    
+    func navigateToCompetition(competition: CompetitionObj) {
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "competition") as! CompetitionFrag
+        currentViewController.pageName = "Competition"
+        currentViewController.navDictionary = ["state": "backOnly"]
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.addToNavStack(vc: currentViewController)
+        appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
+        appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "Competition"
+        appDelegate.currentMediaFrag = nil
+        currentViewController.competition = competition
         
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
     }
@@ -75,6 +99,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         appDelegate.addToNavStack(vc: currentViewController)
         appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
         appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "GC Search"
         currentViewController.game = game
         
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
@@ -82,6 +107,14 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
     
     func navigateToCurrentUserProfile(){
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "profile") as! ProfileFrag
+        currentViewController.pageName = "Edit Profile"
+        currentViewController.navDictionary = ["state": "backOnly"]
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.addToNavStack(vc: currentViewController)
+        appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
+        appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "Edit Profile"
         
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
     }
@@ -95,6 +128,8 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         appDelegate.addToNavStack(vc: currentViewController)
         appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
         appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "Settings"
+        appDelegate.currentMediaFrag = nil
         
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
     }
@@ -108,6 +143,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         appDelegate.addToNavStack(vc: currentViewController)
         appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
         appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "Invite"
         
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
     }
@@ -121,6 +157,8 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         appDelegate.addToNavStack(vc: currentViewController)
         appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
         appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "Requests"
+        appDelegate.currentMediaFrag = nil
         
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
     }
@@ -134,6 +172,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         appDelegate.addToNavStack(vc: currentViewController)
         appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
         appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "Media"
         
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
     }
@@ -147,6 +186,8 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         appDelegate.addToNavStack(vc: currentViewController)
         appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
         appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "Teams"
+        appDelegate.currentMediaFrag = nil
         
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
     }
@@ -158,11 +199,13 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         currentViewController.pageName = "Home"
         currentViewController.navDictionary = ["state": "original"]
         appDelegate.clearAndAddToNavStack(vc: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "Home"
+        appDelegate.currentMediaFrag = nil
         
         selectViewController(currentViewController, direction: .reverse, animated: true, completion: nil)
     }
     
-    func navigateToTeamDashboard(team: TeamObject, newTeam: Bool){
+    func navigateToTeamDashboard(team: TeamObject?, newTeam: Bool){
         //change this to go to team needs selection later.
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "teamDashboard") as! TeamDashboard
         currentViewController.team = team
@@ -173,6 +216,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         appDelegate.addToNavStack(vc: currentViewController)
         appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
         appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "Team Dashboard"
         
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
     }
@@ -184,9 +228,9 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         currentViewController.navDictionary = ["state": "backOnly"]
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        appDelegate.addToNavStack(vc: currentViewController)
-        appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
         appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "Team Needs"
+        appDelegate.currentLanding?.stackDepth += 1
         
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
     }
@@ -197,9 +241,9 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         currentViewController.navDictionary = ["state": "backOnly"]
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        appDelegate.addToNavStack(vc: currentViewController)
-        appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
         appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "Create"
+        appDelegate.currentLanding?.stackDepth += 1
         
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
     }
@@ -213,6 +257,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         appDelegate.addToNavStack(vc: currentViewController)
         appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
         appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "Team Build"
         
         currentViewController.team = team
         
@@ -229,6 +274,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         appDelegate.addToNavStack(vc: currentViewController)
         appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
         appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "Team FA Search"
         currentViewController.team = team
         
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
@@ -244,6 +290,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         appDelegate.addToNavStack(vc: currentViewController)
         appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
         appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "Team FA Results"
         currentViewController.team = team
         
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
@@ -258,6 +305,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         appDelegate.addToNavStack(vc: currentViewController)
         appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
         appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "FA Dash"
         
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
     }
@@ -271,6 +319,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         appDelegate.addToNavStack(vc: currentViewController)
         appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
         appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "FA Dash"
         
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
     }
@@ -284,18 +333,36 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         appDelegate.addToNavStack(vc: currentViewController)
         appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
         appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "View Teams"
         
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
     }
     
     func navigateToTeamFreeAgentFront(){
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "faFront") as! FreeAgentFront
-               
+        currentViewController.pageName = "FA Front"
+        currentViewController.navDictionary = ["state": "backOnly"]
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.addToNavStack(vc: currentViewController)
+        appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
+        appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "FA Front"
+        
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
     }
     
     func navigateToTeamFreeAgentFront(team: TeamObject?, currentUser: User) {
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "faFront") as! FreeAgentFront
+        currentViewController.pageName = "FA Front"
+        currentViewController.navDictionary = ["state": "backOnly"]
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.addToNavStack(vc: currentViewController)
+        appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
+        appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "FA Front"
+        
         if(team != nil){
             currentViewController.team = team
         }
@@ -309,6 +376,15 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         delegate.selectedGCGame = gcGame
         
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "faQuiz") as! FAQuiz
+        currentViewController.pageName = "FA Quiz"
+        currentViewController.navDictionary = ["state": "backOnly"]
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.addToNavStack(vc: currentViewController)
+        appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
+        appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "FA Quiz"
+        
         currentViewController.gcGame = gcGame
         currentViewController.user = currentUser
         if(team != nil){
@@ -323,6 +399,15 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         delegate.selectedGCGame = gcGame
         
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "faQuiz") as! FAQuiz
+        currentViewController.pageName = "FA Quiz"
+        currentViewController.navDictionary = ["state": "backOnly"]
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.addToNavStack(vc: currentViewController)
+        appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
+        appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "FA Quiz"
+        
         currentViewController.gcGame = gcGame
         currentViewController.user = currentUser
         if(team != nil){
@@ -334,12 +419,20 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
     
     func navigateToMessaging(groupChannelUrl: String?, otherUserId: String?){
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "messaging") as! MessagingFrag
-        
         let delegate = UIApplication.shared.delegate as! AppDelegate
         
         guard delegate.currentUser != nil else{
             return
         }
+        
+        currentViewController.pageName = "Messaging"
+        currentViewController.navDictionary = ["state": "messaging", "searchHint": "Message this user.", "sendButton": "Send"]
+        
+        delegate.addToNavStack(vc: currentViewController)
+        delegate.currentLanding?.stackDepth = delegate.navStack.count
+        delegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        delegate.currentFrag = currentViewController.pageName ?? "Messaging"
+        delegate.currentMediaFrag = nil
         
         currentViewController.currentUser = delegate.currentUser!
         

@@ -13,9 +13,15 @@ import moa
 import MSPeekCollectionViewDelegateImplementation
 
 class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUpdate {
+    
     var userRequests = [Any]()
     var cellHeights: [CGFloat] = []
     
+    @IBOutlet weak var quizTable: UITableView!
+    @IBOutlet weak var closeView: UIView!
+    @IBOutlet weak var quizView: UIView!
+    @IBOutlet weak var blurBack: UIVisualEffectView!
+    @IBOutlet weak var quizCollection: UICollectionView!
     @IBOutlet weak var emptyLayout: UIView!
     @IBOutlet weak var requestList: UITableView!
     enum Const {
@@ -23,6 +29,10 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
            static let openCellHeight: CGFloat = 205
            static let rowsCount = 1
     }
+    
+    var questionPayload = [[String]]()
+    
+    var quizSet = false
     
     @IBOutlet weak var requestsSub: UILabel!
     @IBOutlet weak var requestsHeader: UILabel!
@@ -51,11 +61,6 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
             }, completion: nil)
         })
         
-        navDictionary = ["state": "backOnly"]
-        
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        appDelegate.currentLanding?.updateNavigation(currentFrag: self)
-        
         //self.pageName = "Requests"
         //appDelegate.addToNavStack(vc: self)
     }
@@ -74,6 +79,12 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
     private func buildRequests(user: User){
         if(!user.pendingRequests.isEmpty){
             for request in user.pendingRequests{
+                self.userRequests.append(request)
+            }
+        }
+        
+        if(!user.teamInviteRequests.isEmpty){
+            for request in user.teamInviteRequests{
                 self.userRequests.append(request)
             }
         }
@@ -116,82 +127,168 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
         })
     }
     
-    func tableView(_: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return cellHeights[indexPath.row]
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if(tableView == self.requestList){
+            return cellHeights[indexPath.row]
+        }
+        else{
+            return CGFloat(100)
+        }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.userRequests.count
+        if(tableView == self.requestList){
+            return self.userRequests.count
+        }
+        else{
+            return self.questionPayload.count
+        }
     }
     
-    func tableView(_: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard case let cell as RequestsFoldingCell = cell else {
-            return
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if(tableView == self.requestList){
+            guard case let cell as RequestsFoldingCell = cell else {
+                return
+            }
+
+            cell.backgroundColor = .clear
+
+            if cellHeights[indexPath.row] == Const.closeCellHeight {
+                cell.unfold(false, animated: false, completion: nil)
+            } else {
+                cell.unfold(true, animated: false, completion: nil)
+            }
+
+            //cell.number = indexPath.row
         }
-
-        cell.backgroundColor = .clear
-
-        if cellHeights[indexPath.row] == Const.closeCellHeight {
-            cell.unfold(false, animated: false, completion: nil)
-        } else {
-            cell.unfold(true, animated: false, completion: nil)
-        }
-
-        //cell.number = indexPath.row
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! RequestsFoldingCell
-        
-        let current = userRequests[indexPath.item]
-        
-        if(current is FriendRequestObject){
-            cell.setUI(friendRequest: (current as! FriendRequestObject), team: nil, indexPath: indexPath, callbacks: self)
+        if(tableView == self.requestList){
+            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! RequestsFoldingCell
+            
+            let current = userRequests[indexPath.item]
+            
+            if(current is FriendRequestObject){
+                cell.setUI(friendRequest: (current as! FriendRequestObject), team: nil, request: nil, indexPath: indexPath, currentTableView: self.requestList, callbacks: self)
+            }
+            else if(current is RequestObject){
+                cell.setUI(friendRequest: nil, team: nil, request: (current as! RequestObject), indexPath: indexPath, currentTableView: self.requestList, callbacks: self)
+            }
+            else{
+                cell.setUI(friendRequest: nil, team: (current as! TeamObject), request: nil, indexPath: indexPath, currentTableView: self.requestList, callbacks: self)
+            }
+            
+            cell.layoutMargins = UIEdgeInsets.zero
+            cell.separatorInset = UIEdgeInsets.zero
+            
+            return cell
         }
         else{
-            cell.setUI(friendRequest: nil, team: (current as! TeamObject), indexPath: indexPath, callbacks: self)
+            let cell = tableView.dequeueReusableCell(withIdentifier: "question", for: indexPath) as! RequestsQuizQuestionCell
+            
+            let current = self.questionPayload[indexPath.item]
+            cell.question.text = current[0]
+            cell.answer.text = current[1]
+            
+            return cell
         }
-        
-        cell.layoutMargins = UIEdgeInsets.zero
-        cell.separatorInset = UIEdgeInsets.zero
-        
-        return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if(tableView == self.requestList){
+            let cell = tableView.cellForRow(at: indexPath) as! RequestsFoldingCell
 
-        let cell = tableView.cellForRow(at: indexPath) as! RequestsFoldingCell
-
-        if cell.isAnimating() {
-            return
-        }
-
-        var duration = 0.0
-        let cellIsCollapsed = cellHeights[indexPath.row] == Const.closeCellHeight
-        if cellIsCollapsed {
-            cellHeights[indexPath.row] = Const.openCellHeight
-            cell.unfold(true, animated: true, completion: nil)
-            duration = 0.6
-        } else {
-            cellHeights[indexPath.row] = Const.closeCellHeight
-            cell.unfold(false, animated: true, completion: nil)
-            duration = 0.3
-        }
-
-        UIView.animate(withDuration: duration, delay: 0, options: .curveEaseOut, animations: { () -> Void in
-            tableView.beginUpdates()
-            tableView.endUpdates()
-            
-            // fix https://github.com/Ramotion/folding-cell/issues/169
-            if cell.frame.maxY > tableView.frame.maxY {
-                tableView.scrollToRow(at: indexPath, at: UITableView.ScrollPosition.bottom, animated: true)
+            if cell.isAnimating() {
+                return
             }
-        }, completion: nil)
+
+            var duration = 0.0
+            let cellIsCollapsed = cellHeights[indexPath.row] == Const.closeCellHeight
+            if cellIsCollapsed {
+                cellHeights[indexPath.row] = Const.openCellHeight
+                cell.unfold(true, animated: true, completion: nil)
+                duration = 0.6
+            } else {
+                cellHeights[indexPath.row] = Const.closeCellHeight
+                cell.unfold(false, animated: true, completion: nil)
+                duration = 0.3
+            }
+
+            UIView.animate(withDuration: duration, delay: 0, options: .curveEaseOut, animations: { () -> Void in
+                tableView.beginUpdates()
+                tableView.endUpdates()
+                
+                // fix https://github.com/Ramotion/folding-cell/issues/169
+                if cell.frame.maxY > tableView.frame.maxY {
+                    tableView.scrollToRow(at: indexPath, at: UITableView.ScrollPosition.bottom, animated: true)
+                }
+            }, completion: nil)
+        }
     }
+    
+    //later, add "accepted" and "invited" array to user. This way. when they are invited or accepted, we can observe this in the DB and open a nice little overlay that says "you've been accepted, chat or check out the team". We cannot do this just by observing teams because if they create a team themselves, we do not want this overlay showing.
     
     func updateCell(indexPath: IndexPath) {
         self.userRequests.remove(at: indexPath.item)
         self.requestList.deleteRows(at: [indexPath], with: .automatic)
+        
+        if(self.userRequests.isEmpty){
+            UIView.animate(withDuration: 0.8, animations: {
+                self.emptyLayout.alpha = 1
+            }, completion: nil)
+        }
+    }
+    
+    func showQuiz(questions: [[String]]){
+        self.questionPayload = [[String]]()
+        self.questionPayload.append(contentsOf: questions)
+        
+        let closeTap = UITapGestureRecognizer(target: self, action: #selector(hideQuiz))
+        self.closeView.isUserInteractionEnabled = true
+        self.closeView.addGestureRecognizer(closeTap)
+        
+        if(!quizSet){
+            quizTable.delegate = self
+            quizTable.dataSource = self
+            self.reload(tableView: self.quizTable)
+        }
+        else{
+            quizCollection.reloadData()
+        }
+        
+        let top = CGAffineTransform(translationX: -340, y: 0)
+        UIView.animate(withDuration: 0.5, animations: {
+            self.blurBack.alpha = 1
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, delay: 0.3, options: [], animations: {
+                self.quizView.transform = top
+            }, completion: nil)
+        })
+    }
+    
+    @objc func hideQuiz(){
+        let top = CGAffineTransform(translationX: 0, y: 0)
+        UIView.animate(withDuration: 0.5, animations: {
+            self.quizView.transform = top
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, delay: 0.3, options: [], animations: {
+                self.blurBack.alpha = 0
+            }, completion: nil)
+        })
+    }
+    
+    func showQuizClicked(questions: [[String]]){
+        showQuiz(questions: questions)
+    }
+    
+    func reload(tableView: UITableView) {
+        if(tableView == quizTable){
+            let contentOffset = tableView.contentOffset
+            tableView.reloadData()
+            tableView.layoutIfNeeded()
+            tableView.setContentOffset(contentOffset, animated: false)
+        }
     }
     
     struct Section {

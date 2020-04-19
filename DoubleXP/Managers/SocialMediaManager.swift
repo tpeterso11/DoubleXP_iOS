@@ -76,17 +76,8 @@ class SocialMediaManager{
     }
     
     func loadTweets(team: TeamObject, gcGame: GamerConnectGame, callbacks: SocialMediaManagerCallback){
-        let delegate = UIApplication.shared.delegate as! AppDelegate
         var tweets = [TweetObject]()
-        
-        var gcGame: GamerConnectGame? = nil
-        for game in delegate.gcGames{
-           if (game.gameName == team.games[0]) {
-               gcGame = game
-           }
-        }
-       
-        let parameters = ["screen_name": gcGame?.twitterHandle, "count": "10", "include_entities": "true"]
+        let parameters = ["screen_name": gcGame.twitterHandle, "count": "10", "include_entities": "true"]
         var error : NSError?
         let req = TWTRAPIClient().urlRequest(withMethod: "GET", urlString: "https://api.twitter.com/1.1/statuses/user_timeline.json", parameters: parameters, error: &error)
         TWTRAPIClient().sendTwitterRequest(req, completion: { (response, data, error) in

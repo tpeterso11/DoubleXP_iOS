@@ -139,8 +139,6 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         
         self.selectedCategory = options[0]
         
-        //twitchLoginButton.applyGradient(colours:  [#colorLiteral(red: 0.3081886768, green: 0.1980658174, blue: 0.5117434263, alpha: 1), #colorLiteral(red: 0.395016551, green: 0.2572917342, blue: 0.6494273543, alpha: 1)], orientation: .horizontal)
-        
         if #available(iOS 10.0, *) {
             self.news.refreshControl = refreshControl
             self.channelCollection.refreshControl = channelRefreshControl
@@ -491,7 +489,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                             self.articles = [Any]()
                             
-                            self.news?.collectionViewLayout = UICollectionViewFlowLayout()
+                            //self.news?.collectionViewLayout = UICollectionViewFlowLayout()
                             
                             let manager = SocialMediaManager()
                             manager.getTopGames(callbacks: self)
@@ -985,7 +983,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
             self.articleBlur.alpha = 0
         })
         
-        reloadView()
+        reloadColView()
         
         self.articleOpen = false
     }
@@ -1000,7 +998,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
             self.articleBlur.alpha = 0
         })
         
-        reloadView()
+        reloadColView()
         
         self.streams = [TwitchStreamObject]()
         self.channelCollection.reloadData()
@@ -1008,7 +1006,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         self.channelOpen = false
     }
     
-    private func reloadView(){
+    private func reloadColView(){
         self.articleOverlay.setNeedsLayout()
         self.articleOverlay.layoutIfNeeded()
     }

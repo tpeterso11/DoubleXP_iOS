@@ -29,6 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var navStack = KeepOrderDictionary<String, ParentVC>() //pageNames
     var mediaCache = MediaCache()
     var twitchChannels = [TwitchChannelObj]()
+    var competitions = [CompetitionObj]()
     
     private var apnsToken: String = ""
     private var fcmToken: String = ""
@@ -69,11 +70,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     
     func addToNavStack(vc: ParentVC){
         self.navStack[vc.pageName!] = vc
+        print(self.navStack.count)
     }
     
     func clearAndAddToNavStack(vc: ParentVC){
         self.navStack = KeepOrderDictionary<String, ParentVC>()
-        self.navStack.add(index: 0, vc)
+        self.navStack[vc.pageName!] = vc
         
         self.currentLanding?.stackDepth = self.navStack.count
     }
@@ -105,6 +107,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
             //self.navStack = KeepOrderDictionary<String, ParentVC>()
         }
     }
+    
+    func handleToken(){
+        if(currentUser != nil){
+            if(currentUser!.notifications == "false"){
+                self.fcmToken = ""
+            }
+            
+            guard !self.fcmToken.isEmpty else{
+                return
+            }
+            
+            let ref = Database.database().reference().child("Users").child(currentUser!.uId)
+            ref.child("fcmToken").setValue(self.fcmToken)
+        }
+    }
 
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
@@ -122,6 +139,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        
+        UIApplication.shared.applicationIconBadgeNumber = 0
+        
         AppEvents.activateApp()
     }
 

@@ -283,10 +283,10 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
                         let friendsArray = snapshot.childSnapshot(forPath: "friends")
                         for friend in friendsArray.children{
                             let currentObj = friend as! DataSnapshot
-                            let dict = currentObj.value as! [String: Any]
-                            let gamerTag = dict["gamerTag"] as? String ?? ""
-                            let date = dict["date"] as? String ?? ""
-                            let uid = dict["uid"] as? String ?? ""
+                            let dict = currentObj.value as? [String: Any]
+                            let gamerTag = dict?["gamerTag"] as? String ?? ""
+                            let date = dict?["date"] as? String ?? ""
+                            let uid = dict?["uid"] as? String ?? ""
                             
                             let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
                             friends.append(newFriend)
@@ -297,10 +297,10 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
                         let gamerTagsArray = (user as! DataSnapshot).childSnapshot(forPath: "gamerTags")
                         for gamerTagObj in gamerTagsArray.children {
                             let currentObj = gamerTagObj as! DataSnapshot
-                            let dict = currentObj.value as! [String: Any]
-                            let currentTag = dict["gamerTag"] as? String ?? ""
-                            let currentGame = dict["game"] as? String ?? ""
-                            let console = dict["console"] as? String ?? ""
+                            let dict = currentObj.value as? [String: Any]
+                            let currentTag = dict?["gamerTag"] as? String ?? ""
+                            let currentGame = dict?["game"] as? String ?? ""
+                            let console = dict?["console"] as? String ?? ""
                             
                             let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
                             gamerTags.append(currentGamerTagObj)
@@ -363,10 +363,10 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
                         let gamerTagsArray = (user as! DataSnapshot).childSnapshot(forPath: "gamerTags")
                         for gamerTagObj in gamerTagsArray.children {
                             let currentObj = gamerTagObj as! DataSnapshot
-                            let dict = currentObj.value as! [String: Any]
-                            let currentTag = dict["gamerTag"] as? String ?? ""
-                            let currentGame = dict["game"] as? String ?? ""
-                            let console = dict["console"] as? String ?? ""
+                            let dict = currentObj.value as? [String: Any]
+                            let currentTag = dict?["gamerTag"] as? String ?? ""
+                            let currentGame = dict?["game"] as? String ?? ""
+                            let console = dict?["console"] as? String ?? ""
                             
                             let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
                             gamerTags.append(currentGamerTagObj)
@@ -402,10 +402,10 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
                                 let friendsArray = snapshot.childSnapshot(forPath: "friends")
                                 for friend in friendsArray.children{
                                     let currentObj = friend as! DataSnapshot
-                                    let dict = currentObj.value as! [String: Any]
-                                    let gamerTag = dict["gamerTag"] as? String ?? ""
-                                    let date = dict["date"] as? String ?? ""
-                                    let uid = dict["uid"] as? String ?? ""
+                                    let dict = currentObj.value as? [String: Any]
+                                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                                    let date = dict?["date"] as? String ?? ""
+                                    let uid = dict?["uid"] as? String ?? ""
                                     
                                     let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
                                     friends.append(newFriend)
@@ -416,10 +416,10 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
                                 let gamerTagsArray = (user as! DataSnapshot).childSnapshot(forPath: "gamerTags")
                                 for gamerTagObj in gamerTagsArray.children {
                                     let currentObj = gamerTagObj as! DataSnapshot
-                                    let dict = currentObj.value as! [String: Any]
-                                    let currentTag = dict["gamerTag"] as? String ?? ""
-                                    let currentGame = dict["game"] as? String ?? ""
-                                    let console = dict["console"] as? String ?? ""
+                                    let dict = currentObj.value as? [String: Any]
+                                    let currentTag = dict?["gamerTag"] as? String ?? ""
+                                    let currentGame = dict?["game"] as? String ?? ""
+                                    let console = dict?["console"] as? String ?? ""
                                     
                                     let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
                                     gamerTags.append(currentGamerTagObj)

@@ -47,6 +47,14 @@
 @property (nonatomic, setter=setSuper:) BOOL isSuper;
 
 /**
+ *  Represents the channel is broadcast channel or not.
+ *  NO by default.
+ *
+ *  @since 3.0.171
+ */
+@property (nonatomic) BOOL isBroadcast;
+
+/**
  *  Represents the channel is public channel or private one.
  *  NO by default.
  */
@@ -177,6 +185,12 @@
  @since 3.0.157
  */
 @property (atomic, readonly) long long messageOffsetTimestamp;
+
+/// A value that sets the message survival time in seconds. In the channel that is created or updated with this option, the read messages are automatically deleted after a determined amount of time. The default value is `-1` that represents the disappearing message is disabled.
+/// @discussion This feature is available in a 1-on-1 group channel.
+/// @since 3.0.172
+@property (atomic, readonly) NSInteger messageSurvivalSeconds;
+
 /**
  *  DO NOT USE this initializer. You can only get an instance type of `SBDGroupChannel` from SDK.
  */
@@ -463,11 +477,14 @@ DEPRECATED_ATTRIBUTE;
  *  @param coverUrl          The cover image url of group channel.
  *  @param data              The custom data of group channel.
  *  @param completionHandler The handler block to execute. `channel` is the group channel instance which has the `userIds` as <span>members</span>.
+ *
+ *  @deprecated in 3.0.116 Use `updateChannelWithParams:completionHandler:` instead.
  */
 - (void)updateChannelWithName:(NSString * _Nullable)name
                      coverUrl:(NSString * _Nullable)coverUrl
                          data:(NSString * _Nullable)data
-            completionHandler:(nonnull void (^)(SBDGroupChannel * _Nullable channel, SBDError * _Nullable error))completionHandler;
+            completionHandler:(nonnull void (^)(SBDGroupChannel * _Nullable channel, SBDError * _Nullable error))completionHandler
+DEPRECATED_ATTRIBUTE;
 
 /**
  *  Creates a group channel with user IDs.
@@ -778,6 +795,12 @@ DEPRECATED_ATTRIBUTE;
 - (void)markAsRead;
 
 /**
+ *  Sends mark as delivered. The other <span>members</span> in the channel will receive an event. The event will be received in `channelDidUpdateDeliveryReceipt:` of `SBDChannelDelegate`.
+ *  @since 3.0.162
+ */
+- (void)markAsDelivered;
+
+/**
  *  Starts typing. The other <span>members</span> in the channel will receive an event. The event will be received in `channelDidUpdateTypingStatus:` of `SBDChannelDelegate`.
  */
 - (void)startTyping;
@@ -925,6 +948,17 @@ DEPRECATED_ATTRIBUTE;
  `USER_ID` is the user ID as a key. Each `USER_ID` has a `NSDictionary` which includes `SBDUser` object and `NSNUmber` object. The "user" is a key of `SBDUser` object and the "last_seen_at" is a key of `NSNumber` object. The `NSNumber` object has a 64-bit integer value for the timestamp in millisecond.
  */
 - (nonnull NSDictionary<NSString *, NSDictionary<NSString *, NSObject *> *> *)getReadStatusIncludingAllMembers:(BOOL)includeAllMembers;
+
+/**
+ *  Returns how many <span>members</span> haven't been delivery the given message yet.
+ *
+ *  @param message The message.
+ *
+ *  @return Number of undelivered member count. Zero if all <span>members</span> delivered the message.
+ *
+ *  @since 3.0.162
+ */
+- (int)getDeliveryReceipt:(SBDBaseMessage * _Nonnull)message;
 
 /**
  *  If other users are typing in the channel, YES is returned.
@@ -1313,5 +1347,10 @@ DEPRECATED_ATTRIBUTE;
  */
 - (void)registerScheduledUserMessageWithParams:(nonnull SBDScheduledUserMessageParams *)params
                              completionHandler:(nullable void (^)(SBDScheduledUserMessage * _Nullable scheduledUserMessage, SBDError * _Nullable error))completionHandler;
+
+/// Notifies the current user took a screenshot in this channel. The server is going to send an admin message to notify this in the group channel.
+/// @param completionHandler The handler block to be executed.
+/// @since 3.0.172
+- (void)notifyScreenshotWasTakenWithCompletionHandler:(nullable void (^)(SBDError * _Nullable error))completionHandler;
 
 @end

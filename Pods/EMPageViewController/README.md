@@ -15,10 +15,10 @@ In addition to the ability scroll to any view controller, you can also easily sc
 EMPageViewController is not a subclass of UIPageViewController. Instead, it's a subclass of UIViewController with a UIScrollView, written in Swift, and it has common sense delegate and data source methods that will make the development of your page-based iOS app a breeze.
 
 ## Compatibility
-* Xcode 7.0+
-* Swift 3.0+
+* Xcode 10.0+
+* Swift 4.2+
 * Objective-C compatible
-* iOS 7+
+* iOS 8+
 * iPhone, iPad, and iPod Touch
 
 ## Installation
@@ -66,6 +66,6 @@ Full documentation is available on [CocoaDocs](http://cocoadocs.org/docsets/EMPa
 Feedback? Suggestions? Just want to say hello? Contact me anytime on Twitter [@emalyak](https://twitter.com/emalyak). You can also visit my website [erikmalyak.com](http://erikmalyak.com) for other ways to get in touch.
 
 ## License
-Copyright (c) 2015-2016 [Erik Malyak](http://erikmalyak.com)
+Copyright (c) 2015-2019 [Erik Malyak](http://erikmalyak.com)
 
 [MIT License](https://github.com/emalyak/EMPageViewController/blob/master/LICENSE)

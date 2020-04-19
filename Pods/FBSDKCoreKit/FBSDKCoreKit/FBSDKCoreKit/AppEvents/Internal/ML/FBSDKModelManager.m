@@ -32,22 +32,7 @@
 #import "FBSDKSettings.h"
 #import "FBSDKSuggestedEventsIndexer.h"
 #import "FBSDKTypeUtility.h"
-#import "FBSDKViewHierarchyMacros.h"
-
-#define FBSDK_ML_MODEL_PATH @"models"
-
-static NSString *const MODEL_INFO_KEY= @"com.facebook.sdk:FBSDKModelInfo";
-static NSString *const ASSET_URI_KEY = @"asset_uri";
-static NSString *const RULES_URI_KEY = @"rules_uri";
-static NSString *const THRESHOLDS_KEY = @"thresholds";
-static NSString *const USE_CASE_KEY = @"use_case";
-static NSString *const VERSION_ID_KEY = @"version_id";
-static NSString *const MODEL_DATA_KEY = @"data";
-static NSString *const ADDRESS_FILTERING_KEY = @"DATA_DETECTION_ADDRESS";
-
-static NSString *const MTMLKey = @"MTML";
-static NSString *const MTMLTaskAppEventPredKey = @"MTML_APP_EVENT_PRED";
-static NSString *const MTMLTaskAddressDetectKey = @"MTML_ADDRESS_DETECT";
+#import "FBSDKMLMacros.h"
 
 static NSString *_directoryPath;
 static NSMutableDictionary<NSString *, id> *_modelInfo;
@@ -96,8 +81,6 @@ NS_ASSUME_NONNULL_BEGIN
       [FBSDKFeatureManager checkFeature:FBSDKFeatureMTML completionBlock:^(BOOL enabled) {
         if (enabled) {
           [self checkFeaturesAndExecuteForMTML];
-        } else {
-          [self checkFeaturesAndExecute];
         }
       }];
     }];
@@ -123,6 +106,9 @@ NS_ASSUME_NONNULL_BEGIN
   if (!_modelInfo || !_directoryPath) {
     return nil;
   }
+  if ([useCase hasPrefix:MTMLKey]) {
+    useCase = MTMLKey;
+  }
   NSDictionary<NSString *, id> *model = [_modelInfo objectForKey:useCase];
   if (model && model[VERSION_ID_KEY]) {
     NSString *path = [_directoryPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_%@.weights", useCase, model[VERSION_ID_KEY]]];
@@ -134,6 +120,18 @@ NS_ASSUME_NONNULL_BEGIN
                                     error:nil];
   }
   return nil;
+}
+
++ (nullable NSArray *)getThresholdsForKey:(NSString *)useCase
+{
+  if (!_modelInfo) {
+    return nil;
+  }
+  NSDictionary<NSString *, id> * modelInfo = _modelInfo[useCase];
+  if (!modelInfo) {
+    return nil;
+  }
+  return modelInfo[THRESHOLDS_KEY];
 }
 
 #pragma mark - Private methods
@@ -163,7 +161,7 @@ NS_ASSUME_NONNULL_BEGIN
   [self getModelAndRules:MTMLKey onSuccess:^() {
     if ([FBSDKFeatureManager isEnabled:FBSDKFeatureSuggestedEvents]) {
       [self getModelAndRules:MTMLTaskAppEventPredKey onSuccess:^() {
-        [FBSDKEventInferencer loadWeightsForKey:MTMLKey];
+        [FBSDKEventInferencer loadWeightsForKey:MTMLTaskAppEventPredKey];
         [FBSDKFeatureExtractor loadRulesForKey:MTMLTaskAppEventPredKey];
         [FBSDKSuggestedEventsIndexer enable];
       }];
@@ -171,31 +169,12 @@ NS_ASSUME_NONNULL_BEGIN
 
     if ([FBSDKFeatureManager isEnabled:FBSDKFeaturePIIFiltering]) {
       [self getModelAndRules:MTMLTaskAddressDetectKey onSuccess:^() {
-        [FBSDKAddressInferencer loadWeightsForKey:MTMLKey];
+        [FBSDKAddressInferencer loadWeightsForKey:MTMLTaskAddressDetectKey];
         [FBSDKAddressInferencer initializeDenseFeature];
         [FBSDKAddressFilterManager enable];
       }];
     }
   }];
-}
-
-+ (void)checkFeaturesAndExecute
-{
-  if ([FBSDKFeatureManager isEnabled:FBSDKFeatureSuggestedEvents]) {
-    [self getModelAndRules:SUGGEST_EVENT_KEY onSuccess:^() {
-      [FBSDKEventInferencer loadWeightsForKey:SUGGEST_EVENT_KEY];
-      [FBSDKFeatureExtractor loadRulesForKey:SUGGEST_EVENT_KEY];
-      [FBSDKSuggestedEventsIndexer enable];
-    }];
-  }
-
-  if ([FBSDKFeatureManager isEnabled:FBSDKFeaturePIIFiltering]) {
-    [self getModelAndRules:ADDRESS_FILTERING_KEY onSuccess:^() {
-      [FBSDKAddressInferencer loadWeightsForKey:ADDRESS_FILTERING_KEY];
-      [FBSDKAddressInferencer initializeDenseFeature];
-      [FBSDKAddressFilterManager enable];
-    }];
-  }
 }
 
 + (void)getModelAndRules:(NSString *)useCaseKey

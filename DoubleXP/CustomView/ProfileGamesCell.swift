@@ -70,27 +70,13 @@ class ProfileGamesCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let current = gcGames[indexPath.item]
+        
         if(self.gamesPlayed.contains(current)){
-            self.gamesPlayed.remove(at: self.gamesPlayed.index(of: current)!)
-            
-            let cell = collectionView.cellForItem(at: indexPath) as! ProfileGameSelectionCell
-            
-            UIView.animate(withDuration: 0.3, animations: {
-                cell.blurCover.alpha = 0
-                //track changes
-            }, completion: nil)
+            callbacks.gameRemoved(gameName: current.gameName, indexPath: indexPath)
         }
         else{
-            self.gamesPlayed.append(current)
-            let cell = collectionView.cellForItem(at: indexPath) as! ProfileGameSelectionCell
-            
-            UIView.animate(withDuration: 0.3, animations: {
-                cell.blurCover.alpha = 1
-                //track changes
-            }, completion: nil)
+            callbacks.gameAdded(gameName: current.gameName, indexPath: indexPath)
         }
-        
-        self.callbacks.checkChanges(updatedList: self.gamesPlayed)
     }
     
    func collectionView(_ collectionView: UICollectionView,
@@ -98,4 +84,26 @@ class ProfileGamesCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout
                        sizeForItemAt indexPath: IndexPath) -> CGSize {
     return CGSize(width: collectionView.bounds.width - 20, height: CGFloat(100))
    }
+    
+    func updateCell(indexPath: IndexPath, gameName: String, show: Bool){
+        let cell = gameList.cellForItem(at: indexPath) as! ProfileGameSelectionCell
+        if(show){
+            self.gamesPlayed.append(self.gcGames[indexPath.item])
+            
+            UIView.animate(withDuration: 0.3, animations: {
+                cell.blurCover.alpha = 1
+                //track changes
+            }, completion: nil)
+        }
+        else{
+            self.gamesPlayed.remove(at: self.gamesPlayed.index(of: self.gcGames[indexPath.item])!)
+            
+            UIView.animate(withDuration: 0.3, animations: {
+                cell.blurCover.alpha = 0
+                //track changes
+            }, completion: nil)
+        }
+        
+        self.callbacks.checkChanges(updatedList: self.gamesPlayed)
+    }
 }

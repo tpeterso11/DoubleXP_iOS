@@ -97,25 +97,9 @@ EOM
   esac
 }
 if [[ "$CONFIGURATION" == "Debug" ]]; then
-  install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/FontAwesome.ttf"
-  install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/Ionicons.ttf"
-  install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/map-icons.ttf"
-  install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/MaterialIcons-Regular.ttf"
-  install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/octicons.ttf"
-  install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/open-iconic.ttf"
-  install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/SmoothButton.xib"
-  install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/themify.ttf"
   install_resource "${PODS_ROOT}/TwitterKit/iOS/TwitterKit.framework/TwitterKitResources.bundle"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
-  install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/FontAwesome.ttf"
-  install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/Ionicons.ttf"
-  install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/map-icons.ttf"
-  install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/MaterialIcons-Regular.ttf"
-  install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/octicons.ttf"
-  install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/open-iconic.ttf"
-  install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/SmoothButton.xib"
-  install_resource "${PODS_ROOT}/SmoothButton/SmoothButton/SmoothButton/Resources/themify.ttf"
   install_resource "${PODS_ROOT}/TwitterKit/iOS/TwitterKit.framework/TwitterKitResources.bundle"
 fi
 

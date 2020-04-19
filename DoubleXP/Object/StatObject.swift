@@ -288,9 +288,22 @@ class StatObject: NSObject, NSCoding {
         if(!mostUsedDefender.isEmpty){
             count += 1
         }
-        if(!gearScore.isEmpty){
+        if(!codWins.isEmpty){
             count += 1
         }
+        if(!codBestKills.isEmpty){
+            count += 1
+        }
+        if(!codKills.isEmpty){
+            count += 1
+        }
+        if(!codKd.isEmpty){
+            count += 1
+        }
+        if(!codLevel.isEmpty){
+            count += 1
+        }
+        
         
         return count
     }
@@ -334,6 +347,22 @@ class StatObject: NSObject, NSCoding {
             count += 1
         }
         if(!gearScore.isEmpty){
+            count += 1
+        }
+        
+        if(!codWins.isEmpty){
+            count += 1
+        }
+        if(!codBestKills.isEmpty){
+            count += 1
+        }
+        if(!codKills.isEmpty){
+            count += 1
+        }
+        if(!codKd.isEmpty){
+            count += 1
+        }
+        if(!codLevel.isEmpty){
             count += 1
         }
         

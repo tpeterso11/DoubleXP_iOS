@@ -25,6 +25,7 @@ class MessagingManager: UIViewController, SBDConnectionDelegate, SBDUserEventDel
         SBDMain.initWithApplicationId("B1CA477B-83D6-40D9-A8BB-10C959689426")
         SBDMain.connect(withUserId: currentUser.uId, completionHandler: { (user, error) in
             guard error == nil else {   // Error.
+                self.messagingCallbacks!.connectionFailed()
                 return
             }
             
@@ -62,6 +63,9 @@ class MessagingManager: UIViewController, SBDConnectionDelegate, SBDUserEventDel
         
         user!.createMetaData(data) { (metaData, error) in
             guard error != nil else {   // Error.
+                self.sendbirdId = user?.userId
+                self.currentUser?.sendBirdId = user!.userId
+                self.messagingCallbacks!.connectionFailed()
                 return
             }
             
@@ -95,6 +99,7 @@ class MessagingManager: UIViewController, SBDConnectionDelegate, SBDUserEventDel
         
         SBDGroupChannel.createChannel(with: params) { (groupChannel, error) in
             guard error == nil else {   // Error.
+                callbacks.createTeamChannelFailed()
                 return
             }
             
@@ -103,9 +108,10 @@ class MessagingManager: UIViewController, SBDConnectionDelegate, SBDUserEventDel
         }
     }
     
-    func loadGroupChannel(channelUrl: String, team: Bool){
+    func loadGroupChannel(channelUrl: String, team: Bool, callbacks: MessagingCallbacks){
         SBDGroupChannel.getWithUrl(channelUrl) { (groupChannel, error) in
             guard error == nil else {   // Error.
+                callbacks.errorLoadingChannel()
                 return
             }
 
@@ -133,7 +139,7 @@ class MessagingManager: UIViewController, SBDConnectionDelegate, SBDUserEventDel
                         //register push notifications
                     }
                     
-                    self.loadGroupMessages(groupChannel: self.currentChannel!)
+                    self.loadGroupMessages(groupChannel: self.currentChannel!, callbacks: callbacks)
                 })
             }
             else{
@@ -143,16 +149,17 @@ class MessagingManager: UIViewController, SBDConnectionDelegate, SBDUserEventDel
                     //register push notifications
                 }
                 
-                self.loadGroupMessages(groupChannel: self.currentChannel!)
+                self.loadGroupMessages(groupChannel: self.currentChannel!, callbacks: callbacks)
             }
         }
     }
     
-    private func loadGroupMessages(groupChannel: SBDGroupChannel){
+    private func loadGroupMessages(groupChannel: SBDGroupChannel, callbacks: MessagingCallbacks){
         let previousMessageQuery = groupChannel.createPreviousMessageListQuery()
         
         previousMessageQuery?.loadPreviousMessages(withLimit: 50, reverse: false, completionHandler: { (messages, error) in
             guard error == nil else {   // Error.
+                callbacks.errorLoadingMessages()
                 return
             }
             

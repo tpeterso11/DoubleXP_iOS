@@ -2,7 +2,7 @@
 
   EMPageViewController.swift
 
-  Copyright (c) 2015-2016 Erik Malyak
+  Copyright (c) 2015-2019 Erik Malyak
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -127,10 +127,10 @@ open class EMPageViewController: UIViewController, UIScrollViewDelegate {
     /// If the data source is `nil`, gesture based scrolling will be disabled and all view controllers must be provided through `selectViewController:direction:animated:completion:`.
     ///
     /// - important: If you are using a data source, make sure you set `dataSource` before calling `selectViewController:direction:animated:completion:`.
-    open weak var dataSource: EMPageViewControllerDataSource?
+    @objc open weak var dataSource: EMPageViewControllerDataSource?
     
     /// The object that receives messages throughout the navigation process of the page view controller.
-    open weak var delegate: EMPageViewControllerDelegate?
+    @objc open weak var delegate: EMPageViewControllerDelegate?
     
     /// The direction scrolling navigation occurs
     open private(set) var navigationOrientation: EMPageViewControllerNavigationOrientation = .horizontal
@@ -159,13 +159,13 @@ open class EMPageViewController: UIViewController, UIScrollViewDelegate {
     private var beforeViewController: UIViewController?
     
     /// The currently selected view controller. Can be `nil` if no view controller is selected.
-    open private(set) var selectedViewController: UIViewController?
+    @objc open private(set) var selectedViewController: UIViewController?
     
     /// The view controller after the selected view controller.
     private var afterViewController: UIViewController?
     
     /// Boolean that indicates whether the page controller is currently in the process of scrolling.
-    open private(set) var scrolling = false
+    @objc open private(set) var scrolling = false
     
     /// The direction the page controller is scrolling towards.
     open private(set) var navigationDirection: EMPageViewControllerNavigationDirection?
@@ -196,7 +196,7 @@ open class EMPageViewController: UIViewController, UIScrollViewDelegate {
         - parameter direction: The direction of the navigation and animation, if applicable.
         - parameter completion: A block that's called after the transition is finished. The block parameter `transitionSuccessful` is `true` if the transition to the selected view controller was completed successfully.
     */
-    open func selectViewController(_ viewController: UIViewController, direction: EMPageViewControllerNavigationDirection, animated: Bool, completion: ((_ transitionSuccessful: Bool) -> Void)?) {
+    @objc open func selectViewController(_ viewController: UIViewController, direction: EMPageViewControllerNavigationDirection, animated: Bool, completion: ((_ transitionSuccessful: Bool) -> Void)?) {
         
         if (direction == .forward) {
             self.afterViewController = viewController
@@ -307,6 +307,35 @@ open class EMPageViewController: UIViewController, UIScrollViewDelegate {
         }
 
         self.layoutViews()
+    }
+    
+    
+    open override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if let selectedViewController = self.selectedViewController {
+            selectedViewController.beginAppearanceTransition(true, animated: animated)
+        }
+    }
+
+     open override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if let selectedViewController = self.selectedViewController {
+            selectedViewController.endAppearanceTransition()
+        }
+    }
+
+     open override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if let selectedViewController = self.selectedViewController {
+            selectedViewController.beginAppearanceTransition(false, animated: animated)
+        }
+    }
+
+     open override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if let selectedViewController = self.selectedViewController {
+            selectedViewController.endAppearanceTransition()
+        }
     }
     
     
@@ -454,9 +483,9 @@ open class EMPageViewController: UIViewController, UIScrollViewDelegate {
         self.adjustingContentOffset = true
         self.scrollView.contentOffset = CGPoint(x: self.isOrientationHorizontal ? viewWidth : 0, y: self.isOrientationHorizontal ? 0 : viewHeight)
         if self.isOrientationHorizontal {
-            self.scrollView.contentInset = UIEdgeInsets(top: 0, left: beforeInset, bottom: 0, right: afterInset)
+            self.scrollView.contentInset = UIEdgeInsets.init(top: 0, left: beforeInset, bottom: 0, right: afterInset)
         } else {
-            self.scrollView.contentInset = UIEdgeInsets(top: beforeInset, left: 0, bottom: afterInset, right: 0)
+            self.scrollView.contentInset = UIEdgeInsets.init(top: beforeInset, left: 0, bottom: afterInset, right: 0)
         }
         self.adjustingContentOffset = false
         
@@ -571,14 +600,14 @@ open class EMPageViewController: UIViewController, UIScrollViewDelegate {
         
         if self.isOrientationHorizontal {
             if  (self.beforeViewController != nil && self.afterViewController != nil) || // It isn't at the beginning or end of the page collection
-                (self.afterViewController != nil && self.beforeViewController == nil && scrollView.contentOffset.x > fabs(scrollView.contentInset.left)) || // If it's at the beginning of the collection, the decelleration can't be triggered by scrolling away from, than torwards the inset
-                (self.beforeViewController != nil && self.afterViewController == nil && scrollView.contentOffset.x < fabs(scrollView.contentInset.right)) { // Same as the last condition, but at the end of the collection
+                (self.afterViewController != nil && self.beforeViewController == nil && scrollView.contentOffset.x > abs(scrollView.contentInset.left)) || // If it's at the beginning of the collection, the decelleration can't be triggered by scrolling away from, than torwards the inset
+                (self.beforeViewController != nil && self.afterViewController == nil && scrollView.contentOffset.x < abs(scrollView.contentInset.right)) { // Same as the last condition, but at the end of the collection
                     scrollView.setContentOffset(CGPoint(x: self.view.bounds.width, y: 0), animated: true)
             }
         } else {
             if  (self.beforeViewController != nil && self.afterViewController != nil) || // It isn't at the beginning or end of the page collection
-                (self.afterViewController != nil && self.beforeViewController == nil && scrollView.contentOffset.y > fabs(scrollView.contentInset.top)) || // If it's at the beginning of the collection, the decelleration can't be triggered by scrolling away from, than torwards the inset
-                (self.beforeViewController != nil && self.afterViewController == nil && scrollView.contentOffset.y < fabs(scrollView.contentInset.bottom)) { // Same as the last condition, but at the end of the collection
+                (self.afterViewController != nil && self.beforeViewController == nil && scrollView.contentOffset.y > abs(scrollView.contentInset.top)) || // If it's at the beginning of the collection, the decelleration can't be triggered by scrolling away from, than torwards the inset
+                (self.beforeViewController != nil && self.afterViewController == nil && scrollView.contentOffset.y < abs(scrollView.contentInset.bottom)) { // Same as the last condition, but at the end of the collection
                     scrollView.setContentOffset(CGPoint(x: 0, y: self.view.bounds.height), animated: true)
             }
         }

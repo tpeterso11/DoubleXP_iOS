@@ -92,12 +92,18 @@ class TeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate {
         }
         
         if((user?.teams.isEmpty)!){
-            let emptyTeam = TeamObject(teamName: "No Teams", teamId: "", games: ["Tap to build your first."], consoles: [""], teammateTags: [""], teammateIds: [""], teamCaptain: "", teamInvites: [TeamInviteObject](), teamChat: "", teamInviteTags: [""], teamNeeds: [""], selectedTeamNeeds: [""], imageUrl: "")
+            let emptyTeam = TeamObject(teamName: "No Teams", teamId: "", games: ["Tap to build your first."], consoles: [""], teammateTags: [""], teammateIds: [""], teamCaptain: "", teamInvites: [TeamInviteObject](), teamChat: "", teamInviteTags: [""], teamNeeds: [""], selectedTeamNeeds: [""], imageUrl: "", teamCaptainId: "")
             
             self.emptyTeamList.append(emptyTeam)
         }
         
         self.animateView()
+    }
+    
+    override func reloadView(){
+        if(self.teamList != nil){
+            self.teamList.reloadData()
+        }
     }
     
     private func animateView(){
@@ -139,7 +145,7 @@ class TeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate {
             current = self.emptyTeamList[indexPath.item]
         }
         else{
-            current = (user?.teams[indexPath.item]) ?? TeamObject(teamName: "", teamId: "", games: [""], consoles: [""], teammateTags: [""], teammateIds: [""], teamCaptain: "", teamInvites: [TeamInviteObject](), teamChat: "", teamInviteTags: [""], teamNeeds: [""], selectedTeamNeeds: [""], imageUrl: "")
+            current = (user?.teams[indexPath.item]) ?? TeamObject(teamName: "", teamId: "", games: [""], consoles: [""], teammateTags: [""], teammateIds: [""], teamCaptain: "", teamInvites: [TeamInviteObject](), teamChat: "", teamInviteTags: [""], teamNeeds: [""], selectedTeamNeeds: [""], imageUrl: "", teamCaptainId: "")
         }
         cell.teamName.text = current.teamName
         

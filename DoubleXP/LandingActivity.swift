@@ -15,6 +15,7 @@ import GiphyUISDK
 import GiphyCoreSDK
 import moa
 import Firebase
+import Lottie
 
 typealias Runnable = () -> ()
 
@@ -77,6 +78,11 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     var bannerShowing = false
     //@IBOutlet weak var newNav: UIView!
     
+    @IBOutlet weak var alertSubjectStatus: UILabel!
+    @IBOutlet weak var alertSubject: UILabel!
+    @IBOutlet weak var alertBarFriendLayout: UIView!
+    @IBOutlet weak var alertBarAnimation: AnimationView!
+    @IBOutlet weak var alertBar: UIView!
     @IBOutlet weak var notificationLabel: UILabel!
     @IBOutlet weak var clickArea: UIView!
     @IBOutlet weak var mediaButton: UIImageView!
@@ -98,6 +104,10 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     var menuItems = [Any]()
     var constraint : NSLayoutConstraint?
     var messagingDeckHeight: CGFloat?
+    
+    var newTeam: TeamObject?
+    var newFriend: FriendObject?
+    
     @IBOutlet weak var notificationDrawer: UIView!
     
     var bottomNavHeight = CGFloat()
@@ -164,6 +174,8 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         bottomNavSearch.delegate = self
         bottomNavSearch.returnKeyType = .done
         
+        bottomNavHeight = self.bottomNav.bounds.height
+        
         logOut.addTarget(self, action: #selector(logout), for: .touchUpInside)
         
         NotificationCenter.default.addObserver(
@@ -190,6 +202,16 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         addFriendsRef()
         addPendingFriendsRef()
         addMessagingRef()
+        addTeamRequestRef()
+        addTeamsRef()
+    
+        appDelegate.handleToken()
+    
+        /*DispatchQueue.main.asyncAfter(deadline: .now() + 8.5) {
+            let test = ["gamerTag": "SUCCESSFUL!!!!!!!", "uid": "Test", "date": "date"]
+            let ref = Database.database().reference().child("Users").child("")
+            ref.child("friends").setValue(test)
+        }*/
         
         /*let allNewChildrenRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId)
         allNewChildrenRef.observe(.childAdded, with: { (snapshot) in
@@ -237,7 +259,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             self.notificationDrawer.isUserInteractionEnabled = true
             self.notificationDrawer.addGestureRecognizer(tap)
             
-            let top = CGAffineTransform(translationX: 0, y: -130)
+            let top = CGAffineTransform(translationX: 0, y: -160)
             UIView.animate(withDuration: 0.8, delay: 0.0, options:[], animations: {
                 self.notificationDrawer.transform = top
             }, completion: { (finished: Bool) in
@@ -303,6 +325,217 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         }
     }
     
+    private func addTeamsRef(){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        
+        let newTeamsRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("teams")
+            newTeamsRef.observe(.value, with: { (snapshot) in
+                var teams = [TeamObject]()
+                for teamObj in snapshot.children {
+                    let currentObj = teamObj as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let teamName = dict?["teamName"] as? String ?? ""
+                    let teamId = dict?["teamId"] as? String ?? ""
+                    let games = dict?["games"] as? [String] ?? [String]()
+                    let consoles = dict?["consoles"] as? [String] ?? [String]()
+                    let teammateTags = dict?["teammateTags"] as? [String] ?? [String]()
+                    let teammateIds = dict?["teammateIds"] as? [String] ?? [String]()
+                    
+                    var teamInviteRequests = [RequestObject]()
+                    let teamRequests = currentObj.childSnapshot(forPath: "inviteRequests")
+                    for invite in teamRequests.children{
+                       let currentObj = invite as! DataSnapshot
+                       let dict = currentObj.value as? [String: Any]
+                       let status = dict?["status"] as? String ?? ""
+                       let teamId = dict?["teamId"] as? String ?? ""
+                       let teamName = dict?["teamName"] as? String ?? ""
+                       let captainId = dict?["teamCaptainId"] as? String ?? ""
+                       let requestId = dict?["requestId"] as? String ?? ""
+                        
+                       var requestProfiles = [FreeAgentObject]()
+                       let test = dict?["profile"] as? [String: Any] ?? [String: Any]()
+                       let game = test["game"] as? String ?? ""
+                       let consoles = test["consoles"] as? [String] ?? [String]()
+                       let gamerTag = test["gamerTag"] as? String ?? ""
+                       let competitionId = test["competitionId"] as? String ?? ""
+                       let userId = test["userId"] as? String ?? ""
+                       let questions = test["questions"] as? [[String]] ?? [[String]]()
+                       
+                       let result = FreeAgentObject(gamerTag: gamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
+                       
+                       requestProfiles.append(result)
+                       
+                       
+                       let newRequest = RequestObject(status: status, teamId: teamId, teamName: teamName, captainId: captainId, requestId: requestId)
+                       newRequest.profile = requestProfiles[0]
+                       
+                       teamInviteRequests.append(newRequest)
+                    }
+                    
+                    var invites = [TeamInviteObject]()
+                    let teamInvites = currentObj.childSnapshot(forPath: "teamInvites")
+                    for invite in teamInvites.children{
+                        let currentObj = invite as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let gamerTag = dict?["gamerTag"] as? String ?? ""
+                        let date = dict?["date"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
+                        let teamName = dict?["teamName"] as? String ?? ""
+                        
+                        let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid, teamName: teamName)
+                        invites.append(newInvite)
+                    }
+                    
+                    let teamInvitetags = dict?["teamInviteTags"] as? [String] ?? [String]()
+                    let captain = dict?["teamCaptain"] as? String ?? ""
+                    let imageUrl = dict?["imageUrl"] as? String ?? ""
+                    let teamChat = dict?["teamChat"] as? String ?? String()
+                    let teamNeeds = dict?["teamNeeds"] as? [String] ?? [String]()
+                    let selectedTeamNeeds = dict?["selectedTeamNeeds"] as? [String] ?? [String]()
+                    let captainId = dict?["teamCaptainId"] as? String ?? String()
+                    
+                    let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl, teamCaptainId: captainId)
+                    
+                    var teammateArray = [TeammateObject]()
+                    let teammates = currentObj.childSnapshot(forPath: "teammates")
+                    for teammate in teammates.children{
+                        let currentTeammate = teammate as! DataSnapshot
+                        let dict = currentTeammate.value as? [String: Any]
+                        let gamerTag = dict?["gamerTag"] as? String ?? ""
+                        let date = dict?["date"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
+                        
+                        let teammate = TeammateObject(gamerTag: gamerTag, date: date, uid: uid)
+                        teammateArray.append(teammate)
+                    }
+                    currentTeam.teammates = teammateArray
+                    currentTeam.requests = teamInviteRequests
+                    
+                    teams.append(currentTeam)
+                }
+                
+                let currentUser = appDelegate.currentUser
+                
+                var alreadyTeams = [TeamObject]()
+                alreadyTeams.append(contentsOf: currentUser!.teams)
+                
+                for alreadyTeam in alreadyTeams{
+                    for newTeam in teams{
+                        if(alreadyTeam.teamId == newTeam.teamId){
+                            teams.remove(at: teams.index(of: newTeam)!)
+                        }
+                    }
+                }
+                
+                
+                if(!teams.isEmpty){
+                    for team in teams{
+                        if(team.teamCaptainId == currentUser!.uId){
+                            teams.remove(at: teams.index(of: team)!)
+                        }
+                    }
+                    
+                    if(teams.count > 1){
+                        let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.navigateToTeams))
+                        self.showAlert(alertText: "you've just joined some new teams!", tap: drawerTap)
+                    }
+                    else if(teams.count == 1){
+                        self.newTeam = teams[0]
+                        self.launchAlertBar(view: "team", team: self.newTeam, friend: nil)
+                    }
+                }
+            })
+    }
+    
+    private func addFriendsRef(){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        
+        let newFriendRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("friends")
+            newFriendRef.observe(.value, with: { (snapshot) in
+                var friends = [FriendObject]()
+                for friend in snapshot.children{
+                    let currentObj = friend as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    if(dict != nil){
+                        let gamerTag = dict?["gamerTag"] as? String ?? ""
+                        let date = dict?["date"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
+                        
+                        let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
+                        friends.append(newFriend)
+                    }
+                }
+                
+                if(friends.count > appDelegate.currentUser!.friends.count){
+                    var currentFriends = [FriendObject]()
+                    currentFriends.append(contentsOf: appDelegate.currentUser!.friends)
+                    
+                    appDelegate.currentUser!.friends = friends
+                    
+                    for newFriend in friends{
+                        for oldFriend in currentFriends{
+                            if(newFriend.uid == oldFriend.uid){
+                                friends.remove(at: friends.index(of: newFriend)!)
+                            }
+                        }
+                    }
+                    
+                    if(!friends.isEmpty){
+                        if(friends.count > 1){
+                            let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.navigateToTeams))
+                            self.showAlert(alertText: "hey buddy, you got some new friends.", tap: drawerTap)
+                        }
+                        else if(friends.count == 1){
+                            self.newFriend = friends[0]
+                            self.launchAlertBar(view: "friend", team: nil, friend: self.newFriend)
+                        }
+                    }
+                }
+            })
+    }
+    
+    private func launchAlertBar(view: String, team: TeamObject?, friend: FriendObject?){
+        switch(view){
+            case "team":
+                self.newTeam = team
+                self.alertSubject.text = self.newTeam?.teamName
+                self.alertSubjectStatus.text = "just added you to the team!"
+            break
+            case "friend":
+                self.newFriend = friend
+                self.alertSubject.text = self.newFriend?.gamerTag
+                self.alertSubjectStatus.text = "just added you as a friend!"
+            break
+            default: return
+        }
+        
+        let top = CGAffineTransform(translationX: 0, y: 270)
+        UIView.animate(withDuration: 0.8, delay: 0.0, options:[], animations: {
+            self.alertBar.transform = top
+        }, completion: { (finished: Bool) in
+            self.alertBarAnimation.loopMode = .repeat(3)
+            self.alertBarAnimation.play()
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
+                self.dismissAlertBar()
+                
+                if(team != nil){
+                    self.newTeam = nil
+                }
+                if(friend != nil){
+                    self.newFriend = nil
+                }
+            }
+        })
+    }
+    
+    @objc private func dismissAlertBar(){
+        let top = CGAffineTransform(translationX: 0, y: 0)
+        UIView.animate(withDuration: 0.8, delay: 0.0, options:[], animations: {
+            self.alertBar.transform = top
+        }, completion: nil)
+    }
+    
     private func addMessagingRef(){
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
@@ -311,44 +544,63 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                 var messageArray = [MeesageQueueObj]()
                 for message in snapshot.children{
                     let currentObj = message as! DataSnapshot
-                    let dict = currentObj.value as! [String: Any]
-                    let senderId = dict["senderId"] as? String ?? ""
+                    let dict = currentObj.value as? [String: Any]
+                    let senderId = dict?["senderId"] as? String ?? ""
                     
                     let messageObj = MeesageQueueObj(senderId: senderId, type: "user")
                     messageArray.append( messageObj)
                 }
                 
                 if(!messageArray.isEmpty){
-                    let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.navigateToRequests))
                     self.showMessageAlertQueue(array: messageArray)
                 }
             })
     }
     
-    private func addFriendsRef(){
+    private func addTeamRequestRef(){
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
-        let friendsRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("friends")
-        friendsRef.observe(.value, with: { (snapshot) in
-            var friendsArray = [FriendObject]()
-            for friend in snapshot.children{
-                let currentObj = friend as! DataSnapshot
-                let dict = currentObj.value as! [String: Any]
-                let gamerTag = dict["gamerTag"] as? String ?? ""
-                let date = dict["date"] as? String ?? ""
-                let uid = dict["uid"] as? String ?? ""
+        let newRequestRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("inviteRequests")
+            newRequestRef.observe(.value, with: { (snapshot) in
+                var requests = [RequestObject]()
+                 for invite in snapshot.children{
+                    let currentObj = invite as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let status = dict?["status"] as? String ?? ""
+                    let teamId = dict?["teamId"] as? String ?? ""
+                    let teamName = dict?["teamName"] as? String ?? ""
+                    let captainId = dict?["teamCaptainId"] as? String ?? ""
+                    let requestId = dict?["requestId"] as? String ?? ""
+                     
+                     let profile = currentObj.childSnapshot(forPath: "profile")
+                     let profileDict = profile.value as? [String: Any]
+                     let game = profileDict?["game"] as? String ?? ""
+                     let consoles = profileDict?["consoles"] as? [String] ?? [String]()
+                     let gamerTag = profileDict?["gamerTag"] as? String ?? ""
+                     let competitionId = profileDict?["competitionId"] as? String ?? ""
+                     let userId = profileDict?["userId"] as? String ?? ""
+                     let questions = profileDict?["questions"] as? [[String]] ?? [[String]]()
+                     
+                     let result = FreeAgentObject(gamerTag: gamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
+                     
+                     
+                     let newRequest = RequestObject(status: status, teamId: teamId, teamName: teamName, captainId: captainId, requestId: requestId)
+                     newRequest.profile = result
+                     
+                     requests.append(newRequest)
+                }
                 
-                let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
-                friendsArray.append(newFriend)
-            }
-            
-            if(!friendsArray.isEmpty && appDelegate.currentUser!.friends.count < friendsArray.count){
-                appDelegate.currentUser!.friends = friendsArray
+                let currentUser = appDelegate.currentUser!
                 
-                let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.navigateToRequests))
-                self.showAlert(alertText: "someone just added you back!", tap: drawerTap)
-            }
-        })
+                if(currentUser.teamInviteRequests.count < requests.count){
+                    currentUser.teamInviteRequests = requests
+                    
+                    if(!requests.isEmpty){
+                        let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.navigateToRequests))
+                        self.showAlert(alertText: "someone wants to join your team!", tap: drawerTap)
+                    }
+                }
+            })
     }
     
     private func addPendingFriendsRef(){
@@ -360,10 +612,10 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             
             for friend in snapshot.children{
                 let currentObj = friend as! DataSnapshot
-                let dict = currentObj.value as! [String: Any]
-                let gamerTag = dict["gamerTag"] as? String ?? ""
-                let date = dict["date"] as? String ?? ""
-                let uid = dict["uid"] as? String ?? ""
+                let dict = currentObj.value as? [String: Any]
+                let gamerTag = dict?["gamerTag"] as? String ?? ""
+                let date = dict?["date"] as? String ?? ""
+                let uid = dict?["uid"] as? String ?? ""
                 
                 let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
                 pendingRequests.append(newFriend)
@@ -426,13 +678,40 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                 var stack = appDelegate.navStack
                 stackDepth -= 1
                 
+                if self.stackDepth >= 0 && self.stackDepth < stack.count {
+                    let current = Array(stack)[self.stackDepth].value
+                    let key = Array(stack)[self.stackDepth - 1].value
+                    
+                    if(stack.count > 0 && key != nil){
+                        Broadcaster.notify(NavigateToProfile.self) {
+                            $0.programmaticallyLoad(vc: key, fragName: key.pageName!)
+                            updateNavigation(currentFrag: key)
+                        }
+                        
+                        if(stack.count > 1){
+                            stack.removeValue(forKey: current.pageName!)
+                            appDelegate.navStack = stack
+                        }
+                        
+                        if(stack.count == 1){
+                            restoreBottomNav()
+                        }
+                    }
+                }
+            }
+        }
+        else{
+            var stack = appDelegate.navStack
+            stackDepth -= 1
+            
+            
+            if self.stackDepth >= 0 && self.stackDepth < stack.count {
                 let current = Array(stack)[self.stackDepth].value
                 let key = Array(stack)[self.stackDepth - 1].value
                 
                 if(stack.count > 0 && key != nil){
                     Broadcaster.notify(NavigateToProfile.self) {
                         $0.programmaticallyLoad(vc: key, fragName: key.pageName!)
-                        updateNavigation(currentFrag: key)
                     }
                     
                     if(stack.count > 1){
@@ -442,50 +721,22 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                     
                     if(stack.count == 1){
                         restoreBottomNav()
-                        
-                        self.homeAdded = true
-                        self.requestsAdded = false
-                        self.mediaAdded = false
-                        self.teamFragAdded = false
-                        self.profileAdded = false
+                    }
+                }
+                else{
+                    Broadcaster.notify(NavigateToProfile.self) {
+                        $0.navigateToHome()
                     }
                 }
             }
-        }
-        else{
-            var stack = appDelegate.navStack
-            stackDepth -= 1
-            
-            let current = Array(stack)[self.stackDepth].value
-            let key = Array(stack)[self.stackDepth - 1].value
-            
-            if(stack.count > 0 && key != nil){
-                Broadcaster.notify(NavigateToProfile.self) {
-                    $0.programmaticallyLoad(vc: key, fragName: key.pageName!)
-                }
-                
-                if(stack.count > 1){
-                    stack.removeValue(forKey: current.pageName!)
-                    appDelegate.navStack = stack
-                }
-                
-                if(stack.count == 1){
-                    restoreBottomNav()
-                }
-            }
             else{
-                Broadcaster.notify(NavigateToProfile.self) {
-                    $0.navigateToHome()
-                }
+                navigateToHome()
             }
         }
     }
     
-    func navigateToProfile(uid: String){
-        restoreBottomTabs()
-        
+    @objc func navigateToProfile(uid: String){
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Profile"))
-        stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToProfile(uid: uid)
         }
@@ -493,7 +744,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     @objc func navigateToRequests(){
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Requests"))
-        stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToRequests()
         }
@@ -506,9 +756,8 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         }
     }
     
-    func navigateToTeams() {
+    @objc func navigateToTeams() {
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Teams"))
-        stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToTeams()
         }
@@ -516,27 +765,27 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     func navigateToInvite() {
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Invite"))
-        stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToInvite()
         }
     }
     
     func navigateToSearch(game: GamerConnectGame){
-        restoreBottomTabs()
-        
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Search"))
-        stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToSearch(game: game)
         }
     }
     
+    func navigateToCompetition(competition: CompetitionObj) {
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Competition"))
+        Broadcaster.notify(NavigateToProfile.self) {
+            $0.navigateToCompetition(competition: competition)
+        }
+    }
+    
     @objc func navigateToCurrentUserProfile() {
-        restoreBottomTabs()
-        
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Current User Profile"))
-        stackDepth += 1
         
         let top = CGAffineTransform(translationX: -249, y: 0)
         UIView.animate(withDuration: 0.4, delay: 0.0, options:[], animations: {
@@ -548,7 +797,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                 UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
                     self.restoreBottomNav()
                 }, completion: { (finished: Bool) in
-                    self.stackDepth += 1
                     Broadcaster.notify(NavigateToProfile.self) {
                         $0.navigateToCurrentUserProfile()
                     }
@@ -558,10 +806,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     }
     
     func navigateToCreateFrag() {
-        restoreBottomTabs()
-        
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Create Team"))
-        stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToCreateFrag()
         }
@@ -572,26 +817,29 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Settings"))
-            self.stackDepth += 1
             Broadcaster.notify(NavigateToProfile.self) {
                 $0.navigateToSettings()
             }
         }
     }
     
-    func navigateToTeamDashboard(team: TeamObject, newTeam: Bool) {
-        restoreBottomTabs()
+    @objc func navigateToTeamDashboard(team: TeamObject?, newTeam: Bool) {
+        var currentTeam = team
         
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Dashboard"))
-        stackDepth += 1
-        Broadcaster.notify(NavigateToProfile.self) {
-            $0.navigateToTeamDashboard(team: team, newTeam: newTeam)
+        if(currentTeam == nil){
+            currentTeam = self.newTeam
+        }
+        
+        if(currentTeam != nil){
+            AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Dashboard"))
+            Broadcaster.notify(NavigateToProfile.self) {
+                $0.navigateToTeamDashboard(team: currentTeam!, newTeam: newTeam)
+            }
         }
     }
     
     func navigateToTeamNeeds(team: TeamObject) {
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Needs"))
-        stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToTeamNeeds(team: team)
         }
@@ -599,7 +847,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     func navigateToTeamBuild(team: TeamObject) {
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Build"))
-        stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToTeamBuild(team: team)
         }
@@ -607,7 +854,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     func navigateToMedia() {
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Media"))
-        stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToMedia()
         }
@@ -615,7 +861,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     func navigateToTeamFreeAgentSearch(team: TeamObject){
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Search"))
-        stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToTeamFreeAgentSearch(team: team)
         }
@@ -623,17 +868,14 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     func navigateToTeamFreeAgentResults(team: TeamObject){
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Results"))
-        stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToTeamFreeAgentResults(team: team)
         }
     }
     
     func navigateToTeamFreeAgentDash(){
-        restoreBottomTabs()
         
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Dash"))
-        stackDepth += 1
        Broadcaster.notify(NavigateToProfile.self) {
            $0.navigateToTeamFreeAgentDash()
        }
@@ -641,7 +883,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     func navigateToTeamFreeAgentFront(){
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Quiz Front"))
-        stackDepth += 1
        Broadcaster.notify(NavigateToProfile.self) {
            $0.navigateToTeamFreeAgentFront()
        }
@@ -649,7 +890,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     func navigateToFreeAgentQuiz(user: User!, team: TeamObject?, game: GamerConnectGame!) {
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Quiz - " + game.gameName))
-        stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToFreeAgentQuiz(team: team, gcGame: game, currentUser: user)
         }
@@ -657,7 +897,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     func navigateToFreeAgentQuiz(team: TeamObject?, gcGame: GamerConnectGame, currentUser: User){
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Quiz - " + (team?.teamName ?? "")))
-        stackDepth += 1
           Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToFreeAgentQuiz(team: team, gcGame: gcGame, currentUser: currentUser)
           }
@@ -665,24 +904,41 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     @objc func navigateToMessaging(groupChannelUrl: String?, otherUserId: String?){
         self.bottomNavHeight = self.bottomNav.bounds.height + 60
-        restoreBottomTabs()
         
-        if(groupChannelUrl != nil){
+        var chatUrl = groupChannelUrl
+        var chatOtherId = otherUserId
+        
+        if(groupChannelUrl == nil && otherUserId == nil){
+            if(self.newTeam == nil && self.newFriend == nil){
+                return
+            }
+    
+            else{
+                if(groupChannelUrl == nil && self.newTeam != nil){
+                    chatUrl = self.newTeam?.teamChat
+                }
+                if(otherUserId == nil && self.newFriend != nil){
+                    chatOtherId = self.newFriend?.uid
+                }
+            }
+        }
+        
+        if(chatUrl != nil){
             AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Messaging Team"))
         }
-        else{
+        else if(chatOtherId != nil){
             AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Messaging User"))
         }
     
-        stackDepth += 1
-        Broadcaster.notify(NavigateToProfile.self) {
-          $0.navigateToMessaging(groupChannelUrl: groupChannelUrl, otherUserId: otherUserId)
+        if(chatUrl != nil || chatOtherId != nil){
+            Broadcaster.notify(NavigateToProfile.self) {
+              $0.navigateToMessaging(groupChannelUrl: chatUrl, otherUserId: chatOtherId)
+            }
         }
     }
     
     func menuNavigateToMessaging(uId: String) {
         self.bottomNavHeight = self.bottomNav.bounds.height + 60
-        restoreBottomTabs()
         
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing Menu - Messaging User"))
         menuVie.viewShowing = false
@@ -694,7 +950,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
                 self.blur.alpha = 0.0
             }, completion: { (finished: Bool) in
-                    self.stackDepth += 1
                     Broadcaster.notify(NavigateToProfile.self) {
                       $0.navigateToMessaging(groupChannelUrl: nil, otherUserId: uId)
                 }
@@ -715,7 +970,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                 self.blur.alpha = 0.0
             }, completion: { (finished: Bool) in
                 UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
-                        self.stackDepth += 1
                         Broadcaster.notify(NavigateToProfile.self) {
                                 $0.navigateToProfile(uid: uId)
                         }
@@ -725,10 +979,8 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     }
     
     func navigateToViewTeams(){
-        restoreBottomTabs()
         
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - View Teams"))
-        stackDepth += 1
         Broadcaster.notify(NavigateToProfile.self) {
           $0.navigateToViewTeams()
         }
@@ -976,8 +1228,8 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     }
     
     @objc func homeButtonClicked(_ sender: AnyObject?) {
-        
-        if(!homeAdded){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        if(appDelegate.currentFrag != "Home"){
             navigateToHome()
             homeAdded = true
             requestsAdded = false
@@ -990,8 +1242,8 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     }
     
     @objc func mediaButtonClicked(_ sender: AnyObject?) {
-        
-        if(!mediaAdded){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        if(appDelegate.currentFrag != "Media"){
             navigateToMedia()
             homeAdded = false
             requestsAdded = false
@@ -1004,8 +1256,8 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     }
     
     @objc func teamButtonClicked(_ sender: AnyObject?) {
-        
-        if(!teamFragAdded){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        if(appDelegate.currentFrag != "Teams"){
             navigateToTeams()
             teamFragAdded = true
             homeAdded = false
@@ -1018,8 +1270,8 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     }
     
     @objc func requestButtonClicked(_ sender: AnyObject?) {
-        
-        if(!requestsAdded){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        if(appDelegate.currentFrag != "Requests"){
             navigateToRequests()
             requestsAdded = true
             homeAdded = false
@@ -1082,6 +1334,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
                 self.blur.alpha = 0.0
                 self.blur.isUserInteractionEnabled = false
+                self.restoreBottomNav()
             }, completion: nil)
         })
     }
@@ -1184,14 +1437,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         }, completion: nil)
     }
     
-    private func restoreBottomTabs(){
-        requestsAdded = false
-        homeAdded = false
-        teamFragAdded = false
-        profileAdded = false
-        mediaAdded = false
-    }
-    
     func navigateToMessagingFromMenu(uId: String){
         self.bottomNavHeight = self.bottomNav.bounds.height + 60
         navigateToMessaging(groupChannelUrl: nil, otherUserId: uId)
@@ -1276,7 +1521,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         let current = menuItems[indexPath.item]
         if(current is Int){
             if((current as! Int) ==  1){
-                restoreBottomTabs()
                 menuVie.viewShowing = false
                 
                 let top = CGAffineTransform(translationX: -249, y: 0)
@@ -1286,8 +1530,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                     UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
                         self.blur.alpha = 0.0
                     }, completion: { (finished: Bool) in
-                        self.stackDepth += 1
-                    
                         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing Menu - Messaging User"))
                     
                         let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -1326,4 +1568,11 @@ extension LandingActivity: GiphyDelegate {
    func didDismiss(controller: GiphyViewController?) {
         // your user dismissed the controller without selecting a GIF.
    }
+}
+
+extension Array {
+    func getElement(at index: Int) -> Element? {
+        let isValidIndex = index >= 0 && index < count
+        return isValidIndex ? self[index] : nil
+    }
 }

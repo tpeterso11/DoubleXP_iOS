@@ -239,7 +239,7 @@ class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource 
         quizTable.delegate = self
         quizTable.dataSource = self
         
-        let top = CGAffineTransform(translationX: -240, y: 0)
+        let top = CGAffineTransform(translationX: -340, y: 0)
         UIView.animate(withDuration: 0.3, delay: 0.0, options:[], animations: {
             self.blur.alpha = 1.0
         }, completion: { (finished: Bool) in

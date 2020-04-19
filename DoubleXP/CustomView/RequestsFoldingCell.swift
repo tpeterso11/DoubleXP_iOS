@@ -20,9 +20,14 @@ class RequestsFoldingCell: FoldingCell{
     @IBOutlet weak var gamerTagSub: UILabel!
     @IBOutlet weak var requestType: UILabel!
     @IBOutlet weak var requestSince: UILabel!
+    @IBOutlet weak var quizButton: UIButton!
+    @IBOutlet weak var workOverlay: UIView!
+    @IBOutlet weak var workOverlaySpinner: UIActivityIndicatorView!
     private var currentRequest: Any?
     private var indexPath: IndexPath!
     private var callbacks: RequestsUpdate!
+    private var requested = false
+    private var currentTableView: UITableView!
     
     override func awakeFromNib() {
         foregroundView.layer.cornerRadius = 10
@@ -37,14 +42,16 @@ class RequestsFoldingCell: FoldingCell{
         super.awakeFromNib()
     }
     
-    func setUI(friendRequest: FriendRequestObject?, team: TeamObject?, indexPath: IndexPath, callbacks: RequestsUpdate){
+    func setUI(friendRequest: FriendRequestObject?, team: TeamObject?, request: RequestObject?, indexPath: IndexPath, currentTableView: UITableView, callbacks: RequestsUpdate){
         self.indexPath = indexPath
         self.callbacks = callbacks
+        self.currentTableView = currentTableView
         
         if(friendRequest != nil){
             currentRequest = friendRequest
             gamerTagMan.text = friendRequest?.gamerTag
             gamerTagSub.text = friendRequest?.gamerTag
+            quizButton.isHidden = true
             
             requestType.text = "Friend Request"
             
@@ -67,10 +74,24 @@ class RequestsFoldingCell: FoldingCell{
                 }
             }
         }
+        else if(request != nil){
+            currentRequest = request
+            gamerTagMan.text = request?.teamName
+            gamerTagSub.text = request?.profile.gamerTag
+            quizButton.isHidden = false
+            
+            
+            quizButton.isUserInteractionEnabled = true
+            quizButton.addTarget(self, action: #selector(quizClicked), for: .touchUpInside)
+            
+            
+            requestType.text = "Invite Request"
+        }
         else{
             currentRequest = team
             gamerTagMan.text = team?.teamName
             gamerTagSub.text = team?.teamName
+            quizButton.isHidden = true
             
             requestType.text = "Team Invite"
             
@@ -112,7 +133,10 @@ class RequestsFoldingCell: FoldingCell{
         let landing = delegate.currentLanding
         
         if(currentRequest is FriendRequestObject){
-            landing?.navigateToProfile(uid: (currentRequest as! FriendRequestObject).uid)
+           landing?.navigateToProfile(uid: (currentRequest as! FriendRequestObject).uid)
+        }
+        else if(self.currentRequest is RequestObject){
+            landing?.navigateToProfile(uid: (currentRequest as! RequestObject).profile.userId)
         }
         else{
             landing?.navigateToTeamDashboard(team: (currentRequest as! TeamObject), newTeam: false)
@@ -120,27 +144,83 @@ class RequestsFoldingCell: FoldingCell{
     }
     
     @objc func acceptClicked(_ sender: AnyObject?) {
-        let manager = FriendsManager()
-        let delegate = UIApplication.shared.delegate as! AppDelegate
+        self.showWork(indexPath: self.indexPath)
         
-        if(self.currentRequest is FriendRequestObject){
-            manager.acceptFriendFromRequests(position: self.indexPath, otherUserRequest: (self.currentRequest as! FriendRequestObject), currentUserUid: delegate.currentUser!.uId, callbacks: self.callbacks)
-        }
-        else{
-            let teamManager = TeamManager()
-            teamManager.acceptTeamRequest(team: (self.currentRequest as! TeamObject), callbacks: self.callbacks, indexPath: indexPath)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let manager = FriendsManager()
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            
+            if(self.currentRequest is FriendRequestObject){
+                manager.acceptFriendFromRequests(position: self.indexPath, otherUserRequest: (self.currentRequest as! FriendRequestObject), currentUserUid: delegate.currentUser!.uId, callbacks: self.callbacks)
+            }
+            else if(self.currentRequest is RequestObject){
+                var currentTeam: TeamObject? = nil
+                
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                for team in delegate.currentUser!.teams{
+                    if(team.teamName == (self.currentRequest as! RequestObject).teamName){
+                        currentTeam = team
+                        break
+                    }
+                }
+                
+                if(currentTeam != nil){
+                    let teamManager = TeamManager()
+                    teamManager.acceptRequest(requestObject: self.currentRequest as! RequestObject, acceptedTeam: currentTeam!, callbacks: self.callbacks, indexPath: self.indexPath)
+                }
+            }
+            else{
+                let teamManager = TeamManager()
+                teamManager.acceptTeamRequest(team: (self.currentRequest as! TeamObject), callbacks: self.callbacks, indexPath: self.indexPath)
+            }
         }
     }
     
+    func showWork(indexPath: IndexPath){
+        self.currentTableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+        self.currentTableView.delegate?.tableView!(self.currentTableView, didSelectRowAt: indexPath)
+        
+        UIView.animate(withDuration: 0.5, animations: {
+            self.workOverlay.alpha = 1
+        }, completion: { (finished: Bool) in
+            self.isUserInteractionEnabled = false
+            self.workOverlaySpinner.startAnimating()
+        })
+    }
+    
+    @objc func quizClicked(_ sender: AnyObject?) {
+        callbacks.showQuizClicked(questions: (self.currentRequest as! RequestObject).profile.questions)
+    }
+    
     @objc func rejectClicked(_ sender: AnyObject?) {
-        let manager = FriendsManager()
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        if(self.currentRequest is FriendRequestObject){
-        manager.declineRequest(position: self.indexPath, otherUserRequest: (self.currentRequest as! FriendRequestObject), currentUserUid: delegate.currentUser!.uId, callbacks: self.callbacks)
-        }
-        else{
-            let teamManager = TeamManager()
-            teamManager.acceptTeamRequest(team: (self.currentRequest as! TeamObject), callbacks: self.callbacks, indexPath: indexPath)
+        self.showWork(indexPath: self.indexPath)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let manager = FriendsManager()
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            if(self.currentRequest is FriendRequestObject){
+            manager.declineRequest(position: self.indexPath, otherUserRequest: (self.currentRequest as! FriendRequestObject), currentUserUid: delegate.currentUser!.uId, callbacks: self.callbacks)
+            }
+            else if(self.currentRequest is RequestObject){
+                let manager = TeamManager()
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                
+                var currentTeam: TeamObject?
+                for team in delegate.currentUser!.teams{
+                    if(team.teamName == (self.currentRequest as! RequestObject).teamName){
+                        currentTeam = team
+                        break
+                    }
+                }
+                
+                if(currentTeam != nil){
+                    manager.rejectRequest(request: (self.currentRequest as! RequestObject), rejectedTeam: currentTeam!, callbacks: self.callbacks, indexPath: self.indexPath)
+                }
+            }
+            else{
+                let teamManager = TeamManager()
+                teamManager.acceptTeamRequest(team: (self.currentRequest as! TeamObject), callbacks: self.callbacks, indexPath: self.indexPath)
+            }
         }
     }
 }

@@ -160,6 +160,67 @@ class FoldingCellCell: FoldingCell, UICollectionViewDelegate, UICollectionViewDa
             return cell
         }
         
+        if(!keys.contains(current.gameName + "codKd") && !current.codKd.isEmpty){
+           keys.append(current.gameName + "codKd")
+           
+           cell.statLabel.text = "K/D"
+            
+            let formatter = NumberFormatter()
+            formatter.maximumFractionDigits = 2
+            formatter.minimumFractionDigits = 2
+            
+            let convert = current.codKd.floatValue
+            if let formattedString = formatter.string(for: convert) {
+                cell.stat.text = formattedString
+            }
+           
+           return cell
+        }
+               
+       if(!keys.contains(current.gameName + "codKills") && !current.codKills.isEmpty){
+           keys.append(current.gameName + "codKills")
+           
+           cell.statLabel.text = "Kills"
+        
+            let convert = current.codKills.floatValue
+            cell.stat.text = convert.clean
+           
+           return cell
+       }
+               
+       if(!keys.contains(current.gameName + "codWins") && !current.codWins.isEmpty){
+           keys.append(current.gameName + "codWins")
+           
+           cell.statLabel.text = "Wins"
+        
+            let convert = current.codWins.floatValue
+            cell.stat.text = convert.clean
+           
+           return cell
+       }
+               
+       if(!keys.contains(current.gameName + "codLevel") && !current.codLevel.isEmpty){
+           keys.append(current.gameName + "codLevel")
+           
+           cell.statLabel.text = "Level"
+        
+            let convert = current.codLevel.floatValue
+            cell.stat.text = convert.clean
+           
+           return cell
+       }
+               
+       if(!keys.contains(current.gameName + "codWlRatio") && !current.codWlRatio.isEmpty){
+           keys.append(current.gameName + "codWlRatio")
+           
+           cell.statLabel.text = "W/L Ratio"
+            
+           let convert = current.codWlRatio.floatValue
+           cell.stat.text = convert.clean
+           
+           return cell
+       }
+        
         if(!keys.contains(current.gameName + "authorized") && !current.authorized.isEmpty){
             keys.append(current.gameName + "authorized")
             
@@ -174,51 +235,6 @@ class FoldingCellCell: FoldingCell, UICollectionViewDelegate, UICollectionViewDa
             
             cell.statLabel.text = "Public"
             cell.stat.text = current.setPublic
-            
-            return cell
-        }
-        
-        if(!keys.contains(current.gameName + "codKd") && !current.codKd.isEmpty){
-            keys.append(current.gameName + "codKd")
-            
-            cell.statLabel.text = "K/D"
-            cell.stat.text = current.codKd
-            
-            return cell
-        }
-        
-        if(!keys.contains(current.gameName + "codKills") && !current.codKills.isEmpty){
-            keys.append(current.gameName + "codKills")
-            
-            cell.statLabel.text = "Kills"
-            cell.stat.text = current.codKills
-            
-            return cell
-        }
-        
-        if(!keys.contains(current.gameName + "codWins") && !current.codWins.isEmpty){
-            keys.append(current.gameName + "codWins")
-            
-            cell.statLabel.text = "Wins"
-            cell.stat.text = current.codWins
-            
-            return cell
-        }
-        
-        if(!keys.contains(current.gameName + "codLevel") && !current.codLevel.isEmpty){
-            keys.append(current.gameName + "codLevel")
-            
-            cell.statLabel.text = "Level"
-            cell.stat.text = current.codLevel
-            
-            return cell
-        }
-        
-        if(!keys.contains(current.gameName + "codWlRatio") && !current.codWlRatio.isEmpty){
-            keys.append(current.gameName + "codWlRatio")
-            
-            cell.statLabel.text = "W/L Ratio"
-            cell.stat.text = current.codWlRatio
             
             return cell
         }
@@ -239,3 +255,17 @@ extension UIView {
         layer.mask = mask
     }
 }
+
+extension String {
+    var floatValue: Float {
+        return (self as NSString).floatValue
+    }
+}
+
+extension Float {
+    var clean: String {
+       return self.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", self) : String(self)
+    }
+}
+
+

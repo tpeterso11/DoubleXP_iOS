@@ -20,11 +20,13 @@ class FreeAgentManager {
             if(snapshot.exists()){
                 for profile in snapshot.children{
                     let currentProfile = profile as! DataSnapshot
-                    let dict = currentProfile.value as! [String: Any]
-                    let game = dict["game"] as? String ?? ""
+                    let dict = currentProfile.value as? [String: Any]
+                    let game = dict?["game"] as? String ?? ""
                     
                     if(game == faObject.game){
-                        ref.child((profile as! DataSnapshot).key).removeValue()
+                        if let profile = profile as? DataSnapshot {
+                            ref.child((profile).key).removeValue()
+                        }
                         break
                     }
                 }

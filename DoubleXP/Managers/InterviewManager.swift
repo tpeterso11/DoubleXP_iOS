@@ -135,6 +135,7 @@ class InterviewManager{
                         var option10Description = ""
                         var required = ""
                         var questionDescription = ""
+                        var teamNeedQuestion = "false"
                         var acceptMultiple = ""
                         var question1SetURL = ""
                         var question2SetURL = ""
@@ -234,6 +235,9 @@ class InterviewManager{
                                 if(key == "question5SetURL"){
                                     question5SetURL = (value as? String) ?? ""
                                 }
+                                if(key == "teamNeedQuestion"){
+                                    teamNeedQuestion = (value as? String) ?? "false"
+                                }
                             }
                         }
                         let faQuestion = FAQuestion(question: question)
@@ -267,6 +271,7 @@ class InterviewManager{
                         faQuestion.required = required
                         faQuestion.acceptMultiple = acceptMultiple
                         faQuestion.questionDescription = questionDescription
+                        faQuestion.teamNeedQuestion = teamNeedQuestion
                         
                         self.questions.append(faQuestion)
                     }
@@ -321,8 +326,10 @@ class InterviewManager{
             var maxProfiles = 1
             
             let appProps = delegate.appProperties
-            if(appProps.value(forKey: "max_profiles") as? String != nil){
-                maxProfiles = Int((appProps.value(forKey: "max_profiles") as? String)!)!
+            //if(appProps.value(forKey: "max_profiles") as? String != nil){
+            if(appProps.value(forKey: "count") as? String != nil){
+                //maxProfiles = Int((appProps.value(forKey: "max_profiles") as? String)!)!
+                maxProfiles = Int((appProps.value(forKey: "count") as? String)!)!
             }
             
             if(maxProfiles > 1){
@@ -348,13 +355,13 @@ class InterviewManager{
             if(snapshot.exists()){
                 for profile in snapshot.children{
                     let currentProfile = profile as! DataSnapshot
-                    let dict = currentProfile.value as! [String: Any]
-                    let game = dict["game"] as? String ?? ""
-                    let consoles = dict["consoles"] as? [String] ?? [String]()
-                    let gamerTag = dict["gamerTag"] as? String ?? ""
-                    let competitionId = dict["competitionId"] as? String ?? ""
-                    let userId = dict["userId"] as? String ?? ""
-                    let questions = dict["questions"] as? [[String]] ?? [[String]]()
+                    let dict = currentProfile.value as? [String: Any]
+                    let game = dict?["game"] as? String ?? ""
+                    let consoles = dict?["consoles"] as? [String] ?? [String]()
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let competitionId = dict?["competitionId"] as? String ?? ""
+                    let userId = dict?["userId"] as? String ?? ""
+                    let questions = dict?["questions"] as? [[String]] ?? [[String]]()
                     
                     let result = FreeAgentObject(gamerTag: gamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
                     profileList.append(result)

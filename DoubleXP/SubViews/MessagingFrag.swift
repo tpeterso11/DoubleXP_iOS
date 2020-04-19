@@ -15,10 +15,13 @@ import SendBirdSDK
 import MessageKit
 import SwiftNotificationCenter
 import SwiftyGif
+import FBSDKCoreKit
 
 class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewDelegate, UITableViewDataSource {
+    
     var currentUser: User?
     var groupChannelUrl: String?
+    var team: TeamObject?
     var manager: MessagingManager?
     var otherUserId: String?
     var chatMessages = [Any]()
@@ -30,6 +33,8 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
     @IBOutlet weak var emptyHeader: UILabel!
     @IBOutlet weak var emptyOverlay: UIView!
     @IBOutlet weak var messagingView: UITableView!
+    @IBOutlet weak var errorOverlay: UIView!
+    @IBOutlet weak var errorText: UILabel!
     //@IBOutlet weak var sendButton: UIButton!
     
     var estimatedHeight: CGFloat?
@@ -40,14 +45,9 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
         super.viewDidLoad()
         
         manager = MessagingManager()
-        navDictionary = ["state": "messaging", "searchHint": "Message this user.", "sendButton": "Send"]
+        
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let currentUser = delegate.currentUser
-        
-        delegate.currentLanding?.updateNavigation(currentFrag: self)
-        
-        self.pageName = "Messaging"
-        delegate.addToNavStack(vc: self)
         
         manager!.setup(sendBirdId: currentUser!.sendBirdId, currentUser: currentUser!, messagingCallbacks: self)
         
@@ -91,11 +91,20 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
     
     func connectionSuccessful() {
         if(groupChannelUrl != nil){
-            manager?.loadGroupChannel(channelUrl: groupChannelUrl!, team: true)
+            manager?.loadGroupChannel(channelUrl: groupChannelUrl!, team: true, callbacks: self)
+        }
+        else if(groupChannelUrl == nil && otherUserId == nil){
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let currentUser = appDelegate.currentUser
+            manager?.createTeamChannel(userId: currentUser!.uId, callbacks: self)
         }
         else{
             seeIfChannelExists()
         }
+    }
+    
+    func connectionFailed() {
+        showError(string: "there was an error connecting to the chat client.")
     }
     
     func seeIfChannelExists(){
@@ -109,11 +118,11 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
                 let messagingArray = snapshot.childSnapshot(forPath: "messaging")
                 for channel in messagingArray.children{
                     let currentObj = channel as! DataSnapshot
-                    let dict = currentObj.value as! [String: Any]
-                    let channelUrl = dict["channelUrl"] as? String ?? ""
-                    let otherUser = dict["otherUser"] as? String ?? ""
-                    let legacyUser = dict["legacy"] as? String ?? ""
-                    let otherUserId = dict["otherUserId"] as? String ?? ""
+                    let dict = currentObj.value as? [String: Any]
+                    let channelUrl = dict?["channelUrl"] as? String ?? ""
+                    let otherUser = dict?["otherUser"] as? String ?? ""
+                    let legacyUser = dict?["legacy"] as? String ?? ""
+                    let otherUserId = dict?["otherUserId"] as? String ?? ""
                     if(legacyUser == "true"){
                         legacy = true
                         break
@@ -133,7 +142,7 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
                     var contained = false
                     for object in array{
                         if(object.otherUserId == self.otherUserId){
-                            self.manager?.loadGroupChannel(channelUrl: object.chatUrl, team: false)
+                            self.manager?.loadGroupChannel(channelUrl: object.chatUrl, team: false, callbacks: self)
                             contained = true
                             break
                         }
@@ -167,9 +176,9 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
                 let messagingArray = snapshot.childSnapshot(forPath: "messaging")
                 for channel in messagingArray.children{
                     let currentObj = channel as! DataSnapshot
-                    let dict = currentObj.value as! [String: Any]
-                    let channelUrl = dict["channelUrl"] as? String ?? ""
-                    let otherUser = dict["otherUser"] as? String ?? ""
+                    let dict = currentObj.value as? [String: Any]
+                    let channelUrl = dict?["channelUrl"] as? String ?? ""
+                    let otherUser = dict?["otherUser"] as? String ?? ""
                     
                     let chatObj = ChatObject(chatUrl: channelUrl, otherUser: otherUser)
                     chatObj.otherUserId = self.otherUserId!
@@ -262,71 +271,183 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
     }
     
     func createTeamChannelSuccessful(groupChannel: SBDGroupChannel) {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let currentUser = appDelegate.currentUser
-        let ref = Database.database().reference().child("Users").child(currentUser!.uId)
-        ref.observeSingleEvent(of: .value, with: { (snapshot) in
-            if(snapshot.exists()){
-                var array = [ChatObject]()
-                let messagingArray = snapshot.childSnapshot(forPath: "messaging")
-                for channel in messagingArray.children{
-                    let currentObj = channel as! DataSnapshot
-                    let dict = currentObj.value as! [String: Any]
-                    let channelUrl = dict["channelUrl"] as? String ?? ""
-                    let otherUser = dict["otherUser"] as? String ?? ""
-                    let otherUserId = dict["otherUserId"] as? String ?? ""
-                    
-                    let chatObj = ChatObject(chatUrl: channelUrl, otherUser: otherUser)
-                    chatObj.otherUserId = otherUserId
-                    array.append(chatObj)
-                }
-                
-                let current = ChatObject(chatUrl: groupChannel.channelUrl, otherUser: self.otherUserId!)
-                array.append(current)
-                
-                var sendUp = [[String: String]]()
-                for channel in array{
-                    let currentOne = ["channelUrl": channel.chatUrl, "otherUser": channel.otherUser, "otherUserId": self.otherUserId ?? ""]
-                    
-                    sendUp.append(currentOne)
-                }
-                
-                ref.child("messaging").setValue(sendUp)
-                
-                let ref = Database.database().reference().child("Users").child(self.otherUserId!)
-                ref.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if(snapshot.exists()){
-                        var array = [ChatObject]()
-                        let messagingArray = snapshot.childSnapshot(forPath: "messaging")
-                        for channel in messagingArray.children{
-                            let currentObj = channel as! DataSnapshot
-                            let dict = currentObj.value as! [String: Any]
-                            let channelUrl = dict["channelUrl"] as? String ?? ""
-                            let otherUser = dict["otherUser"] as? String ?? ""
-                            let otherUserId = dict["otherUserId"] as? String ?? ""
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Messaging: Create Channel Successful"))
+        
+        if(team != nil){
+            //team channel was empty, attempted to make a new one.
+            for user in team!.teammateIds{
+                let ref = Database.database().reference().child("Users").child(user)
+                    ref.observeSingleEvent(of: .value, with: { (snapshot) in
+                        if(snapshot.exists()){
+                            var teams = [TeamObject]()
+                            let teamsArray = snapshot.childSnapshot(forPath: "teams")
+                            for teamObj in teamsArray.children {
+                                let currentObj = teamObj as! DataSnapshot
+                                let dict = currentObj.value as? [String: Any]
+                                let teamName = dict?["teamName"] as? String ?? ""
+                                let teamId = dict?["teamId"] as? String ?? ""
+                                let games = dict?["games"] as? [String] ?? [String]()
+                                let consoles = dict?["consoles"] as? [String] ?? [String]()
+                                let teammateTags = dict?["teammateTags"] as? [String] ?? [String]()
+                                let teammateIds = dict?["teammateIds"] as? [String] ?? [String]()
+                                let captainId = dict?["teamCaptainId"] as? String ?? String()
+                                
+                                var invites = [TeamInviteObject]()
+                                let teamInvites = snapshot.childSnapshot(forPath: "teamInvites")
+                                for invite in teamInvites.children{
+                                    let currentObj = invite as! DataSnapshot
+                                    let dict = currentObj.value as? [String: Any]
+                                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                                    let date = dict?["date"] as? String ?? ""
+                                    let uid = dict?["uid"] as? String ?? ""
+                                    let teamName = dict?["teamName"] as? String ?? ""
+                                    
+                                    let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid, teamName: teamName)
+                                    invites.append(newInvite)
+                                }
+                                
+                                let teamInvitetags = dict?["teamInviteTags"] as? [String] ?? [String]()
+                                let captain = dict?["teamCaptain"] as? String ?? ""
+                                let imageUrl = dict?["imageUrl"] as? String ?? ""
+                                let teamChat = dict?["teamChat"] as? String ?? String()
+                                let teamNeeds = dict?["teamNeeds"] as? [String] ?? [String]()
+                                let selectedTeamNeeds = dict?["selectedTeamNeeds"] as? [String] ?? [String]()
+                                
+                                let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl, teamCaptainId: captainId)
+                                
+                                var teammateArray = [TeammateObject]()
+                                if(currentObj.hasChild("teammates")){
+                                    let teammates = currentObj.childSnapshot(forPath: "teammates")
+                                    for teammate in teammates.children{
+                                        let currentTeammate = teammate as! DataSnapshot
+                                        let dict = currentTeammate.value as? [String: Any]
+                                        let gamerTag = dict?["gamerTag"] as? String ?? ""
+                                        let date = dict?["date"] as? String ?? ""
+                                        let uid = dict?["uid"] as? String ?? ""
+                                        
+                                        let teammate = TeammateObject(gamerTag: gamerTag, date: date, uid: uid)
+                                        teammateArray.append(teammate)
+                                    }
+                                    currentTeam.teammates = teammateArray
+                                    teams.append(currentTeam)
+                                }
+                            }
                             
-                            let chatObj = ChatObject(chatUrl: channelUrl, otherUser: otherUser)
-                            chatObj.otherUserId = otherUserId
-                            array.append(chatObj)
+                            var sendUp = [[String: Any]]()
+                            for team in teams{
+                                if(team.teamChat.isEmpty){
+                                    team.teamChat = groupChannel.channelUrl
+                                }
+                                
+                                let current = ["teamName": team.teamName, "teamId": team.teamId, "games": team.games, "consoles": team.consoles, "teammateTags": team.teammateTags, "teammateIds": team.teammateIds, "teamCaptain": team.teamCaptain, "teamInvites": team.teamInvites, "teamChat": team.teamChat, "teamInviteTags": team.teamInviteTags, "teamNeeds": team.teamNeeds, "selectedTeamNeeds": team.selectedTeamNeeds, "imageUrl": team.imageUrl] as [String : Any]
+                                
+                                sendUp.append(current)
+                            }
+                            ref.child("teams").setValue(sendUp)
                         }
+                    })
+                { (error) in
+                    print(error.localizedDescription)
+                    self.showError(string: "error initializing team chat.")
+                }
+            }
+        }
+        else{
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let currentUser = appDelegate.currentUser
+            let ref = Database.database().reference().child("Users").child(currentUser!.uId)
+            ref.observeSingleEvent(of: .value, with: { (snapshot) in
+                if(snapshot.exists()){
+                    var array = [ChatObject]()
+                    let messagingArray = snapshot.childSnapshot(forPath: "messaging")
+                    for channel in messagingArray.children{
+                        let currentObj = channel as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let channelUrl = dict?["channelUrl"] as? String ?? ""
+                        let otherUser = dict?["otherUser"] as? String ?? ""
+                        let otherUserId = dict?["otherUserId"] as? String ?? ""
                         
-                        let current = ChatObject(chatUrl: groupChannel.channelUrl, otherUser: appDelegate.currentUser!.uId)
-                        array.append(current)
-                        
-                        var sendUp = [[String: String]]()
-                        for channel in array{
-                            let currentOne = ["channelUrl": channel.chatUrl, "otherUser": currentUser!.uId, "otherUserId": currentUser!.uId]
-                            
-                            sendUp.append(currentOne)
-                        }
-                        
-                        ref.child("messaging").setValue(sendUp)
-                        
+                        let chatObj = ChatObject(chatUrl: channelUrl, otherUser: otherUser)
+                        chatObj.otherUserId = otherUserId
+                        array.append(chatObj)
                     }
+                    
+                    let current = ChatObject(chatUrl: groupChannel.channelUrl, otherUser: self.otherUserId!)
+                    array.append(current)
+                    
+                    var sendUp = [[String: String]]()
+                    for channel in array{
+                        let currentOne = ["channelUrl": channel.chatUrl, "otherUser": channel.otherUser, "otherUserId": self.otherUserId ?? ""]
+                        
+                        sendUp.append(currentOne)
+                    }
+                    
+                    ref.child("messaging").setValue(sendUp)
+                    
+                    let ref = Database.database().reference().child("Users").child(self.otherUserId!)
+                    ref.observeSingleEvent(of: .value, with: { (snapshot) in
+                        if(snapshot.exists()){
+                            var array = [ChatObject]()
+                            let messagingArray = snapshot.childSnapshot(forPath: "messaging")
+                            for channel in messagingArray.children{
+                                let currentObj = channel as! DataSnapshot
+                                let dict = currentObj.value as? [String: Any]
+                                let channelUrl = dict?["channelUrl"] as? String ?? ""
+                                let otherUser = dict?["otherUser"] as? String ?? ""
+                                let otherUserId = dict?["otherUserId"] as? String ?? ""
+                                
+                                let chatObj = ChatObject(chatUrl: channelUrl, otherUser: otherUser)
+                                chatObj.otherUserId = otherUserId
+                                array.append(chatObj)
+                            }
+                            
+                            let current = ChatObject(chatUrl: groupChannel.channelUrl, otherUser: appDelegate.currentUser!.uId)
+                            array.append(current)
+                            
+                            var sendUp = [[String: String]]()
+                            for channel in array{
+                                let currentOne = ["channelUrl": channel.chatUrl, "otherUser": currentUser!.uId, "otherUserId": currentUser!.uId]
+                                
+                                sendUp.append(currentOne)
+                            }
+                            
+                            ref.child("messaging").setValue(sendUp)
+                            
+                        }
+                    })
+                }
+            }) { (error) in
+                print(error.localizedDescription)
+                self.showError(string: "error initializing chat.")
+            }
+        }
+    }
+    
+    func createTeamChannelFailed() {
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Messaging: Create Channel Failed"))
+        
+        if(emptyShowing){
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.emptyOverlay.alpha = 0
+                }, completion: { (finished: Bool) in
+                    self.emptyShowing = false
+                    self.showError(string: "there was an issue loading your channel.")
                 })
             }
-        }) { (error) in
-            print(error.localizedDescription)
+        }
+        else{
+            self.showError(string: "there was an issue loading your channel.")
+        }
+    }
+    
+    private func showError(string: String){
+        self.errorText.text = string
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            UIView.animate(withDuration: 0.5, animations: {
+                self.errorOverlay.alpha = 1
+            }, completion: nil)
         }
     }
     
@@ -349,6 +470,46 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
     }
     
     func successfulLeaveChannel() {
+    }
+    
+    func errorLoadingChannel() {
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Messaging: Error Loading Channel " + currentUser!.uId))
+        
+        if(emptyShowing){
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.emptyOverlay.alpha = 0
+                }, completion: { (finished: Bool) in
+                    self.emptyShowing = false
+                    self.showError(string: "there was an issue loading your chat.")
+                })
+            }
+        }
+        else{
+            self.showError(string: "there was an issue loading your chat.")
+        }
+    }
+    
+    func errorLoadingMessages() {
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Messaging: Error Loading Messages " + currentUser!.uId))
+        
+        if(emptyShowing){
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.emptyOverlay.alpha = 0
+                }, completion: { (finished: Bool) in
+                    self.emptyShowing = false
+                    self.showError(string: "there was an issue loading your messages.")
+                })
+            }
+        }
+        else{
+            self.showError(string: "there was an issue loading your messages.")
+        }
     }
     
     func messageSentSuccessfully(chatMessage: ChatMessage, sender: SBDSender) {
@@ -438,10 +599,6 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
                     cell.message.layer.masksToBounds = true
                     cell.message.layer.cornerRadius = 15
                     
-                    /*cell.message.layer.masksToBounds = false
-                    cell.message.layer.shadowRadius = 2.0
-                    cell.message.layer.shadowOpacity = 0.2
-                    cell.message.layer.shadowOffset = CGSize(width: 1, height: 2)*/
                     return cell
                 }
             }
@@ -481,10 +638,6 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
                         }
                     }
                     
-                    /*cell.message.layer.masksToBounds = false
-                    cell.message.layer.shadowRadius = 2.0
-                    cell.message.layer.shadowOpacity = 0.2
-                    cell.message.layer.shadowOffset = CGSize(width: 1, height: 2)*/
                     return cell
                 }
             }

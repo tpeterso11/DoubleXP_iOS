@@ -13,5 +13,9 @@ class ParentVC: UIViewController{
     var pageName: String?
     
     var navDictionary: [String: String]?
+    
+    func reloadView(){
+        //empty
+    }
     //state : original, secondary, search, none
 }

@@ -12,7 +12,7 @@ target 'DoubleXP' do
   pod 'Firebase/Database'
   pod 'moa', '~> 11.0'
   pod 'CollapsibleTableSectionViewController', '~> 1.0.0'
-  pod 'MSPeekCollectionViewDelegateImplementation'
+  pod 'MSPeekCollectionViewDelegateImplementation', '~> 2.0.0'
   pod 'SwiftNotificationCenter'
   pod 'EMPageViewController'
   pod 'SendBirdSDK'

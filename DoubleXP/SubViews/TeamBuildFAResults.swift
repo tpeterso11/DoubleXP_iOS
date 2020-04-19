@@ -17,6 +17,7 @@ class TeamBuildFAResults: ParentVC, UITableViewDelegate, UITableViewDataSource, 
     var quizPayload = [Any]()
     var quizOverlayShowing = false
     var expandedCells = [Int]()
+    var quizSet = false
     
     @IBOutlet weak var quizViewProfile: UIButton!
     @IBOutlet weak var quizViewInvite: UIButton!
@@ -397,6 +398,14 @@ class TeamBuildFAResults: ParentVC, UITableViewDelegate, UITableViewDataSource, 
                 statObject.playerLevelPVP = freeAgentObject.statTree["playerLevelPVP"] ?? ""
             }
             
+            if(self.team!.games[0] == "Call Of Duty Modern Warfare"){
+                statObject.codKd = freeAgentObject.statTree["codKd"] ?? ""
+                statObject.codLevel = freeAgentObject.statTree["codLevel"] ?? ""
+                statObject.codWins = freeAgentObject.statTree["codWins"] ?? ""
+                statObject.codWlRatio = freeAgentObject.statTree["codWlRatio"] ?? ""
+                statObject.codBestKills = freeAgentObject.statTree["codBestKills"] ?? ""
+            }
+            
             self.quizPayload.append(statObject)
         }
         
@@ -406,8 +415,16 @@ class TeamBuildFAResults: ParentVC, UITableViewDelegate, UITableViewDataSource, 
         }
         
         self.quizFALabel.text = freeAgentObject.gamerTag
-        self.quizTable.delegate = self
-        self.quizTable.dataSource = self
+        
+        if(!quizSet){
+            self.quizTable.delegate = self
+            self.quizTable.dataSource = self
+            
+            self.quizSet = true
+        }
+        else{
+            self.quizTable.reloadData()
+        }
         
         quizViewInvite?.tag = position
         quizViewProfile?.tag = position

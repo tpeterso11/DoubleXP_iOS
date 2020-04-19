@@ -21,6 +21,7 @@ class TeamBuildFrag: ParentVC, UITableViewDataSource, UITableViewDelegate, TeamC
     @IBOutlet weak var inviteButton: UIButton!
     @IBOutlet weak var freeAgentButton: UIButton!
     @IBOutlet weak var captainStar: UIImageView!
+    @IBOutlet weak var empty: UIView!
     
     var invitableFriends = [FriendObject]()
     
@@ -53,7 +54,12 @@ class TeamBuildFrag: ParentVC, UITableViewDataSource, UITableViewDelegate, TeamC
                 animateView()
             }
             else{
-                //show empty
+                let top2 = CGAffineTransform(translationX: 0, y: -10)
+                
+                UIView.animate(withDuration: 0.8, animations: {
+                        self.empty.alpha = 1
+                        self.empty.transform = top2
+                }, completion: nil)
             }
         }
         

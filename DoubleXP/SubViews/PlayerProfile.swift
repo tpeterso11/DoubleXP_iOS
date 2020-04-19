@@ -172,12 +172,13 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 let teamInvites = snapshot.childSnapshot(forPath: "teamInvites")
                 for invite in teamInvites.children{
                     let currentObj = invite as! DataSnapshot
-                    let dict = currentObj.value as! [String: Any]
-                    let gamerTag = dict["gamerTag"] as? String ?? ""
-                    let date = dict["date"] as? String ?? ""
-                    let uid = dict["uid"] as? String ?? ""
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    let teamName = dict?["teamName"] as? String ?? ""
                     
-                    let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid)
+                    let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid, teamName: teamName)
                     invites.append(newInvite)
                 }
                 
@@ -202,8 +203,9 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 let teamChat = dict["teamChat"] as? String ?? String()
                 let teamNeeds = dict["teamNeeds"] as? [String] ?? [String]()
                 let selectedTeamNeeds = dict["selectedTeamNeeds"] as? [String] ?? [String]()
+                let captainId = dict["teamCaptainId"] as? String ?? String()
                 
-                let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl)
+                let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl, teamCaptainId: captainId)
                 currentTeam.teammates = teammateArray
                 teams.append(currentTeam)
             }

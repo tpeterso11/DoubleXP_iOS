@@ -23,7 +23,7 @@ protocol NavigateToProfile: class {
     
     func navigateToCreateFrag()
     
-    func navigateToTeamDashboard(team: TeamObject, newTeam: Bool)
+    func navigateToTeamDashboard(team: TeamObject?, newTeam: Bool)
     
     func navigateToTeamNeeds(team: TeamObject)
     
@@ -58,10 +58,13 @@ protocol NavigateToProfile: class {
     func navigateToInvite()
     
     func navigateToSettings()
+    
+    func navigateToCompetition(competition: CompetitionObj)
 }
 
 protocol RequestsUpdate: class{
     func updateCell(indexPath: IndexPath)
+    func showQuizClicked(questions: [[String]])
 }
 
 protocol TeamCallbacks: class{
@@ -74,11 +77,15 @@ protocol FACallbacks: class{
 
 protocol MessagingCallbacks: class {
     func connectionSuccessful()
+    func connectionFailed()
     func createTeamChannelSuccessful(groupChannel: SBDGroupChannel)
     func messageSuccessfullyReceived(message: SBDUserMessage)
     func onMessagesLoaded(messages: [SBDUserMessage])
     func successfulLeaveChannel()
     func messageSentSuccessfully(chatMessage: ChatMessage, sender: SBDSender)
+    func createTeamChannelFailed()
+    func errorLoadingMessages()
+    func errorLoadingChannel()
 }
 
 protocol TeamInteractionCallbacks: class{
@@ -145,5 +152,7 @@ protocol LandingUICallbacks: class{
 protocol CurrentProfileCallbacks: class{
     func checkChanges(updatedList: [GamerConnectGame]?)
     func changesComplete()
+    func gameAdded(gameName: String, indexPath: IndexPath)
+    func gameRemoved(gameName: String, indexPath: IndexPath)
 }
 

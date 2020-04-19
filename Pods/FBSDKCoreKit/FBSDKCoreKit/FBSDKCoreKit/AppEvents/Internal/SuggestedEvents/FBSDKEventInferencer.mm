@@ -24,65 +24,69 @@
 
 #import <Foundation/Foundation.h>
 
+#import "FBSDKAppEvents+Internal.h"
 #import "FBSDKFeatureExtractor.h"
 #import "FBSDKModelManager.h"
 #import "FBSDKModelParser.h"
 #import "FBSDKModelRuntime.hpp"
 #import "FBSDKModelUtility.h"
-#import "FBSDKViewHierarchyMacros.h"
+#import "FBSDKMLMacros.h"
 
 #include<stdexcept>
 
-static NSString *const MODEL_INFO_KEY= @"com.facebook.sdk:FBSDKModelInfo";
-static NSString *const THRESHOLDS_KEY = @"thresholds";
-static NSString *const SUGGESTED_EVENT[4] = {@"fb_mobile_add_to_cart", @"fb_mobile_complete_registration", @"other", @"fb_mobile_purchase"};
-static NSDictionary<NSString *, NSString *> *const DEFAULT_PREDICTION = @{SUGGEST_EVENT_KEY: SUGGESTED_EVENTS_OTHER};
+extern FBSDKAppEventName FBSDKAppEventNameCompletedRegistration;
+extern FBSDKAppEventName FBSDKAppEventNameAddedToCart;
+extern FBSDKAppEventName FBSDKAppEventNamePurchased;
+extern FBSDKAppEventName FBSDKAppEventNameInitiatedCheckout;
 
 static NSString *_useCase;
-static std::unordered_map<std::string, mat::MTensor> _weights;
+static std::unordered_map<std::string, fbsdk::MTensor> _weights;
 
 @implementation FBSDKEventInferencer : NSObject
 
 + (void)loadWeightsForKey:(NSString *)useCase
 {
-  NSData *data = [FBSDKModelManager getWeightsForKey:useCase];
-  if (!data) {
-    return;
-  }
-  std::unordered_map<std::string, mat::MTensor> weights = [FBSDKModelParser parseWeightsData:data];
-  if ([FBSDKModelParser validateWeights:weights forKey:useCase]) {
-    _useCase = useCase;
-    _weights = weights;
+  @synchronized (self) {
+    if (_useCase) {
+      return;
+    }
+    NSData *data = [FBSDKModelManager getWeightsForKey:useCase];
+    if (!data) {
+      return;
+    }
+    std::unordered_map<std::string, fbsdk::MTensor> weights = [FBSDKModelParser parseWeightsData:data];
+    if ([FBSDKModelParser validateWeights:weights forKey:useCase]) {
+      _useCase = useCase;
+      _weights = weights;
+    }
   }
 }
 
 + (NSDictionary<NSString *, NSString *> *)predict:(NSString *)buttonText
                                          viewTree:(NSMutableDictionary *)viewTree
-                                          withLog:(BOOL)isPrint
 {
-  if (buttonText.length == 0 || _weights.size() == 0) {
-    return DEFAULT_PREDICTION;
+  NSDictionary<NSString *, NSString *> *defaultPrediction = [self getDefaultPrediction];
+  NSArray<NSString *> *eventMapping = [self getEventMapping];
+  if (buttonText.length == 0 || _useCase.length == 0 || _weights.size() == 0) {
+    return defaultPrediction;
   }
   try {
     // Get bytes tensor
     NSString *textFeature = [FBSDKModelUtility normalizeText:[FBSDKFeatureExtractor getTextFeature:buttonText withScreenName:viewTree[@"screenname"]]];
     if (textFeature.length == 0) {
-      return DEFAULT_PREDICTION;
+      return defaultPrediction;
     }
     const char *bytes = [textFeature UTF8String];
     if ((int)strlen(bytes) == 0) {
-      return DEFAULT_PREDICTION;
+      return defaultPrediction;
     }
 
     // Get dense tensor
-    std::vector<int64_t> dense_tensor_shape;
-    dense_tensor_shape.push_back(1);
-    dense_tensor_shape.push_back(30);
-    mat::MTensor dense_tensor = mat::mempty(dense_tensor_shape);
-    float *dense_tensor_data = dense_tensor.data<float>();
+    fbsdk::MTensor dense_tensor({1, 30});
+    float *dense_tensor_data = dense_tensor.mutable_data();
     float *dense_data = [FBSDKFeatureExtractor getDenseFeatures:viewTree];
     if (!dense_data) {
-      return DEFAULT_PREDICTION;
+      return defaultPrediction;
     }
 
     NSMutableDictionary<NSString *, NSString *> *result = [[NSMutableDictionary alloc] init];
@@ -92,36 +96,41 @@ static std::unordered_map<std::string, mat::MTensor> _weights;
     for (int i=0; i < 30; i++) {
       [denseDataArray addObject:[NSNumber numberWithFloat: dense_data[i]]];
     }
-    [result setObject:[denseDataArray componentsJoinedByString:@","] forKey:DENSE_FEATURE_KEY];
+    result[DENSE_FEATURE_KEY] = [denseDataArray componentsJoinedByString:@","];
 
     memcpy(dense_tensor_data, dense_data, sizeof(float) * 30);
     free(dense_data);
-    NSString *key = _useCase;
-    if ([key isEqualToString:@"MTML"]) {
-      key = @"MTML_APP_EVENT_PRED";
-    }
-    float *res = mat1::predictOnText(std::string([key UTF8String]), bytes, _weights, dense_tensor_data);
-    NSMutableDictionary<NSString *, id> *modelInfo = [[NSUserDefaults standardUserDefaults] objectForKey:MODEL_INFO_KEY];
-    if (!modelInfo) {
-      return DEFAULT_PREDICTION;
-    }
-    NSDictionary<NSString *, id> * suggestedEventModelInfo = [modelInfo objectForKey:SUGGEST_EVENT_KEY];
-    if (!suggestedEventModelInfo) {
-      return DEFAULT_PREDICTION;
-    }
-    NSMutableArray *thresholds = [suggestedEventModelInfo objectForKey:THRESHOLDS_KEY];
-    if (thresholds.count < 4) {
-      return DEFAULT_PREDICTION;
+
+    NSArray *thresholds = [FBSDKModelManager getThresholdsForKey:_useCase];
+    if (thresholds.count != eventMapping.count) {
+      return defaultPrediction;
     }
 
-    for (int i = 0; i < thresholds.count; i++){
-      if ((float)res[i] >= (float)[thresholds[i] floatValue]) {
-        [result setObject:SUGGESTED_EVENT[i] forKey:SUGGEST_EVENT_KEY];
+    const fbsdk::MTensor& res = fbsdk::predictOnMTML("app_event_pred", bytes, _weights, dense_tensor_data);
+    const float *res_data = res.data();
+    for (int i = 0; i < thresholds.count; i++) {
+      if ((float)res_data[i] >= (float)[thresholds[i] floatValue]) {
+        result[SUGGEST_EVENT_KEY] = eventMapping[i];
         return result;
       }
     }
   } catch (const std::exception &e) {}
-  return DEFAULT_PREDICTION;
+  return defaultPrediction;
+}
+
++ (NSDictionary<NSString *, NSString *> *)getDefaultPrediction
+{
+  return @{SUGGEST_EVENT_KEY: SUGGESTED_EVENT_OTHER};
+}
+
++ (NSArray<NSString *> *)getEventMapping
+{
+  return
+  @[SUGGESTED_EVENT_OTHER,
+  FBSDKAppEventNameCompletedRegistration,
+  FBSDKAppEventNameAddedToCart,
+  FBSDKAppEventNamePurchased,
+  FBSDKAppEventNameInitiatedCheckout];
 }
 
 @end

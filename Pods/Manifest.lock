@@ -3,114 +3,122 @@ PODS:
   - Bartinter (0.0.5)
   - CollapsibleTableSectionViewController (1.0.1)
   - DeepDiff (2.3.1)
-  - DynamicBlurView (3.0.1)
+  - DynamicBlurView (4.1.0)
   - ElongationPreview (2.1.0)
-  - EMPageViewController (3.0.0)
-  - ExpyTableView (1.1)
-  - FBSDKCoreKit/Basics (6.2.0)
-  - FBSDKCoreKit/Core (6.2.0):
+  - EMPageViewController (4.0.0)
+  - ExpyTableView (1.2.1)
+  - FBSDKCoreKit/Basics (6.4.0)
+  - FBSDKCoreKit/Core (6.4.0):
     - FBSDKCoreKit/Basics
-  - FBSDKCoreKit/Swift (6.2.0):
+  - FBSDKCoreKit/Swift (6.4.0):
     - FBSDKCoreKit/Core
-  - Firebase/Analytics (6.13.0):
+  - Firebase/Analytics (6.22.0):
     - Firebase/Core
-  - Firebase/Auth (6.13.0):
+  - Firebase/Auth (6.22.0):
     - Firebase/CoreOnly
-    - FirebaseAuth (~> 6.4.0)
-  - Firebase/Core (6.13.0):
+    - FirebaseAuth (~> 6.5.1)
+  - Firebase/Core (6.22.0):
     - Firebase/CoreOnly
-    - FirebaseAnalytics (= 6.1.6)
-  - Firebase/CoreOnly (6.13.0):
-    - FirebaseCore (= 6.4.0)
-  - Firebase/Database (6.13.0):
+    - FirebaseAnalytics (= 6.4.1)
+  - Firebase/CoreOnly (6.22.0):
+    - FirebaseCore (= 6.6.6)
+  - Firebase/Database (6.22.0):
     - Firebase/CoreOnly
-    - FirebaseDatabase (~> 6.1.2)
-  - Firebase/Messaging (6.13.0):
+    - FirebaseDatabase (~> 6.1.4)
+  - Firebase/Messaging (6.22.0):
     - Firebase/CoreOnly
-    - FirebaseMessaging (~> 4.1.9)
-  - FirebaseAnalytics (6.1.6):
-    - FirebaseCore (~> 6.4)
-    - FirebaseInstanceID (~> 4.2)
-    - GoogleAppMeasurement (= 6.1.6)
+    - FirebaseMessaging (~> 4.3.0)
+  - FirebaseAnalytics (6.4.1):
+    - FirebaseCore (~> 6.6)
+    - FirebaseInstallations (~> 1.1)
+    - GoogleAppMeasurement (= 6.4.1)
     - GoogleUtilities/AppDelegateSwizzler (~> 6.0)
     - GoogleUtilities/MethodSwizzler (~> 6.0)
     - GoogleUtilities/Network (~> 6.0)
     - "GoogleUtilities/NSData+zlib (~> 6.0)"
     - nanopb (= 0.3.9011)
   - FirebaseAnalyticsInterop (1.5.0)
-  - FirebaseAuth (6.4.0):
+  - FirebaseAuth (6.5.1):
     - FirebaseAuthInterop (~> 1.0)
-    - FirebaseCore (~> 6.2)
-    - GoogleUtilities/AppDelegateSwizzler (~> 6.2)
-    - GoogleUtilities/Environment (~> 6.2)
+    - FirebaseCore (~> 6.6)
+    - GoogleUtilities/AppDelegateSwizzler (~> 6.5)
+    - GoogleUtilities/Environment (~> 6.5)
     - GTMSessionFetcher/Core (~> 1.1)
-  - FirebaseAuthInterop (1.0.0)
-  - FirebaseCore (6.4.0):
-    - FirebaseCoreDiagnostics (~> 1.0)
-    - FirebaseCoreDiagnosticsInterop (~> 1.0)
-    - GoogleUtilities/Environment (~> 6.2)
-    - GoogleUtilities/Logger (~> 6.2)
-  - FirebaseCoreDiagnostics (1.1.2):
-    - FirebaseCoreDiagnosticsInterop (~> 1.0)
-    - GoogleDataTransportCCTSupport (~> 1.0)
-    - GoogleUtilities/Environment (~> 6.2)
-    - GoogleUtilities/Logger (~> 6.2)
+  - FirebaseAuthInterop (1.1.0)
+  - FirebaseCore (6.6.6):
+    - FirebaseCoreDiagnostics (~> 1.2)
+    - FirebaseCoreDiagnosticsInterop (~> 1.2)
+    - GoogleUtilities/Environment (~> 6.5)
+    - GoogleUtilities/Logger (~> 6.5)
+  - FirebaseCoreDiagnostics (1.2.3):
+    - FirebaseCoreDiagnosticsInterop (~> 1.2)
+    - GoogleDataTransportCCTSupport (~> 2.0)
+    - GoogleUtilities/Environment (~> 6.5)
+    - GoogleUtilities/Logger (~> 6.5)
     - nanopb (~> 0.3.901)
-  - FirebaseCoreDiagnosticsInterop (1.1.0)
-  - FirebaseDatabase (6.1.2):
+  - FirebaseCoreDiagnosticsInterop (1.2.0)
+  - FirebaseDatabase (6.1.4):
     - FirebaseAuthInterop (~> 1.0)
     - FirebaseCore (~> 6.0)
     - leveldb-library (~> 1.22)
-  - FirebaseInstanceID (4.2.7):
-    - FirebaseCore (~> 6.0)
-    - GoogleUtilities/Environment (~> 6.0)
-    - GoogleUtilities/UserDefaults (~> 6.0)
-  - FirebaseMessaging (4.1.10):
-    - FirebaseAnalyticsInterop (~> 1.3)
-    - FirebaseCore (~> 6.2)
-    - FirebaseInstanceID (~> 4.1)
-    - GoogleUtilities/AppDelegateSwizzler (~> 6.2)
-    - GoogleUtilities/Environment (~> 6.2)
-    - GoogleUtilities/Reachability (~> 6.2)
-    - GoogleUtilities/UserDefaults (~> 6.2)
+  - FirebaseInstallations (1.1.1):
+    - FirebaseCore (~> 6.6)
+    - GoogleUtilities/UserDefaults (~> 6.5)
+    - PromisesObjC (~> 1.2)
+  - FirebaseInstanceID (4.3.3):
+    - FirebaseCore (~> 6.6)
+    - FirebaseInstallations (~> 1.0)
+    - GoogleUtilities/Environment (~> 6.5)
+    - GoogleUtilities/UserDefaults (~> 6.5)
+  - FirebaseMessaging (4.3.0):
+    - FirebaseAnalyticsInterop (~> 1.5)
+    - FirebaseCore (~> 6.6)
+    - FirebaseInstanceID (~> 4.3)
+    - GoogleUtilities/AppDelegateSwizzler (~> 6.5)
+    - GoogleUtilities/Environment (~> 6.5)
+    - GoogleUtilities/Reachability (~> 6.5)
+    - GoogleUtilities/UserDefaults (~> 6.5)
     - Protobuf (>= 3.9.2, ~> 3.9)
+  - FLAnimatedImage (1.0.12)
   - FoldingCell (5.0.2)
-  - Giphy (1.2.2):
+  - Giphy (1.2.5):
     - DeepDiff
     - libwebp
     - PINCache
-  - GoogleAppMeasurement (6.1.6):
+  - GoogleAppMeasurement (6.4.1):
     - GoogleUtilities/AppDelegateSwizzler (~> 6.0)
     - GoogleUtilities/MethodSwizzler (~> 6.0)
     - GoogleUtilities/Network (~> 6.0)
     - "GoogleUtilities/NSData+zlib (~> 6.0)"
     - nanopb (= 0.3.9011)
-  - GoogleDataTransport (3.2.0)
-  - GoogleDataTransportCCTSupport (1.2.2):
-    - GoogleDataTransport (~> 3.2)
+  - GoogleDataTransport (5.1.1)
+  - GoogleDataTransportCCTSupport (2.0.3):
+    - GoogleDataTransport (~> 5.1)
     - nanopb (~> 0.3.901)
-  - GoogleUtilities/AppDelegateSwizzler (6.3.2):
+  - GoogleUtilities/AppDelegateSwizzler (6.5.2):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
     - GoogleUtilities/Network
-  - GoogleUtilities/Environment (6.3.2)
-  - GoogleUtilities/Logger (6.3.2):
+  - GoogleUtilities/Environment (6.5.2)
+  - GoogleUtilities/Logger (6.5.2):
     - GoogleUtilities/Environment
-  - GoogleUtilities/MethodSwizzler (6.3.2):
+  - GoogleUtilities/MethodSwizzler (6.5.2):
     - GoogleUtilities/Logger
-  - GoogleUtilities/Network (6.3.2):
+  - GoogleUtilities/Network (6.5.2):
     - GoogleUtilities/Logger
     - "GoogleUtilities/NSData+zlib"
     - GoogleUtilities/Reachability
-  - "GoogleUtilities/NSData+zlib (6.3.2)"
-  - GoogleUtilities/Reachability (6.3.2):
+  - "GoogleUtilities/NSData+zlib (6.5.2)"
+  - GoogleUtilities/Reachability (6.5.2):
     - GoogleUtilities/Logger
-  - GoogleUtilities/UserDefaults (6.3.2):
+  - GoogleUtilities/UserDefaults (6.5.2):
     - GoogleUtilities/Logger
-  - GTMSessionFetcher/Core (1.3.0)
+  - GTMSessionFetcher/Core (1.3.1)
   - Hero (1.5.0)
-  - ImageLoader (0.14.0)
-  - InputBarAccessoryView (4.2.2)
+  - ImageLoader (0.15.0)
+  - InputBarAccessoryView (4.3.2):
+    - InputBarAccessoryView/Core (= 4.3.2)
+  - InputBarAccessoryView/Core (4.3.2)
   - leveldb-library (1.22)
   - libwebp (1.1.0):
     - libwebp/demux (= 1.1.0)
@@ -121,10 +129,10 @@ PODS:
   - libwebp/mux (1.1.0):
     - libwebp/demux
   - libwebp/webp (1.1.0)
-  - lottie-ios (3.1.5)
+  - lottie-ios (3.1.6)
   - Marshal (1.2.7)
-  - MessageKit (3.0.0):
-    - InputBarAccessoryView (~> 4.2.2)
+  - MessageKit (3.1.0):
+    - InputBarAccessoryView (~> 4.3.0)
   - moa (11.0.1)
   - MSPeekCollectionViewDelegateImplementation (2.0.0)
   - nanopb (0.3.9011):
@@ -132,28 +140,22 @@ PODS:
     - nanopb/encode (= 0.3.9011)
   - nanopb/decode (0.3.9011)
   - nanopb/encode (0.3.9011)
-  - PINCache (3.0.1-beta.8):
-    - PINCache/Arc-exception-safe (= 3.0.1-beta.8)
-    - PINCache/Core (= 3.0.1-beta.8)
-  - PINCache/Arc-exception-safe (3.0.1-beta.8):
-    - PINCache/Core
-  - PINCache/Core (3.0.1-beta.8):
-    - PINOperation (~> 1.1.1)
-  - PINOperation (1.1.2)
-  - PINRemoteImage (3.0.0):
-    - PINRemoteImage/PINCache (= 3.0.0)
-  - PINRemoteImage/Core (3.0.0):
-    - PINOperation
-  - PINRemoteImage/PINCache (3.0.0):
-    - PINCache (= 3.0.1-beta.8)
+  - PINCache (2.3)
+  - PINRemoteImage (2.1.4):
+    - PINRemoteImage/FLAnimatedImage (= 2.1.4)
+  - PINRemoteImage/Core (2.1.4):
+    - PINCache (>= 2.1)
+  - PINRemoteImage/FLAnimatedImage (2.1.4):
+    - FLAnimatedImage (>= 1.0)
     - PINRemoteImage/Core
-  - PopupDialog (1.0.0):
-    - DynamicBlurView (~> 3.0.1)
+  - PopupDialog (1.1.1):
+    - DynamicBlurView (~> 4.0)
+  - PromisesObjC (1.2.8)
   - Protobuf (3.11.4)
   - RAMPaperSwitch (3.1.0)
-  - SendBirdSDK (3.0.161)
-  - SmoothButton (0.0.1)
-  - SoftUIView (0.0.1)
+  - SendBirdSDK (3.0.177)
+  - SmoothButton (0.0.3)
+  - SoftUIView (0.0.2)
   - SwiftHTTP (3.0.1)
   - SwiftNotificationCenter (1.0.4)
   - SwiftRichString (3.7.1)
@@ -188,7 +190,7 @@ DEPENDENCIES:
   - lottie-ios
   - MessageKit
   - moa (~> 11.0)
-  - MSPeekCollectionViewDelegateImplementation
+  - MSPeekCollectionViewDelegateImplementation (~> 2.0.0)
   - PINRemoteImage
   - PopupDialog (~> 1.0)
   - RAMPaperSwitch
@@ -225,8 +227,10 @@ SPEC REPOS:
     - FirebaseCoreDiagnostics
     - FirebaseCoreDiagnosticsInterop
     - FirebaseDatabase
+    - FirebaseInstallations
     - FirebaseInstanceID
     - FirebaseMessaging
+    - FLAnimatedImage
     - FoldingCell
     - Giphy
     - GoogleAppMeasurement
@@ -246,9 +250,9 @@ SPEC REPOS:
     - MSPeekCollectionViewDelegateImplementation
     - nanopb
     - PINCache
-    - PINOperation
     - PINRemoteImage
     - PopupDialog
+    - PromisesObjC
     - Protobuf
     - RAMPaperSwitch
     - SendBirdSDK
@@ -271,49 +275,51 @@ SPEC CHECKSUMS:
   Bartinter: 3c1fc3bcb631b066fdd78f7e01f1635fbafffdea
   CollapsibleTableSectionViewController: c41694de812a1039c5f8581c934cf0fc38e4e871
   DeepDiff: e5ae6c50d0321568e4508cec5930b9f10bb293fc
-  DynamicBlurView: b1df5415f9bd31897549e5d7077e5ec120a4d636
+  DynamicBlurView: 58e18fae80bb614e34681a4486870e7d257b62e8
   ElongationPreview: 84b401d349bfcf855e94d6cc6b95d609260b6d96
-  EMPageViewController: 8e0abc2b2f53f56a83044527eadbb56bd71ae3e3
-  ExpyTableView: 52dde6e141056544c0b8e7b083a840c37ddb6132
-  FBSDKCoreKit: a7bb9f5ac56c1e11d5f8ae0b90a3610f8744b43a
-  Firebase: 458d109512200d1aca2e1b9b6cf7d68a869a4a46
-  FirebaseAnalytics: 45f36d9c429fc91d206283900ab75390cd05ee8a
+  EMPageViewController: de8c8d6ea44c77bc2463f2cb9b4128390d2391f2
+  ExpyTableView: 19cf224c2ff04b1ec215ec52bc4ba6f81fa809ed
+  FBSDKCoreKit: 7bea330627be2601a9079413c615313746aa9f7c
+  Firebase: 32f9520684e87c7af3f0704f7f88042626d6b536
+  FirebaseAnalytics: 83f822fd0d33a46f49f89b8c3ab16ab4d89df08a
   FirebaseAnalyticsInterop: 3f86269c38ae41f47afeb43ebf32a001f58fcdae
-  FirebaseAuth: 7d0f84873926f6648bbd1391a318dfb1a26b5e4f
-  FirebaseAuthInterop: 0ffa57668be100582bb7643d4fcb7615496c41fc
-  FirebaseCore: 307ea2508df730c5865334e41965bd9ea344b0e5
-  FirebaseCoreDiagnostics: 511f4f3ed7d440bb69127e8b97c2bc8befae639e
-  FirebaseCoreDiagnosticsInterop: e9b1b023157e3a2fc6418b5cb601e79b9af7b3a0
-  FirebaseDatabase: 963515d232ded06f36f6ce830507c94551866170
-  FirebaseInstanceID: ebd2ea79ee38db0cb5f5167b17a0d387e1cc7b6e
-  FirebaseMessaging: 089b7a4991425783384acc8bcefcd78c0af913bd
+  FirebaseAuth: a6da11d78dfd956b7f7af3222a0f0b1c93ef8fc9
+  FirebaseAuthInterop: a0f37ae05833af156e72028f648d313f7e7592e9
+  FirebaseCore: 9aca0f1fffb405176ba15311a5621fcde4106fcf
+  FirebaseCoreDiagnostics: 13a6564cd6d5375066bbc8940cc1753af24497f3
+  FirebaseCoreDiagnosticsInterop: 296e2c5f5314500a850ad0b83e9e7c10b011a850
+  FirebaseDatabase: 0144e0706a4761f1b0e8679572eba8095ddb59be
+  FirebaseInstallations: acb3216eb9784d3b1d2d2d635ff74fa892cc0c44
+  FirebaseInstanceID: 4b87a9a75ef628a53bb5de46e4d4cecfcce88c02
+  FirebaseMessaging: 4ec33842d36b3319e062e51fb8b35a74f726950d
+  FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
   FoldingCell: f92eb5fb9842319e7cd08c71533c98408b785099
-  Giphy: 0fd5898a9100716fa031e342ec919aca876fb3f3
-  GoogleAppMeasurement: dfe55efa543e899d906309eaaac6ca26d249862f
-  GoogleDataTransport: 8e9b210c97d55fbff306cc5468ff91b9cb32dcf5
-  GoogleDataTransportCCTSupport: ef79a4728b864946a8aafdbab770d5294faf3b5f
-  GoogleUtilities: 547a86735c6f0ee30ad17e94df4fc21f616b71cb
-  GTMSessionFetcher: 43b8b64263023d4f32caa0b40f4c8bfa3c5f36d8
+  Giphy: 76a033587d9291d5e6d2001897bd8fb11840c7df
+  GoogleAppMeasurement: e49be3954045b17d046f271b9cc1ec052bad9702
+  GoogleDataTransport: 6ffa4dd0b6d547f8d27b91bd92fa9e197a3f5f1f
+  GoogleDataTransportCCTSupport: 2d7e609f8c5af1a33d7d59053e6f8cba59365df5
+  GoogleUtilities: ad0f3b691c67909d03a3327cc205222ab8f42e0e
+  GTMSessionFetcher: cea130bbfe5a7edc8d06d3f0d17288c32ffe9925
   Hero: b7385b75e7259da62f4f85462f59a5082d66b058
-  ImageLoader: 56f57e35d6ed26a74183dc2e472133b4b22eb7b9
-  InputBarAccessoryView: 2b937602598e2fab3149f37f51dd7ad795653812
+  ImageLoader: e0635d52020d64dc7687e3a3b14dc53212ac0442
+  InputBarAccessoryView: 7985d418040a05fe894bd4b8328dd43ab35517c3
   leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
   libwebp: 946cb3063cea9236285f7e9a8505d806d30e07f3
-  lottie-ios: 32bf84389337d86fbc8b12266e88452e0abf1dee
+  lottie-ios: 85ce835dd8c53e02509f20729fc7d6a4e6645a0a
   Marshal: ef480864a6af10a63f67be7e55bb5d8fe67a16d9
-  MessageKit: e892a9ca49ebe6d82684d3a93ad84021fa23e2c6
+  MessageKit: 3beb578737a5aa2bba25cc27c7b6d6faa09af5a7
   moa: a26c4e97c7ac9345e87c4bb999e85116c8ec0310
   MSPeekCollectionViewDelegateImplementation: 3091e9512b3cd03facdea3c02e57673a4a06246a
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
-  PINCache: 534fd41d358d828dfdf227a0d327f3673a65e20b
-  PINOperation: 24b774353ca248fcf87d67b2d61eef42087c125a
-  PINRemoteImage: e2b89e19fb6e77ffc099f9d9f3b3fe1745e3f9f9
-  PopupDialog: 28f29a1ffe9e1fab32fb258b53d56ca31670e8a2
+  PINCache: ce36ed282031b92fc7733ffe831f474ff80fddc2
+  PINRemoteImage: 4ac4011c5caefd6befd99758e09becede05d3226
+  PopupDialog: 720c92befd8bc23c13442254945213db5612f149
+  PromisesObjC: c119f3cd559f50b7ae681fa59dc1acd19173b7e6
   Protobuf: 176220c526ad8bd09ab1fb40a978eac3fef665f7
   RAMPaperSwitch: 4ab6358e37cc90060693f10fb60fb6b73f6492c3
-  SendBirdSDK: fae108b5757e21250d7cd32f4ff023075d7c06ae
-  SmoothButton: b3191c0bdba16ff40bdd2934db9ddd93edaa9c9f
-  SoftUIView: f5ab13bf6bf9370455dd918877f25d81ddfa16eb
+  SendBirdSDK: 7e271e1945ac82dd8c504406c5e04947577d524b
+  SmoothButton: 993d5d9c80828754adac8444586fb06f392d5298
+  SoftUIView: e04596489fc59b5c50ba4b2f970d82a277430263
   SwiftHTTP: e94f1aa8cde58637dcc0100f6349de31a3337fde
   SwiftNotificationCenter: 760386da2ce03d3594cb5e96d1e22ec80b44b46f
   SwiftRichString: 9a6a70b4fe2cf428e38348b5ada5400da74621fd
@@ -326,6 +332,6 @@ SPEC CHECKSUMS:
   ValidationComponents: fad1f9e9d7fbf3e10c893c880ef9d27627e90382
   ValidationToolkit: ce8e9c1a5d49eddc3266a009d46df5ea22042dbc
 
-PODFILE CHECKSUM: 81b7b961aed98ac74dd53a2da7b6ff651220b26c
+PODFILE CHECKSUM: 75014154fbc51180d263ae1663823f329c5e3907
 
 COCOAPODS: 1.8.4

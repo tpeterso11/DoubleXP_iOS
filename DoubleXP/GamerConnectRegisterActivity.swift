@@ -62,6 +62,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
     @IBOutlet weak var creationThumb: UIImageView!
     
     var importToggled = false
+    var allGamesChecked = false
     var savedTag = ""
     var selectedConsole = ""
     var highlightCount = 4
@@ -284,6 +285,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
     
     @objc func allConsolesClicked(){
         if(!(gcDrawerGamertag.text!.isEmpty) && self.savedTag.isEmpty){
+            self.allGamesChecked = true
             //save
             self.savedTag = gcDrawerGamertag.text!
             
@@ -317,6 +319,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
             }, completion: nil)
         }
         else if(!self.savedTag.isEmpty){
+            self.allGamesChecked = false
             //undo
             self.savedTag = ""
             self.gcDrawerGamertag.text = ""
@@ -650,7 +653,10 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         let gamerProfile = GamerProfile(gamerTag: gamerTag, game: gameName, console: console)
         user?.gamerTags.append(gamerProfile)
         
-        let sendUp = ["gamerTag": gamerTag, "gameName": gameName, "console": console]
+        let sendUp = ["gamerTag": gamerTag, "game": gameName, "console": console]
+        if(!self.allGamesChecked && self.savedTag.isEmpty){
+            self.savedTag = gamerTag
+        }
         
         self.sendUpArray.append(sendUp)
     }

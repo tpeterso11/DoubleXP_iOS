@@ -88,5 +88,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>MGLMapboxAccessToken</key>
+	<string>pk.eyJ1IjoidHBldGVyc28xMSIsImEiOiJjazkza3dzZDIwM2ZjM2RwaWJ4Mzg1bnhlIn0.HcG2NYBrB3nD62Cr6ozd_w</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Showing location of competitions.</string>
 </dict>
 </plist>

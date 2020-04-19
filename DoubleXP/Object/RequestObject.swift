@@ -86,14 +86,14 @@ class RequestObject: GenericRequestObject, NSCoding {
         self.status = (decoder.decodeObject(forKey: "status") as! String)
         self.teamId = (decoder.decodeObject(forKey: "teamId") as! String)
         self.teamName = (decoder.decodeObject(forKey: "teamName") as! String)
-        self.captainId = (decoder.decodeObject(forKey: "captainId") as! String)
+        self.captainId = (decoder.decodeObject(forKey: "teamCaptainId") as! String)
         self.requestId = (decoder.decodeObject(forKey: "requestId") as! String)
     }
 
     func encode(with coder: NSCoder) {
         coder.encode(self.status, forKey: "status")
         coder.encode(self.teamId, forKey: "teamId")
-        coder.encode(self.captainId, forKey: "captainId")
+        coder.encode(self.captainId, forKey: "teamCaptainId")
         coder.encode(self.teamName, forKey: "teamName")
         coder.encode(self.requestId, forKey: "requestId")
     }

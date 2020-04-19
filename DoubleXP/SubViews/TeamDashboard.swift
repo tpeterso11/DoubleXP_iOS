@@ -257,12 +257,11 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! TeamRosterCell
             let current = team!.teammates[indexPath.item]
             let delegate = UIApplication.shared.delegate as! AppDelegate
-            let manager = GamerProfileManager()
             let currentUser = delegate.currentUser
             
             cell.gamerTag.text = current.gamerTag
             
-            if((team!.teamCaptain == manager.getGamerTagForGame(gameName: self.team!.games[0]))){
+            if((team!.teamCaptain == current.gamerTag)){
                 cell.captainStar.isHidden = false
                 cell.backgroundColor = #colorLiteral(red: 0.833609879, green: 0.6559728384, blue: 0.2461257577, alpha: 1)
             }
@@ -270,7 +269,8 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
                 cell.captainStar.isHidden = true
             }
             
-            if(current.uid == currentUser!.uId){
+            cell.messageButton.isHidden = true
+            /*if(current.uid == currentUser!.uId){
                 cell.messageButton.isHidden = true
             }
             else{
@@ -279,7 +279,7 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
                 let singleTap = UITapGestureRecognizer(target: self, action: #selector(goToChat))
                 cell.messageButton.isUserInteractionEnabled = true
                 cell.messageButton.addGestureRecognizer(singleTap)
-            }
+            }*/
             
             cell.backgroundColor = .white
             cell.layer.shadowColor = UIColor.black.cgColor
@@ -388,7 +388,7 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
             let current = self.teammates[indexPath.item]
             
             if(current.uid != currentUser?.uId){
-                delegate.currentLanding?.navigateToProfile(uid: currentUser!.uId)
+                delegate.currentLanding?.navigateToProfile(uid: current.uid)
             }
         }
     }

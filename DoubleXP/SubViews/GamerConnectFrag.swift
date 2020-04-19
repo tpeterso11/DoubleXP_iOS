@@ -23,6 +23,7 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
     @IBOutlet weak var currentDate: UILabel!
     var gcGames = [GamerConnectGame]()
     var delegate: MSPeekCollectionViewDelegateImplementation!
+    var secondaryPayload = [Any]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,17 +41,19 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         gcGames = appDelegate.gcGames
         
-        self.pageName = "Home"
-        appDelegate.addToNavStack(vc: self)
-        
         self.updatesStatusBarAppearanceAutomatically = true
-        
-        navDictionary = ["state": "original"]
-        
-        appDelegate.currentLanding?.updateNavigation(currentFrag: self)
+    }
+    
+    override func reloadView() {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.currentLanding!.restoreBottomNav()
+        appDelegate.currentLanding!.updateNavColor(color: .darkGray)
+        appDelegate.currentLanding!.stackDepth = 1
     }
     
     private func animateView(){
+        buildSecondaryPayload()
+        
         let top = CGAffineTransform(translationX: 0, y: 50)
         UIView.animate(withDuration: 0.5, animations: {
             self.connectHeader.alpha = 1
@@ -78,46 +81,71 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
         }
     }
     
+    private func buildSecondaryPayload(){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        secondaryPayload.append(contentsOf: appDelegate.competitions)
+        
+        let userOne = RecommendedUser(gamerTag: "allthesaints011", uid: "lD6mtUk4ZshjQ7EHLtRUf7v22Xs2")
+        let userTwo = RecommendedUser(gamerTag: "fitboy_", uid: "oFdx8UequuOs77s8daWFifODVhJ3")
+        let userThree = RecommendedUser(gamerTag: "Kwatakye Raven", uid: "N1k1BqmvEvdOXrbmi2p91kTNLOo1")
+        
+        secondaryPayload.append(userOne)
+        secondaryPayload.append(userTwo)
+        secondaryPayload.append(userThree)
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == self.gcGameScroll {
             return gcGames.count
         }
         else{
-            return 3
+            return secondaryPayload.count
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == self.recommendedUsers {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "recommendedCell", for: indexPath) as! RecommendedUsersCell
+            let current = self.secondaryPayload[indexPath.item]
             
-            if(indexPath.item == 0){
-                cell.gamerTag.text = "allthesaints011"
-                cell.xBox.isHidden = true
-                AppEvents.logEvent(AppEvents.Name(rawValue: "GC-Connect Toussaint Click"))
+            if(current is RecommendedUser){
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "recommendedCell", for: indexPath) as! RecommendedUsersCell
+                
+                cell.gamerTag.text = (current as! RecommendedUser).gamerTag
+                
+                if((current as! RecommendedUser).gamerTag == "allthesaints011"){
+                    cell.xBox.isHidden = true
+                    AppEvents.logEvent(AppEvents.Name(rawValue: "GC-Connect Toussaint Click"))
+                }
+                if((current as! RecommendedUser).gamerTag == "fitboy_"){
+                    cell.xBox.isHidden = true
+                    AppEvents.logEvent(AppEvents.Name(rawValue: "GC-Connect Hodges Click"))
+                }
+                if((current as! RecommendedUser).gamerTag == "Kwatakye Raven"){
+                    AppEvents.logEvent(AppEvents.Name(rawValue: "GC-Connect Mike Click"))
+                }
+                
+                
+                cell.contentView.layer.borderColor = UIColor.clear.cgColor
+                cell.contentView.layer.masksToBounds = true
+                
+                cell.layer.shadowColor = UIColor.black.cgColor
+                cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+                cell.layer.shadowRadius = 2.0
+                cell.layer.shadowOpacity = 0.5
+                cell.layer.masksToBounds = false
+                cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
+                
+                return cell
             }
-            if(indexPath.item == 1){
-                cell.gamerTag.text = "fitboy_"
-                cell.xBox.isHidden = true
-                AppEvents.logEvent(AppEvents.Name(rawValue: "GC-Connect Hodges Click"))
+            else{
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "competitionCell", for: indexPath) as! CompetitionCell
+                
+                cell.competitionName.text = (current as! CompetitionObj).competitionName
+                cell.gameName.text = (current as! CompetitionObj).gameName
+                cell.topPrize.text = "top prize: " + (current as! CompetitionObj).topPrize
+                
+                return cell
             }
-            if(indexPath.item == 2){
-                cell.gamerTag.text = "Kwatakye Raven"
-                AppEvents.logEvent(AppEvents.Name(rawValue: "GC-Connect Mike Click"))
-            }
-            
-            
-            cell.contentView.layer.borderColor = UIColor.clear.cgColor
-            cell.contentView.layer.masksToBounds = true
-            
-            cell.layer.shadowColor = UIColor.black.cgColor
-            cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
-            cell.layer.shadowRadius = 2.0
-            cell.layer.shadowOpacity = 0.5
-            cell.layer.masksToBounds = false
-            cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
-            
-            return cell
         }
         else{
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! homeGCCell
@@ -147,8 +175,20 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == self.recommendedUsers {
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            appDelegate.currentLanding!.navigateToProfile(uid: getHomeUid(position: indexPath.item))
+            let cell = collectionView.cellForItem(at: indexPath)
+            
+            if(cell is RecommendedUsersCell){
+                let current = self.secondaryPayload[indexPath.item]
+                
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                appDelegate.currentLanding!.navigateToProfile(uid: (current as! RecommendedUser).uid)
+            }
+            else{
+                let current = self.secondaryPayload[indexPath.item]
+                
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                appDelegate.currentLanding!.navigateToCompetition(competition: (current as! CompetitionObj))
+            }
         }
         else{
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -156,28 +196,18 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
         }
     }
     
-    private func getHomeUid(position: Int) -> String{
-        if(position == 0){
-            return "lD6mtUk4ZshjQ7EHLtRUf7v22Xs2"
-        }
-        
-        if(position == 1){
-            return "oFdx8UequuOs77s8daWFifODVhJ3"
-        }
-        
-        if(position == 2){
-            return "N1k1BqmvEvdOXrbmi2p91kTNLOo1"
-        }
-        
-        return ""
-    }
-    
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         let kWhateverHeightYouWant = 150
         if collectionView == self.recommendedUsers {
-            return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(100))
+            let current = self.secondaryPayload[indexPath.item]
+            if(current is CompetitionObj){
+                return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(180))
+            }
+            else{
+                return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(100))
+            }
         }
         else{
             return CGSize(width: 260, height: CGFloat(150))

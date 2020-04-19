@@ -77,6 +77,8 @@ class LoginController: UIViewController {
             let value = snapshot.value as? NSDictionary
             let uId = snapshot.key
             let gamerTag = value?["gamerTag"] as? String ?? ""
+            let subscriptions = value?["subscriptions"] as? [String] ?? [String]()
+            let competitions = value?["competitions"] as? [String] ?? [String]()
             let bio = value?["bio"] as? String ?? ""
             
             let search = value?["search"] as? String ?? ""
@@ -99,10 +101,10 @@ class LoginController: UIViewController {
                 let friendsArray = snapshot.childSnapshot(forPath: "sent_requests")
                 for friend in friendsArray.children{
                     let currentObj = friend as! DataSnapshot
-                    let dict = currentObj.value as! [String: Any]
-                    let gamerTag = dict["gamerTag"] as? String ?? ""
-                    let date = dict["date"] as? String ?? ""
-                    let uid = dict["uid"] as? String ?? ""
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
                     
                     let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
                     sentRequests.append(newFriend)
@@ -118,14 +120,43 @@ class LoginController: UIViewController {
                 let friendsArray = snapshot.childSnapshot(forPath: "pending_friends")
                 for friend in friendsArray.children{
                     let currentObj = friend as! DataSnapshot
-                    let dict = currentObj.value as! [String: Any]
-                    let gamerTag = dict["gamerTag"] as? String ?? ""
-                    let date = dict["date"] as? String ?? ""
-                    let uid = dict["uid"] as? String ?? ""
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
                     
                     let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
                     pendingRequests.append(newFriend)
                 }
+            }
+            
+            var teamInviteReqs = [RequestObject]()
+            let teamInviteRequests = snapshot.childSnapshot(forPath: "inviteRequests")
+             for invite in teamInviteRequests.children{
+                let currentObj = invite as! DataSnapshot
+                let dict = currentObj.value as? [String: Any]
+                let status = dict?["status"] as? String ?? ""
+                let teamId = dict?["teamId"] as? String ?? ""
+                let teamName = dict?["teamName"] as? String ?? ""
+                let captainId = dict?["teamCaptainId"] as? String ?? ""
+                let requestId = dict?["requestId"] as? String ?? ""
+                 
+                 let profile = currentObj.childSnapshot(forPath: "profile")
+                 let profileDict = profile.value as? [String: Any]
+                 let game = profileDict?["game"] as? String ?? ""
+                 let consoles = profileDict?["consoles"] as? [String] ?? [String]()
+                 let gamerTag = profileDict?["gamerTag"] as? String ?? ""
+                 let competitionId = profileDict?["competitionId"] as? String ?? ""
+                 let userId = profileDict?["userId"] as? String ?? ""
+                 let questions = profileDict?["questions"] as? [[String]] ?? [[String]]()
+                 
+                 let result = FreeAgentObject(gamerTag: gamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
+                 
+                 
+                 let newRequest = RequestObject(status: status, teamId: teamId, teamName: teamName, captainId: captainId, requestId: requestId)
+                 newRequest.profile = result
+                 
+                 teamInviteReqs.append(newRequest)
             }
             
             var friends = [FriendObject]()
@@ -136,10 +167,10 @@ class LoginController: UIViewController {
                 let friendsArray = snapshot.childSnapshot(forPath: "friends")
                 for friend in friendsArray.children{
                     let currentObj = friend as! DataSnapshot
-                    let dict = currentObj.value as! [String: Any]
-                    let gamerTag = dict["gamerTag"] as? String ?? ""
-                    let date = dict["date"] as? String ?? ""
-                    let uid = dict["uid"] as? String ?? ""
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
                     
                     let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
                     friends.append(newFriend)
@@ -151,10 +182,10 @@ class LoginController: UIViewController {
             let gamerTagsArray = snapshot.childSnapshot(forPath: "gamerTags")
             for gamerTagObj in gamerTagsArray.children {
                 let currentObj = gamerTagObj as! DataSnapshot
-                let dict = currentObj.value as! [String: Any]
-                let currentTag = dict["gamerTag"] as? String ?? ""
-                let currentGame = dict["game"] as? String ?? ""
-                let console = dict["console"] as? String ?? ""
+                let dict = currentObj.value as? [String: Any]
+                let currentTag = dict?["gamerTag"] as? String ?? ""
+                let currentGame = dict?["game"] as? String ?? ""
+                let console = dict?["console"] as? String ?? ""
                 
                 let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
                 gamerTags.append(currentGamerTagObj)
@@ -164,24 +195,25 @@ class LoginController: UIViewController {
             let teamsArray = snapshot.childSnapshot(forPath: "teams")
             for teamObj in teamsArray.children {
                 let currentObj = teamObj as! DataSnapshot
-                let dict = currentObj.value as! [String: Any]
-                let teamName = dict["teamName"] as? String ?? ""
-                let teamId = dict["teamId"] as? String ?? ""
-                let games = dict["games"] as? [String] ?? [String]()
-                let consoles = dict["consoles"] as? [String] ?? [String]()
-                let teammateTags = dict["teammateTags"] as? [String] ?? [String]()
-                let teammateIds = dict["teammateIds"] as? [String] ?? [String]()
+                let dict = currentObj.value as? [String: Any]
+                let teamName = dict?["teamName"] as? String ?? ""
+                let teamId = dict?["teamId"] as? String ?? ""
+                let games = dict?["games"] as? [String] ?? [String]()
+                let consoles = dict?["consoles"] as? [String] ?? [String]()
+                let teammateTags = dict?["teammateTags"] as? [String] ?? [String]()
+                let teammateIds = dict?["teammateIds"] as? [String] ?? [String]()
                 
                 var invites = [TeamInviteObject]()
                 let teamInvites = snapshot.childSnapshot(forPath: "teamInvites")
                 for invite in teamInvites.children{
                     let currentObj = invite as! DataSnapshot
-                    let dict = currentObj.value as! [String: Any]
-                    let gamerTag = dict["gamerTag"] as? String ?? ""
-                    let date = dict["date"] as? String ?? ""
-                    let uid = dict["uid"] as? String ?? ""
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    let teamName = dict?["teamName"] as? String ?? ""
                     
-                    let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid)
+                    let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid, teamName: teamName)
                     invites.append(newInvite)
                 }
                 
@@ -190,24 +222,25 @@ class LoginController: UIViewController {
                     let teammates = currentObj.childSnapshot(forPath: "teammates")
                     for teammate in teammates.children{
                         let currentTeammate = teammate as! DataSnapshot
-                        let dict = currentTeammate.value as! [String: Any]
-                        let gamerTag = dict["gamerTag"] as? String ?? ""
-                        let date = dict["date"] as? String ?? ""
-                        let uid = dict["uid"] as? String ?? ""
+                        let dict = currentTeammate.value as? [String: Any]
+                        let gamerTag = dict?["gamerTag"] as? String ?? ""
+                        let date = dict?["date"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
                         
                         let teammate = TeammateObject(gamerTag: gamerTag, date: date, uid: uid)
                         teammateArray.append(teammate)
                     }
                 }
                 
-                let teamInvitetags = dict["teamInviteTags"] as? [String] ?? [String]()
-                let captain = dict["teamCaptain"] as? String ?? ""
-                let imageUrl = dict["imageUrl"] as? String ?? ""
-                let teamChat = dict["teamChat"] as? String ?? String()
-                let teamNeeds = dict["teamNeeds"] as? [String] ?? [String]()
-                let selectedTeamNeeds = dict["selectedTeamNeeds"] as? [String] ?? [String]()
+                let teamInvitetags = dict?["teamInviteTags"] as? [String] ?? [String]()
+                let captain = dict?["teamCaptain"] as? String ?? ""
+                let imageUrl = dict?["imageUrl"] as? String ?? ""
+                let teamChat = dict?["teamChat"] as? String ?? String()
+                let teamNeeds = dict?["teamNeeds"] as? [String] ?? [String]()
+                let selectedTeamNeeds = dict?["selectedTeamNeeds"] as? [String] ?? [String]()
+                let captainId = dict?["teamCaptainId"] as? String ?? String()
                 
-                let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl)
+                let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl, teamCaptainId: captainId)
                 currentTeam.teammates = teammateArray
                 teams.append(currentTeam)
             }
@@ -216,24 +249,25 @@ class LoginController: UIViewController {
             let teamInvitesArray = snapshot.childSnapshot(forPath: "teamInvites")
             for teamObj in teamInvitesArray.children {
                 let currentObj = teamObj as! DataSnapshot
-                let dict = currentObj.value as! [String: Any]
-                let teamName = dict["teamName"] as? String ?? ""
-                let teamId = dict["teamId"] as? String ?? ""
-                let games = dict["games"] as? [String] ?? [String]()
-                let consoles = dict["consoles"] as? [String] ?? [String]()
-                let teammateTags = dict["teammateTags"] as? [String] ?? [String]()
-                let teammateIds = dict["teammateIds"] as? [String] ?? [String]()
+                let dict = currentObj.value as? [String: Any]
+                let teamName = dict?["teamName"] as? String ?? ""
+                let teamId = dict?["teamId"] as? String ?? ""
+                let games = dict?["games"] as? [String] ?? [String]()
+                let consoles = dict?["consoles"] as? [String] ?? [String]()
+                let teammateTags = dict?["teammateTags"] as? [String] ?? [String]()
+                let teammateIds = dict?["teammateIds"] as? [String] ?? [String]()
                 
                 var invites = [TeamInviteObject]()
                 let teamInvites = snapshot.childSnapshot(forPath: "teamInvites")
                 for invite in teamInvites.children{
                     let currentObj = invite as! DataSnapshot
-                    let dict = currentObj.value as! [String: Any]
-                    let gamerTag = dict["gamerTag"] as? String ?? ""
-                    let date = dict["date"] as? String ?? ""
-                    let uid = dict["uid"] as? String ?? ""
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    let teamName = dict?["teamName"] as? String ?? ""
                     
-                    let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid)
+                    let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid, teamName: teamName)
                     invites.append(newInvite)
                 }
                 
@@ -242,29 +276,26 @@ class LoginController: UIViewController {
                     let teammates = currentObj.childSnapshot(forPath: "teammates")
                     for teammate in teammates.children{
                         let currentTeammate = teammate as! DataSnapshot
-                        let dict = currentTeammate.value as! [String: Any]
-                        let gamerTag = dict["gamerTag"] as? String ?? ""
-                        let date = dict["date"] as? String ?? ""
-                        let uid = dict["uid"] as? String ?? ""
+                        let dict = currentTeammate.value as? [String: Any]
+                        let gamerTag = dict?["gamerTag"] as? String ?? ""
+                        let date = dict?["date"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
                         
                         let teammate = TeammateObject(gamerTag: gamerTag, date: date, uid: uid)
                         teammateArray.append(teammate)
                     }
                 }
                 
-                let teamInvitetags = dict["teamInviteTags"] as? [String] ?? [String]()
-                let captain = dict["teamCaptain"] as? String ?? ""
-                let imageUrl = dict["imageUrl"] as? String ?? ""
-                let teamChat = dict["teamChat"] as? String ?? String()
-                let teamNeeds = dict["teamNeeds"] as? [String] ?? [String]()
-                let selectedTeamNeeds = dict["selectedTeamNeeds"] as? [String] ?? [String]()
+                let teamInvitetags = dict?["teamInviteTags"] as? [String] ?? [String]()
+                let captain = dict?["teamCaptain"] as? String ?? ""
+                let imageUrl = dict?["imageUrl"] as? String ?? ""
+                let teamChat = dict?["teamChat"] as? String ?? String()
+                let teamNeeds = dict?["teamNeeds"] as? [String] ?? [String]()
+                let selectedTeamNeeds = dict?["selectedTeamNeeds"] as? [String] ?? [String]()
+                let captainId = dict?["teamCaptainId"] as? String ?? String()
                 
-                let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl)
+                let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl, teamCaptainId: captainId)
                 currentTeam.teammates = teammateArray
-                teams.append(currentTeam)
-                
-                
-                
                 currentTeamInvites.append(currentTeam)
             }
             
@@ -272,29 +303,29 @@ class LoginController: UIViewController {
             let statsArray = snapshot.childSnapshot(forPath: "stats")
             for statObj in statsArray.children {
                 let currentObj = statObj as! DataSnapshot
-                let dict = currentObj.value as! [String: Any]
-                let gameName = dict["gameName"] as? String ?? ""
-                let playerLevelGame = dict["playerLevelGame"] as? String ?? ""
-                let playerLevelPVP = dict["playerLevelPVP"] as? String ?? ""
-                let killsPVP = dict["killsPVP"] as? String ?? ""
-                let killsPVE = dict["killsPVE"] as? String ?? ""
-                let statURL = dict["statURL"] as? String ?? ""
-                let setPublic = dict["setPublic"] as? String ?? ""
-                let authorized = dict["authorized"] as? String ?? ""
-                let currentRank = dict["currentRank"] as? String ?? ""
-                let totalRankedWins = dict["otalRankedWins"] as? String ?? ""
-                let totalRankedLosses = dict["totalRankedLosses"] as? String ?? ""
-                let totalRankedKills = dict["totalRankedKills"] as? String ?? ""
-                let totalRankedDeaths = dict["totalRankedDeaths"] as? String ?? ""
-                let mostUsedAttacker = dict["mostUsedAttacker"] as? String ?? ""
-                let mostUsedDefender = dict["mostUsedDefender"] as? String ?? ""
-                let gearScore = dict["gearScore"] as? String ?? ""
-                let codKills = dict["codKills"] as? String ?? ""
-                let codKd = dict["codKd"] as? String ?? ""
-                let codLevel = dict["codLevel"] as? String ?? ""
-                let codBestKills = dict["codBestKills"] as? String ?? ""
-                let codWins = dict["codWins"] as? String ?? ""
-                let codWlRatio = dict["codWlRatio"] as? String ?? ""
+                let dict = currentObj.value as? [String: Any]
+                let gameName = dict?["gameName"] as? String ?? ""
+                let playerLevelGame = dict?["playerLevelGame"] as? String ?? ""
+                let playerLevelPVP = dict?["playerLevelPVP"] as? String ?? ""
+                let killsPVP = dict?["killsPVP"] as? String ?? ""
+                let killsPVE = dict?["killsPVE"] as? String ?? ""
+                let statURL = dict?["statURL"] as? String ?? ""
+                let setPublic = dict?["setPublic"] as? String ?? ""
+                let authorized = dict?["authorized"] as? String ?? ""
+                let currentRank = dict?["currentRank"] as? String ?? ""
+                let totalRankedWins = dict?["otalRankedWins"] as? String ?? ""
+                let totalRankedLosses = dict?["totalRankedLosses"] as? String ?? ""
+                let totalRankedKills = dict?["totalRankedKills"] as? String ?? ""
+                let totalRankedDeaths = dict?["totalRankedDeaths"] as? String ?? ""
+                let mostUsedAttacker = dict?["mostUsedAttacker"] as? String ?? ""
+                let mostUsedDefender = dict?["mostUsedDefender"] as? String ?? ""
+                let gearScore = dict?["gearScore"] as? String ?? ""
+                let codKills = dict?["codKills"] as? String ?? ""
+                let codKd = dict?["codKd"] as? String ?? ""
+                let codLevel = dict?["codLevel"] as? String ?? ""
+                let codBestKills = dict?["codBestKills"] as? String ?? ""
+                let codWins = dict?["codWins"] as? String ?? ""
+                let codWlRatio = dict?["codWlRatio"] as? String ?? ""
                 
                 let currentStat = StatObject(gameName: gameName)
                 currentStat.authorized = authorized
@@ -324,11 +355,11 @@ class LoginController: UIViewController {
             }
             
             let consoleArray = snapshot.childSnapshot(forPath: "consoles")
-            let dict = consoleArray.value as! [String: Bool]
-            let nintendo = dict["nintendo"] ?? false
-            let ps = dict["ps"] ?? false
-            let xbox = dict["xbox"] ?? false
-            let pc = dict["pc"] ?? false
+            let dict = consoleArray.value as? [String: Bool]
+            let nintendo = dict?["nintendo"] ?? false
+            let ps = dict?["ps"] ?? false
+            let xbox = dict?["xbox"] ?? false
+            let pc = dict?["pc"] ?? false
             
             let user = User(uId: uId)
             user.gamerTags = gamerTags
@@ -348,6 +379,9 @@ class LoginController: UIViewController {
             user.bio = bio
             user.search = search
             user.notifications = notifications
+            user.teamInviteRequests = teamInviteReqs
+            user.subscriptions = subscriptions
+            user.competitions = competitions
             
             DispatchQueue.main.async {
                 let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -382,10 +416,10 @@ class LoginController: UIViewController {
                         let gamerTagsArray = current.childSnapshot(forPath: "gamerTags")
                         for gamerTagObj in gamerTagsArray.children {
                             let currentObj = gamerTagObj as! DataSnapshot
-                            let dict = currentObj.value as! [String: Any]
-                            let currentTag = dict["gamerTag"] as? String ?? ""
-                            let currentGame = dict["game"] as? String ?? ""
-                            let console = dict["console"] as? String ?? ""
+                            let dict = currentObj.value as? [String: Any]
+                            let currentTag = dict?["gamerTag"] as? String ?? ""
+                            let currentGame = dict?["game"] as? String ?? ""
+                            let console = dict?["console"] as? String ?? ""
                             
                             let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
                             gamerTags.append(currentGamerTagObj)
@@ -440,10 +474,10 @@ class LoginController: UIViewController {
                         let gamerTagsArray = current.childSnapshot(forPath: "gamerTags")
                         for gamerTagObj in gamerTagsArray.children {
                             let currentObj = gamerTagObj as! DataSnapshot
-                            let dict = currentObj.value as! [String: Any]
-                            let currentTag = dict["gamerTag"] as? String ?? ""
-                            let currentGame = dict["game"] as? String ?? ""
-                            let console = dict["console"] as? String ?? ""
+                            let dict = currentObj.value as? [String: Any]
+                            let currentTag = dict?["gamerTag"] as? String ?? ""
+                            let currentGame = dict?["game"] as? String ?? ""
+                            let console = dict?["console"] as? String ?? ""
                             
                             let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
                             gamerTags.append(currentGamerTagObj)
@@ -485,7 +519,7 @@ class LoginController: UIViewController {
         }
     }
     
-    private func convertTeamInvites(list: [String], pathString: String, teamName: String){
+    /*private func convertTeamInvites(list: [String], pathString: String, teamName: String){
         var newArray = [TeamInviteObject]()
         let tempRequests = list
         if(!tempRequests.isEmpty){
@@ -502,10 +536,10 @@ class LoginController: UIViewController {
                         let gamerTagsArray = current.childSnapshot(forPath: "gamerTags")
                         for gamerTagObj in gamerTagsArray.children {
                             let currentObj = gamerTagObj as! DataSnapshot
-                            let dict = currentObj.value as! [String: Any]
-                            let currentTag = dict["gamerTag"] as? String ?? ""
-                            let currentGame = dict["game"] as? String ?? ""
-                            let console = dict["console"] as? String ?? ""
+                            let dict = currentObj.value as? [String: Any]
+                            let currentTag = dict?["gamerTag"] as? String ?? ""
+                            let currentGame = dict?["game"] as? String ?? ""
+                            let console = dict?["console"] as? String ?? ""
                             
                             let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
                             gamerTags.append(currentGamerTagObj)
@@ -546,7 +580,7 @@ class LoginController: UIViewController {
                 print(error.localizedDescription)
             }
         }
-    }
+    }*/
 }
 
 extension UITextField {

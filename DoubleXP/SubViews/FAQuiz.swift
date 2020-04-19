@@ -13,7 +13,7 @@ import moa
 import SwiftHTTP
 import SwiftNotificationCenter
 
-class FAQuiz: UIViewController, EMPageViewControllerDelegate, FreeAgentQuizNav {
+class FAQuiz: ParentVC, EMPageViewControllerDelegate, FreeAgentQuizNav {
     var user: User!
     var team: TeamObject?
     var gcGame: GamerConnectGame?

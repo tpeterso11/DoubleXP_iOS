@@ -173,16 +173,16 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
                     uiSwitch.isOn = true
                     
                     if(uiSwitch == self.nintendoSwitch){
-                        console = "Switch"
+                        console = "nintendo"
                     }
                     if(uiSwitch == self.xboxSwitch){
-                        console = "XBox"
+                        console = "xbox"
                     }
                     if(uiSwitch == self.psSwitch){
-                        console = "Playstation"
+                        console = "ps"
                     }
                     if(uiSwitch == self.pcSwitch){
-                        console = "PC"
+                        console = "pc"
                     }
                     
                     consoleChecked = true
@@ -262,10 +262,10 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
                 let gamerTagsArray = snapshot.childSnapshot(forPath: "gamerTags")
                 for gamerTagObj in gamerTagsArray.children {
                     let currentObj = gamerTagObj as! DataSnapshot
-                    let dict = currentObj.value as! [String: Any]
-                    let currentTag = dict["gamerTag"] as? String ?? ""
-                    let currentGame = dict["game"] as? String ?? ""
-                    let console = dict["console"] as? String ?? ""
+                    let dict = currentObj.value as? [String: Any]
+                    let currentTag = dict?["gamerTag"] as? String ?? ""
+                    let currentGame = dict?["game"] as? String ?? ""
+                    let console = dict?["console"] as? String ?? ""
                     
                     let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
                     gamerTags.append(currentGamerTagObj)
@@ -273,11 +273,11 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
                 
                 var profilesUp = [[String: String]]()
                 for profile in gamerTags{
-                    let current = ["gamerTag": profile.gamerTag, "gameName": profile.game, "console": profile.console]
+                    let current = ["gamerTag": profile.gamerTag, "game": profile.game, "console": profile.console]
                     profilesUp.append(current)
                 }
                 
-                let sendUp = ["gamerTag": self.enteredTag, "gameName": self.chosenGame, "console": self.chosenConsole]
+                let sendUp = ["gamerTag": self.enteredTag, "game": self.chosenGame, "console": self.chosenConsole]
                 profilesUp.append(sendUp)
                 
                 userRef.child("gamerTags").setValue(profilesUp)
@@ -307,11 +307,18 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         
         let currentGame = getGameInfo(selectedGame: chosenGame)
         
+        let formatter = DateFormatter()
+        //2016-12-08 03:37:22 +0000
+        //formatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+        formatter.dateFormat = "MM-dd-yyyy"
+        let now = Date()
+        let dateString = formatter.string(from:now)
+        
         var teammates = [TeammateObject]()
-        let captain = TeammateObject(gamerTag: self.enteredTag, date: "", uid: user!.uId)
+        let captain = TeammateObject(gamerTag: self.enteredTag, date: dateString, uid: user!.uId)
         teammates.append(captain)
         
-        let newTeam = TeamObject(teamName: teamName.text!, teamId: randomAlphaNumericString(length: 12), games: selected, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: self.enteredTag, teamInvites: [TeamInviteObject](), teamChat: "", teamInviteTags: [String](), teamNeeds: currentGame?.teamNeeds ?? [String](), selectedTeamNeeds: [String](), imageUrl: currentGame?.imageUrl ?? "")
+        let newTeam = TeamObject(teamName: teamName.text!, teamId: randomAlphaNumericString(length: 12), games: selected, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: self.enteredTag, teamInvites: [TeamInviteObject](), teamChat: "", teamInviteTags: [String](), teamNeeds: currentGame?.teamNeeds ?? [String](), selectedTeamNeeds: [String](), imageUrl: currentGame?.imageUrl ?? "", teamCaptainId: delegate.currentUser!.uId)
         newTeam.teammates = teammates
         
         createTeam(team: newTeam)
@@ -336,14 +343,23 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         
         let currentGame = getGameInfo(selectedGame: chosenGame)
         
+        let formatter = DateFormatter()
+        //2016-12-08 03:37:22 +0000
+        //formatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+        formatter.dateFormat = "MM-dd-yyyy"
+        let now = Date()
+        let dateString = formatter.string(from:now)
+        
         var teammates = [TeammateObject]()
-        let captain = TeammateObject(gamerTag: manager.getGamerTagForGame(gameName: currentGame!.gameName), date: "", uid: user!.uId)
+        let captain = TeammateObject(gamerTag: manager.getGamerTagForGame(gameName: currentGame!.gameName), date: dateString, uid: user!.uId)
         teammates.append(captain)
         
-        let newTeam = TeamObject(teamName: teamName.text!, teamId: randomAlphaNumericString(length: 12), games: selected, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: manager.getGamerTagForGame(gameName: chosenGame), teamInvites: [TeamInviteObject](), teamChat: "", teamInviteTags: [String](), teamNeeds: currentGame?.teamNeeds ?? [String](), selectedTeamNeeds: [String](), imageUrl: currentGame?.imageUrl ?? "")
-        newTeam.teammates = teammates
-        
-        createTeam(team: newTeam)
+        if(!self.chosenGame.isEmpty){
+            let newTeam = TeamObject(teamName: teamName.text!, teamId: randomAlphaNumericString(length: 12), games: selected, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: manager.getGamerTagForGame(gameName: chosenGame), teamInvites: [TeamInviteObject](), teamChat: "", teamInviteTags: [String](), teamNeeds: currentGame?.teamNeeds ?? [String](), selectedTeamNeeds: [String](), imageUrl: currentGame?.imageUrl ?? "", teamCaptainId: delegate.currentUser!.uId)
+            newTeam.teammates = teammates
+            
+            createTeam(team: newTeam)
+        }
     }
     
     private func showDrawer(){
@@ -490,12 +506,12 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let currentCell = collectionView.cellForItem(at: indexPath as IndexPath) as! homeGCCell
         
-        self.chosenGame = ""
-        
         if(self.selectedCells.contains(self.gcGames[indexPath.item].gameName)){
             self.selectedCells.remove(at: self.selectedCells.index(of: self.gcGames[indexPath.item].gameName)!)
             currentCell.cover.isHidden = true
             currentCell.hook.isHidden = true
+            
+            self.chosenGame = ""
         }
         else{
             self.selectedCells = [String]()
@@ -530,6 +546,15 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         }
     }
     
+    func connectionFailed() {
+        DispatchQueue.main.async {
+            let manager = MessagingManager()
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let user = appDelegate.currentUser
+            manager.createTeamChannel(userId: user!.uId, callbacks: self)
+        }
+    }
+    
     func createTeamChannelSuccessful(groupChannel: SBDGroupChannel) {
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let user = delegate.currentUser
@@ -543,8 +568,9 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
             teammates.append(current)
         }
         
-        tempPayload = ["teamName": team.teamName, "teamId": team.teamId, "games": team.games, "consoles": team.consoles, "teammateTags": team.teammateTags, "teammateIds": team.teammateIds, "teamCaptain": team.teamCaptain, "teamInvites": team.teamInvites, "teamChat": groupChannel.channelUrl, "teamInviteTags": team.teamInviteTags, "teamNeeds": team.teamNeeds, "selectedTeamNeeds": team.selectedTeamNeeds, "imageUrl": team.imageUrl, "teammates": teammates] as [String : Any]
+        tempPayload = ["teamName": team.teamName, "teamId": team.teamId, "games": team.games, "consoles": team.consoles, "teammateTags": team.teammateTags, "teammateIds": team.teammateIds, "teamCaptain": team.teamCaptain, "teamInvites": team.teamInvites, "teamChat": groupChannel.channelUrl, "teamInviteTags": team.teamInviteTags, "teamNeeds": team.teamNeeds, "selectedTeamNeeds": team.selectedTeamNeeds, "imageUrl": team.imageUrl, "teammates": teammates, "teamCaptainId": delegate.currentUser!.uId] as [String : Any]
         
+        team.teamChat = groupChannel.channelUrl
         user?.teams.append(team)
         ref.child(team.teamName).setValue(tempPayload)
         userRef.child("teams").child(team.teamName).setValue(tempPayload)
@@ -558,6 +584,49 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         }
         
         AppEvents.logEvent(AppEvents.Name(rawValue: "Create Frag - Team Created With Chat"))
+    }
+    
+    func createTeamChannelFail() {
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let user = delegate.currentUser
+        let ref = Database.database().reference().child("Teams")
+        let userRef = Database.database().reference().child("Users").child(user!.uId)
+        let team = self.setupTeamObj!
+        
+        var teammates = [Dictionary<String, String>]()
+        for teammate in team.teammates{
+            let current = ["gamerTag": teammate.gamerTag, "date": teammate.date, "uid": teammate.uid]
+            teammates.append(current)
+        }
+        
+        tempPayload = ["teamName": team.teamName, "teamId": team.teamId, "games": team.games, "consoles": team.consoles, "teammateTags": team.teammateTags, "teammateIds": team.teammateIds, "teamCaptain": team.teamCaptain, "teamInvites": team.teamInvites, "teamChat": "", "teamInviteTags": team.teamInviteTags, "teamNeeds": team.teamNeeds, "selectedTeamNeeds": team.selectedTeamNeeds, "imageUrl": team.imageUrl, "teammates": teammates] as [String : Any]
+        
+        user?.teams.append(team)
+        ref.child(team.teamName).setValue(tempPayload)
+        userRef.child("teams").child(team.teamName).setValue(tempPayload)
+        
+        let currentLanding = delegate.currentLanding
+        if (!self.setupTeamObj!.teamNeeds.isEmpty){
+            currentLanding?.stackDepth -= 1
+            currentLanding?.navigateToTeamNeeds(team: self.setupTeamObj!)
+        }
+        else{
+            currentLanding?.stackDepth -= 1
+            currentLanding?.navigateToTeamDashboard(team: self.setupTeamObj!, newTeam: true)
+        }
+        
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Create Frag - Team Created With Chat"))
+    }
+    
+    
+    func errorLoadingMessages() {
+    }
+    
+    func createTeamChannelFailed(){
+        createTeamChannelFail()
+    }
+    
+    func errorLoadingChannel() {
     }
     
     func messageSuccessfullyReceived(message: SBDUserMessage) {

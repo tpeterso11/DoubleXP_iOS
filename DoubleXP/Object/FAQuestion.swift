@@ -354,6 +354,16 @@ class FAQuestion: NSObject, NSCoding {
         }
     }
     
+    var _teamNeedQuestion = ""
+    var teamNeedQuestion: String {
+        get {
+            return (_teamNeedQuestion)
+        }
+        set (newVal) {
+            _teamNeedQuestion = newVal
+        }
+    }
+    
     var _questionDescription = ""
     var questionDescription: String {
         get {
@@ -424,6 +434,7 @@ class FAQuestion: NSObject, NSCoding {
         self.question1SetURL = (decoder.decodeObject(forKey: "question1SetURL") as! String)
         self.option1Description = (decoder.decodeObject(forKey: "option1Description") as! String)
         self.option1 = (decoder.decodeObject(forKey: "option1") as! String)
+        self.teamNeedQuestion = (decoder.decodeObject(forKey: "teamNeedQuestion") as! String)
     }
 
     func encode(with coder: NSCoder) {
@@ -448,5 +459,6 @@ class FAQuestion: NSObject, NSCoding {
         coder.encode(self.question1SetURL, forKey: "question1SetURL")
         coder.encode(self.option1Description, forKey: "option1Description")
         coder.encode(self.option1, forKey: "option1")
+        coder.encode(self.teamNeedQuestion, forKey: "teamNeedQuestion")
     }
 }

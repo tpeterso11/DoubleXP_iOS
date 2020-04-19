@@ -27,6 +27,7 @@ class ViewTeamsFoldingCell: FoldingCell, UICollectionViewDataSource, UICollectio
     private var gameName = ""
     private var currentTeam: TeamObject?
     private var currentCollection: UITableView?
+    private var set = false
     
     override func awakeFromNib() {
         foregroundView.layer.cornerRadius = 10
@@ -57,14 +58,25 @@ class ViewTeamsFoldingCell: FoldingCell, UICollectionViewDataSource, UICollectio
         
         self.profiles.append(contentsOf: profiles)
         
-        
         if(!team.teamNeeds.isEmpty){
             if(!team.selectedTeamNeeds.isEmpty){
+                self.selectedNeeds = [String]()
                 self.selectedNeeds.append("needs_header_one")
                 self.selectedNeeds.append(contentsOf: team.selectedTeamNeeds)
                 needsCollection.isHidden = false
-                needsCollection.delegate = self
-                needsCollection.dataSource = self
+                
+                if(!set){
+                    needsCollection.delegate = self
+                    needsCollection.dataSource = self
+                    
+                    self.set = true
+                }
+                else{
+                    needsCollection.reloadData()
+                }
+            }
+            else{
+                needsCollection.isHidden = true
             }
         }
         else{
@@ -82,55 +94,80 @@ class ViewTeamsFoldingCell: FoldingCell, UICollectionViewDataSource, UICollectio
             }
         }
         
-        //if this user has a game profile for this game AND the current teams' team needs are not empty
-        if(contained && (!self.currentTeam!.teamNeeds.isEmpty && !self.currentTeam!.selectedTeamNeeds.isEmpty)){
-            if(self.currentTeam!.selectedTeamNeeds.contains((containedProfile?.questions[0][0])!)){
-                //match team needs
+        if(isRequested(team: team)){
+            self.setRequested(indexPath: indexPath)
+            self.isUserInteractionEnabled = false
+        }
+        else{
+            self.isUserInteractionEnabled = true
+            //if this user has a game profile for this game AND the current teams' team needs are not empty
+            if(contained && (!self.currentTeam!.teamNeeds.isEmpty && !self.currentTeam!.selectedTeamNeeds.isEmpty)){
+                var answer = containedProfile?.questions[0][0]
+                if(self.currentTeam!.selectedTeamNeeds.contains((containedProfile?.questions[0][1])!)){
+                    //match team needs
+                    self.sendButton.tag = indexPath.item
+                    self.sendButton.addTarget(self, action: #selector(sendRequest), for: .touchUpInside)
+                    
+                    self.statusText.text = " send a request to join this team."
+                    self.createButton.isHidden = true
+                }
+                else{
+                    //do not match team needs
+                    self.statusText.text = " you do not have a profile that matches this teams needs."
+                    self.createButton.isHidden = false
+                    self.sendButton.alpha = 0.4
+                    self.sendButton.isUserInteractionEnabled = false
+                    
+                    self.createButton.addTarget(self, action: #selector(createProfile), for: .touchUpInside)
+                }
+                //else need to handle change to "You do not fit this teams needs"
+            }
+            else if(contained && (self.currentTeam!.teamNeeds.isEmpty || (!self.currentTeam!.teamNeeds.isEmpty && self.currentTeam!.selectedTeamNeeds.isEmpty))){
+                //if this user has a game profile for this game AND there are no team needs. Anyone can join.
                 self.sendButton.tag = indexPath.item
                 self.sendButton.addTarget(self, action: #selector(sendRequest), for: .touchUpInside)
                 
-                self.statusText.text = " send a request to join this team."
                 self.createButton.isHidden = true
+                self.statusText.text = " send a request to join this team."
             }
             else{
-                //do not match team needs
-                self.statusText.text = " you do not have a profile that matches this teams needs."
-                self.createButton.isHidden = false
-                self.sendButton.alpha = 0.4
-                self.sendButton.isUserInteractionEnabled = false
-                
-                self.createButton.addTarget(self, action: #selector(createProfile), for: .touchUpInside)
-            }
-            //else need to handle change to "You do not fit this teams needs"
-        }
-        else if(contained && (self.currentTeam!.teamNeeds.isEmpty || (!self.currentTeam!.teamNeeds.isEmpty && self.currentTeam!.selectedTeamNeeds.isEmpty))){
-            //if this user has a game profile for this game AND there are no team needs. Anyone can join.
-            self.sendButton.tag = indexPath.item
-            self.sendButton.addTarget(self, action: #selector(sendRequest), for: .touchUpInside)
-            
-            self.createButton.isHidden = true
-            self.statusText.text = " send a request to join this team."
-        }
-        else{
-            //if this gamer does not have a game profile for this game AND there are team needs.
-            if(!contained && (!self.currentTeam!.teamNeeds.isEmpty && !self.currentTeam!.selectedTeamNeeds.isEmpty)){
-                self.statusText.text = " you do not have a profile that matches this teams needs."
-                self.createButton.isHidden = false
-                self.sendButton.alpha = 0.4
-                self.sendButton.isUserInteractionEnabled = false
-                
-                self.createButton.addTarget(self, action: #selector(createProfile), for: .touchUpInside)
-            }
-            else{
-                //if not contained and no team needs, they still need a profile to request
-                self.createButton.isHidden = false
-                self.sendButton.alpha = 0.4
-                self.sendButton.isUserInteractionEnabled = false
-                
-                self.createButton.addTarget(self, action: #selector(createProfile), for: .touchUpInside)
-                self.statusText.text = " need a profile to request to join this team."
+                //if this gamer does not have a game profile for this game AND there are team needs.
+                if(!contained && (!self.currentTeam!.teamNeeds.isEmpty && !self.currentTeam!.selectedTeamNeeds.isEmpty)){
+                    self.statusText.text = " you do not have a profile that matches this teams needs."
+                    self.createButton.isHidden = false
+                    self.sendButton.alpha = 0.4
+                    self.sendButton.isUserInteractionEnabled = false
+                    
+                    self.createButton.addTarget(self, action: #selector(createProfile), for: .touchUpInside)
+                }
+                else{
+                    //if not contained and no team needs, they still need a profile to request
+                    self.createButton.isHidden = false
+                    self.sendButton.alpha = 0.4
+                    self.sendButton.isUserInteractionEnabled = false
+                    
+                    self.createButton.addTarget(self, action: #selector(createProfile), for: .touchUpInside)
+                    self.statusText.text = " need a profile to request to join this team."
+                }
             }
         }
+    }
+    
+    func isRequested(team: TeamObject) -> Bool{
+        var requested = false
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        for request in team.requests{
+            if(request.profile.userId == delegate.currentUser!.uId){
+                for request in team.requests{
+                    if(request.profile.userId == delegate.currentUser!.uId){
+                        requested = true
+                        break
+                    }
+                }
+            }
+        }
+        
+        return requested
     }
     
     override func animationDuration(_ itemIndex: NSInteger, type _: FoldingCell.AnimationType) -> TimeInterval {
@@ -205,6 +242,22 @@ class ViewTeamsFoldingCell: FoldingCell, UICollectionViewDataSource, UICollectio
         self.currentCollection?.delegate?.tableView!(self.currentCollection!, didSelectRowAt: indexPath)
         
         self.requestStatusOverlay.backgroundColor = #colorLiteral(red: 0.2039215686, green: 0.7803921569, blue: 0.3490196078, alpha: 0.8515089897)
+        self.requestStatus.text = "requested."
+        
+        UIView.animate(withDuration: 0.8, delay: 0.5, options: [], animations: {
+            self.requestStatusOverlay.alpha = 1
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.8, delay: 0.2, options: [], animations: {
+                self.isUserInteractionEnabled = false
+            }, completion: nil)
+        })
+    }
+    
+    func setRequested(indexPath: IndexPath){
+        self.currentCollection?.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+        self.currentCollection?.delegate?.tableView!(self.currentCollection!, didSelectRowAt: indexPath)
+        
+        self.requestStatusOverlay.backgroundColor = #colorLiteral(red: 0.177384913, green: 0.172250092, blue: 0.1810538173, alpha: 0.7015999572)
         self.requestStatus.text = "requested."
         
         UIView.animate(withDuration: 0.8, delay: 0.5, options: [], animations: {

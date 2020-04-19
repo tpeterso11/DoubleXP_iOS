@@ -49,13 +49,15 @@ class FriendsManager{
                 pendingArray.append(contentsOf: pendingFriendsArray)
             }
             
-            let date = Date()
-            let formatter = DateFormatter()
-            formatter.dateFormat = "MMMM.dd.yyyy"
-            let result = formatter.string(from: date)
+           let formatter = DateFormatter()
+            //2016-12-08 03:37:22 +0000
+            //formatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+            formatter.dateFormat = "MM-dd-yyyy"
+            let now = Date()
+            let dateString = formatter.string(from:now)
             
             //gamerTag is the currentUsers gamertag, the one making the request.
-            let otherUserfriendRequest = FriendRequestObject(gamerTag: manager.getGamerTag(user: currentUser!), date: result, uid: currentUser!.uId)
+            let otherUserfriendRequest = FriendRequestObject(gamerTag: manager.getGamerTag(user: currentUser!), date: dateString, uid: currentUser!.uId)
             
             pendingArray.append(otherUserfriendRequest)
             
@@ -74,7 +76,7 @@ class FriendsManager{
                 sendingArray.append(contentsOf: sentFriends)
             }
             
-            let currentUserSentRequest = FriendRequestObject(gamerTag: manager.getGamerTag(user: otherUser), date: result, uid: otherUser.uId)
+            let currentUserSentRequest = FriendRequestObject(gamerTag: manager.getGamerTag(user: otherUser), date: dateString, uid: otherUser.uId)
             sendingArray.append(currentUserSentRequest)
             
             var sendList = [[String: Any]]()
@@ -116,10 +118,10 @@ class FriendsManager{
                     let friendsArray = snapshot.childSnapshot(forPath: "pending_friends")
                     for friend in friendsArray.children{
                         let currentObj = friend as! DataSnapshot
-                        let dict = currentObj.value as! [String: Any]
-                        let gamerTag = dict["gamerTag"] as? String ?? ""
-                        let date = dict["date"] as? String ?? ""
-                        let uid = dict["uid"] as? String ?? ""
+                        let dict = currentObj.value as? [String: Any]
+                        let gamerTag = dict?["gamerTag"] as? String ?? ""
+                        let date = dict?["date"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
                         
                         let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
                         pendingRequests.append(newFriend)
@@ -151,8 +153,8 @@ class FriendsManager{
                 var contained = false
                 if(currentFriends != nil){
                     for friend in currentFriends!{
-                        let dict = friend.value as! [String: String]
-                        let newFriend = FriendObject(gamerTag: dict["gamerTag"]!, date: dict["date"]!, uid: dict["uId"]!)
+                        let dict = friend.value as? [String: String]
+                        let newFriend = FriendObject(gamerTag: dict?["gamerTag"] ?? "", date: dict?["date"] ?? "", uid: dict?["uId"] ?? "")
                         
                         friends[newFriend.uid] = newFriend
                     }
@@ -166,12 +168,14 @@ class FriendsManager{
                 }
                 
                 if(!contained){
-                    let date = Date()
                     let formatter = DateFormatter()
-                    formatter.dateFormat = "MMMM.dd.yyyy"
-                    let result = formatter.string(from: date)
+                    //2016-12-08 03:37:22 +0000
+                    //formatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+                    formatter.dateFormat = "MM-dd-yyyy"
+                    let now = Date()
+                    let dateString = formatter.string(from:now)
                     
-                    let newFriend = FriendObject(gamerTag: otherUserRequest.gamerTag, date: result, uid: otherUserRequest.uid)
+                    let newFriend = FriendObject(gamerTag: otherUserRequest.gamerTag, date: dateString, uid: otherUserRequest.uid)
                     
                     friends[otherUserRequest.uid] = newFriend
                     
@@ -207,10 +211,10 @@ class FriendsManager{
                 let requestsArray = snapshot.childSnapshot(forPath: "sent_requests")
                 for request in requestsArray.children{
                     let currentObj = request as! DataSnapshot
-                    let dict = currentObj.value as! [String: Any]
-                    let gamerTag = dict["gamerTag"] as? String ?? ""
-                    let date = dict["date"] as? String ?? ""
-                    let uid = dict["uid"] as? String ?? ""
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
                     
                     let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
                     tempArray.append(newFriend)
@@ -230,7 +234,6 @@ class FriendsManager{
                 }
                 
                 ref.child("sent_requests").setValue(sendList)
-                currentUser!.sentRequests = tempArray
                 
                 
                 //Next, let's add the other user to the CURRENT user's friends.
@@ -239,8 +242,8 @@ class FriendsManager{
                 var friends = [String: FriendObject]()
                 if(currentFriends != nil){
                     for friend in currentFriends!{
-                        let dict = friend.value as! [String: String]
-                        let newFriend = FriendObject(gamerTag: dict["gamerTag"]!, date: dict["date"]!, uid: dict["uId"]!)
+                        let dict = friend.value as? [String: String]
+                        let newFriend = FriendObject(gamerTag: dict?["gamerTag"] ?? "", date: dict?["date"] ?? "", uid: dict?["uId"] ?? "")
                         
                         friends[newFriend.uid] = newFriend
                     }
@@ -254,12 +257,14 @@ class FriendsManager{
                 }
                 
                 if(!contained){
-                    let date = Date()
                     let formatter = DateFormatter()
-                    formatter.dateFormat = "MMMM.dd.yyyy"
-                    let result = formatter.string(from: date)
+                    //2016-12-08 03:37:22 +0000
+                    //formatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+                    formatter.dateFormat = "MM-dd-yyyy"
+                    let now = Date()
+                    let dateString = formatter.string(from:now)
                     
-                    let newFriend = FriendObject(gamerTag: manager.getGamerTag(user: currentUser!), date: result, uid: currentUser!.uId)
+                    let newFriend = FriendObject(gamerTag: manager.getGamerTag(user: currentUser!), date: dateString, uid: currentUser!.uId)
                     
                     friends[currentUser!.uId] = newFriend
                     
@@ -296,10 +301,10 @@ class FriendsManager{
                 let friendsArray = snapshot.childSnapshot(forPath: "pending_friends")
                     for friend in friendsArray.children{
                         let currentObj = friend as! DataSnapshot
-                        let dict = currentObj.value as! [String: Any]
-                        let gamerTag = dict["gamerTag"] as? String ?? ""
-                        let date = dict["date"] as? String ?? ""
-                        let uid = dict["uid"] as? String ?? ""
+                        let dict = currentObj.value as? [String: Any]
+                        let gamerTag = dict?["gamerTag"] as? String ?? ""
+                        let date = dict?["date"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
                         
                         let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
                         pendingRequests.append(newFriend)
@@ -347,10 +352,10 @@ class FriendsManager{
                 let requestsArray = snapshot.childSnapshot(forPath: "sent_requests")
                 for request in requestsArray.children{
                     let currentObj = request as! DataSnapshot
-                    let dict = currentObj.value as! [String: Any]
-                    let gamerTag = dict["gamerTag"] as? String ?? ""
-                    let date = dict["date"] as? String ?? ""
-                    let uid = dict["uid"] as? String ?? ""
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
                     
                     let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
                     tempArray.append(newFriend)
@@ -393,12 +398,14 @@ class FriendsManager{
                     let sentRequests = value?["sent_requests"] as? [String] ?? [String]()
                     if(!sentRequests.isEmpty){
                         for request in sentRequests{
-                            let date = Date()
                             let formatter = DateFormatter()
-                            formatter.dateFormat = "MMMM.dd.yyyy"
-                            let result = formatter.string(from: date)
+                            //2016-12-08 03:37:22 +0000
+                            //formatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+                            formatter.dateFormat = "MM-dd-yyyy"
+                            let now = Date()
+                            let dateString = formatter.string(from:now)
                             
-                            let fixedRequest = FriendRequestObject(gamerTag: request, date: result, uid: user.uId)
+                            let fixedRequest = FriendRequestObject(gamerTag: request, date: dateString, uid: user.uId)
                             
                             sentArray.append(fixedRequest)
                         }
@@ -413,10 +420,10 @@ class FriendsManager{
                     let friendsArray = snapshot.childSnapshot(forPath: "sent_requests")
                     for friend in friendsArray.children{
                         let currentObj = friend as! DataSnapshot
-                        let dict = currentObj.value as! [String: Any]
-                        let gamerTag = dict["gamerTag"] as? String ?? ""
-                        let date = dict["date"] as? String ?? ""
-                        let uid = dict["uid"] as? String ?? ""
+                        let dict = currentObj.value as? [String: Any]
+                        let gamerTag = dict?["gamerTag"] as? String ?? ""
+                        let date = dict?["date"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
                         
                         let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
                         sentRequests.append(newFriend)
@@ -436,10 +443,10 @@ class FriendsManager{
                 let friendsArray = snapshot.childSnapshot(forPath: "friends")
                 for friend in friendsArray.children{
                     let currentObj = friend as! DataSnapshot
-                    let dict = currentObj.value as! [String: Any]
-                    let gamerTag = dict["gamerTag"] as? String ?? ""
-                    let date = dict["date"] as? String ?? ""
-                    let uid = dict["uid"] as? String ?? ""
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
                     
                     let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
                     friends.append(newFriend)
@@ -496,63 +503,49 @@ class FriendsManager{
         let ref = Database.database().reference().child("Users").child(otherUserRequest.uid)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             if(snapshot.exists()){
+                //first, remove sent request
+                var tempArray = [FriendRequestObject]()
+                let requestsArray = snapshot.childSnapshot(forPath: "sent_requests")
+                for request in requestsArray.children{
+                    let currentObj = request as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    
+                    let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
+                    tempArray.append(newFriend)
+                }
+                
+                for request in tempArray{
+                    if(request.uid == currentUserUid){
+                        tempArray.remove(at: tempArray.index(of: request)!)
+                        break
+                    }
+                }
+                
+                var reqSendList = [[String: Any]]()
+                for request in tempArray{
+                    let current = ["gamerTag": request.gamerTag, "date": request.date, "uid": request.uid] as [String : String]
+                    reqSendList.append(current)
+                }
+                
+                ref.child("sent_requests").setValue(reqSendList)
+                
                 let value = snapshot.value as? NSDictionary
-                if(value?["pending_friends"] is [String]){
-                    var pendingRequests = value?["pending_friends"] as? [String] ?? [String]()
-                    if(!pendingRequests.isEmpty){
-                        for request in pendingRequests{
-                            if(request == manager.getGamerTag(user: currentUser!)){
-                                pendingRequests = pendingRequests.filter { $0 != manager.getGamerTag(user: currentUser!)}
-                            }
-                        }
-                        
-                        ref.child("pending_friends").setValue(pendingRequests)
-                    }
-                }
-                else{
-                    var pendingRequests = [FriendRequestObject]()
-                    let friendsArray = snapshot.childSnapshot(forPath: "pending_friends")
-                    for friend in friendsArray.children{
-                        let currentObj = friend as! DataSnapshot
-                        let dict = currentObj.value as! [String: Any]
-                        let gamerTag = dict["gamerTag"] as? String ?? ""
-                        let date = dict["date"] as? String ?? ""
-                        let uid = dict["uid"] as? String ?? ""
-                        
-                        let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
-                        pendingRequests.append(newFriend)
-                    }
-                    
-                    
-                    if(!pendingRequests.isEmpty){
-                        for request in pendingRequests{
-                            if(request.uid == currentUserUid){
-                                pendingRequests = pendingRequests.filter { $0 != request}
-                                break
-                            }
-                        }
-                    }
-                    
-                    var sendList = [[String: Any]]()
-                    for request in pendingRequests{
-                        let current = ["gamerTag": request.gamerTag, "date": request.date, "uid": request.uid] as [String : String]
-                        sendList.append(current)
-                    }
-                    
-                    ref.child("pending_friends").setValue(sendList)
-                    currentUser!.pendingRequests = pendingRequests
-                }
                 
                 //Next, let's add the current user to the OTHER user's friends.
                 //var friends = value?["friends"] as? [String] ?? [String]()
                 let currentFriends = value?["friends"] as? NSDictionary
                 var friends = [String: FriendObject]()
                 
-                for friend in currentFriends!{
-                    let dict = friend.value as! [String: String]
-                    let newFriend = FriendObject(gamerTag: dict["gamerTag"]!, date: dict["date"]!, uid: dict["uId"]!)
-                    
-                    friends[newFriend.uid] = newFriend
+                if(currentFriends != nil){
+                    for friend in currentFriends!{
+                        let dict = friend.value as? [String: String]
+                        let newFriend = FriendObject(gamerTag: dict?["gamerTag"] ?? "", date: dict?["date"] ?? "", uid: dict?["uId"] ?? "")
+                        
+                        friends[newFriend.uid] = newFriend
+                    }
                 }
                 
                 var contained = false
@@ -564,12 +557,14 @@ class FriendsManager{
                 }
                 
                 if(!contained){
-                    let date = Date()
                     let formatter = DateFormatter()
-                    formatter.dateFormat = "MMMM.dd.yyyy"
-                    let result = formatter.string(from: date)
+                    //2016-12-08 03:37:22 +0000
+                    //formatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+                    formatter.dateFormat = "MM-dd-yyyy"
+                    let now = Date()
+                    let dateString = formatter.string(from:now)
                     
-                    let newFriend = FriendObject(gamerTag: manager.getGamerTag(user: currentUser!), date: result, uid: currentUser!.uId)
+                    let newFriend = FriendObject(gamerTag: manager.getGamerTag(user: currentUser!), date: dateString, uid: currentUser!.uId)
                     
                     friends[currentUser!.uId] = newFriend
                 }
@@ -596,55 +591,59 @@ class FriendsManager{
         let ref = Database.database().reference().child("Users").child(currentUserUid)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             if(snapshot.exists()){
-                let delegate = UIApplication.shared.delegate as! AppDelegate!
-                let currentUser = delegate?.currentUser
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                let currentUser = delegate.currentUser
                 let manager = GamerProfileManager()
                 
-                var tempList = [FriendRequestObject]()
                 let value = snapshot.value as? NSDictionary
-                let pendingArray = snapshot.childSnapshot(forPath: "sent_requests")
-                for request in pendingArray.children{
-                    let currentObj = request as! DataSnapshot
-                    let dict = currentObj.value as! [String: Any]
-                    let date = dict["date"] as? String ?? ""
-                    let tag = dict["gamerTag"] as? String ?? ""
-                    let uid = dict["uid"] as? String ?? ""
+                var pendingRequests = [FriendRequestObject]()
+                let friendsArray = snapshot.childSnapshot(forPath: "pending_friends")
+                for friend in friendsArray.children{
+                    let currentObj = friend as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
                     
-                    let request = FriendRequestObject(gamerTag: tag, date: date, uid: uid)
-                    tempList.append(request)
+                    let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
+                    pendingRequests.append(newFriend)
                 }
                 
-                for request in tempList{
-                    if(request.uid == otherUserRequest.uid){
-                        tempList.remove(at: tempList.index(of: request)!)
-                        break
+                
+                if(!pendingRequests.isEmpty){
+                    for request in pendingRequests{
+                        if(request.uid == otherUserRequest.uid){
+                            pendingRequests.remove(at: pendingRequests.index(of: request)!)
+                            break
+                        }
                     }
                 }
                 
-                var sendList = [[String: Any]]()
-                for request in tempList{
+                var pendingSendList = [[String: Any]]()
+                for request in pendingRequests{
                     let current = ["gamerTag": request.gamerTag, "date": request.date, "uid": request.uid] as [String : String]
-                    sendList.append(current)
+                    pendingSendList.append(current)
                 }
                 
-                ref.child("sent_requests").setValue(sendList)
-                currentUser!.sentRequests = tempList
-                
+                ref.child("pending_friends").setValue(pendingSendList)
+                currentUser!.pendingRequests = pendingRequests
                 
                 //Next, let's add the other user to the CURRENT user's friends.
                 let currentFriends = value?["friends"] as? NSDictionary
                 var friends = [String: FriendObject]()
                 
-                for friend in currentFriends!{
-                    let dict = friend.value as! [String: String]
-                    let newFriend = FriendObject(gamerTag: dict["gamerTag"]!, date: dict["date"]!, uid: dict["uId"]!)
-                    
-                    friends[newFriend.uid] = newFriend
+                if(currentFriends != nil){
+                    for friend in currentFriends!{
+                        let dict = friend.value as? [String: String]
+                        let newFriend = FriendObject(gamerTag: dict?["gamerTag"] ?? "", date: dict?["date"] ?? "", uid: dict?["uId"] ?? "")
+                        
+                        friends[newFriend.uid] = newFriend
+                    }
                 }
                 
                 var contained = false
                 for friend in friends{
-                    if(friend.key == currentUser!.uId){
+                    if(friend.key == otherUserRequest.uid){
                         contained = true
                         break
                     }
@@ -652,14 +651,16 @@ class FriendsManager{
                 
                 if(!contained){
                     //if the friend is not already there, add. Then send.
-                    let date = Date()
                     let formatter = DateFormatter()
-                    formatter.dateFormat = "MMMM.dd.yyyy"
-                    let result = formatter.string(from: date)
+                    //2016-12-08 03:37:22 +0000
+                    //formatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+                    formatter.dateFormat = "MM-dd-yyyy"
+                    let now = Date()
+                    let dateString = formatter.string(from:now)
                     
-                    let newFriend = FriendObject(gamerTag: manager.getGamerTag(user: currentUser!), date: result, uid: currentUser!.uId)
+                    let newFriend = FriendObject(gamerTag: otherUserRequest.gamerTag, date: dateString, uid: otherUserRequest.uid)
                     
-                    friends[currentUser!.uId] = newFriend
+                    friends[otherUserRequest.uid] = newFriend
                     
                     var sendList = [[String: Any]]()
                     for friend in friends{
@@ -717,10 +718,10 @@ class FriendsManager{
                     var tempList = [FriendRequestObject]()
                     for friend in pendingArray.children{
                         let currentObj = friend as! DataSnapshot
-                        let dict = currentObj.value as! [String: Any]
-                        let date = dict["date"] as? String ?? ""
-                        let tag = dict["gamerTag"] as? String ?? ""
-                        let uid = dict["uid"] as? String ?? ""
+                        let dict = currentObj.value as? [String: Any]
+                        let date = dict?["date"] as? String ?? ""
+                        let tag = dict?["gamerTag"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
                         
                         let request = FriendRequestObject(gamerTag: tag, date: date, uid: uid)
                         tempList.append(request)

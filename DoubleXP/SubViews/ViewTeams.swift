@@ -44,13 +44,6 @@ class ViewTeams: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate,
         gcGameList.delegate = self
         gcGameList.dataSource = self
         
-        gcGameList.layer.shadowColor = UIColor.black.cgColor
-        gcGameList.layer.shadowOffset = CGSize(width: 0, height: 5.0)
-        gcGameList.layer.shadowRadius = 2.0
-        gcGameList.layer.shadowOpacity = 0.5
-        gcGameList.layer.masksToBounds = false
-        gcGameList.layer.shadowPath = UIBezierPath(roundedRect: gcGameList.bounds, cornerRadius: gcGameList.layer.cornerRadius).cgPath
-        
         let delegate = UIApplication.shared.delegate as! AppDelegate
         gcGames.append(contentsOf: delegate.gcGames)
         
@@ -97,13 +90,13 @@ class ViewTeams: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate,
             if(snapshot.exists()){
                 for profile in snapshot.children{
                     let currentProfile = profile as! DataSnapshot
-                    let dict = currentProfile.value as! [String: Any]
-                    let game = dict["game"] as? String ?? ""
-                    let consoles = dict["consoles"] as? [String] ?? [String]()
-                    let gamerTag = dict["gamerTag"] as? String ?? ""
-                    let competitionId = dict["competitionId"] as? String ?? ""
-                    let userId = dict["userId"] as? String ?? ""
-                    let questions = dict["questions"] as? [[String]] ?? [[String]]()
+                    let dict = currentProfile.value as? [String: Any]
+                    let game = dict?["game"] as? String ?? ""
+                    let consoles = dict?["consoles"] as? [String] ?? [String]()
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let competitionId = dict?["competitionId"] as? String ?? ""
+                    let userId = dict?["userId"] as? String ?? ""
+                    let questions = dict?["questions"] as? [[String]] ?? [[String]]()
                     
                     let result = FreeAgentObject(gamerTag: gamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
                     self.profiles.append(result)
@@ -122,38 +115,39 @@ class ViewTeams: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate,
             ref.observeSingleEvent(of: .value, with: { (snapshot) in
                 for team in snapshot.children{
                     let currentObj = team as! DataSnapshot
-                    let dict = currentObj.value as! [String: Any]
-                    let currentTeamName = dict["teamName"] as? String ?? ""
-                    let teamId = dict["teamId"] as? String ?? ""
-                    let games = dict["games"] as? [String] ?? [String]()
+                    let dict = currentObj.value as? [String: Any]
+                    let currentTeamName = dict?["teamName"] as? String ?? ""
+                    let teamId = dict?["teamId"] as? String ?? ""
+                    let games = dict?["games"] as? [String] ?? [String]()
                     
                     if(self.addThisTeam(teamName: teamName, gameName: gameName, games: games, currentTeamName: currentTeamName)){
-                        let consoles = dict["consoles"] as? [String] ?? [String]()
-                        let teammateTags = dict["teammateTags"] as? [String] ?? [String]()
-                        let teammateIds = dict["teammateIds"] as? [String] ?? [String]()
+                        let consoles = dict?["consoles"] as? [String] ?? [String]()
+                        let teammateTags = dict?["teammateTags"] as? [String] ?? [String]()
+                        let teammateIds = dict?["teammateIds"] as? [String] ?? [String]()
                         
                         var invites = [TeamInviteObject]()
-                        let teamInvites = snapshot.childSnapshot(forPath: "teamInvites")
+                        let teamInvites = currentObj.childSnapshot(forPath: "teamInvites")
                         for invite in teamInvites.children{
                             let currentObj = invite as! DataSnapshot
-                            let dict = currentObj.value as! [String: Any]
-                            let gamerTag = dict["gamerTag"] as? String ?? ""
-                            let date = dict["date"] as? String ?? ""
-                            let uid = dict["uid"] as? String ?? ""
+                            let dict = currentObj.value as? [String: Any]
+                            let gamerTag = dict?["gamerTag"] as? String ?? ""
+                            let date = dict?["date"] as? String ?? ""
+                            let uid = dict?["uid"] as? String ?? ""
+                            let teamName = dict?["teamName"] as? String ?? ""
                             
-                            let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid)
+                            let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid, teamName: teamName)
                             invites.append(newInvite)
                         }
                         
                         var teammateArray = [TeammateObject]()
                         if(currentObj.hasChild("teammates")){
-                            let teammates = snapshot.childSnapshot(forPath: "teammates")
+                            let teammates = currentObj.childSnapshot(forPath: "teammates")
                             for invite in teammates.children{
                                 let currentObj = invite as! DataSnapshot
-                                let dict = currentObj.value as! [String: Any]
-                                let gamerTag = dict["gamerTag"] as? String ?? ""
-                                let date = dict["date"] as? String ?? ""
-                                let uid = dict["uid"] as? String ?? ""
+                                let dict = currentObj.value as? [String: Any]
+                                let gamerTag = dict?["gamerTag"] as? String ?? ""
+                                let date = dict?["date"] as? String ?? ""
+                                let uid = dict?["uid"] as? String ?? ""
                                 
                                 let teammate = TeammateObject(gamerTag: gamerTag, date: date, uid: uid)
                                 teammateArray.append(teammate)
@@ -161,47 +155,45 @@ class ViewTeams: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate,
                         }
                         
                         var dbRequests = [RequestObject]()
-                         let teamRequests = snapshot.childSnapshot(forPath: "inviteRequests")
+                         let teamRequests = currentObj.childSnapshot(forPath: "inviteRequests")
                          for invite in teamRequests.children{
                             let currentObj = invite as! DataSnapshot
-                            let dict = currentObj.value as! [String: Any]
-                            let status = dict["status"] as? String ?? ""
-                            let teamId = dict["teamId"] as? String ?? ""
-                            let teamName = dict["teamName"] as? String ?? ""
-                            let captainId = dict["captainId"] as? String ?? ""
-                            let requestId = dict["requestId"] as? String ?? ""
+                            let dict = currentObj.value as? [String: Any]
+                            let status = dict?["status"] as? String ?? ""
+                            let teamId = dict?["teamId"] as? String ?? ""
+                            let teamName = dict?["teamName"] as? String ?? ""
+                            let captainId = dict?["teamCaptainId"] as? String ?? ""
+                            let requestId = dict?["requestId"] as? String ?? ""
                              
-                             let requestsArray = snapshot.childSnapshot(forPath: "inviteRequests")
-                             var requestProfiles = [FreeAgentObject]()
-                             for requestObj in requestsArray.children {
-                                 let currentObj = requestObj as! DataSnapshot
-                                 let dict = currentObj.value as! [String: Any]
-                                 let game = dict["game"] as? String ?? ""
-                                 let consoles = dict["consoles"] as? [String] ?? [String]()
-                                 let gamerTag = dict["gamerTag"] as? String ?? ""
-                                 let competitionId = dict["competitionId"] as? String ?? ""
-                                 let userId = dict["userId"] as? String ?? ""
-                                 let questions = dict["questions"] as? [[String]] ?? [[String]]()
-                                 
-                                 let result = FreeAgentObject(gamerTag: gamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
-                                 
-                                 requestProfiles.append(result)
-                             }
-                             
-                             let newRequest = RequestObject(status: status, teamId: teamId, teamName: teamName, captainId: captainId, requestId: requestId)
-                             newRequest.profile = requestProfiles[0]
-                             
-                             dbRequests.append(newRequest)
-                        }
+                            var requestProfiles = [FreeAgentObject]()
+                            let test = dict?["profile"] as? [String: Any] ?? [String: Any]()
+                            let game = test["game"] as? String ?? ""
+                            let consoles = test["consoles"] as? [String] ?? [String]()
+                            let gamerTag = test["gamerTag"] as? String ?? ""
+                            let competitionId = test["competitionId"] as? String ?? ""
+                            let userId = test["userId"] as? String ?? ""
+                            let questions = test["questions"] as? [[String]] ?? [[String]]()
+                            
+                            let result = FreeAgentObject(gamerTag: gamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
+                            
+                            requestProfiles.append(result)
+                            
+                            
+                            let newRequest = RequestObject(status: status, teamId: teamId, teamName: teamName, captainId: captainId, requestId: requestId)
+                            newRequest.profile = requestProfiles[0]
+                            
+                            dbRequests.append(newRequest)
+                         }
                         
-                        let teamInvitetags = dict["teamInviteTags"] as? [String] ?? [String]()
-                        let captain = dict["teamCaptain"] as? String ?? ""
-                        let imageUrl = dict["imageUrl"] as? String ?? ""
-                        let teamChat = dict["teamChat"] as? String ?? String()
-                        let teamNeeds = dict["teamNeeds"] as? [String] ?? [String]()
-                        let selectedTeamNeeds = dict["selectedTeamNeeds"] as? [String] ?? [String]()
+                        let teamInvitetags = dict?["teamInviteTags"] as? [String] ?? [String]()
+                        let captain = dict?["teamCaptain"] as? String ?? ""
+                        let imageUrl = dict?["imageUrl"] as? String ?? ""
+                        let teamChat = dict?["teamChat"] as? String ?? String()
+                        let teamNeeds = dict?["teamNeeds"] as? [String] ?? [String]()
+                        let selectedTeamNeeds = dict?["selectedTeamNeeds"] as? [String] ?? [String]()
+                        let captainId = dict?["teamCaptainId"] as? String ?? String()
                         
-                        let currentTeam = TeamObject(teamName: currentTeamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl)
+                        let currentTeam = TeamObject(teamName: currentTeamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl, teamCaptainId: captainId)
                         currentTeam.teammates = teammateArray
                         currentTeam.requests = dbRequests
                         
@@ -257,6 +249,14 @@ class ViewTeams: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate,
         if(games != nil){
             if((games?.contains(gameName!))!){
                 add = true
+            }
+        }
+        
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        for team in delegate.currentUser!.teams{
+            if(team.teamName == currentTeamName){
+                add = false
+                break
             }
         }
         
@@ -375,7 +375,7 @@ class ViewTeams: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate,
         
         let current = self.teams[indexPath.item]
         
-        cell.gameBack.backgroundColor = UIColor(named: "whiteBackToDarkGrey")
+        //cell.gameBack.backgroundColor = UIColor(named: "whiteBackToDarkGrey")
         //cell.gameBack.moa.url = current.imageUrl
         //cell.gameBack.contentMode = .scaleAspectFill
         //cell.gameBack.clipsToBounds = true

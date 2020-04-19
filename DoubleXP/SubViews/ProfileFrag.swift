@@ -9,9 +9,11 @@
 import Foundation
 import UIKit
 import FBSDKCoreKit
+import UnderLineTextField
 
 class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, CurrentProfileCallbacks, UITextFieldDelegate{
     
+    @IBOutlet weak var bottomDrawerCover: UIView!
     @IBOutlet weak var savedOverlay: UIView!
     @IBOutlet weak var saveButton: UIButton!
     @IBOutlet weak var cancelButton: UIButton!
@@ -22,6 +24,18 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
     @IBOutlet weak var psSwitch: UISwitch!
     @IBOutlet weak var bioEntry: UITextField!
     @IBOutlet weak var gamesCollection: UITableView!
+    @IBOutlet weak var bottomDrawer: UIView!
+    @IBOutlet weak var gamerTagField: UnderLineTextField!
+    @IBOutlet weak var drawerPSSwitch: UISwitch!
+    @IBOutlet weak var drawerPSLabel: UILabel!
+    @IBOutlet weak var drawerXboxSwitch: UISwitch!
+    @IBOutlet weak var drawerXboxLabel: UILabel!
+    @IBOutlet weak var drawerNintendoSwitch: UISwitch!
+    @IBOutlet weak var drawerNintendoLabel: UILabel!
+    @IBOutlet weak var drawerPcSwitch: UISwitch!
+    @IBOutlet weak var drawerPcLabel: UILabel!
+    @IBOutlet weak var drawerAddButton: UIButton!
+    @IBOutlet weak var drawerCancelButton: UIButton!
     var gcGames = [GamerConnectGame]()
     var gamesPlayed = [GamerConnectGame]()
     var payload = [String]()
@@ -29,6 +43,17 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
     var consoleIndexPath: IndexPath?
     var gamesIndexPath: IndexPath?
     var testCell: ProfileConsolesCell?
+    var currentProfilePayload = [[String: String]]()
+    var drawerOpen = false
+    var drawerHeight: CGFloat!
+    var currentConsoleCell: ProfileConsolesCell?
+    var currentGamesCell: ProfileGamesCell?
+    
+    var drawerSwitches = [UISwitch]()
+    var addedName = ""
+    var addedIndex: IndexPath!
+    var removedName = ""
+    var removedIndex: IndexPath!
     
     var bio: String?
     var ps: Bool!
@@ -36,6 +61,8 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
     var pc: Bool!
     var nintendo: Bool!
     
+    var chosenConsole = ""
+    var consoleChecked = false
     
     var cellHeights: [CGFloat] = []
     enum Const {
@@ -60,15 +87,236 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         
         let currentUser = appDelegate.currentUser!
         
+        for profile in currentUser.gamerTags{
+            let current = ["gamerTag": profile.gamerTag, "gameName": profile.game, "console": profile.console]
+            currentProfilePayload.append(current)
+        }
+        
         for game in gcGames{
             if(currentUser.games.contains(game.gameName)){
                 gamesPlayed.append(game)
             }
         }
         
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillDisappear),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
+        
         setup()
         
+        gamerTagField.delegate = self
+        gamerTagField.returnKeyType = UIReturnKeyType.done
+        
+        drawerSwitches.append(drawerPSSwitch)
+        drawerSwitches.append(drawerXboxSwitch)
+        drawerSwitches.append(drawerPcSwitch)
+        drawerSwitches.append(drawerNintendoSwitch)
+        
+        drawerPSSwitch.addTarget(self, action: #selector(psSwitchChanged), for: UIControl.Event.valueChanged)
+        drawerXboxSwitch.addTarget(self, action: #selector(xboxSwitchChanged), for: UIControl.Event.valueChanged)
+        drawerPcSwitch.addTarget(self, action: #selector(pcSwitchChanged), for: UIControl.Event.valueChanged)
+        drawerNintendoSwitch.addTarget(self, action: #selector(nintendoSwitchChanged), for: UIControl.Event.valueChanged)
+        
         AppEvents.logEvent(AppEvents.Name(rawValue: "User Profile"))
+    }
+    
+    func gameAdded(gameName: String, indexPath: IndexPath){
+        self.addedName = gameName
+        self.addedIndex = indexPath
+        
+        showBottomDrawer()
+    }
+    
+    func gameRemoved(gameName: String, indexPath: IndexPath) {
+        for array in self.currentProfilePayload{
+            if(array["gameName"] == gameName){
+                self.currentProfilePayload.remove(at: currentProfilePayload.index(of: array)!)
+            }
+        }
+        
+        checkGamerProfiles()
+        
+        currentGamesCell?.updateCell(indexPath: indexPath, gameName: gameName, show: false)
+    }
+    
+    @objc func psSwitchChanged(psSwitch: UISwitch) {
+        cycleSwitches(selectedSwitch:psSwitch)
+    }
+    
+    @objc func xboxSwitchChanged(psSwitch: UISwitch) {
+        cycleSwitches(selectedSwitch:psSwitch)
+    }
+    
+    @objc func pcSwitchChanged(psSwitch: UISwitch) {
+        cycleSwitches(selectedSwitch:psSwitch)
+    }
+    
+    @objc func nintendoSwitchChanged(psSwitch: UISwitch) {
+        cycleSwitches(selectedSwitch:psSwitch)
+    }
+    
+    private func cycleSwitches(selectedSwitch: UISwitch){
+        var console = ""
+        for uiSwitch in self.drawerSwitches{
+            if(uiSwitch == selectedSwitch){
+                if(!uiSwitch.isOn){
+                    uiSwitch.isOn = false
+                }
+                else{
+                    uiSwitch.isOn = true
+                    
+                    if(uiSwitch == self.drawerNintendoSwitch){
+                        console = "nintendo"
+                    }
+                    if(uiSwitch == self.drawerXboxSwitch){
+                        console = "xbox"
+                    }
+                    if(uiSwitch == self.drawerPSSwitch){
+                        console = "ps"
+                    }
+                    if(uiSwitch == self.drawerPcSwitch){
+                        console = "pc"
+                    }
+                    
+                    consoleChecked = true
+                }
+            }
+            else{
+                uiSwitch.isOn = false
+            }
+        }
+        
+        if(console == ""){
+            consoleChecked = false
+        }
+        self.chosenConsole = console
+        
+        checkNextActivation()
+    }
+    
+    private func checkNextActivation(){
+        if(consoleChecked && gamerTagField.text != nil){
+            self.drawerAddButton.alpha = 1
+            
+            self.drawerAddButton.isUserInteractionEnabled = true
+            self.drawerAddButton.addTarget(self, action: #selector(addButtonClicked), for: .touchUpInside)
+        }
+        else{
+            self.drawerAddButton.alpha = 0.33
+           
+            self.drawerAddButton.isUserInteractionEnabled = false
+        }
+    }
+    
+    @objc func addButtonClicked() {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = appDelegate.currentUser
+        
+        if(drawerPSSwitch.isOn){
+            currentUser!.ps = true
+            if(self.currentConsoleCell?.psSwitch != nil){
+                if(!(self.currentConsoleCell?.psSwitch.isOn)!){
+                    self.currentConsoleCell?.psSwitch.isOn = true
+                }
+            }
+        }
+        if(drawerXboxSwitch.isOn){
+            currentUser!.xbox = true
+            if(self.currentConsoleCell?.xBoxSwitch != nil){
+                if(!(self.currentConsoleCell?.xBoxSwitch.isOn)!){
+                    self.currentConsoleCell?.xBoxSwitch.isOn = true
+                }
+            }
+        }
+        if(drawerPcSwitch.isOn){
+            currentUser!.pc = true
+            if(self.currentConsoleCell?.pcSwitch != nil){
+                if(!(self.currentConsoleCell?.pcSwitch.isOn)!){
+                    self.currentConsoleCell?.pcSwitch.isOn = true
+                }
+            }
+        }
+        if(drawerNintendoSwitch.isOn){
+            currentUser!.nintendo = true
+            if(self.currentConsoleCell?.pcSwitch != nil){
+                if(!(self.currentConsoleCell?.nintendoSwitch.isOn)!){
+                    self.currentConsoleCell?.nintendoSwitch.isOn = true
+                }
+            }
+        }
+        
+        dismissDrawer()
+        
+        let current = ["gamerTag": gamerTagField.text!, "gameName": self.addedName, "console": self.chosenConsole]
+        self.currentProfilePayload.append(current)
+        
+        currentGamesCell?.updateCell(indexPath: self.addedIndex, gameName: self.addedName, show: true)
+        // send broadcast to update cell
+    }
+    
+    private func dismissDrawer(){
+        let top = CGAffineTransform(translationX: 0, y: 0)
+        UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+            self.bottomDrawer.transform = top
+        }, completion: { (finished: Bool) in
+                UIView.animate(withDuration: 0.5) {
+                self.bottomDrawerCover.alpha = 0
+                    
+                self.drawerOpen = false
+            }
+        })
+    }
+    
+    func showBottomDrawer(){
+        let top = CGAffineTransform(translationX: 0, y: -290)
+        UIView.animate(withDuration: 0.8, animations: {
+            self.bottomDrawerCover.alpha = 1
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                self.bottomDrawer.transform = top
+                
+                self.drawerOpen = true
+            }, completion: nil)
+        })
+    }
+    
+    @objc func keyboardWillShow(_ notification: Notification) {
+        if(drawerOpen){
+            if let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+                let keyboardRectangle = keyboardFrame.cgRectValue
+                let keyboardHeight = keyboardRectangle.height
+                
+                self.drawerHeight = keyboardHeight
+                
+                extendBottom(height: self.drawerHeight)
+            }
+        }
+    }
+    
+    @objc func keyboardWillDisappear() {
+        if(drawerOpen){
+            let top = CGAffineTransform(translationX: 0, y: -290)
+            UIView.animate(withDuration: 0.5, animations: {
+                self.bottomDrawer.transform = top
+            }, completion: nil)
+        }
+    }
+    
+    private func extendBottom(height: CGFloat){
+        let top = CGAffineTransform(translationX: 0, y: -390)
+        UIView.animate(withDuration: 0.8, animations: {
+            self.bottomDrawer.transform = top
+        }, completion: nil)
     }
     
     private func setup(){
@@ -119,6 +367,8 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         }
         else if(current == "games"){
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "games", for: indexPath) as! ProfileGamesCell
+            self.currentGamesCell = cell
+            
             cell.setUi(list: self.gamesPlayed, callbacks: self)
             
             self.gamesIndexPath = indexPath
@@ -126,6 +376,8 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         }
         else{
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "consoles", for: indexPath) as! ProfileConsolesCell
+            
+            self.currentConsoleCell = cell
             
             if(currentUser.ps){
                 cell.psSwitch.isOn = true
@@ -304,7 +556,24 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         }
         
         let manager = ProfileManage()
-        manager.saveChanges(bio: self.bio ?? "", games: games, ps: self.ps, pc: self.pc, xBox: self.xbox, nintendo: self.nintendo, callbacks: self)
+        manager.saveChanges(bio: self.bio ?? "", games: games, ps: self.ps, pc: self.pc, xBox: self.xbox, nintendo: self.nintendo, profiles: self.currentProfilePayload, callbacks: self)
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = appDelegate.currentUser
+        currentUser!.ps = self.ps
+        currentUser!.xbox = self.xbox
+        currentUser!.pc = self.pc
+        currentUser!.nintendo = self.nintendo
+        
+        var profiles = [GamerProfile]()
+        for profile in self.currentProfilePayload{
+            let newProfile = GamerProfile(gamerTag: profile["gamerTag"]!, game: profile["gameName"]!, console: profile["console"]!)
+            profiles.append(newProfile)
+        }
+        currentUser!.gamerTags = profiles
+        currentUser!.games = games
+        currentUser!.bio = self.bio ?? ""
+        
         
         AppEvents.logEvent(AppEvents.Name(rawValue: "User Profile - Profile Updated"))
     }
@@ -312,6 +581,35 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
     @objc func cancelButtonClicked(_ sender: AnyObject?) {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.currentLanding!.navigateToHome()
+    }
+    
+    func checkGamerProfiles(){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = appDelegate.currentUser
+        
+        var psIsOn = false
+        var xIsOn = false
+        var pcIsOn = false
+        var ninIsOn = false
+        
+        for profile in currentUser!.gamerTags{
+            if(profile.console == "ps" && !psIsOn){
+                self.currentConsoleCell?.psSwitch.isOn = true
+                psIsOn = true
+            }
+            if(profile.console == "xbox" && !xIsOn){
+                self.currentConsoleCell?.xBoxSwitch.isOn = true
+                xIsOn = true
+            }
+            if(profile.console == "pc" && !pcIsOn){
+                self.currentConsoleCell?.pcSwitch.isOn = true
+                pcIsOn = true
+            }
+            if(profile.console == "xbox" && !ninIsOn){
+                self.currentConsoleCell?.nintendoSwitch.isOn = true
+                ninIsOn = true
+            }
+        }
     }
     
     func changesComplete() {

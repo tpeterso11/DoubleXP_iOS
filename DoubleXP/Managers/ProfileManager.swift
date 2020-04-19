@@ -11,7 +11,7 @@ import UIKit
 import Firebase
 
 class ProfileManage {
-    func saveChanges(bio: String, games: [String], ps: Bool, pc: Bool, xBox: Bool, nintendo: Bool, callbacks: CurrentProfileCallbacks){
+    func saveChanges(bio: String, games: [String], ps: Bool, pc: Bool, xBox: Bool, nintendo: Bool, profiles: [[String: String]], callbacks: CurrentProfileCallbacks){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let user = delegate.currentUser!
         
@@ -21,6 +21,8 @@ class ProfileManage {
                 if(!bio.isEmpty){
                     ref.child("Bio").setValue(bio)
                 }
+                
+                ref.child("gamerTags").setValue(profiles)
                 
                 ref.child("games").setValue(games)
                 

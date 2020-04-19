@@ -72,6 +72,26 @@ class User: NSObject, NSCoding, SenderType {
         }
     }
     
+    var _competitions = [String]()
+    var competitions: [String] {
+        get {
+            return (_competitions)
+        }
+        set (newVal) {
+            _competitions = newVal
+        }
+    }
+    
+    var _subscriptions = [String]()
+    var subscriptions: [String] {
+        get {
+            return (_subscriptions)
+        }
+        set (newVal) {
+            _subscriptions = newVal
+        }
+    }
+    
     var _lastLogin = ""
     var lastLogin: String {
         get {
@@ -212,6 +232,16 @@ class User: NSObject, NSCoding, SenderType {
         }
     }
     
+    var _teamInviteRequests = [RequestObject]()
+    var teamInviteRequests: [RequestObject] {
+        get {
+            return (_teamInviteRequests)
+        }
+        set (newVal) {
+            _teamInviteRequests = newVal
+        }
+    }
+    
     var _chatObjects = [ChatObject]()
     var chatObjects: [ChatObject] {
         get {
@@ -293,6 +323,8 @@ class User: NSObject, NSCoding, SenderType {
         self.sendBirdId = (decoder.decodeObject(forKey: "sendBirdId") as! String)
         self.search = (decoder.decodeObject(forKey: "search") as! String)
         self.notifications = (decoder.decodeObject(forKey: "notifications") as! String)
+        self.teamInviteRequests = (decoder.decodeObject(forKey: "teamInviteRequests") as! [RequestObject])
+        self.subscriptions = (decoder.decodeObject(forKey: "subscriptions") as! [String])
     }
     
     func encode(with coder: NSCoder) {
@@ -311,6 +343,8 @@ class User: NSObject, NSCoding, SenderType {
         coder.encode(self.chatObjects, forKey: "chatObjects")
         coder.encode(self.search, forKey: "search")
         coder.encode(self.notifications, forKey: "notifications")
+        coder.encode(self.teamInviteRequests, forKey: "teamInviteRequests")
+        coder.encode(self.subscriptions, forKey: "subscriptions")
     }
 }
 

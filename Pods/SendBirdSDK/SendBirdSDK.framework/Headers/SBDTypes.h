@@ -91,6 +91,7 @@ typedef NS_ENUM(NSInteger, SBDErrorCode) {
     SBDErrorInvalidJsonBody = 400403,
     
     SBDErrorInternalServerError = 500901,
+    SBDErrorRateLimitExceeded = 500910,
     
     // SDK Internal Errors
     SBDErrorUnknownError = 800000,
@@ -111,10 +112,13 @@ typedef NS_ENUM(NSInteger, SBDErrorCode) {
     SBDErrorWebSocketConnectionFailed = 800210,
     SBDErrorRequestFailed = 800220,
     SBDErrorFileUploadCancelFailed = 800230,
-    SBDErrorFileUploadCancelled = 800240,
-	SBDErrorFileUploadTimeout = 800250,
+    SBDErrorFileUploadCanceled = 800240,
+    SBDErrorFileUploadTimeout = 800250,
     SBDErrorTimerWasExpired = 800301,
     SBDErrorTimerWasAlreadyDone = 800302,
+    
+    // WS Error
+    SBDErrorMessagesRateLimitExceeded = 900200,
 };
 
 /**
@@ -578,12 +582,32 @@ typedef NS_ENUM(NSUInteger, SBDPushTokenType) {
  - SBDMessageRequestStateSucceeded: Indicates the state of the message that success to send the message.
  
  @since 3.0.141
+ @deprecated 3.0.173. Use `SBDMessageSendingStatus` instead.
  */
 typedef NS_ENUM(NSUInteger, SBDMessageRequestState) {
     SBDMessageRequestStateNone = 0,
     SBDMessageRequestStatePending,
     SBDMessageRequestStateFailed,
     SBDMessageRequestStateSucceeded,
+};
+
+/**
+ Constants of type to describe message's sending status.
+ 
+ - SBDMessageSendingStatusNone: MUST NOT BE. If you got a message instance from SDK, the message can't have this value.
+ - SBDMessageSendingStatusPending: Indicates the status of the message returned when trying to send a message. The message with the pending status means that is not dispatched completely to the SendBird server. The pending message should be replaced with a message (failed or succeeded) from the callback.
+ - SBDMessageSendingStatusFailed: Indicates the status of the message that failed to send the message.
+ - SBDMessageSendingStatusSucceeded: Indicates the status of the message that success to send the message.
+ - SBDMessageSendingStatusCanceled: Indicates the status of the message that is canceled.
+ 
+ @since 3.0.173
+ */
+typedef NS_ENUM(NSUInteger, SBDMessageSendingStatus) {
+    SBDMessageSendingStatusNone = 0,
+    SBDMessageSendingStatusPending,
+    SBDMessageSendingStatusFailed,
+    SBDMessageSendingStatusSucceeded,
+    SBDMessageSendingStatusCanceled,
 };
 
 /**
@@ -614,6 +638,30 @@ typedef NS_ENUM(NSUInteger, SBDReportCategory) {
     SBDReportCategoryHarassing,
     SBDReportCategorySpam,
     SBDReportCategoryInappropriate,
+};
+
+/**
+ The order type for `SBDMessageSearchQuery`.
+ 
+ - SBDMessageSearchQueryOrderScore: Score type returns the result as by their matching score.
+ - SBDMessageSearchQueryOrderTimeStamp: Timestamp type returns the result as by `SBDBaseMessage`'s timestamp.
+ @since 3.0.162
+ */
+typedef NS_ENUM(NSUInteger, SBDMessageSearchQueryOrder) {
+    SBDMessageSearchQueryOrderScore = 0,
+    SBDMessageSearchQueryOrderTimeStamp,
+};
+
+#pragma mark - Reactions
+
+/**
+ The SBDReactionEvent action state.
+
+ @since 3.0.169
+*/
+typedef NS_ENUM(NSUInteger, SBDReactionEventAction) {
+    SBDReactionEventActionAdd = 0,
+    SBDReactionEventActionDelete = 1,
 };
 
 #endif /* SBDTypes_h */

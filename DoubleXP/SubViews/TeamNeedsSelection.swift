@@ -47,6 +47,7 @@ class TeamNeedsSelection: ParentVC, UICollectionViewDataSource, UICollectionView
         let currentLanding = delegate.currentLanding
         
         if(selectedNeeds.isEmpty){
+            currentLanding?.stackDepth -= 1
             currentLanding?.navigateToTeamDashboard(team: team!, newTeam: true)
         }
         else{
@@ -62,6 +63,7 @@ class TeamNeedsSelection: ParentVC, UICollectionViewDataSource, UICollectionView
                 }
             }
             
+            currentLanding?.stackDepth -= 1
             currentLanding?.navigateToTeamDashboard(team: team!, newTeam: true)
         }
     }
