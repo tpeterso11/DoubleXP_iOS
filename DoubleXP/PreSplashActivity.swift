@@ -13,6 +13,7 @@ import Firebase
 import TwitterKit
 import SwiftTwitch
 import Marshal
+import SwiftDate
 
 class PreSplashActivity: UIViewController {
     private var data: [NewsObject]!
@@ -31,7 +32,18 @@ class PreSplashActivity: UIViewController {
         //let social = SocialMediaManager()
         //social.getGame()
         //getTwitchToken()
-        getAppConfig()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            self.getAppConfig()
+        }
+        
+        //let test = ["gamerTag": "SUCCESSFUL!!!!!!!", "game": "Test", "observableTime": "0", "timeInMs": "50000"]
+                   
+                   //array.append(test)
+                   //let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                   //let allNewChildrenRef = Database.database().reference().child("Users").child("UNrTyfFOeHZB3T2HQvUVevIxHkE2")
+                   //allNewChildrenRef.child("tempRivals").setValue(test)
+               //allNewChildrenRef.child("thisShitIsSoAnnoying").setValue("YOU!")
+        
         //testLoadTwitter()
     }
     
@@ -461,6 +473,120 @@ class PreSplashActivity: UIViewController {
                     gamerTags.append(currentGamerTagObj)
                 }
             }
+            
+            var rivals = [RivalObj]()
+            if(snapshot.hasChild("currentTempRivals")){
+                let pendingArray = snapshot.childSnapshot(forPath: "currentTempRivals")
+                for rival in pendingArray.children{
+                    let currentObj = rival as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let date = dict?["date"] as? String ?? ""
+                    let tag = dict?["gamerTag"] as? String ?? ""
+                    let game = dict?["game"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    let dbType = dict?["type"] as? String ?? ""
+                    
+                    let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                    
+                    let calendar = Calendar.current
+                    if(!date.isEmpty){
+                        let dbDate = self.stringToDate(date)
+                        
+                        if(dbDate != nil){
+                            let dbDateFuture = calendar.date(byAdding: .minute, value: 5, to: dbDate as Date)
+                            
+                            if(dbDateFuture != nil){
+                                let now = NSDate()
+                                let formatter = DateFormatter()
+                                formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+                                formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                                let future = formatter.string(from: now as Date)
+                                let dbFuture = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                                
+                                let validRival = dbDate.compare(.isEarlier(than: dbFuture))
+                                
+                                if(dbFuture != nil){
+                                    if(validRival){
+                                        rivals.append(request)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            var tempRivals = [RivalObj]()
+            if(snapshot.hasChild("tempRivals")){
+                let pendingArray = snapshot.childSnapshot(forPath: "tempRivals")
+                for rival in pendingArray.children{
+                    let currentObj = rival as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let date = dict?["date"] as? String ?? ""
+                    let tag = dict?["gamerTag"] as? String ?? ""
+                    let game = dict?["game"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    let dbType = dict?["type"] as? String ?? ""
+                    
+                    let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                    
+                    if(!date.isEmpty){
+                        let dbDate = self.stringToDate(date)
+                        
+                        if(dbDate != nil){
+                            let now = NSDate()
+                            let formatter = DateFormatter()
+                            formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+                            formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                            let future = formatter.string(from: now as Date)
+                            let dbFuture = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                            
+                            let validRival = dbDate.compare(.isEarlier(than: dbFuture))
+                            
+                            if(dbFuture != nil){
+                                if(validRival){
+                                    tempRivals.append(request)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            var acceptedRivals = [RivalObj]()
+            if(snapshot.hasChild("acceptedTempRivals")){
+                let pendingArray = snapshot.childSnapshot(forPath: "acceptedTempRivals")
+                for rival in pendingArray.children{
+                    let currentObj = rival as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let date = dict?["date"] as? String ?? ""
+                    let tag = dict?["gamerTag"] as? String ?? ""
+                    let game = dict?["game"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    let dbType = dict?["type"] as? String ?? ""
+                    
+                    let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                    acceptedRivals.append(request)
+                }
+            }
+            
+            var rejectedRivals = [RivalObj]()
+            if(snapshot.hasChild("rejectedTempRivals")){
+                let pendingArray = snapshot.childSnapshot(forPath: "rejectedTempRivals")
+                for rival in pendingArray.children{
+                    let currentObj = rival as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let date = dict?["date"] as? String ?? ""
+                    let tag = dict?["gamerTag"] as? String ?? ""
+                    let game = dict?["game"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    let dbType = dict?["type"] as? String ?? ""
+                    
+                    let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                    rejectedRivals.append(request)
+                }
+            }
+            
             let messagingNotifications = value?["messagingNotifications"] as? Bool ?? false
             
             var teams = [TeamObject]()
@@ -616,6 +742,7 @@ class PreSplashActivity: UIViewController {
             user.teamInvites = currentTeamInvites
             user.games = games
             user.friends = friends
+            user.gamerTags = gamerTags
             user.pendingRequests = pendingRequests
             user.sentRequests = sentRequests
             user.gamerTag = gamerTag
@@ -630,6 +757,10 @@ class PreSplashActivity: UIViewController {
             user.teamInviteRequests = dbRequests
             user.subscriptions = subscriptions
             user.competitions = competitions
+            user.currentTempRivals = rivals
+            user.acceptedTempRivals = acceptedRivals
+            user.rejectedTempRivals = rejectedRivals
+            user.tempRivals = tempRivals
             
             DispatchQueue.main.async {
                 let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -700,6 +831,13 @@ class PreSplashActivity: UIViewController {
                 print(error.localizedDescription)
             }
         }
+    }
+    
+    func stringToDate(_ str: String)->Date{
+        let formatter = DateFormatter()
+        formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+        formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+        return formatter.date(from: str)!
     }
     
     private func convertRequests(list: [String], pathString: String, userUid: String){

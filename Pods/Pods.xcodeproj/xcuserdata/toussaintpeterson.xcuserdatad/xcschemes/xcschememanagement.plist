@@ -9,6 +9,11 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>AppAuth.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>Bartinter.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -49,7 +54,22 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>FBSDKLoginKit.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>FLAnimatedImage.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>FacebookCore.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>FacebookLogin.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -119,6 +139,11 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>GTMAppAuth.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>GTMSessionFetcher.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -144,12 +169,12 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>GoogleUtilities.xcscheme</key>
+		<key>GoogleSignIn.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>Hero.xcscheme</key>
+		<key>GoogleUtilities.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -244,6 +269,11 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>SwiftDate.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>SwiftHTTP.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -295,6 +325,11 @@
 			<false/>
 		</dict>
 		<key>ValidationToolkit.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>VideoBackground.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>

@@ -24,11 +24,7 @@
 
 static NSString *const FBSDKFeatureManagerPrefix = @"com.facebook.sdk:FBSDKFeatureManager.FBSDKFeature";
 
-NS_ASSUME_NONNULL_BEGIN
-
 @implementation FBSDKFeatureManager
-
-#pragma mark - Public methods
 
 + (void)checkFeature:(FBSDKFeature)feature
      completionBlock:(FBSDKFeatureManagerBlock)completionBlock
@@ -65,8 +61,6 @@ NS_ASSUME_NONNULL_BEGIN
   [[NSUserDefaults standardUserDefaults] setObject:[FBSDKSettings sdkVersion] forKey:[FBSDKFeatureManagerPrefix stringByAppendingString:featureName]];
 }
 
-#pragma mark - Private methods
-
 + (FBSDKFeature)getParentFeature:(FBSDKFeature)feature
 {
   if ((feature & 0xFF) > 0) {
@@ -99,19 +93,17 @@ NS_ASSUME_NONNULL_BEGIN
     case FBSDKFeaturePrivacyProtection: featureName = @"PrivacyProtection"; break;
     case FBSDKFeatureSuggestedEvents: featureName = @"SuggestedEvents"; break;
     case FBSDKFeaturePIIFiltering: featureName = @"PIIFiltering"; break;
-    case FBSDKFeatureMTML: featureName = @"MTML"; break;
     case FBSDKFeatureEventDeactivation: featureName = @"EventDeactivation"; break;
     case FBSDKFeatureInstrument: featureName = @"Instrument"; break;
     case FBSDKFeatureCrashReport: featureName = @"CrashReport"; break;
     case FBSDKFeatureCrashShield: featureName = @"CrashShield"; break;
     case FBSDKFeatureErrorReport: featureName = @"ErrorReport"; break;
-    case FBSDKFeatureMonitoring: featureName = @"Monitoring"; break;
 
     case FBSDKFeatureLogin: featureName = @"LoginKit"; break;
 
     case FBDSDKFeatureShare: featureName = @"ShareKit"; break;
 
-    case FBDSDKFeatureGamingServices: featureName = @"GamingServicesKit"; break;
+    case FBSDKFeaturePlaces: featureName = @"PlacesKit"; break;
   }
 
   return featureName;
@@ -130,19 +122,9 @@ NS_ASSUME_NONNULL_BEGIN
     case FBSDKFeaturePrivacyProtection:
     case FBSDKFeatureSuggestedEvents:
     case FBSDKFeaturePIIFiltering:
-    case FBSDKFeatureMTML:
-    case FBSDKFeatureMonitoring:
       return NO;
-    case FBSDKFeatureLogin:
-    case FBDSDKFeatureShare:
-    case FBSDKFeatureCore:
-    case FBSDKFeatureAppEvents:
-    case FBSDKFeatureCodelessEvents:
-    case FBDSDKFeatureGamingServices:
-      return YES;
+    default: return YES;
   }
 }
 
 @end
-
-NS_ASSUME_NONNULL_END

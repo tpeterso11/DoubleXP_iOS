@@ -15,7 +15,8 @@ import FoldingCell
 import Bartinter
 import FBSDKCoreKit
 
-class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, ProfileCallbacks {
+class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, ProfileCallbacks, UICollectionViewDataSource, UICollectionViewDelegate, RequestsUpdate, UICollectionViewDelegateFlowLayout {
+    
     var uid: String = ""
     var userForProfile: User? = nil
     
@@ -49,14 +50,33 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     @IBOutlet weak var declineButton: UIButton!
     @IBOutlet weak var acceptButton: UIButton!
     @IBOutlet weak var clickArea: UIView!
+    @IBOutlet weak var rivalButton: UIButton!
     
+    @IBOutlet weak var rivalSendResultSub: UILabel!
+    @IBOutlet weak var rivalSendResultText: UILabel!
+    @IBOutlet weak var rivalOverlaySpinner: UIActivityIndicatorView!
+    @IBOutlet weak var rivalCoOpSelection: UIView!
+    @IBOutlet weak var rivalRivalSelection: UIView!
+    @IBOutlet weak var rivalLoadingOverlay: UIView!
+    @IBOutlet weak var rivalSendResultOverlay: UIView!
+    @IBOutlet weak var rivalOverlay: UIView!
+    @IBOutlet weak var rivalBlur: UIVisualEffectView!
+    @IBOutlet weak var rivalClose: UIImageView!
+    @IBOutlet weak var rivalTypeView: UIView!
+    @IBOutlet weak var rivalOverlayHeader: UILabel!
+    @IBOutlet weak var rivalGameView: UIView!
+    @IBOutlet weak var rivalGameCollection: UICollectionView!
     
+    var rivalOverlayPayload = [GamerConnectGame]()
     var sections = [Section]()
     var nav: NavigationPageController?
     
+    var rivalSelectedGame = ""
+    var rivalSelectedType = ""
+    
      enum Const {
            static let closeCellHeight: CGFloat = 72
-           static let openCellHeight: CGFloat = 235
+           static let openCellHeight: CGFloat = 280
            static let rowsCount = 1
     }
     
@@ -156,6 +176,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
                 gamerTags.append(currentGamerTagObj)
             }
+            
             var teams = [TeamObject]()
             let teamsArray = snapshot.childSnapshot(forPath: "teams")
             for teamObj in teamsArray.children {
@@ -284,6 +305,10 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             user.nintendo = nintendo
             user.bio = bio
             
+            
+            
+            
+            
             self.setUI(user: user)
             
         }) { (error) in
@@ -294,6 +319,19 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     func setUI(user: User){
         self.userForProfile = user
         let manager = GamerProfileManager()
+        
+        
+        let friendsManager = FriendsManager()
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser
+        
+        if(friendsManager.isInFriendList(user: userForProfile!, currentUser: currentUser!)){
+            checkRivals()
+        }
+        else{
+            self.rivalButton.alpha = 0
+            self.rivalButton.isUserInteractionEnabled = false
+        }
         
         self.gamerTag.text = manager.getGamerTag(user: user)
         
@@ -311,10 +349,6 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         }
         
         self.setup(statsEmpty: user.stats.isEmpty)
-        
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        let currentUser = delegate.currentUser
-        let friendsManager = FriendsManager()
         
         if(friendsManager.checkListsForUser(user: userForProfile!, currentUser: currentUser!)){
             
@@ -560,6 +594,51 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         }, completion: nil)
     }
     
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        self.rivalOverlayPayload.count
+    }
+       
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! homeGCCell
+        
+        let game = self.rivalOverlayPayload[indexPath.item]
+           cell.backgroundImage.moa.url = game.imageUrl
+           cell.backgroundImage.contentMode = .scaleAspectFill
+           cell.backgroundImage.clipsToBounds = true
+           
+           cell.hook.text = game.gameName
+           AppEvents.logEvent(AppEvents.Name(rawValue: "Player Profile Rival " + game.gameName + " Click"))
+           
+           cell.contentView.layer.cornerRadius = 2.0
+           cell.contentView.layer.borderWidth = 1.0
+           cell.contentView.layer.borderColor = UIColor.clear.cgColor
+           cell.contentView.layer.masksToBounds = true
+           
+           cell.layer.shadowColor = UIColor.black.cgColor
+           cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+           cell.layer.shadowRadius = 2.0
+           cell.layer.shadowOpacity = 0.5
+           cell.layer.masksToBounds = false
+           cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
+           return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let current = self.rivalOverlayPayload[indexPath.item]
+        
+        self.rivalSelectedGame = current.gameName
+        
+        self.progressRival()
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
+        
+        return CGSize(width: self.rivalGameCollection.bounds.width - 10, height: CGFloat(80))
+    }
+    
     func onFriendRequested(){
         let top = CGAffineTransform(translationX: 0, y: -40)
         UIView.animate(withDuration: 0.5, animations: {
@@ -667,6 +746,291 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             }
         }
         return newArray
+    }
+    
+    @objc private func rivalClicked(){
+        let closeTap = UITapGestureRecognizer(target: self, action: #selector(self.closeOverlay))
+        self.rivalClose.isUserInteractionEnabled = true
+        self.rivalClose.addGestureRecognizer(closeTap)
+        
+        UIView.animate(withDuration: 0.8, animations: {
+            self.rivalBlur.alpha = 1
+            
+            self.rivalGameCollection.dataSource = self
+            self.rivalGameCollection.delegate = self
+        }, completion: { (finished: Bool) in
+            
+            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                self.rivalOverlay.alpha = 1
+            }, completion: nil)
+        })
+    }
+    
+    @objc private func closeOverlay(){
+        UIView.animate(withDuration: 0.5, delay: 2.0, options: [], animations: {
+            self.rivalOverlay.alpha = 0
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.8, delay: 0.3, options: [], animations: {
+                self.rivalBlur.alpha = 0
+            }, completion: nil)
+        })
+    }
+    
+    private func progressRival(){
+        let top = CGAffineTransform(translationX: -(self.rivalGameView.bounds.width), y: 0)
+        
+        UIView.transition(with: self.rivalOverlayHeader,
+             duration: 0.3,
+              options: .transitionCrossDissolve,
+           animations: { [weak self] in
+               self?.rivalOverlayHeader.text = "how are you wanting to play?"
+         }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.3, animations: {
+                self.rivalGameView.transform = top
+                self.rivalGameView.alpha = 0
+            }, completion: { (finished: Bool) in
+                let coOpTap = UITapGestureRecognizer(target: self, action: #selector(self.coOpClicked))
+                self.rivalCoOpSelection.isUserInteractionEnabled = true
+                self.rivalCoOpSelection.addGestureRecognizer(coOpTap)
+                
+                let rivalTap = UITapGestureRecognizer(target: self, action: #selector(self.rivalOptionlicked))
+                self.rivalRivalSelection.isUserInteractionEnabled = true
+                self.rivalRivalSelection.addGestureRecognizer(rivalTap)
+                
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.rivalTypeView.alpha = 1
+                }, completion: nil)
+            })
+        })
+    }
+    
+    @objc private func coOpClicked(){
+        self.rivalLoadingOverlay.backgroundColor = UIColor(named: "greenAlpha")
+        
+        UIView.animate(withDuration: 0.8, animations: {
+            self.rivalLoadingOverlay.alpha = 1
+            self.rivalOverlaySpinner.startAnimating()
+            self.rivalSelectedType = "co-op"
+            
+            self.sendPayload()
+        }, completion: nil)
+    }
+    
+    @objc private func rivalOptionlicked(){
+        self.rivalLoadingOverlay.backgroundColor = UIColor(named: "redAlpha")
+        
+        UIView.animate(withDuration: 0.8, animations: {
+            self.rivalLoadingOverlay.alpha = 1
+            self.rivalOverlaySpinner.startAnimating()
+            self.rivalSelectedType = "rival"
+            
+            self.sendPayload()
+        }, completion: nil)
+    }
+    
+    private func sendPayload(){
+        let manager = FriendsManager()
+        manager.createRivalRequest(otherUser: self.userForProfile!, game: self.rivalSelectedGame, type: self.rivalSelectedType, callbacks: self, gamerTags: self.userForProfile!.gamerTags)
+    }
+    
+    func updateCell(indexPath: IndexPath) {
+    }
+    
+    func showQuizClicked(questions: [[String]]) {
+    }
+    
+    func rivalRequestAlready() {
+    }
+    
+    func rivalResponseAccepted(indexPath: IndexPath) {
+    }
+    
+    func rivalResponseRejected(indexPath: IndexPath) {
+    }
+    
+    func rivalResponseFailed() {
+    }
+    
+    func rivalRequestSuccess() {
+        self.rivalSendResultText.text = "sent!"
+        self.rivalSendResultSub.text = "one step closer."
+        
+        UIView.animate(withDuration: 0.8, animations: {
+            self.rivalLoadingOverlay.alpha = 0
+            }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, delay: 2.0, options: [], animations: {
+                self.rivalSendResultOverlay.alpha = 1
+            }, completion: { (finished: Bool) in
+                    UIView.animate(withDuration: 0.5, delay: 2.0, options: [], animations: {
+                        self.rivalOverlay.alpha = 0
+                    }, completion: { (finished: Bool) in
+                        UIView.animate(withDuration: 0.8, delay: 0.3, options: [], animations: {
+                            self.rivalBlur.alpha = 0
+                        
+                            self.self.rivalButton.alpha = 0.3
+                            self.rivalButton.isUserInteractionEnabled = false
+                        
+                            if(self.rivalSelectedType == "co-op"){
+                                UIView.transition(with: self.headerView, duration: 0.3, options: .curveEaseInOut, animations: {
+                                    self.rivalButton.backgroundColor = UIColor(named: "greenToDarker")
+                                    self.headerView.backgroundColor = UIColor(named: "greenToDarker")
+                                }, completion: nil)
+                            }
+                        else{
+                            UIView.transition(with: self.headerView, duration: 0.3, options: .curveEaseInOut, animations: {
+                                 self.rivalButton.backgroundColor = UIColor(named: "redToDark")
+                                 self.headerView.backgroundColor = UIColor(named: "redToDark")
+                            }, completion: nil)
+                        }
+                    }, completion: nil)
+                })
+            })
+        })
+    }
+    
+    func rivalRequestFail() {
+        self.rivalSendResultText.text = "error!"
+        self.rivalSendResultSub.text = "our bad. please try again."
+        
+        UIView.animate(withDuration: 0.8, animations: {
+            self.rivalLoadingOverlay.alpha = 1
+            }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, delay: 2.0, options: [], animations: {
+                self.rivalSendResultOverlay.alpha = 1
+            }, completion: { (finished: Bool) in
+                    UIView.animate(withDuration: 0.5, delay: 2.0, options: [], animations: {
+                        self.rivalOverlay.alpha = 0
+                    }, completion: { (finished: Bool) in
+                      UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                        self.rivalBlur.alpha = 1
+                    }, completion: nil)
+                })
+            })
+        })
+    }
+    
+    func stringToDate(_ str: String)->Date{
+        let formatter = DateFormatter()
+        formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+        formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+        return formatter.date(from: str)!
+    }
+    
+    private func checkRivals(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser!
+        var currentRival: RivalObj?
+        
+        var alreadyARival = false
+        for rival in currentUser.currentTempRivals{
+            let dbDate = self.stringToDate(rival.date)
+            
+            if(dbDate != nil){
+                let now = NSDate()
+                let formatter = DateFormatter()
+                formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+                formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                let nowString = formatter.string(from: now as Date)
+                let nowDate = self.stringToDate(nowString)
+                let dbFuture = dbDate.adding(minutes: 10)
+                
+                let validRival = nowDate.compare(.isEarlier(than: dbFuture))
+                
+                if(dbFuture != nil){
+                    if(!validRival){
+                        currentUser.currentTempRivals.remove(at: currentUser.currentTempRivals.index(of: rival)!)
+                    }
+                    else{
+                        if(rival.uid == userForProfile!.uId){
+                            alreadyARival = true
+                            currentRival = rival
+                        }
+                    }
+                }
+            }
+        }
+        
+        for rival in currentUser.tempRivals{
+            let dbDate = self.stringToDate(rival.date)
+            
+            if(dbDate != nil){
+                let now = NSDate()
+                let formatter = DateFormatter()
+                formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+                formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                let future = formatter.string(from: now as Date)
+                let dbFuture = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                
+                let validRival = dbDate.compareCloseTo(dbFuture, precision: 10.minutes.timeInterval)
+                
+                if(dbFuture != nil){
+                    if(!validRival){
+                        currentUser.tempRivals.remove(at: currentUser.tempRivals.index(of: rival)!)
+                    }
+                    else{
+                        if(rival.uid == userForProfile!.uId){
+                            alreadyARival = true
+                            currentRival = rival
+                        }
+                    }
+                }
+            }
+        }
+        
+        var contained = false
+        var gcPayload = [String]()
+        for game in userForProfile!.gamerTags{
+            for currentUserGame in delegate.currentUser!.gamerTags{
+                if (game.game == currentUserGame.game && !game.gamerTag.isEmpty){
+                    contained = true
+                    gcPayload.append(game.game)
+                }
+            }
+        }
+        
+        if(contained && !alreadyARival){
+            rivalButton.alpha = 1
+            rivalButton.addTarget(self, action: #selector(rivalClicked), for: .touchUpInside)
+            rivalButton.isUserInteractionEnabled = true
+            
+            checkGames(payload: gcPayload)
+        }
+        else if(contained && alreadyARival){
+            rivalButton.alpha = 0.3
+            rivalButton.isUserInteractionEnabled = false
+            
+            if(currentRival != nil){
+                if(currentRival!.type == "co-op"){
+                    UIView.transition(with: self.headerView, duration: 0.3, options: .curveEaseInOut, animations: {
+                        self.rivalButton.titleLabel?.text = "co-op"
+                        self.rivalButton.backgroundColor = UIColor(named: "greenToDarker")
+                        self.headerView.backgroundColor = UIColor(named: "greenToDarker")
+                    }, completion: nil)
+                }
+                else{
+                    UIView.transition(with: self.headerView, duration: 0.3, options: .curveEaseInOut, animations: {
+                        self.rivalButton.titleLabel?.text = "rival"
+                        self.rivalButton.backgroundColor = UIColor(named: "redToDark")
+                        self.headerView.backgroundColor = UIColor(named: "redToDark")
+                    }, completion: nil)
+                }
+            }
+        }
+        else{
+            rivalButton.alpha = 0
+            rivalButton.isUserInteractionEnabled = false
+        }
+    }
+    
+    
+    private func checkGames(payload: [String]){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        
+        for game in delegate.gcGames{
+            if(payload.contains(game.gameName)){
+                self.rivalOverlayPayload.append(game)
+            }
+        }
     }
 }
 
@@ -846,4 +1210,10 @@ extension UIVisualEffectView {
         }
     }
 
+}
+
+extension Date {
+    func adding(minutes: Int) -> Date {
+        return Calendar.current.date(byAdding: .minute, value: minutes, to: self)!
+    }
 }

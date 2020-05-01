@@ -60,11 +60,19 @@ protocol NavigateToProfile: class {
     func navigateToSettings()
     
     func navigateToCompetition(competition: CompetitionObj)
+    
+    func navigateToSponsor()
 }
 
 protocol RequestsUpdate: class{
     func updateCell(indexPath: IndexPath)
     func showQuizClicked(questions: [[String]])
+    func rivalRequestAlready()
+    func rivalRequestSuccess()
+    func rivalRequestFail()
+    func rivalResponseAccepted(indexPath: IndexPath)
+    func rivalResponseRejected(indexPath: IndexPath)
+    func rivalResponseFailed()
 }
 
 protocol TeamCallbacks: class{

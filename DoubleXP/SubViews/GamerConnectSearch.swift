@@ -42,6 +42,7 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        //check rivals on entry.
         
         if(game != nil){
             //gameHeaderImage.alpha = 0
@@ -82,12 +83,43 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
             xboxSwitch.addTarget(self, action: #selector(xboxSwitchChanged), for: UIControl.Event.valueChanged)
             nintendoSwitch.addTarget(self, action: #selector(nintendoSwitchChanged), for: UIControl.Event.valueChanged)
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                self.searchUsers(userName: nil)
-            }
-            
             Broadcaster.register(SearchCallbacks.self, observer: self)
+            
+            checkRivals()
         }
+    }
+    
+    private func checkRivals(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        currentUser = delegate.currentUser
+        
+        for rival in currentUser.currentTempRivals{
+            let calendar = Calendar.current
+            if(!rival.date.isEmpty){
+                let dbDate = self.stringToDate(rival.date) as NSDate
+                
+                if(dbDate != nil){
+                    let dbDateFuture = calendar.date(byAdding: .minute, value: 5, to: dbDate as Date)
+                    
+                    if(dbDateFuture != nil){
+                        if((dbDateFuture! as NSDate).isLessThanDate(dateToCompare: NSDate())){
+                            currentUser.currentTempRivals.remove(at: currentUser.currentTempRivals.index(of: rival)!)
+                        }
+                    }
+                }
+            }
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            self.searchUsers(userName: nil)
+        }
+        
+    }
+    
+    func stringToDate(_ str: String)->Date{
+        let formatter = DateFormatter()
+        formatter.dateFormat="yyyy.MM.dd hh:mm aaa"
+        return formatter.date(from: str)!
     }
     
     @objc func psSwitchChanged(stationSwitch: UISwitch) {
@@ -269,13 +301,14 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
                 
                 
                 let search = value?["search"] as? String ?? "true"
+                let gamerTag = value?["gamerTag"] as? String ?? ""
                 
-                if(search == "true"){
+                //make users that did not enter a gamertag are not searchable
+                if(search == "true" && !(gamerTag.isEmpty && gamerTag == "undefined")){
                     let games = value?["games"] as? [String] ?? [String]()
                     
                     if(games.contains(self.game!.gameName) && userName == nil){
                         let uId = (user as! DataSnapshot).key
-                        let gamerTag = value?["gamerTag"] as? String ?? ""
                         let bio = value?["bio"] as? String ?? ""
                         let sentRequests = value?["sentRequests"] as? [FriendRequestObject] ?? [FriendRequestObject]()
                         
@@ -551,4 +584,17 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
     
     func messageTextSubmitted(string: String, list: [String]?) {
     }
+    
+    func updateCell(indexPath: IndexPath) {
+    }
+    
+    func showQuizClicked(questions: [[String]]) {
+    }
 }
+
+extension Int {
+    func dateFromMilliseconds() -> Date {
+        return Date(timeIntervalSince1970: TimeInterval(self)/1000)
+    }
+}
+

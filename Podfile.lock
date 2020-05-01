@@ -1,5 +1,10 @@
 PODS:
   - AIFlatSwitch (1.0.7)
+  - AppAuth (1.3.0):
+    - AppAuth/Core (= 1.3.0)
+    - AppAuth/ExternalUserAgent (= 1.3.0)
+  - AppAuth/Core (1.3.0)
+  - AppAuth/ExternalUserAgent (1.3.0)
   - Bartinter (0.0.5)
   - CollapsibleTableSectionViewController (1.0.1)
   - DeepDiff (2.3.1)
@@ -7,11 +12,22 @@ PODS:
   - ElongationPreview (2.1.0)
   - EMPageViewController (4.0.0)
   - ExpyTableView (1.2.1)
-  - FBSDKCoreKit/Basics (6.4.0)
-  - FBSDKCoreKit/Core (6.4.0):
+  - FacebookCore (0.9.0):
+    - FBSDKCoreKit (~> 5.0)
+  - FacebookLogin (0.9.0):
+    - FacebookCore (~> 0.9.0)
+    - FBSDKCoreKit (~> 5.0)
+    - FBSDKLoginKit (~> 5.0)
+  - FBSDKCoreKit (5.15.1):
+    - FBSDKCoreKit/Basics (= 5.15.1)
+    - FBSDKCoreKit/Core (= 5.15.1)
+  - FBSDKCoreKit/Basics (5.15.1)
+  - FBSDKCoreKit/Core (5.15.1):
     - FBSDKCoreKit/Basics
-  - FBSDKCoreKit/Swift (6.4.0):
-    - FBSDKCoreKit/Core
+  - FBSDKLoginKit (5.15.1):
+    - FBSDKLoginKit/Login (= 5.15.1)
+  - FBSDKLoginKit/Login (5.15.1):
+    - FBSDKCoreKit (~> 5.0)
   - Firebase/Analytics (6.22.0):
     - Firebase/Core
   - Firebase/Auth (6.22.0):
@@ -95,6 +111,10 @@ PODS:
   - GoogleDataTransportCCTSupport (2.0.3):
     - GoogleDataTransport (~> 5.1)
     - nanopb (~> 0.3.901)
+  - GoogleSignIn (5.0.2):
+    - AppAuth (~> 1.2)
+    - GTMAppAuth (~> 1.0)
+    - GTMSessionFetcher/Core (~> 1.1)
   - GoogleUtilities/AppDelegateSwizzler (6.5.2):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
@@ -113,8 +133,14 @@ PODS:
     - GoogleUtilities/Logger
   - GoogleUtilities/UserDefaults (6.5.2):
     - GoogleUtilities/Logger
+  - GTMAppAuth (1.0.0):
+    - AppAuth/Core (~> 1.0)
+    - GTMSessionFetcher (~> 1.1)
+  - GTMSessionFetcher (1.3.1):
+    - GTMSessionFetcher/Full (= 1.3.1)
   - GTMSessionFetcher/Core (1.3.1)
-  - Hero (1.5.0)
+  - GTMSessionFetcher/Full (1.3.1):
+    - GTMSessionFetcher/Core (= 1.3.1)
   - ImageLoader (0.15.0)
   - InputBarAccessoryView (4.3.2):
     - InputBarAccessoryView/Core (= 4.3.2)
@@ -156,6 +182,7 @@ PODS:
   - SendBirdSDK (3.0.177)
   - SmoothButton (0.0.3)
   - SoftUIView (0.0.2)
+  - SwiftDate (5.1.0)
   - SwiftHTTP (3.0.1)
   - SwiftNotificationCenter (1.0.4)
   - SwiftRichString (3.7.1)
@@ -170,6 +197,7 @@ PODS:
   - ValidationComponents (0.3.0):
     - ValidationToolkit (~> 0.4.1)
   - ValidationToolkit (0.4.1)
+  - VideoBackground (0.2.0)
 
 DEPENDENCIES:
   - AIFlatSwitch
@@ -178,14 +206,15 @@ DEPENDENCIES:
   - ElongationPreview
   - EMPageViewController
   - ExpyTableView
-  - FBSDKCoreKit/Swift
+  - FacebookCore
+  - FacebookLogin
   - Firebase/Analytics
   - Firebase/Auth
   - Firebase/Database
   - Firebase/Messaging
   - FoldingCell
   - Giphy
-  - Hero
+  - GoogleSignIn
   - ImageLoader (~> 0.14)
   - lottie-ios
   - MessageKit
@@ -197,6 +226,7 @@ DEPENDENCIES:
   - SendBirdSDK
   - SmoothButton
   - SoftUIView
+  - SwiftDate (~> 5.0)
   - SwiftHTTP (~> 3.0)
   - SwiftNotificationCenter
   - SwiftRichString
@@ -206,10 +236,12 @@ DEPENDENCIES:
   - TwitterKit
   - UnderLineTextField (~> 2.1)
   - ValidationComponents
+  - VideoBackground
 
 SPEC REPOS:
   trunk:
     - AIFlatSwitch
+    - AppAuth
     - Bartinter
     - CollapsibleTableSectionViewController
     - DeepDiff
@@ -217,7 +249,10 @@ SPEC REPOS:
     - ElongationPreview
     - EMPageViewController
     - ExpyTableView
+    - FacebookCore
+    - FacebookLogin
     - FBSDKCoreKit
+    - FBSDKLoginKit
     - Firebase
     - FirebaseAnalytics
     - FirebaseAnalyticsInterop
@@ -236,9 +271,10 @@ SPEC REPOS:
     - GoogleAppMeasurement
     - GoogleDataTransport
     - GoogleDataTransportCCTSupport
+    - GoogleSignIn
     - GoogleUtilities
+    - GTMAppAuth
     - GTMSessionFetcher
-    - Hero
     - ImageLoader
     - InputBarAccessoryView
     - leveldb-library
@@ -258,6 +294,7 @@ SPEC REPOS:
     - SendBirdSDK
     - SmoothButton
     - SoftUIView
+    - SwiftDate
     - SwiftHTTP
     - SwiftNotificationCenter
     - SwiftRichString
@@ -269,9 +306,11 @@ SPEC REPOS:
     - UnderLineTextField
     - ValidationComponents
     - ValidationToolkit
+    - VideoBackground
 
 SPEC CHECKSUMS:
   AIFlatSwitch: fd56a5e6ab8769f0b52cef815c4f071e83050352
+  AppAuth: 73574f3013a1e65b9601a3ddc8b3158cce68c09d
   Bartinter: 3c1fc3bcb631b066fdd78f7e01f1635fbafffdea
   CollapsibleTableSectionViewController: c41694de812a1039c5f8581c934cf0fc38e4e871
   DeepDiff: e5ae6c50d0321568e4508cec5930b9f10bb293fc
@@ -279,7 +318,10 @@ SPEC CHECKSUMS:
   ElongationPreview: 84b401d349bfcf855e94d6cc6b95d609260b6d96
   EMPageViewController: de8c8d6ea44c77bc2463f2cb9b4128390d2391f2
   ExpyTableView: 19cf224c2ff04b1ec215ec52bc4ba6f81fa809ed
-  FBSDKCoreKit: 7bea330627be2601a9079413c615313746aa9f7c
+  FacebookCore: ba86524b66cfa86d0f8e65d08faa8504a9f732dd
+  FacebookLogin: 6cee9fd6e1fe976fe8f7eec199e27b28b14f5d63
+  FBSDKCoreKit: 1d5acf7c9d7a2f92bb1a242dc60cae5b7adb91df
+  FBSDKLoginKit: f1ea8026a58b52d30c9f2e6a58ca7d813619fb83
   Firebase: 32f9520684e87c7af3f0704f7f88042626d6b536
   FirebaseAnalytics: 83f822fd0d33a46f49f89b8c3ab16ab4d89df08a
   FirebaseAnalyticsInterop: 3f86269c38ae41f47afeb43ebf32a001f58fcdae
@@ -298,9 +340,10 @@ SPEC CHECKSUMS:
   GoogleAppMeasurement: e49be3954045b17d046f271b9cc1ec052bad9702
   GoogleDataTransport: 6ffa4dd0b6d547f8d27b91bd92fa9e197a3f5f1f
   GoogleDataTransportCCTSupport: 2d7e609f8c5af1a33d7d59053e6f8cba59365df5
+  GoogleSignIn: 7137d297ddc022a7e0aa4619c86d72c909fa7213
   GoogleUtilities: ad0f3b691c67909d03a3327cc205222ab8f42e0e
+  GTMAppAuth: 4deac854479704f348309e7b66189e604cf5e01e
   GTMSessionFetcher: cea130bbfe5a7edc8d06d3f0d17288c32ffe9925
-  Hero: b7385b75e7259da62f4f85462f59a5082d66b058
   ImageLoader: e0635d52020d64dc7687e3a3b14dc53212ac0442
   InputBarAccessoryView: 7985d418040a05fe894bd4b8328dd43ab35517c3
   leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
@@ -320,6 +363,7 @@ SPEC CHECKSUMS:
   SendBirdSDK: 7e271e1945ac82dd8c504406c5e04947577d524b
   SmoothButton: 993d5d9c80828754adac8444586fb06f392d5298
   SoftUIView: e04596489fc59b5c50ba4b2f970d82a277430263
+  SwiftDate: 6329e58969a2de31cea7f1ee1143b247693196e7
   SwiftHTTP: e94f1aa8cde58637dcc0100f6349de31a3337fde
   SwiftNotificationCenter: 760386da2ce03d3594cb5e96d1e22ec80b44b46f
   SwiftRichString: 9a6a70b4fe2cf428e38348b5ada5400da74621fd
@@ -331,7 +375,8 @@ SPEC CHECKSUMS:
   UnderLineTextField: b3f5307b56962331e30a965e81b79aae2df1de83
   ValidationComponents: fad1f9e9d7fbf3e10c893c880ef9d27627e90382
   ValidationToolkit: ce8e9c1a5d49eddc3266a009d46df5ea22042dbc
+  VideoBackground: b4a2f39d3b16254b2bec9488cb2968a06dff69c5
 
-PODFILE CHECKSUM: 75014154fbc51180d263ae1663823f329c5e3907
+PODFILE CHECKSUM: 920fac22df93bcd5d4f29b14b625c1a4024d5ef3
 
 COCOAPODS: 1.8.4

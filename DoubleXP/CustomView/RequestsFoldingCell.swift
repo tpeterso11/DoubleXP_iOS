@@ -42,7 +42,7 @@ class RequestsFoldingCell: FoldingCell{
         super.awakeFromNib()
     }
     
-    func setUI(friendRequest: FriendRequestObject?, team: TeamObject?, request: RequestObject?, indexPath: IndexPath, currentTableView: UITableView, callbacks: RequestsUpdate){
+    func setUI(friendRequest: FriendRequestObject?, team: TeamObject?, request: RequestObject?, rival: RivalObj?, indexPath: IndexPath, currentTableView: UITableView, callbacks: RequestsUpdate){
         self.indexPath = indexPath
         self.callbacks = callbacks
         self.currentTableView = currentTableView
@@ -86,6 +86,15 @@ class RequestsFoldingCell: FoldingCell{
             
             
             requestType.text = "Invite Request"
+        }
+        else if(rival != nil){
+            currentRequest = rival
+            gamerTagMan.text = rival?.gamerTag
+            gamerTagSub.text = "wants to play " + rival!.game
+            quizButton.isHidden = true
+            
+            
+            requestType.text = "Play Request"
         }
         else{
             currentRequest = team
@@ -138,6 +147,9 @@ class RequestsFoldingCell: FoldingCell{
         else if(self.currentRequest is RequestObject){
             landing?.navigateToProfile(uid: (currentRequest as! RequestObject).profile.userId)
         }
+        else if(self.currentRequest is RivalObj){
+            landing?.navigateToProfile(uid: (currentRequest as! RivalObj).uid)
+        }
         else{
             landing?.navigateToTeamDashboard(team: (currentRequest as! TeamObject), newTeam: false)
         }
@@ -168,6 +180,9 @@ class RequestsFoldingCell: FoldingCell{
                     let teamManager = TeamManager()
                     teamManager.acceptRequest(requestObject: self.currentRequest as! RequestObject, acceptedTeam: currentTeam!, callbacks: self.callbacks, indexPath: self.indexPath)
                 }
+            }
+            else if(self.currentRequest is RivalObj){
+                manager.acceptPlayRequest(position: self.indexPath, rival: (self.currentRequest as! RivalObj), callbacks: self.callbacks)
             }
             else{
                 let teamManager = TeamManager()
@@ -216,6 +231,9 @@ class RequestsFoldingCell: FoldingCell{
                 if(currentTeam != nil){
                     manager.rejectRequest(request: (self.currentRequest as! RequestObject), rejectedTeam: currentTeam!, callbacks: self.callbacks, indexPath: self.indexPath)
                 }
+            }
+            else if(self.currentRequest is RivalObj){
+                manager.rejectPlayRequest(position: self.indexPath, rival: (self.currentRequest as! RivalObj), callbacks: self.callbacks)
             }
             else{
                 let teamManager = TeamManager()

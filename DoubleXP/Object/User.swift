@@ -252,6 +252,48 @@ class User: NSObject, NSCoding, SenderType {
         }
     }
     
+    //current rivals that you have sent
+    var _currentTempRivals = [RivalObj]()
+    var currentTempRivals: [RivalObj] {
+        get {
+            return (_currentTempRivals)
+        }
+        set (newVal) {
+            _currentTempRivals = newVal
+        }
+    }
+    
+    //rivals that you have received, but not responded to.
+    var _tempRivals = [RivalObj]()
+       var tempRivals: [RivalObj] {
+           get {
+               return (_tempRivals)
+           }
+           set (newVal) {
+               _tempRivals = newVal
+           }
+       }
+    
+    var _acceptedTempRivals = [RivalObj]()
+    var acceptedTempRivals: [RivalObj] {
+        get {
+            return (_acceptedTempRivals)
+        }
+        set (newVal) {
+            _acceptedTempRivals = newVal
+        }
+    }
+    
+    var _rejectedTempRivals = [RivalObj]()
+    var rejectedTempRivals: [RivalObj] {
+        get {
+            return (_rejectedTempRivals)
+        }
+        set (newVal) {
+            _rejectedTempRivals = newVal
+        }
+    }
+    
     var _stats = [StatObject]()
     var stats: [StatObject] {
         get {
@@ -325,6 +367,10 @@ class User: NSObject, NSCoding, SenderType {
         self.notifications = (decoder.decodeObject(forKey: "notifications") as! String)
         self.teamInviteRequests = (decoder.decodeObject(forKey: "teamInviteRequests") as! [RequestObject])
         self.subscriptions = (decoder.decodeObject(forKey: "subscriptions") as! [String])
+        self.currentTempRivals = (decoder.decodeObject(forKey: "currentTempRivals") as! [RivalObj])
+        self.acceptedTempRivals = (decoder.decodeObject(forKey: "acceptedTempRivals") as! [RivalObj])
+        self.rejectedTempRivals = (decoder.decodeObject(forKey: "rejectedTempRivals") as! [RivalObj])
+        self.tempRivals = (decoder.decodeObject(forKey: "tempRivals") as! [RivalObj])
     }
     
     func encode(with coder: NSCoder) {
@@ -345,6 +391,10 @@ class User: NSObject, NSCoding, SenderType {
         coder.encode(self.notifications, forKey: "notifications")
         coder.encode(self.teamInviteRequests, forKey: "teamInviteRequests")
         coder.encode(self.subscriptions, forKey: "subscriptions")
+        coder.encode(self.currentTempRivals, forKey: "currentTempRivals")
+        coder.encode(self.acceptedTempRivals, forKey: "acceptedTempRivals")
+        coder.encode(self.rejectedTempRivals, forKey: "rejectedTempRivals")
+        coder.encode(self.tempRivals, forKey: "tempRivals")
     }
 }
 

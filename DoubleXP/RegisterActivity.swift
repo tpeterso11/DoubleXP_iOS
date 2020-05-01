@@ -11,10 +11,15 @@ import Firebase
 import ImageLoader
 import ValidationComponents
 import FBSDKCoreKit
+import FacebookLogin
+import PopupDialog
+import GoogleSignIn
 
-class RegisterActivity: UIViewController, UITextFieldDelegate {
+
+class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate {
     @IBOutlet weak var headerImage: UIImageView!
     
+    @IBOutlet weak var emailLoginCover: UIImageView!
     @IBOutlet weak var emailField: UITextField!
     @IBOutlet weak var passwordField: UITextField!
     @IBOutlet weak var closeX: UIImageView!
@@ -23,11 +28,117 @@ class RegisterActivity: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var nintendoSwitch: UISwitch!
     @IBOutlet weak var pcSwitch: UISwitch!
     @IBOutlet weak var nextButton: UIButton!
+    @IBOutlet weak var facebook: UIImageView!
+    @IBOutlet weak var googleSignIn: UIView!
     
     private var emailEntered = false
     private var passwordEntered = false
     private var consoleChosen = false
+    private var isMFAEnabled = false
     private var switches = [UISwitch]()
+    private var facebookLoginAccepted = false
+    private var googleLoginAccepted = false
+    private var googleToken = ""
+    private var facebookLoginUid = ""
+    private var facebookTokenString = ""
+    private var googleTokenString = ""
+    private var registrationType = ""
+    
+    func supportsAlertController() -> Bool {
+        return NSClassFromString("UIAlertController") != nil
+    }
+    
+    class SimpleTextPromptDelegate: NSObject, UIAlertViewDelegate {
+    }
+    
+    func loginManagerDidComplete(_ result: LoginResult) {
+        let alertController: UIAlertController
+        switch result {
+        case .cancelled:
+            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Canceled"))
+            
+            var buttons = [PopupDialogButton]()
+            let title = "facebook login canceled."
+            let message = "facebook login was canceled.."
+            
+            let button = DefaultButton(title: "try again.") { [weak self] in
+                self?.loginWithReadPermissions()
+                
+            }
+            buttons.append(button)
+            
+            let buttonOne = CancelButton(title: "i know") { [weak self] in
+                //do nothing
+            }
+            buttons.append(buttonOne)
+            
+            let popup = PopupDialog(title: title, message: message)
+            popup.addButtons(buttons)
+
+            // Present dialog
+            self.present(popup, animated: true, completion: nil)
+        case .failed(let error):
+            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Fail - " + error.localizedDescription))
+            
+            var buttons = [PopupDialogButton]()
+            let title = "facebook login error."
+            let message = "there was an error getting you logged into facebook. try again, or try registering using your email."
+            
+            let button = DefaultButton(title: "try again.") { [weak self] in
+                self?.loginWithReadPermissions()
+                
+            }
+            buttons.append(button)
+            
+            let buttonOne = CancelButton(title: "nevermind") { [weak self] in
+                //do nothing
+            }
+            buttons.append(buttonOne)
+            
+            let popup = PopupDialog(title: title, message: message)
+            popup.addButtons(buttons)
+
+            // Present dialog
+            self.present(popup, animated: true, completion: nil)
+            
+
+        case .success(_, _, let token):
+            self.facebookTokenString = token.tokenString
+            self.facebookLoginAccepted = true
+            
+            let top = CGAffineTransform(translationX: 0, y: 70)
+            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5,
+                           initialSpringVelocity: 0.5, options: [], animations: {
+                            self.emailLoginCover.transform = top
+                            self.emailLoginCover.alpha = 1
+                            self.emailField.alpha = 0.3
+                            self.emailField.isUserInteractionEnabled = false
+                            self.passwordField.alpha = 0.3
+                            self.passwordField.isUserInteractionEnabled = false
+            }, completion: nil)
+        }
+    }
+
+    @IBAction private func loginWithReadPermissions() {
+        let loginManager = LoginManager()
+        loginManager.logIn(
+            permissions: [.publicProfile, .email],
+            viewController: self
+        ) { result in
+            self.loginManagerDidComplete(result)
+        }
+    }
+
+    @IBAction private func logOut() {
+        let loginManager = LoginManager()
+        loginManager.logOut()
+
+        let alertController = UIAlertController(
+            title: "Logout",
+            message: "Logged out.", preferredStyle: .alert
+        )
+        present(alertController, animated: true, completion: nil)
+    }
     
     @IBOutlet weak var backX: UIImageView!
     override func viewDidLoad() {
@@ -46,6 +157,13 @@ class RegisterActivity: UIViewController, UITextFieldDelegate {
         emailField.addTarget(self, action: #selector(textFieldDidChange), for: UIControl.Event.editingChanged)
         passwordField.addTarget(self, action: #selector(textFieldDidChange), for: UIControl.Event.editingChanged)
 
+        let facebookTap = UITapGestureRecognizer(target: self, action: #selector(loginWithReadPermissions))
+        facebook.isUserInteractionEnabled = true
+        facebook.addGestureRecognizer(facebookTap)
+        
+        let googleTap = UITapGestureRecognizer(target: self, action: #selector(googleClicked))
+        googleSignIn.isUserInteractionEnabled = true
+        googleSignIn.addGestureRecognizer(googleTap)
         
         switches.append(psSwitch)
         switches.append(xboxSwitch)
@@ -57,9 +175,16 @@ class RegisterActivity: UIViewController, UITextFieldDelegate {
         nintendoSwitch.addTarget(self, action: #selector(nintendoSwitchChanged), for: UIControl.Event.valueChanged)
         pcSwitch.addTarget(self, action: #selector(pcSwitchChanged), for: UIControl.Event.valueChanged)
         
+        GIDSignIn.sharedInstance().delegate = self
+        
         checkNextButton()
         
         AppEvents.logEvent(AppEvents.Name(rawValue: "Register"))
+    }
+    
+    @objc func googleClicked(){
+        GIDSignIn.sharedInstance()?.presentingViewController = self
+        GIDSignIn.sharedInstance().signIn()
     }
     
     @objc func psSwitchChanged(stationSwitch: UISwitch) {
@@ -78,70 +203,616 @@ class RegisterActivity: UIViewController, UITextFieldDelegate {
         checkNextButton()
     }
     
-    func registerUser(email: String, pass: String){
-        Auth.auth().createUser(withEmail: email, password: pass) { authResult, error in
-            if(authResult != nil){
-                let uId = authResult?.user.uid ?? ""
+    func registerUser(email: String?, pass: String?, facebook: Bool, google: Bool){
+        if(facebook){
+            let credential = FacebookAuthProvider.credential(withAccessToken: self.facebookTokenString)
+            Auth.auth().signIn(with: credential) { (authResult, error) in
+              if let error = error {
+              let authError = error as NSError
+                AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Fail Firebase - " + error.localizedDescription))
+                
+                var message: String = ""
+                let code = String(error._code)
+                
+                switch(code){
+                    case "17007": message = "sorry, that email is already in use."
+                    case "17008": message = "sorry, please enter a valid email to continue."
+                    case "17009": message = "sorry, that password is incorrect. please try again."
+                    case "17011": message = "sorry, we do not have that user in our database."
+                    default: message = "there was an error logging you in. please try again."
+                }
+                
+                let alertController = UIAlertController(title: "registration error", message: message, preferredStyle: .alert)
+                alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                self.display(alertController: alertController)
+              }
+              else{
+                if(authResult != nil){
+                    let checkRef = Database.database().reference().child("Users").child((authResult?.user.uid)!)
+                    checkRef.observeSingleEvent(of: .value, with: { (snapshot) in
+                        if(snapshot.exists()){
+                            self.downloadDBRef(uid: (authResult?.user.uid)!)
+                        }
+                    else{
+                        let uId = authResult?.user.uid ?? ""
+                            let user = User(uId: uId)
+                                
+                            if(self.psSwitch.isOn){
+                                user.ps = true
+                            }
+                            
+                            if(self.pcSwitch.isOn){
+                                user.pc = true
+                            }
+                            
+                            if(self.xboxSwitch.isOn){
+                                user.xbox = true
+                            }
+                            
+                            if(self.nintendoSwitch.isOn){
+                                user.nintendo = true
+                            }
+                            checkRef.child("consoles").child("xbox").setValue(self.xboxSwitch.isOn)
+                            checkRef.child("consoles").child("ps").setValue(self.psSwitch.isOn)
+                            checkRef.child("consoles").child("nintendo").setValue(self.nintendoSwitch.isOn)
+                            checkRef.child("consoles").child("pc").setValue(self.pcSwitch.isOn)
+                            checkRef.child("platform").setValue("ios")
+                            checkRef.child("search").setValue("true")
+                            checkRef.child("registrationType").setValue("facebook")
+                            checkRef.child("model").setValue(UIDevice.modelName)
+                            checkRef.child("notifications").setValue("true")
+                                
+                            DispatchQueue.main.async {
+                                let delegate = UIApplication.shared.delegate as! AppDelegate
+                                delegate.currentUser = user
+                                    
+                                if(!user.pc && !user.xbox && !user.ps && !user.nintendo){
+                                    AppEvents.logEvent(AppEvents.Name(rawValue: "Register - No GC"))
+                                    self.performSegue(withIdentifier: "registerNoGC", sender: nil)
+                                }
+                                else{
+                                    if(user.pc){
+                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PC User"))
+                                    }
+                                    if(user.xbox){
+                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - xBox User"))
+                                    }
+                                    if(user.ps){
+                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PS User"))
+                                    }
+                                    if(user.nintendo){
+                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Nintendo User"))
+                                    }
+                                    
+                                    AppEvents.logEvent(AppEvents.Name(rawValue: "Register - GC"))
+                                    self.performSegue(withIdentifier: "registerGC", sender: nil)
+                                }
+                                }
+                            }
+                        }) { (error) in
+                            print(error.localizedDescription)
+                        }
+                    }
+                }
+            }
+        }
+        else if(google){
+                let credential = GoogleAuthProvider.credential(withIDToken: self.googleToken,
+                                                               accessToken: self.googleTokenString)
+                Auth.auth().signIn(with: credential) { (authResult, error) in
+                   if let error = error {
+                               let authError = error as NSError
+                                 AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Fail Firebase - " + error.localizedDescription))
+                                 
+                                 var message: String = ""
+                                 let code = String(error._code)
+                                 
+                                 switch(code){
+                                     case "17007": message = "sorry, that email is already in use."
+                                     case "17008": message = "sorry, please enter a valid email to continue."
+                                     case "17009": message = "sorry, that password is incorrect. please try again."
+                                     case "17011": message = "sorry, we do not have that user in our database."
+                                     default: message = "there was an error logging you in. please try again."
+                                 }
+                                 
+                                 let alertController = UIAlertController(title: "registration error", message: message, preferredStyle: .alert)
+                                 alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                                 self.display(alertController: alertController)
+                               }
+                  else{
+                    if(authResult != nil){
+                        let checkRef = Database.database().reference().child("Users").child((authResult?.user.uid)!)
+                        checkRef.observeSingleEvent(of: .value, with: { (snapshot) in
+                            if(snapshot.exists()){
+                                self.downloadDBRef(uid: (authResult?.user.uid)!)
+                            }
+                            else{
+                                let uId = authResult?.user.uid ?? ""
+                                    let user = User(uId: uId)
+                                        
+                                    if(self.psSwitch.isOn){
+                                        user.ps = true
+                                    }
+                                    
+                                    if(self.pcSwitch.isOn){
+                                        user.pc = true
+                                    }
+                                    
+                                    if(self.xboxSwitch.isOn){
+                                        user.xbox = true
+                                    }
+                                    
+                                    if(self.nintendoSwitch.isOn){
+                                        user.nintendo = true
+                                    }
+                                    checkRef.child("consoles").child("xbox").setValue(self.xboxSwitch.isOn)
+                                    checkRef.child("consoles").child("ps").setValue(self.psSwitch.isOn)
+                                    checkRef.child("consoles").child("nintendo").setValue(self.nintendoSwitch.isOn)
+                                    checkRef.child("consoles").child("pc").setValue(self.pcSwitch.isOn)
+                                    checkRef.child("platform").setValue("ios")
+                                    checkRef.child("search").setValue("true")
+                                    checkRef.child("registrationType").setValue("google")
+                                    checkRef.child("model").setValue(UIDevice.modelName)
+                                    checkRef.child("notifications").setValue("true")
+                                        
+                                    DispatchQueue.main.async {
+                                        let delegate = UIApplication.shared.delegate as! AppDelegate
+                                        delegate.currentUser = user
+                                            
+                                        if(!user.pc && !user.xbox && !user.ps && !user.nintendo){
+                                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - No GC"))
+                                            self.performSegue(withIdentifier: "registerNoGC", sender: nil)
+                                        }
+                                        else{
+                                            if(user.pc){
+                                                AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PC User"))
+                                            }
+                                            if(user.xbox){
+                                                AppEvents.logEvent(AppEvents.Name(rawValue: "Register - xBox User"))
+                                            }
+                                            if(user.ps){
+                                                AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PS User"))
+                                            }
+                                            if(user.nintendo){
+                                                AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Nintendo User"))
+                                            }
+                                            
+                                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - GC"))
+                                            self.performSegue(withIdentifier: "registerGC", sender: nil)
+                                        }
+                                        }
+                                    }
+                                }) { (error) in
+                                    print(error.localizedDescription)
+                                }
+                            }
+                    }
+                }
+            }
+        else if(!self.emailField.text!.isEmpty && !self.passwordField.text!.isEmpty){
+            if(email != nil && pass != nil){
+                Auth.auth().createUser(withEmail: email!, password: pass!) { authResult, error in
+                    if let error = error {
+                                 let authError = error as NSError
+                                   AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Fail Firebase - " + error.localizedDescription))
+                                   
+                                   var message: String = ""
+                                   let code = String(error._code)
+                                   
+                                   switch(code){
+                                       case "17007": message = "sorry, that email is already in use."
+                                       case "17008": message = "sorry, please enter a valid email to continue."
+                                       case "17009": message = "sorry, that password is incorrect. please try again."
+                                       case "17011": message = "sorry, we do not have that user in our database."
+                                       default: message = "there was an error logging you in. please try again."
+                                   }
+                                   
+                                   let alertController = UIAlertController(title: "registration error", message: message, preferredStyle: .alert)
+                                   alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                                   self.display(alertController: alertController)
+                                 }
+                    else{
+                        if(authResult != nil){
+                            let uId = authResult?.user.uid ?? ""
+                            let user = User(uId: uId)
+                            
+                            if(self.psSwitch.isOn){
+                                user.ps = true
+                            }
+                            
+                            if(self.pcSwitch.isOn){
+                                user.pc = true
+                            }
+                            
+                            if(self.xboxSwitch.isOn){
+                                user.xbox = true
+                            }
+                            
+                            if(self.nintendoSwitch.isOn){
+                                user.nintendo = true
+                            }
+                            
+                            let ref = Database.database().reference().child("Users").child((authResult?.user.uid)!)
+                            ref.child("consoles").child("xbox").setValue(self.xboxSwitch.isOn)
+                            ref.child("consoles").child("ps").setValue(self.psSwitch.isOn)
+                            ref.child("consoles").child("nintendo").setValue(self.nintendoSwitch.isOn)
+                            ref.child("consoles").child("pc").setValue(self.pcSwitch.isOn)
+                            ref.child("platform").setValue("ios")
+                            ref.child("search").setValue("true")
+                            ref.child("registrationType").setValue("email")
+                            ref.child("model").setValue(UIDevice.modelName)
+                            ref.child("notifications").setValue("true")
+                            
+                            DispatchQueue.main.async {
+                                let delegate = UIApplication.shared.delegate as! AppDelegate
+                                delegate.currentUser = user
+                                
+                                if(!user.pc && !user.xbox && !user.ps && !user.nintendo){
+                                    AppEvents.logEvent(AppEvents.Name(rawValue: "Register - No GC"))
+                                    self.performSegue(withIdentifier: "registerNoGC", sender: nil)
+                                }
+                                else{
+                                    if(user.pc){
+                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PC User"))
+                                    }
+                                    if(user.xbox){
+                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - xBox User"))
+                                    }
+                                    if(user.ps){
+                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PS User"))
+                                    }
+                                    if(user.nintendo){
+                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Nintendo User"))
+                                    }
+                                    
+                                    AppEvents.logEvent(AppEvents.Name(rawValue: "Register - GC"))
+                                    self.performSegue(withIdentifier: "registerGC", sender: nil)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else{
+            var buttons = [PopupDialogButton]()
+            let title = "login error."
+            let message = "there was an error getting you logged in. try again, or feel free to reach out if there is an issue."
+            
+            let button = DefaultButton(title: "try again.") { [weak self] in
+                self?.loginWithReadPermissions()
+            }
+            buttons.append(button)
+            
+            let buttonOne = CancelButton(title: "nevermind") { [weak self] in
+                self?.backButtonClicked(nil)
+            }
+            buttons.append(buttonOne)
+            
+            let popup = PopupDialog(title: title, message: message)
+            popup.addButtons(buttons)
+
+            // Present dialog
+            self.present(popup, animated: true, completion: nil)
+        }
+    }
+    
+    private func downloadDBRef(uid: String){
+        let ref = Database.database().reference().child("Users").child(uid)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+                // Get user value
+            if(snapshot.exists()){
+                let value = snapshot.value as? NSDictionary
+                let uId = snapshot.key
+                let gamerTag = value?["gamerTag"] as? String ?? ""
+                let subscriptions = value?["subscriptions"] as? [String] ?? [String]()
+                let competitions = value?["competitions"] as? [String] ?? [String]()
+                let bio = value?["bio"] as? String ?? ""
+                
+                let search = value?["search"] as? String ?? ""
+                if(search.isEmpty){
+                    ref.child("search").setValue("true")
+                }
+                
+                let notifications = value?["notifications"] as? String ?? ""
+                if(notifications.isEmpty){
+                    ref.child("notifications").setValue("true")
+                }
+                
+                var sentRequests = [FriendRequestObject]()
+                let sentArray = snapshot.childSnapshot(forPath: "sent_requests")
+                for friend in sentArray.children{
+                    let currentObj = friend as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    
+                    let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
+                    sentRequests.append(newFriend)
+                }
+                
+                var pendingRequests = [FriendRequestObject]()
+                let requestsArray = snapshot.childSnapshot(forPath: "pending_friends")
+                for friend in requestsArray.children{
+                    let currentObj = friend as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    
+                    let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
+                    pendingRequests.append(newFriend)
+                }
+                
+                var teamInviteReqs = [RequestObject]()
+                let teamInviteRequests = snapshot.childSnapshot(forPath: "inviteRequests")
+                 for invite in teamInviteRequests.children{
+                    let currentObj = invite as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let status = dict?["status"] as? String ?? ""
+                    let teamId = dict?["teamId"] as? String ?? ""
+                    let teamName = dict?["teamName"] as? String ?? ""
+                    let captainId = dict?["teamCaptainId"] as? String ?? ""
+                    let requestId = dict?["requestId"] as? String ?? ""
+                     
+                     let profile = currentObj.childSnapshot(forPath: "profile")
+                     let profileDict = profile.value as? [String: Any]
+                     let game = profileDict?["game"] as? String ?? ""
+                     let consoles = profileDict?["consoles"] as? [String] ?? [String]()
+                     let gamerTag = profileDict?["gamerTag"] as? String ?? ""
+                     let competitionId = profileDict?["competitionId"] as? String ?? ""
+                     let userId = profileDict?["userId"] as? String ?? ""
+                     let questions = profileDict?["questions"] as? [[String]] ?? [[String]]()
+                     
+                     let result = FreeAgentObject(gamerTag: gamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
+                     
+                     
+                     let newRequest = RequestObject(status: status, teamId: teamId, teamName: teamName, captainId: captainId, requestId: requestId)
+                     newRequest.profile = result
+                     
+                     teamInviteReqs.append(newRequest)
+                }
+                
+                var friends = [FriendObject]()
+                let friendsArray = snapshot.childSnapshot(forPath: "friends")
+                for friend in friendsArray.children{
+                    let currentObj = friend as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    
+                    let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
+                    friends.append(newFriend)
+                }
+                
+                
+                let games = value?["games"] as? [String] ?? [String]()
+                var gamerTags = [GamerProfile]()
+                let gamerTagsArray = snapshot.childSnapshot(forPath: "gamerTags")
+                for gamerTagObj in gamerTagsArray.children {
+                    let currentObj = gamerTagObj as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let currentTag = dict?["gamerTag"] as? String ?? ""
+                    let currentGame = dict?["game"] as? String ?? ""
+                    let console = dict?["console"] as? String ?? ""
+                    
+                    let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
+                    gamerTags.append(currentGamerTagObj)
+                }
+                
+                let messagingNotifications = value?["messagingNotifications"] as? Bool ?? false
+                var teams = [TeamObject]()
+                let teamsArray = snapshot.childSnapshot(forPath: "teams")
+                for teamObj in teamsArray.children {
+                    let currentObj = teamObj as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let teamName = dict?["teamName"] as? String ?? ""
+                    let teamId = dict?["teamId"] as? String ?? ""
+                    let games = dict?["games"] as? [String] ?? [String]()
+                    let consoles = dict?["consoles"] as? [String] ?? [String]()
+                    let teammateTags = dict?["teammateTags"] as? [String] ?? [String]()
+                    let teammateIds = dict?["teammateIds"] as? [String] ?? [String]()
+                    
+                    var invites = [TeamInviteObject]()
+                    let teamInvites = snapshot.childSnapshot(forPath: "teamInvites")
+                    for invite in teamInvites.children{
+                        let currentObj = invite as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let gamerTag = dict?["gamerTag"] as? String ?? ""
+                        let date = dict?["date"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
+                        let teamName = dict?["teamName"] as? String ?? ""
+                        
+                        let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid, teamName: teamName)
+                        invites.append(newInvite)
+                    }
+                    
+                    var teammateArray = [TeammateObject]()
+                    if(currentObj.hasChild("teammates")){
+                        let teammates = currentObj.childSnapshot(forPath: "teammates")
+                        for teammate in teammates.children{
+                            let currentTeammate = teammate as! DataSnapshot
+                            let dict = currentTeammate.value as? [String: Any]
+                            let gamerTag = dict?["gamerTag"] as? String ?? ""
+                            let date = dict?["date"] as? String ?? ""
+                            let uid = dict?["uid"] as? String ?? ""
+                            
+                            let teammate = TeammateObject(gamerTag: gamerTag, date: date, uid: uid)
+                            teammateArray.append(teammate)
+                        }
+                    }
+                    
+                    let teamInvitetags = dict?["teamInviteTags"] as? [String] ?? [String]()
+                    let captain = dict?["teamCaptain"] as? String ?? ""
+                    let imageUrl = dict?["imageUrl"] as? String ?? ""
+                    let teamChat = dict?["teamChat"] as? String ?? String()
+                    let teamNeeds = dict?["teamNeeds"] as? [String] ?? [String]()
+                    let selectedTeamNeeds = dict?["selectedTeamNeeds"] as? [String] ?? [String]()
+                    let captainId = dict?["teamCaptainId"] as? String ?? String()
+                    
+                    let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl, teamCaptainId: captainId)
+                    currentTeam.teammates = teammateArray
+                    teams.append(currentTeam)
+                }
+                
+                var currentTeamInvites = [TeamObject]()
+                let teamInvitesArray = snapshot.childSnapshot(forPath: "teamInvites")
+                for teamObj in teamInvitesArray.children {
+                    let currentObj = teamObj as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let teamName = dict?["teamName"] as? String ?? ""
+                    let teamId = dict?["teamId"] as? String ?? ""
+                    let games = dict?["games"] as? [String] ?? [String]()
+                    let consoles = dict?["consoles"] as? [String] ?? [String]()
+                    let teammateTags = dict?["teammateTags"] as? [String] ?? [String]()
+                    let teammateIds = dict?["teammateIds"] as? [String] ?? [String]()
+                    
+                    var invites = [TeamInviteObject]()
+                    let teamInvites = snapshot.childSnapshot(forPath: "teamInvites")
+                    for invite in teamInvites.children{
+                        let currentObj = invite as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let gamerTag = dict?["gamerTag"] as? String ?? ""
+                        let date = dict?["date"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
+                        let teamName = dict?["teamName"] as? String ?? ""
+                        
+                        let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid, teamName: teamName)
+                        invites.append(newInvite)
+                    }
+                    
+                    var teammateArray = [TeammateObject]()
+                    if(currentObj.hasChild("teammates")){
+                        let teammates = currentObj.childSnapshot(forPath: "teammates")
+                        for teammate in teammates.children{
+                            let currentTeammate = teammate as! DataSnapshot
+                            let dict = currentTeammate.value as? [String: Any]
+                            let gamerTag = dict?["gamerTag"] as? String ?? ""
+                            let date = dict?["date"] as? String ?? ""
+                            let uid = dict?["uid"] as? String ?? ""
+                            
+                            let teammate = TeammateObject(gamerTag: gamerTag, date: date, uid: uid)
+                            teammateArray.append(teammate)
+                        }
+                    }
+                    
+                    let teamInvitetags = dict?["teamInviteTags"] as? [String] ?? [String]()
+                    let captain = dict?["teamCaptain"] as? String ?? ""
+                    let imageUrl = dict?["imageUrl"] as? String ?? ""
+                    let teamChat = dict?["teamChat"] as? String ?? String()
+                    let teamNeeds = dict?["teamNeeds"] as? [String] ?? [String]()
+                    let selectedTeamNeeds = dict?["selectedTeamNeeds"] as? [String] ?? [String]()
+                    let captainId = dict?["teamCaptainId"] as? String ?? String()
+                    
+                    let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl, teamCaptainId: captainId)
+                    currentTeam.teammates = teammateArray
+                    currentTeamInvites.append(currentTeam)
+                }
+                
+                var currentStats = [StatObject]()
+                let statsArray = snapshot.childSnapshot(forPath: "stats")
+                for statObj in statsArray.children {
+                    let currentObj = statObj as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let gameName = dict?["gameName"] as? String ?? ""
+                    let playerLevelGame = dict?["playerLevelGame"] as? String ?? ""
+                    let playerLevelPVP = dict?["playerLevelPVP"] as? String ?? ""
+                    let killsPVP = dict?["killsPVP"] as? String ?? ""
+                    let killsPVE = dict?["killsPVE"] as? String ?? ""
+                    let statURL = dict?["statURL"] as? String ?? ""
+                    let setPublic = dict?["setPublic"] as? String ?? ""
+                    let authorized = dict?["authorized"] as? String ?? ""
+                    let currentRank = dict?["currentRank"] as? String ?? ""
+                    let totalRankedWins = dict?["otalRankedWins"] as? String ?? ""
+                    let totalRankedLosses = dict?["totalRankedLosses"] as? String ?? ""
+                    let totalRankedKills = dict?["totalRankedKills"] as? String ?? ""
+                    let totalRankedDeaths = dict?["totalRankedDeaths"] as? String ?? ""
+                    let mostUsedAttacker = dict?["mostUsedAttacker"] as? String ?? ""
+                    let mostUsedDefender = dict?["mostUsedDefender"] as? String ?? ""
+                    let gearScore = dict?["gearScore"] as? String ?? ""
+                    let codKills = dict?["codKills"] as? String ?? ""
+                    let codKd = dict?["codKd"] as? String ?? ""
+                    let codLevel = dict?["codLevel"] as? String ?? ""
+                    let codBestKills = dict?["codBestKills"] as? String ?? ""
+                    let codWins = dict?["codWins"] as? String ?? ""
+                    let codWlRatio = dict?["codWlRatio"] as? String ?? ""
+                    
+                    let currentStat = StatObject(gameName: gameName)
+                    currentStat.authorized = authorized
+                    currentStat.playerLevelGame = playerLevelGame
+                    currentStat.playerLevelPVP = playerLevelPVP
+                    currentStat.killsPVP = killsPVP
+                    currentStat.killsPVE = killsPVE
+                    currentStat.statUrl = statURL
+                    currentStat.setPublic = setPublic
+                    currentStat.authorized = authorized
+                    currentStat.currentRank = currentRank
+                    currentStat.totalRankedWins = totalRankedWins
+                    currentStat.totalRankedLosses = totalRankedLosses
+                    currentStat.totalRankedKills = totalRankedKills
+                    currentStat.totalRankedDeaths = totalRankedDeaths
+                    currentStat.mostUsedAttacker = mostUsedAttacker
+                    currentStat.mostUsedDefender = mostUsedDefender
+                    currentStat.gearScore = gearScore
+                    currentStat.codKills = codKills
+                    currentStat.codKd = codKd
+                    currentStat.codLevel = codLevel
+                    currentStat.codBestKills = codBestKills
+                    currentStat.codWins = codWins
+                    currentStat.codWlRatio = codWlRatio
+                    
+                    currentStats.append(currentStat)
+                }
+                
+                let consoleArray = snapshot.childSnapshot(forPath: "consoles")
+                let dict = consoleArray.value as? [String: Bool]
+                let nintendo = dict?["nintendo"] ?? false
+                let ps = dict?["ps"] ?? false
+                let xbox = dict?["xbox"] ?? false
+                let pc = dict?["pc"] ?? false
+                
                 let user = User(uId: uId)
-                
-                if(self.psSwitch.isOn){
-                    user.ps = true
-                }
-                
-                if(self.pcSwitch.isOn){
-                    user.pc = true
-                }
-                
-                if(self.xboxSwitch.isOn){
-                    user.xbox = true
-                }
-                
-                if(self.nintendoSwitch.isOn){
-                    user.nintendo = true
-                }
-                
-                let ref = Database.database().reference().child("Users").child((authResult?.user.uid)!)
-                ref.child("consoles").child("xbox").setValue(self.xboxSwitch.isOn)
-                ref.child("consoles").child("ps").setValue(self.psSwitch.isOn)
-                ref.child("consoles").child("nintendo").setValue(self.nintendoSwitch.isOn)
-                ref.child("consoles").child("pc").setValue(self.pcSwitch.isOn)
-                ref.child("platform").setValue("ios")
-                ref.child("search").setValue("true")
-                ref.child("model").setValue(UIDevice.modelName)
-                ref.child("notifications").setValue("true")
+                user.gamerTags = gamerTags
+                user.teams = teams
+                user.stats = currentStats
+                user.teamInvites = currentTeamInvites
+                user.games = games
+                user.friends = friends
+                user.pendingRequests = pendingRequests
+                user.sentRequests = sentRequests
+                user.gamerTag = gamerTag
+                user.messagingNotifications = messagingNotifications
+                user.pc = pc
+                user.ps = ps
+                user.xbox = xbox
+                user.nintendo = nintendo
+                user.bio = bio
+                user.search = search
+                user.notifications = notifications
+                user.teamInviteRequests = teamInviteReqs
+                user.subscriptions = subscriptions
+                user.competitions = competitions
                 
                 DispatchQueue.main.async {
                     let delegate = UIApplication.shared.delegate as! AppDelegate
                     delegate.currentUser = user
                     
-                    if(!user.pc && !user.xbox && !user.ps && !user.nintendo){
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - No GC"))
-                        self.performSegue(withIdentifier: "registerNoGC", sender: nil)
-                    }
-                    else{
-                        if(user.pc){
-                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PC User"))
-                        }
-                        if(user.xbox){
-                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - xBox User"))
-                        }
-                        if(user.ps){
-                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PS User"))
-                        }
-                        if(user.nintendo){
-                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Nintendo User"))
-                        }
-                        
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - GC"))
-                        self.performSegue(withIdentifier: "registerGC", sender: nil)
-                    }
+                    AppEvents.logEvent(AppEvents.Name(rawValue: "Successful Login"))
+                    
+                    self.performSegue(withIdentifier: "loginSuccessful", sender: nil)
                 }
             }
+            
+            }) { (error) in
+                AppEvents.logEvent(AppEvents.Name(rawValue: "Login Error"))
+                print(error.localizedDescription)
         }
     }
-    
+
     func checkNextButton(){
-        if(self.emailEntered && passwordEntered && checkSwitches()){
+        if((self.emailEntered && passwordEntered && checkSwitches()) || (self.emailLoginCover.alpha == 1 && self.facebookLoginAccepted && checkSwitches()) || (self.googleLoginAccepted && checkSwitches())){
             self.nextButton.alpha = 1
         }
         else{
@@ -195,7 +866,13 @@ class RegisterActivity: UIViewController, UITextFieldDelegate {
         
         //registerUser(email: email, pass: pass)
         if(!email.isEmpty && !pass.isEmpty && rule.evaluate(with: email)){
-            registerUser(email: email, pass: pass)
+            registerUser(email: email, pass: pass, facebook: false, google: false)
+        }
+        else if(self.facebookLoginAccepted && !self.facebookTokenString.isEmpty){
+            registerUser(email: nil, pass: nil, facebook: true, google: false)
+        }
+        else if(self.googleLoginAccepted && !self.googleTokenString.isEmpty && !self.googleToken.isEmpty){
+            registerUser(email: nil, pass: nil, facebook: false, google: true)
         }
         else{
             if(!rule.evaluate(with: email)){
@@ -230,6 +907,82 @@ class RegisterActivity: UIViewController, UITextFieldDelegate {
     private func display(alertController: UIAlertController){
         self.present(alertController, animated: true, completion: nil)
     }
+    
+    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error?) {
+      // ...
+      if let error = error {
+        // ...AppEvents.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login Fail - " + error.localizedDescription))
+        
+        var buttons = [PopupDialogButton]()
+        let title = "google login error."
+        let message = "there was an error getting you logged into google. try again, or try registering using your email."
+        
+        let button = DefaultButton(title: "try again.") { [weak self] in
+            self?.loginWithReadPermissions()
+            
+        }
+        buttons.append(button)
+        
+        let buttonOne = CancelButton(title: "nevermind") { [weak self] in
+            //do nothing
+        }
+        buttons.append(buttonOne)
+        
+        let popup = PopupDialog(title: title, message: message)
+        popup.addButtons(buttons)
+
+        // Present dialog
+        self.present(popup, animated: true, completion: nil)
+        return
+      }
+
+      guard let authentication = user.authentication else { return }
+
+        self.googleTokenString = authentication.accessToken
+        self.googleToken = authentication.idToken
+        self.googleLoginAccepted = true
+        
+        let top = CGAffineTransform(translationX: 0, y: 70)
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5,
+                       initialSpringVelocity: 0.5, options: [], animations: {
+                        self.emailLoginCover.transform = top
+                        self.emailLoginCover.alpha = 1
+                        self.emailField.alpha = 0.3
+                        self.emailField.isUserInteractionEnabled = false
+                        self.passwordField.alpha = 0.3
+                        self.passwordField.isUserInteractionEnabled = false
+        }, completion: nil)
+        
+    }
+
+    func sign(_ signIn: GIDSignIn!, didDisconnectWith user: GIDGoogleUser!, withError error: Error!) {
+        // Perform any operations when the user disconnects from app here.
+        // ...
+    }
+    
+    /*func showTextInputPrompt(withMessage message: String?,  completion: ((Bool, String) -> Void)? = nil) {
+        if supportsAlertController() {
+            let prompt = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+            weak var weakPrompt = prompt
+            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
+                    completion!(false, "")
+                })
+            let okAction = UIAlertAction(title: "Ok", style: .default, handler: { action in
+                    let strongPrompt = weakPrompt
+                    completion!(true, (strongPrompt?.textFields?[0].text) ?? "")
+                })
+            prompt.addTextField(configurationHandler: nil)
+            prompt.addAction(cancelAction)
+            prompt.addAction(okAction)
+            present(prompt, animated: true)
+        }
+        else {
+            let prompt = SimpleTextPromptDelegate()
+            let alertView = UIAlertView(title: "", message: message ?? "error", delegate: prompt, cancelButtonTitle: "Cancel", otherButtonTitles: "Ok")
+            alertView.alertViewStyle = .plainTextInput
+            alertView.show()
+        }
+    }*/
 }
 
 public extension UIDevice {

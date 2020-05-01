@@ -13,6 +13,7 @@ import moa
 import MSPeekCollectionViewDelegateImplementation
 import Bartinter
 import FBSDKCoreKit
+import VideoBackground
 
 class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, MSPeekImplementationDelegate {
     @IBOutlet weak var gcGameScroll: UICollectionView!
@@ -33,7 +34,7 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
         gcGameScroll.configureForPeekingDelegate()
         let todaysDate:NSDate = NSDate()
         let dateFormatter:DateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMMM dd-yyyy"
+        dateFormatter.dateFormat = "MMMM.dd.yyyy"
         let todayString:String = dateFormatter.string(from: todaysDate as Date)
         
         currentDate.text = todayString
@@ -85,7 +86,7 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         secondaryPayload.append(contentsOf: appDelegate.competitions)
         
-        let userOne = RecommendedUser(gamerTag: "allthesaints011", uid: "lD6mtUk4ZshjQ7EHLtRUf7v22Xs2")
+        let userOne = RecommendedUser(gamerTag: "allthesaints011", uid: "UNrTyfFOeHZB3T2HQvUVevIxHkE2")
         let userTwo = RecommendedUser(gamerTag: "fitboy_", uid: "oFdx8UequuOs77s8daWFifODVhJ3")
         let userThree = RecommendedUser(gamerTag: "Kwatakye Raven", uid: "N1k1BqmvEvdOXrbmi2p91kTNLOo1")
         
@@ -144,6 +145,39 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
                 cell.gameName.text = (current as! CompetitionObj).gameName
                 cell.topPrize.text = "top prize: " + (current as! CompetitionObj).topPrize
                 
+                if(!(current as! CompetitionObj).videoPlayed){
+                    if((current as! CompetitionObj).gcName == "NBA 2K20"){
+                        guard let videoPath = Bundle.main.path(forResource: "basketball", ofType: "mov"),
+                        let imagePath = Bundle.main.path(forResource: "null", ofType: "png") else{
+                            return cell
+                        }
+                        
+                        let options = VideoOptions(pathToVideo: videoPath,
+                                                   pathToImage: imagePath,
+                                                   isMuted: true,
+                                                   shouldLoop: false)
+                        let videoView = VideoBackground(frame: cell.bounds, options: options)
+                        videoView.layer.masksToBounds = true
+                        videoView.alpha = 0.3
+                        
+                        //videoView.heightAnchor.constraint(equalTo: cell.contentView.heightAnchor).isActive = true
+                        cell.contentView.insertSubview(videoView, at: 0)
+                    }
+                    (current as! CompetitionObj).videoPlayed = true
+                }
+                
+                cell.contentView.layer.cornerRadius = 10.0
+                cell.contentView.layer.borderWidth = 1.0
+                cell.contentView.layer.borderColor = UIColor.clear.cgColor
+                cell.contentView.layer.masksToBounds = true
+                
+                cell.layer.shadowColor = UIColor.black.cgColor
+                cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+                cell.layer.shadowRadius = 2.0
+                cell.layer.shadowOpacity = 0.5
+                cell.layer.masksToBounds = false
+                cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
+                    
                 return cell
             }
         }

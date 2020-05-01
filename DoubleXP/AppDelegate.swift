@@ -11,6 +11,7 @@ import CoreData
 import Firebase
 import TwitterKit
 import FBSDKCoreKit
+import GoogleSignIn
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
@@ -40,6 +41,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         // Override point for customization after application launch.
         
         FirebaseApp.configure()
+        GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
         
         Messaging.messaging().delegate = self
         
@@ -66,6 +68,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         getToken()
 
         return true
+    }
+    
+    @available(iOS 9.0, *)
+    func application(_ application: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any])
+      -> Bool {
+      return GIDSignIn.sharedInstance().handle(url)
+    }
+    
+    func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
+        return GIDSignIn.sharedInstance().handle(url)
     }
     
     func addToNavStack(vc: ParentVC){
@@ -276,7 +288,53 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         //subscribe to topic to send message to multiple device
         //self.subscribeToTopic()
     }
+    
+    /*func application(
+      _ application: UIApplication,
+      continue userActivity: NSUserActivity,
+      restorationHandler: @escaping ([UIUserActivityRestoring]?
+    ) -> Void) -> Bool {
+      
+      // 1
+      guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+        let url = userActivity.webpageURL,
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
+          return false
+      }
+      
+      // 2
+      if let computer = ItemHandler.sharedInstance.items
+        .filter({ $0.path == components.path}).first {
+        presentDetailViewController(computer)
+        return true
+      }
+      
+      // 3
+      if let webpageUrl = URL(string: "http://rw-universal-links-final.herokuapp.com") {
+        application.open(webpageUrl)
+        return false
+      }
+      
+      return false
+    }*/
 }
+
+/*func presentDetailViewController(_ computer: Computer) {
+  let storyboard = UIStoryboard(name: "Main", bundle: nil)
+  
+  guard
+    let detailVC = storyboard
+      .instantiateViewController(withIdentifier: "DetailController")
+        as? ComputerDetailController,
+    let navigationVC = storyboard
+      .instantiateViewController(withIdentifier: "NavigationController")
+        as? UINavigationController
+  else { return }
+  
+  detailVC.item = computer
+  navigationVC.modalPresentationStyle = .formSheet
+  navigationVC.pushViewController(detailVC, animated: true)
+}*/
 
 public struct KeepOrderDictionary<Key, Value> where Key : Hashable
 {

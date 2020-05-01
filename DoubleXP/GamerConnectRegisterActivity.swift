@@ -1000,7 +1000,12 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                 ref.child("gamerTag").setValue(self.savedTag)
             }
             else{
-                ref.child("gamerTag").setValue(self.sendUpArray[0]["gamerTag"])
+                if(!self.sendUpArray.isEmpty){
+                    ref.child("gamerTag").setValue(self.sendUpArray[0]["gamerTag"])
+                }
+                else{
+                    ref.child("gamerTag").setValue("undefined")
+                }
             }
             
             var count = 0

@@ -81,8 +81,8 @@
             timestampString = "593448618.68404"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "33"
-            endingLineNumber = "33"
+            startingLineNumber = "34"
+            endingLineNumber = "34"
             landmarkName = "viewDidLoad()"
             landmarkType = "7">
          </BreakpointContent>
@@ -98,8 +98,8 @@
             timestampString = "595718838.466342"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "68"
-            endingLineNumber = "68"
+            startingLineNumber = "208"
+            endingLineNumber = "208"
             landmarkName = "LoginController"
             landmarkType = "3">
          </BreakpointContent>
@@ -115,8 +115,8 @@
             timestampString = "595718838.466403"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "39"
-            endingLineNumber = "39"
+            startingLineNumber = "154"
+            endingLineNumber = "154"
             landmarkName = "loginButtonClicked(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -132,8 +132,8 @@
             timestampString = "595718838.466561"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "171"
-            endingLineNumber = "171"
+            startingLineNumber = "321"
+            endingLineNumber = "321"
             landmarkName = "downloadDBRef(uid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -166,8 +166,8 @@
             timestampString = "593448618.686126"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "55"
-            endingLineNumber = "55"
+            startingLineNumber = "67"
+            endingLineNumber = "67"
             landmarkName = "getAppConfig()"
             landmarkType = "7">
          </BreakpointContent>
@@ -234,8 +234,8 @@
             timestampString = "595656238.922698"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1024"
-            endingLineNumber = "1024"
+            startingLineNumber = "1029"
+            endingLineNumber = "1029"
             landmarkName = "zipItUp()"
             landmarkType = "7">
          </BreakpointContent>
@@ -251,8 +251,8 @@
             timestampString = "595656238.922737"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1024"
-            endingLineNumber = "1024"
+            startingLineNumber = "1029"
+            endingLineNumber = "1029"
             landmarkName = "zipItUp()"
             landmarkType = "7">
          </BreakpointContent>
@@ -268,8 +268,8 @@
             timestampString = "595656238.922775"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1031"
-            endingLineNumber = "1031"
+            startingLineNumber = "1036"
+            endingLineNumber = "1036"
             landmarkName = "zipItUp()"
             landmarkType = "7">
          </BreakpointContent>
@@ -319,8 +319,8 @@
             timestampString = "595656238.922912"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1031"
-            endingLineNumber = "1031"
+            startingLineNumber = "1036"
+            endingLineNumber = "1036"
             landmarkName = "zipItUp()"
             landmarkType = "7">
          </BreakpointContent>
@@ -353,8 +353,8 @@
             timestampString = "595656238.922989"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1031"
-            endingLineNumber = "1031"
+            startingLineNumber = "1036"
+            endingLineNumber = "1036"
             landmarkName = "zipItUp()"
             landmarkType = "7">
          </BreakpointContent>
@@ -370,25 +370,8 @@
             timestampString = "595656238.923028"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1031"
-            endingLineNumber = "1031"
-            landmarkName = "zipItUp()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "2DB2032B-753C-438D-8C61-1A445151D6CA"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "DoubleXP/GamerConnectRegisterActivity.swift"
-            timestampString = "595656238.923066"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1031"
-            endingLineNumber = "1031"
+            startingLineNumber = "1036"
+            endingLineNumber = "1036"
             landmarkName = "zipItUp()"
             landmarkType = "7">
          </BreakpointContent>
@@ -404,8 +387,8 @@
             timestampString = "595656238.923104"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1031"
-            endingLineNumber = "1031"
+            startingLineNumber = "1036"
+            endingLineNumber = "1036"
             landmarkName = "zipItUp()"
             landmarkType = "7">
          </BreakpointContent>
@@ -421,8 +404,8 @@
             timestampString = "595656238.923143"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1031"
-            endingLineNumber = "1031"
+            startingLineNumber = "1036"
+            endingLineNumber = "1036"
             landmarkName = "zipItUp()"
             landmarkType = "7">
          </BreakpointContent>
@@ -438,8 +421,8 @@
             timestampString = "595718838.4669"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "36"
-            endingLineNumber = "36"
+            startingLineNumber = "146"
+            endingLineNumber = "146"
             landmarkName = "viewDidLoad()"
             landmarkType = "7">
          </BreakpointContent>
@@ -455,8 +438,8 @@
             timestampString = "595718838.466942"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "43"
-            endingLineNumber = "43"
+            startingLineNumber = "158"
+            endingLineNumber = "158"
             landmarkName = "loginButtonClicked(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -472,8 +455,8 @@
             timestampString = "595718838.4669811"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "34"
-            endingLineNumber = "34"
+            startingLineNumber = "144"
+            endingLineNumber = "144"
             landmarkName = "viewDidLoad()"
             landmarkType = "7">
             <Locations>
@@ -523,8 +506,8 @@
             timestampString = "595718838.4670171"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "44"
-            endingLineNumber = "44"
+            startingLineNumber = "160"
+            endingLineNumber = "160"
             landmarkName = "loginButtonClicked(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -540,8 +523,8 @@
             timestampString = "595718838.467057"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "832"
-            endingLineNumber = "832"
+            startingLineNumber = "1053"
+            endingLineNumber = "1053"
             landmarkName = "navigateToTeamDashboard(team:newTeam:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -557,8 +540,8 @@
             timestampString = "595717855.461077"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "107"
-            endingLineNumber = "107"
+            startingLineNumber = "108"
+            endingLineNumber = "108"
             landmarkName = "collectionView(_:cellForItemAt:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -574,8 +557,8 @@
             timestampString = "595718838.467126"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "832"
-            endingLineNumber = "832"
+            startingLineNumber = "1053"
+            endingLineNumber = "1053"
             landmarkName = "navigateToTeamDashboard(team:newTeam:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -591,8 +574,8 @@
             timestampString = "595706349.202767"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "243"
-            endingLineNumber = "243"
+            startingLineNumber = "264"
+            endingLineNumber = "264"
             landmarkName = "loadUserInfo(uid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -608,8 +591,8 @@
             timestampString = "595706349.202955"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "65"
-            endingLineNumber = "65"
+            startingLineNumber = "85"
+            endingLineNumber = "85"
             landmarkName = "viewDidLoad()"
             landmarkType = "7">
          </BreakpointContent>
@@ -642,8 +625,8 @@
             timestampString = "595706349.2030571"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "62"
-            endingLineNumber = "62"
+            startingLineNumber = "82"
+            endingLineNumber = "82"
             landmarkName = "PlayerProfile"
             landmarkType = "3">
          </BreakpointContent>
@@ -676,8 +659,8 @@
             timestampString = "595706349.203267"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "253"
-            endingLineNumber = "253"
+            startingLineNumber = "274"
+            endingLineNumber = "274"
             landmarkName = "loadUserInfo(uid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -693,8 +676,8 @@
             timestampString = "595706349.203377"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "289"
-            endingLineNumber = "289"
+            startingLineNumber = "314"
+            endingLineNumber = "314"
             landmarkName = "loadUserInfo(uid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -710,8 +693,8 @@
             timestampString = "595706349.203493"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "246"
-            endingLineNumber = "246"
+            startingLineNumber = "267"
+            endingLineNumber = "267"
             landmarkName = "loadUserInfo(uid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -727,8 +710,8 @@
             timestampString = "595706349.203548"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "238"
-            endingLineNumber = "238"
+            startingLineNumber = "259"
+            endingLineNumber = "259"
             landmarkName = "loadUserInfo(uid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -744,8 +727,8 @@
             timestampString = "595706349.203604"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "241"
-            endingLineNumber = "241"
+            startingLineNumber = "262"
+            endingLineNumber = "262"
             landmarkName = "loadUserInfo(uid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -761,8 +744,8 @@
             timestampString = "595706349.20366"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "66"
-            endingLineNumber = "66"
+            startingLineNumber = "86"
+            endingLineNumber = "86"
             landmarkName = "viewDidLoad()"
             landmarkType = "7">
          </BreakpointContent>
@@ -778,8 +761,8 @@
             timestampString = "595718838.467469"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "675"
-            endingLineNumber = "675"
+            startingLineNumber = "886"
+            endingLineNumber = "886"
             landmarkName = "backButtonClicked(_:)"
             landmarkType = "7">
             <Locations>
@@ -821,23 +804,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "50B1F51C-F80C-42E6-9EED-FA1EDF816478"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "DoubleXP/SubViews/GamerConnectFrag.swift"
-            timestampString = "595717855.461893"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "172"
-            endingLineNumber = "172"
-            landmarkName = "collectionView(_:cellForItemAt:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "79192924-3778-4F62-8788-5E694492C4D3"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -846,8 +812,8 @@
             timestampString = "595706349.203898"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "313"
-            endingLineNumber = "313"
+            startingLineNumber = "346"
+            endingLineNumber = "346"
             landmarkName = "searchUsers(userName:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -863,8 +829,8 @@
             timestampString = "595706349.204298"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "202"
-            endingLineNumber = "202"
+            startingLineNumber = "234"
+            endingLineNumber = "234"
             landmarkName = "collectionView(_:cellForItemAt:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -880,8 +846,8 @@
             timestampString = "595706349.204584"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "294"
-            endingLineNumber = "294"
+            startingLineNumber = "327"
+            endingLineNumber = "327"
             landmarkName = "searchUsers(userName:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -897,8 +863,8 @@
             timestampString = "595706349.20485"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "226"
-            endingLineNumber = "226"
+            startingLineNumber = "258"
+            endingLineNumber = "258"
             landmarkName = "collectionView(_:didSelectItemAt:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -914,8 +880,8 @@
             timestampString = "595706349.205085"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "313"
-            endingLineNumber = "313"
+            startingLineNumber = "346"
+            endingLineNumber = "346"
             landmarkName = "searchUsers(userName:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -931,8 +897,8 @@
             timestampString = "595706349.205317"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "117"
-            endingLineNumber = "117"
+            startingLineNumber = "149"
+            endingLineNumber = "149"
             landmarkName = "nintendoSwitchChanged(switchSwitch:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -948,8 +914,8 @@
             timestampString = "595706349.205598"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "248"
-            endingLineNumber = "248"
+            startingLineNumber = "269"
+            endingLineNumber = "269"
             landmarkName = "loadUserInfo(uid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -982,8 +948,8 @@
             timestampString = "595706349.205727"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "130"
-            endingLineNumber = "130"
+            startingLineNumber = "162"
+            endingLineNumber = "162"
             landmarkName = "collectionView(_:numberOfItemsInSection:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -999,8 +965,8 @@
             timestampString = "595706349.205956"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "208"
-            endingLineNumber = "208"
+            startingLineNumber = "240"
+            endingLineNumber = "240"
             landmarkName = "collectionView(_:cellForItemAt:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1016,8 +982,8 @@
             timestampString = "595739736.1862611"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "107"
-            endingLineNumber = "107"
+            startingLineNumber = "93"
+            endingLineNumber = "93"
             landmarkName = "buildRequests(user:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1033,8 +999,8 @@
             timestampString = "595739736.1864001"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "122"
-            endingLineNumber = "122"
+            startingLineNumber = "165"
+            endingLineNumber = "165"
             landmarkName = "refreshHandler()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1129,8 +1095,8 @@
             filePath = "DoubleXP/LoginController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "101"
-            endingLineNumber = "101"
+            startingLineNumber = "251"
+            endingLineNumber = "251"
             landmarkName = "downloadDBRef(uid:)"
             landmarkType = "7">
             <Locations>
@@ -1177,8 +1143,8 @@
             filePath = "DoubleXP/LoginController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "314"
-            endingLineNumber = "314"
+            startingLineNumber = "464"
+            endingLineNumber = "464"
             landmarkName = "downloadDBRef(uid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1193,8 +1159,8 @@
             filePath = "DoubleXP/LoginController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "104"
-            endingLineNumber = "104"
+            startingLineNumber = "254"
+            endingLineNumber = "254"
             landmarkName = "downloadDBRef(uid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1209,8 +1175,8 @@
             filePath = "DoubleXP/LoginController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "99"
-            endingLineNumber = "99"
+            startingLineNumber = "249"
+            endingLineNumber = "249"
             landmarkName = "downloadDBRef(uid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1225,8 +1191,8 @@
             filePath = "DoubleXP/LoginController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "341"
-            endingLineNumber = "341"
+            startingLineNumber = "491"
+            endingLineNumber = "491"
             landmarkName = "downloadDBRef(uid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1241,8 +1207,8 @@
             filePath = "DoubleXP/LoginController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "105"
-            endingLineNumber = "105"
+            startingLineNumber = "255"
+            endingLineNumber = "255"
             landmarkName = "downloadDBRef(uid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1257,8 +1223,8 @@
             filePath = "DoubleXP/LoginController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "85"
-            endingLineNumber = "85"
+            startingLineNumber = "235"
+            endingLineNumber = "235"
             landmarkName = "downloadDBRef(uid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1321,8 +1287,8 @@
             filePath = "DoubleXP/SubViews/FAQuizPage.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "95"
-            endingLineNumber = "95"
+            startingLineNumber = "97"
+            endingLineNumber = "97"
             landmarkName = "viewDidLoad()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1385,8 +1351,8 @@
             filePath = "DoubleXP/SubViews/FAQuizPage.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "96"
-            endingLineNumber = "96"
+            startingLineNumber = "98"
+            endingLineNumber = "98"
             landmarkName = "viewDidLoad()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1401,8 +1367,8 @@
             filePath = "DoubleXP/SubViews/FAQuizPage.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "99"
-            endingLineNumber = "99"
+            startingLineNumber = "101"
+            endingLineNumber = "101"
             landmarkName = "viewDidLoad()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1625,8 +1591,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1142"
-            endingLineNumber = "1142"
+            startingLineNumber = "1363"
+            endingLineNumber = "1363"
             landmarkName = "removeBottomNav(showNewNav:hideSearch:searchHint:searchButtonText:isMessaging:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1641,8 +1607,8 @@
             filePath = "DoubleXP/PreSplashActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "691"
-            endingLineNumber = "691"
+            startingLineNumber = "822"
+            endingLineNumber = "822"
             landmarkName = "convertFriends(list:pathString:userUid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1657,8 +1623,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1094"
-            endingLineNumber = "1094"
+            startingLineNumber = "1315"
+            endingLineNumber = "1315"
             landmarkName = "removeBottomNav(showNewNav:hideSearch:searchHint:searchButtonText:isMessaging:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1673,8 +1639,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "893"
-            endingLineNumber = "893"
+            startingLineNumber = "1114"
+            endingLineNumber = "1114"
             landmarkName = "navigateToFreeAgentQuiz(user:team:game:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1689,8 +1655,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "635"
-            endingLineNumber = "635"
+            startingLineNumber = "846"
+            endingLineNumber = "846"
             landmarkName = "searchClicked(_:)"
             landmarkType = "7">
             <Locations>
@@ -1753,8 +1719,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1028"
-            endingLineNumber = "1028"
+            startingLineNumber = "1249"
+            endingLineNumber = "1249"
             landmarkName = "updateNavigation(currentFrag:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1817,8 +1783,8 @@
             filePath = "DoubleXP/SubViews/PlayerProfile.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "452"
-            endingLineNumber = "452"
+            startingLineNumber = "486"
+            endingLineNumber = "486"
             landmarkName = "showDrawerAndOverlay()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1833,8 +1799,8 @@
             filePath = "DoubleXP/SubViews/PlayerProfile.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "293"
-            endingLineNumber = "293"
+            startingLineNumber = "318"
+            endingLineNumber = "318"
             landmarkName = "PlayerProfile"
             landmarkType = "3">
          </BreakpointContent>
@@ -1849,8 +1815,8 @@
             filePath = "DoubleXP/SubViews/PlayerProfile.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "291"
-            endingLineNumber = "291"
+            startingLineNumber = "316"
+            endingLineNumber = "316"
             landmarkName = "loadUserInfo(uid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1865,8 +1831,8 @@
             filePath = "DoubleXP/SubViews/GamerConnectSearch.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "340"
-            endingLineNumber = "340"
+            startingLineNumber = "373"
+            endingLineNumber = "373"
             landmarkName = "searchUsers(userName:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1897,8 +1863,8 @@
             filePath = "DoubleXP/SubViews/GamerConnectSearch.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "337"
-            endingLineNumber = "337"
+            startingLineNumber = "370"
+            endingLineNumber = "370"
             landmarkName = "searchUsers(userName:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1913,25 +1879,9 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "935"
-            endingLineNumber = "935"
+            startingLineNumber = "1156"
+            endingLineNumber = "1156"
             landmarkName = "navigateToMessaging(groupChannelUrl:otherUserId:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "AAE221AE-547B-46B2-9141-14DF39AA1B35"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "DoubleXP/SubViews/Requests.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "60"
-            endingLineNumber = "60"
-            landmarkName = "viewDidLoad()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1945,8 +1895,8 @@
             filePath = "DoubleXP/SubViews/Requests.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "129"
-            endingLineNumber = "129"
+            startingLineNumber = "172"
+            endingLineNumber = "172"
             landmarkName = "Requests"
             landmarkType = "3">
          </BreakpointContent>
@@ -1961,9 +1911,9 @@
             filePath = "DoubleXP/CustomView/RequestsFoldingCell.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "108"
-            endingLineNumber = "108"
-            landmarkName = "setUI(friendRequest:team:request:indexPath:currentTableView:callbacks:)"
+            startingLineNumber = "117"
+            endingLineNumber = "117"
+            landmarkName = "setUI(friendRequest:team:request:rival:indexPath:currentTableView:callbacks:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -2057,8 +2007,8 @@
             filePath = "DoubleXP/PreSplashActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "308"
-            endingLineNumber = "308"
+            startingLineNumber = "320"
+            endingLineNumber = "320"
             landmarkName = "downloadDBRef(uid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2361,8 +2311,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1302"
-            endingLineNumber = "1302"
+            startingLineNumber = "1523"
+            endingLineNumber = "1523"
             landmarkName = "menuButtonClicked(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2393,8 +2343,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1249"
-            endingLineNumber = "1249"
+            startingLineNumber = "1470"
+            endingLineNumber = "1470"
             landmarkName = "mediaButtonClicked(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2409,8 +2359,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "869"
-            endingLineNumber = "869"
+            startingLineNumber = "1090"
+            endingLineNumber = "1090"
             landmarkName = "navigateToTeamFreeAgentResults(team:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2841,8 +2791,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "950"
-            endingLineNumber = "950"
+            startingLineNumber = "1171"
+            endingLineNumber = "1171"
             landmarkName = "menuNavigateToMessaging(uId:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2953,8 +2903,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "944"
-            endingLineNumber = "944"
+            startingLineNumber = "1165"
+            endingLineNumber = "1165"
             landmarkName = "menuNavigateToMessaging(uId:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2969,8 +2919,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "943"
-            endingLineNumber = "943"
+            startingLineNumber = "1164"
+            endingLineNumber = "1164"
             landmarkName = "menuNavigateToMessaging(uId:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2985,8 +2935,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1093"
-            endingLineNumber = "1093"
+            startingLineNumber = "1314"
+            endingLineNumber = "1314"
             landmarkName = "removeBottomNav(showNewNav:hideSearch:searchHint:searchButtonText:isMessaging:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3081,8 +3031,8 @@
             filePath = "DoubleXP/SubViews/TeamBuildFAResults.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "391"
-            endingLineNumber = "391"
+            startingLineNumber = "396"
+            endingLineNumber = "396"
             landmarkName = "configureList(freeAgentObject:position:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3097,8 +3047,8 @@
             filePath = "DoubleXP/SubViews/TeamBuildFAResults.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "264"
-            endingLineNumber = "264"
+            startingLineNumber = "269"
+            endingLineNumber = "269"
             landmarkName = "tableView(_:cellForRowAt:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3113,8 +3063,8 @@
             filePath = "DoubleXP/SubViews/TeamBuildFAResults.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "265"
-            endingLineNumber = "265"
+            startingLineNumber = "270"
+            endingLineNumber = "270"
             landmarkName = "tableView(_:cellForRowAt:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3129,8 +3079,8 @@
             filePath = "DoubleXP/SubViews/TeamBuildFAResults.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "360"
-            endingLineNumber = "360"
+            startingLineNumber = "365"
+            endingLineNumber = "365"
             landmarkName = "inviteClicked(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3145,8 +3095,8 @@
             filePath = "DoubleXP/SubViews/TeamBuildFAResults.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "179"
-            endingLineNumber = "179"
+            startingLineNumber = "184"
+            endingLineNumber = "184"
             landmarkName = "refreshHandler()"
             landmarkType = "7">
          </BreakpointContent>
@@ -3161,8 +3111,8 @@
             filePath = "DoubleXP/SubViews/TeamBuildFAResults.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "302"
-            endingLineNumber = "302"
+            startingLineNumber = "307"
+            endingLineNumber = "307"
             landmarkName = "tableView(_:heightForRowAt:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3177,8 +3127,8 @@
             filePath = "DoubleXP/SubViews/TeamBuildFAResults.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "145"
-            endingLineNumber = "145"
+            startingLineNumber = "150"
+            endingLineNumber = "150"
             landmarkName = "processResults(results:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3193,8 +3143,8 @@
             filePath = "DoubleXP/SubViews/TeamBuildFAResults.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "119"
-            endingLineNumber = "119"
+            startingLineNumber = "120"
+            endingLineNumber = "120"
             landmarkName = "processResults(results:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3203,22 +3153,6 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "B27AF448-0FDA-4EA9-816B-2178653FCF47"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "DoubleXP/SubViews/TeamBuildFAResults.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "387"
-            endingLineNumber = "387"
-            landmarkName = "configureList(freeAgentObject:position:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "C53D6EB2-822D-4E7F-AC50-6AD226170648"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -3234,6 +3168,22 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "C53D6EB2-822D-4E7F-AC50-6AD226170648"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/TeamBuildFAResults.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "397"
+            endingLineNumber = "397"
+            landmarkName = "configureList(freeAgentObject:position:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
             uuid = "2967E1ED-D17E-4436-BCAD-3EF7C1329BD1"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -3241,8 +3191,8 @@
             filePath = "DoubleXP/SubViews/TeamBuildFAResults.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "276"
-            endingLineNumber = "276"
+            startingLineNumber = "281"
+            endingLineNumber = "281"
             landmarkName = "tableView(_:cellForRowAt:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3257,8 +3207,8 @@
             filePath = "DoubleXP/SubViews/GamerConnectSearch.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "333"
-            endingLineNumber = "333"
+            startingLineNumber = "366"
+            endingLineNumber = "366"
             landmarkName = "searchUsers(userName:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3273,8 +3223,8 @@
             filePath = "DoubleXP/SubViews/GamerConnectSearch.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "342"
-            endingLineNumber = "342"
+            startingLineNumber = "375"
+            endingLineNumber = "375"
             landmarkName = "searchUsers(userName:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3289,8 +3239,8 @@
             filePath = "DoubleXP/SubViews/GamerConnectSearch.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "336"
-            endingLineNumber = "336"
+            startingLineNumber = "369"
+            endingLineNumber = "369"
             landmarkName = "searchUsers(userName:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3305,8 +3255,8 @@
             filePath = "DoubleXP/SubViews/GamerConnectSearch.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "256"
-            endingLineNumber = "256"
+            startingLineNumber = "288"
+            endingLineNumber = "288"
             landmarkName = "searchUsers(userName:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3321,8 +3271,8 @@
             filePath = "DoubleXP/SubViews/GamerConnectSearch.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "270"
-            endingLineNumber = "270"
+            startingLineNumber = "302"
+            endingLineNumber = "302"
             landmarkName = "searchUsers(userName:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3337,8 +3287,8 @@
             filePath = "DoubleXP/SubViews/GamerConnectSearch.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "68"
-            endingLineNumber = "68"
+            startingLineNumber = "69"
+            endingLineNumber = "69"
             landmarkName = "viewDidLoad()"
             landmarkType = "7">
          </BreakpointContent>
@@ -3353,8 +3303,8 @@
             filePath = "DoubleXP/SubViews/GamerConnectSearch.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "394"
-            endingLineNumber = "394"
+            startingLineNumber = "427"
+            endingLineNumber = "427"
             landmarkName = "searchUsers(userName:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3369,8 +3319,8 @@
             filePath = "DoubleXP/SubViews/GamerConnectSearch.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "359"
-            endingLineNumber = "359"
+            startingLineNumber = "392"
+            endingLineNumber = "392"
             landmarkName = "searchUsers(userName:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3385,8 +3335,8 @@
             filePath = "DoubleXP/SubViews/GamerConnectSearch.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "380"
-            endingLineNumber = "380"
+            startingLineNumber = "413"
+            endingLineNumber = "413"
             landmarkName = "searchUsers(userName:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3737,8 +3687,8 @@
             filePath = "DoubleXP/PreSplashActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "314"
-            endingLineNumber = "314"
+            startingLineNumber = "326"
+            endingLineNumber = "326"
             landmarkName = "downloadDBRef(uid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3897,8 +3847,8 @@
             filePath = "DoubleXP/SubViews/PlayerProfile.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "366"
-            endingLineNumber = "366"
+            startingLineNumber = "400"
+            endingLineNumber = "400"
             landmarkName = "setup(statsEmpty:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4025,8 +3975,8 @@
             filePath = "DoubleXP/SubViews/MediaFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "321"
-            endingLineNumber = "321"
+            startingLineNumber = "322"
+            endingLineNumber = "322"
             landmarkName = "collectionView(_:cellForItemAt:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4361,8 +4311,8 @@
             filePath = "DoubleXP/SubViews/MediaFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "596"
-            endingLineNumber = "596"
+            startingLineNumber = "586"
+            endingLineNumber = "586"
             landmarkName = "collectionView(_:didSelectItemAt:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4409,8 +4359,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1288"
-            endingLineNumber = "1288"
+            startingLineNumber = "1509"
+            endingLineNumber = "1509"
             landmarkName = "menuButtonClicked(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4441,8 +4391,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "972"
-            endingLineNumber = "972"
+            startingLineNumber = "1193"
+            endingLineNumber = "1193"
             landmarkName = "menuNavigateToProfile(uId:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4457,8 +4407,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1116"
-            endingLineNumber = "1116"
+            startingLineNumber = "1337"
+            endingLineNumber = "1337"
             landmarkName = "removeBottomNav(showNewNav:hideSearch:searchHint:searchButtonText:isMessaging:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4473,8 +4423,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1009"
-            endingLineNumber = "1009"
+            startingLineNumber = "1230"
+            endingLineNumber = "1230"
             landmarkName = "updateNavigation(currentFrag:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4489,8 +4439,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "997"
-            endingLineNumber = "997"
+            startingLineNumber = "1218"
+            endingLineNumber = "1218"
             landmarkName = "LandingActivity"
             landmarkType = "3">
          </BreakpointContent>
@@ -4505,8 +4455,8 @@
             filePath = "DoubleXP/SubViews/MediaFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "547"
-            endingLineNumber = "547"
+            startingLineNumber = "536"
+            endingLineNumber = "536"
             landmarkName = "collectionView(_:didSelectItemAt:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4521,8 +4471,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1319"
-            endingLineNumber = "1319"
+            startingLineNumber = "1539"
+            endingLineNumber = "1539"
             landmarkName = "figureMenu()"
             landmarkType = "7">
          </BreakpointContent>
@@ -4537,8 +4487,8 @@
             filePath = "DoubleXP/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "246"
-            endingLineNumber = "246"
+            startingLineNumber = "258"
+            endingLineNumber = "258"
             landmarkName = "application(_:didFailToRegisterForRemoteNotificationsWithError:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4553,8 +4503,8 @@
             filePath = "DoubleXP/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "170"
-            endingLineNumber = "170"
+            startingLineNumber = "182"
+            endingLineNumber = "182"
             landmarkName = "persistentContainer"
             landmarkType = "24">
          </BreakpointContent>
@@ -4569,8 +4519,8 @@
             filePath = "DoubleXP/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "173"
-            endingLineNumber = "173"
+            startingLineNumber = "185"
+            endingLineNumber = "185"
             landmarkName = "persistentContainer"
             landmarkType = "24">
             <Locations>
@@ -4617,8 +4567,8 @@
             filePath = "DoubleXP/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "172"
-            endingLineNumber = "172"
+            startingLineNumber = "184"
+            endingLineNumber = "184"
             landmarkName = "persistentContainer"
             landmarkType = "24">
          </BreakpointContent>
@@ -4633,8 +4583,8 @@
             filePath = "DoubleXP/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "231"
-            endingLineNumber = "231"
+            startingLineNumber = "243"
+            endingLineNumber = "243"
             landmarkName = "application(_:didReceiveRemoteNotification:fetchCompletionHandler:)"
             landmarkType = "7">
             <Locations>
@@ -4681,8 +4631,8 @@
             filePath = "DoubleXP/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "207"
-            endingLineNumber = "207"
+            startingLineNumber = "219"
+            endingLineNumber = "219"
             landmarkName = "getToken()"
             landmarkType = "7">
          </BreakpointContent>
@@ -4697,8 +4647,8 @@
             filePath = "DoubleXP/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "200"
-            endingLineNumber = "200"
+            startingLineNumber = "212"
+            endingLineNumber = "212"
             landmarkName = "getToken()"
             landmarkType = "7">
             <Locations>
@@ -4745,8 +4695,8 @@
             filePath = "DoubleXP/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "184"
-            endingLineNumber = "184"
+            startingLineNumber = "196"
+            endingLineNumber = "196"
             landmarkName = "AppDelegate"
             landmarkType = "3">
          </BreakpointContent>
@@ -4761,8 +4711,8 @@
             filePath = "DoubleXP/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "213"
-            endingLineNumber = "213"
+            startingLineNumber = "225"
+            endingLineNumber = "225"
             landmarkName = "application(_:didReceiveRemoteNotification:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4777,8 +4727,8 @@
             filePath = "DoubleXP/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "217"
-            endingLineNumber = "217"
+            startingLineNumber = "229"
+            endingLineNumber = "229"
             landmarkName = "application(_:didReceiveRemoteNotification:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4825,8 +4775,8 @@
             filePath = "DoubleXP/PreSplashActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "46"
-            endingLineNumber = "46"
+            startingLineNumber = "58"
+            endingLineNumber = "58"
             landmarkName = "getAppConfig()"
             landmarkType = "7">
          </BreakpointContent>
@@ -4841,8 +4791,8 @@
             filePath = "DoubleXP/PreSplashActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "47"
-            endingLineNumber = "47"
+            startingLineNumber = "59"
+            endingLineNumber = "59"
             landmarkName = "getAppConfig()"
             landmarkType = "7">
          </BreakpointContent>
@@ -4857,8 +4807,8 @@
             filePath = "DoubleXP/PreSplashActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "42"
-            endingLineNumber = "42"
+            startingLineNumber = "54"
+            endingLineNumber = "54"
             landmarkName = "getAppConfig()"
             landmarkType = "7">
          </BreakpointContent>
@@ -4953,8 +4903,8 @@
             filePath = "DoubleXP/SubViews/MediaFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "647"
-            endingLineNumber = "647"
+            startingLineNumber = "637"
+            endingLineNumber = "637"
             landmarkName = "showArticle(article:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4969,8 +4919,8 @@
             filePath = "DoubleXP/SubViews/MediaFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "711"
-            endingLineNumber = "711"
+            startingLineNumber = "701"
+            endingLineNumber = "701"
             landmarkName = "showArticle(article:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4985,8 +4935,8 @@
             filePath = "DoubleXP/SubViews/MediaFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "807"
-            endingLineNumber = "807"
+            startingLineNumber = "797"
+            endingLineNumber = "797"
             landmarkName = "showChannel(channel:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5001,8 +4951,8 @@
             filePath = "DoubleXP/SubViews/MediaFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "808"
-            endingLineNumber = "808"
+            startingLineNumber = "798"
+            endingLineNumber = "798"
             landmarkName = "MediaFrag"
             landmarkType = "3">
          </BreakpointContent>
@@ -5017,8 +4967,8 @@
             filePath = "DoubleXP/SubViews/MediaFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "800"
-            endingLineNumber = "800"
+            startingLineNumber = "790"
+            endingLineNumber = "790"
             landmarkName = "showChannel(channel:)"
             landmarkType = "7">
             <Locations>
@@ -5065,8 +5015,8 @@
             filePath = "DoubleXP/SubViews/MediaFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "214"
-            endingLineNumber = "214"
+            startingLineNumber = "215"
+            endingLineNumber = "215"
             landmarkName = "getMedia()"
             landmarkType = "7">
          </BreakpointContent>
@@ -5081,8 +5031,8 @@
             filePath = "DoubleXP/SubViews/MediaFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "229"
-            endingLineNumber = "229"
+            startingLineNumber = "230"
+            endingLineNumber = "230"
             landmarkName = "getMedia()"
             landmarkType = "7">
          </BreakpointContent>
@@ -5097,8 +5047,8 @@
             filePath = "DoubleXP/SubViews/MediaFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "221"
-            endingLineNumber = "221"
+            startingLineNumber = "222"
+            endingLineNumber = "222"
             landmarkName = "getMedia()"
             landmarkType = "7">
          </BreakpointContent>
@@ -5161,8 +5111,8 @@
             filePath = "DoubleXP/SubViews/MediaFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "759"
-            endingLineNumber = "759"
+            startingLineNumber = "749"
+            endingLineNumber = "749"
             landmarkName = "getHomeUid(position:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5177,8 +5127,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1031"
-            endingLineNumber = "1031"
+            startingLineNumber = "1252"
+            endingLineNumber = "1252"
             landmarkName = "updateNavigation(currentFrag:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5193,8 +5143,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1121"
-            endingLineNumber = "1121"
+            startingLineNumber = "1342"
+            endingLineNumber = "1342"
             landmarkName = "removeBottomNav(showNewNav:hideSearch:searchHint:searchButtonText:isMessaging:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5209,8 +5159,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1129"
-            endingLineNumber = "1129"
+            startingLineNumber = "1350"
+            endingLineNumber = "1350"
             landmarkName = "removeBottomNav(showNewNav:hideSearch:searchHint:searchButtonText:isMessaging:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5225,8 +5175,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1128"
-            endingLineNumber = "1128"
+            startingLineNumber = "1349"
+            endingLineNumber = "1349"
             landmarkName = "removeBottomNav(showNewNav:hideSearch:searchHint:searchButtonText:isMessaging:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5241,8 +5191,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1144"
-            endingLineNumber = "1144"
+            startingLineNumber = "1365"
+            endingLineNumber = "1365"
             landmarkName = "removeBottomNav(showNewNav:hideSearch:searchHint:searchButtonText:isMessaging:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5257,8 +5207,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1524"
-            endingLineNumber = "1524"
+            startingLineNumber = "1745"
+            endingLineNumber = "1745"
             landmarkName = "collectionView(_:didSelectItemAt:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5273,8 +5223,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1173"
-            endingLineNumber = "1173"
+            startingLineNumber = "1394"
+            endingLineNumber = "1394"
             landmarkName = "removeBottomNav(showNewNav:hideSearch:searchHint:searchButtonText:isMessaging:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5289,8 +5239,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1127"
-            endingLineNumber = "1127"
+            startingLineNumber = "1348"
+            endingLineNumber = "1348"
             landmarkName = "removeBottomNav(showNewNav:hideSearch:searchHint:searchButtonText:isMessaging:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5305,8 +5255,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1145"
-            endingLineNumber = "1145"
+            startingLineNumber = "1366"
+            endingLineNumber = "1366"
             landmarkName = "removeBottomNav(showNewNav:hideSearch:searchHint:searchButtonText:isMessaging:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5321,8 +5271,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1190"
-            endingLineNumber = "1190"
+            startingLineNumber = "1411"
+            endingLineNumber = "1411"
             landmarkName = "restoreBottomNav()"
             landmarkType = "7">
          </BreakpointContent>
@@ -5337,8 +5287,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1143"
-            endingLineNumber = "1143"
+            startingLineNumber = "1364"
+            endingLineNumber = "1364"
             landmarkName = "removeBottomNav(showNewNav:hideSearch:searchHint:searchButtonText:isMessaging:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5385,8 +5335,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1048"
-            endingLineNumber = "1048"
+            startingLineNumber = "1269"
+            endingLineNumber = "1269"
             landmarkName = "removeBottomNav(showNewNav:hideSearch:searchHint:searchButtonText:isMessaging:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5577,8 +5527,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1029"
-            endingLineNumber = "1029"
+            startingLineNumber = "1250"
+            endingLineNumber = "1250"
             landmarkName = "updateNavigation(currentFrag:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5593,8 +5543,8 @@
             filePath = "DoubleXP/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "69"
-            endingLineNumber = "69"
+            startingLineNumber = "71"
+            endingLineNumber = "71"
             landmarkName = "application(_:didFinishLaunchingWithOptions:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5609,8 +5559,8 @@
             filePath = "DoubleXP/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "69"
-            endingLineNumber = "69"
+            startingLineNumber = "71"
+            endingLineNumber = "71"
             landmarkName = "application(_:didFinishLaunchingWithOptions:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5625,8 +5575,8 @@
             filePath = "DoubleXP/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "69"
-            endingLineNumber = "69"
+            startingLineNumber = "71"
+            endingLineNumber = "71"
             landmarkName = "application(_:didFinishLaunchingWithOptions:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5641,8 +5591,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "704"
-            endingLineNumber = "704"
+            startingLineNumber = "915"
+            endingLineNumber = "915"
             landmarkName = "backButtonClicked(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5657,8 +5607,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1128"
-            endingLineNumber = "1128"
+            startingLineNumber = "1349"
+            endingLineNumber = "1349"
             landmarkName = "removeBottomNav(showNewNav:hideSearch:searchHint:searchButtonText:isMessaging:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5689,8 +5639,8 @@
             filePath = "DoubleXP/SubViews/MediaFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "877"
-            endingLineNumber = "877"
+            startingLineNumber = "869"
+            endingLineNumber = "869"
             landmarkName = "onVideoLoaded(url:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5705,8 +5655,8 @@
             filePath = "DoubleXP/SubViews/MediaFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "872"
-            endingLineNumber = "872"
+            startingLineNumber = "864"
+            endingLineNumber = "864"
             landmarkName = "onVideoLoaded(url:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5715,14 +5665,14 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "18F82F55-C247-4A2B-87E6-EB9F7316EC05"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DoubleXP/SubViews/MediaFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "881"
-            endingLineNumber = "881"
+            startingLineNumber = "873"
+            endingLineNumber = "873"
             landmarkName = "onVideoLoaded(url:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5737,8 +5687,8 @@
             filePath = "DoubleXP/SubViews/MediaFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "174"
-            endingLineNumber = "174"
+            startingLineNumber = "175"
+            endingLineNumber = "175"
             landmarkName = "viewDidLoad()"
             landmarkType = "7">
          </BreakpointContent>
@@ -5753,8 +5703,8 @@
             filePath = "DoubleXP/SubViews/TeamBuildFAResults.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "379"
-            endingLineNumber = "379"
+            startingLineNumber = "384"
+            endingLineNumber = "384"
             landmarkName = "configureList(freeAgentObject:position:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5769,8 +5719,8 @@
             filePath = "DoubleXP/SubViews/TeamBuildFAResults.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "325"
-            endingLineNumber = "325"
+            startingLineNumber = "330"
+            endingLineNumber = "330"
             landmarkName = "profileClicked(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5785,8 +5735,8 @@
             filePath = "DoubleXP/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "69"
-            endingLineNumber = "69"
+            startingLineNumber = "71"
+            endingLineNumber = "71"
             landmarkName = "application(_:didFinishLaunchingWithOptions:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5801,8 +5751,8 @@
             filePath = "DoubleXP/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "83"
-            endingLineNumber = "83"
+            startingLineNumber = "95"
+            endingLineNumber = "95"
             landmarkName = "resetStack(vc:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -5817,8 +5767,8 @@
             filePath = "DoubleXP/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "82"
-            endingLineNumber = "82"
+            startingLineNumber = "94"
+            endingLineNumber = "94"
             landmarkName = "AppDelegate"
             landmarkType = "3">
          </BreakpointContent>
@@ -5849,8 +5799,8 @@
             filePath = "DoubleXP/NavigationPageController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "186"
-            endingLineNumber = "186"
+            startingLineNumber = "201"
+            endingLineNumber = "201"
             landmarkName = "navigateToTeams()"
             landmarkType = "7">
          </BreakpointContent>
@@ -5881,8 +5831,8 @@
             filePath = "DoubleXP/SubViews/FAQuizPage.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "50"
-            endingLineNumber = "50"
+            startingLineNumber = "52"
+            endingLineNumber = "52"
             landmarkName = "viewDidLoad()"
             landmarkType = "7">
          </BreakpointContent>
@@ -5897,8 +5847,8 @@
             filePath = "DoubleXP/SubViews/FAQuizPage.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "49"
-            endingLineNumber = "49"
+            startingLineNumber = "51"
+            endingLineNumber = "51"
             landmarkName = "viewDidLoad()"
             landmarkType = "7">
          </BreakpointContent>
@@ -5968,22 +5918,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "12205330-C8A1-461B-827C-06E0A9462B7E"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "DoubleXP/RegisterActivity.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "142"
-            endingLineNumber = "142"
-            landmarkName = "RegisterActivity"
-            landmarkType = "3">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "BD17A8AC-B087-456D-AB35-78022433202F"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -5991,8 +5925,8 @@
             filePath = "DoubleXP/RegisterActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "163"
-            endingLineNumber = "163"
+            startingLineNumber = "834"
+            endingLineNumber = "834"
             landmarkName = "textFieldDidChange(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -6007,8 +5941,8 @@
             filePath = "DoubleXP/RegisterActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "158"
-            endingLineNumber = "158"
+            startingLineNumber = "829"
+            endingLineNumber = "829"
             landmarkName = "textFieldDidChange(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -6023,8 +5957,8 @@
             filePath = "DoubleXP/GamerConnectRegisterActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1031"
-            endingLineNumber = "1031"
+            startingLineNumber = "1036"
+            endingLineNumber = "1036"
             landmarkName = "zipItUp()"
             landmarkType = "7">
          </BreakpointContent>
@@ -6049,14 +5983,14 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "79E59902-F806-4D45-98D8-DA64B47AD437"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DoubleXP/GamerConnectRegisterActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1031"
-            endingLineNumber = "1031"
+            startingLineNumber = "1036"
+            endingLineNumber = "1036"
             landmarkName = "zipItUp()"
             landmarkType = "7">
          </BreakpointContent>
@@ -6071,8 +6005,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1512"
-            endingLineNumber = "1512"
+            startingLineNumber = "1733"
+            endingLineNumber = "1733"
             landmarkName = "collectionView(_:layout:sizeForItemAt:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -6087,8 +6021,8 @@
             filePath = "DoubleXP/SubViews/MediaFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "397"
-            endingLineNumber = "397"
+            startingLineNumber = "398"
+            endingLineNumber = "398"
             landmarkName = "collectionView(_:cellForItemAt:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -6103,8 +6037,8 @@
             filePath = "DoubleXP/SubViews/MediaFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "475"
-            endingLineNumber = "475"
+            startingLineNumber = "478"
+            endingLineNumber = "478"
             landmarkName = "collectionView(_:didSelectItemAt:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -6119,8 +6053,8 @@
             filePath = "DoubleXP/SubViews/MediaFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "483"
-            endingLineNumber = "483"
+            startingLineNumber = "488"
+            endingLineNumber = "488"
             landmarkName = "collectionView(_:didSelectItemAt:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -6497,7 +6431,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "055D949C-6B09-42FC-9709-9E9796453992"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DoubleXP/GamerConnectRegisterActivity.swift"
@@ -6695,8 +6629,8 @@
             filePath = "DoubleXP/SubViews/GamerConnectSearch.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "140"
-            endingLineNumber = "140"
+            startingLineNumber = "172"
+            endingLineNumber = "172"
             landmarkName = "collectionView(_:cellForItemAt:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -6727,8 +6661,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "245"
-            endingLineNumber = "245"
+            startingLineNumber = "253"
+            endingLineNumber = "253"
             landmarkName = "viewDidLoad()"
             landmarkType = "7">
          </BreakpointContent>
@@ -6743,8 +6677,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "246"
-            endingLineNumber = "246"
+            startingLineNumber = "254"
+            endingLineNumber = "254"
             landmarkName = "viewDidLoad()"
             landmarkType = "7">
          </BreakpointContent>
@@ -6759,8 +6693,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "218"
-            endingLineNumber = "218"
+            startingLineNumber = "226"
+            endingLineNumber = "226"
             landmarkName = "viewDidLoad()"
             landmarkType = "7">
          </BreakpointContent>
@@ -6775,8 +6709,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "611"
-            endingLineNumber = "611"
+            startingLineNumber = "822"
+            endingLineNumber = "822"
             landmarkName = "addPendingFriendsRef()"
             landmarkType = "7">
          </BreakpointContent>
@@ -6791,8 +6725,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "624"
-            endingLineNumber = "624"
+            startingLineNumber = "835"
+            endingLineNumber = "835"
             landmarkName = "addPendingFriendsRef()"
             landmarkType = "7">
          </BreakpointContent>
@@ -6807,8 +6741,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "613"
-            endingLineNumber = "613"
+            startingLineNumber = "824"
+            endingLineNumber = "824"
             landmarkName = "addPendingFriendsRef()"
             landmarkType = "7">
          </BreakpointContent>
@@ -6823,8 +6757,8 @@
             filePath = "DoubleXP/SubViews/PlayerProfile.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "333"
-            endingLineNumber = "333"
+            startingLineNumber = "367"
+            endingLineNumber = "367"
             landmarkName = "setUI(user:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -6855,8 +6789,8 @@
             filePath = "DoubleXP/SubViews/PlayerProfile.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "93"
-            endingLineNumber = "93"
+            startingLineNumber = "113"
+            endingLineNumber = "113"
             landmarkName = "receivedButtonClicked(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -6887,8 +6821,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "281"
-            endingLineNumber = "281"
+            startingLineNumber = "291"
+            endingLineNumber = "291"
             landmarkName = "showMessageAlertQueue(array:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -6935,8 +6869,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "655"
-            endingLineNumber = "655"
+            startingLineNumber = "866"
+            endingLineNumber = "866"
             landmarkName = "sendMessage(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -7159,8 +7093,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "544"
-            endingLineNumber = "544"
+            startingLineNumber = "755"
+            endingLineNumber = "755"
             landmarkName = "addMessagingRef()"
             landmarkType = "7">
          </BreakpointContent>
@@ -7783,8 +7717,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "588"
-            endingLineNumber = "588"
+            startingLineNumber = "799"
+            endingLineNumber = "799"
             landmarkName = "addTeamRequestRef()"
             landmarkType = "7">
          </BreakpointContent>
@@ -7799,8 +7733,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "587"
-            endingLineNumber = "587"
+            startingLineNumber = "798"
+            endingLineNumber = "798"
             landmarkName = "addTeamRequestRef()"
             landmarkType = "7">
          </BreakpointContent>
@@ -7815,8 +7749,8 @@
             filePath = "DoubleXP/SubViews/Requests.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "80"
-            endingLineNumber = "80"
+            startingLineNumber = "66"
+            endingLineNumber = "66"
             landmarkName = "buildRequests(user:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -7831,8 +7765,8 @@
             filePath = "DoubleXP/SubViews/Requests.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "244"
-            endingLineNumber = "244"
+            startingLineNumber = "290"
+            endingLineNumber = "290"
             landmarkName = "showQuiz(questions:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -7847,8 +7781,8 @@
             filePath = "DoubleXP/SubViews/Requests.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "281"
-            endingLineNumber = "281"
+            startingLineNumber = "327"
+            endingLineNumber = "327"
             landmarkName = "showQuizClicked(questions:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -7863,8 +7797,8 @@
             filePath = "DoubleXP/SubViews/Requests.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "282"
-            endingLineNumber = "282"
+            startingLineNumber = "328"
+            endingLineNumber = "328"
             landmarkName = "showQuizClicked(questions:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -7879,8 +7813,8 @@
             filePath = "DoubleXP/CustomView/RequestsFoldingCell.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "192"
-            endingLineNumber = "192"
+            startingLineNumber = "207"
+            endingLineNumber = "207"
             landmarkName = "quizClicked(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -7897,7 +7831,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "50"
             endingLineNumber = "50"
-            landmarkName = "setUI(friendRequest:team:request:indexPath:currentTableView:callbacks:)"
+            landmarkName = "setUI(friendRequest:team:request:rival:indexPath:currentTableView:callbacks:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -7911,8 +7845,8 @@
             filePath = "DoubleXP/PreSplashActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "630"
-            endingLineNumber = "630"
+            startingLineNumber = "757"
+            endingLineNumber = "757"
             landmarkName = "downloadDBRef(uid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -7927,8 +7861,8 @@
             filePath = "DoubleXP/PreSplashActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "345"
-            endingLineNumber = "345"
+            startingLineNumber = "357"
+            endingLineNumber = "357"
             landmarkName = "downloadDBRef(uid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -7943,8 +7877,8 @@
             filePath = "DoubleXP/CustomView/RequestsFoldingCell.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "217"
-            endingLineNumber = "217"
+            startingLineNumber = "232"
+            endingLineNumber = "232"
             landmarkName = "rejectClicked(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -7959,8 +7893,8 @@
             filePath = "DoubleXP/CustomView/RequestsFoldingCell.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "199"
-            endingLineNumber = "199"
+            startingLineNumber = "214"
+            endingLineNumber = "214"
             landmarkName = "rejectClicked(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -7975,8 +7909,8 @@
             filePath = "DoubleXP/PreSplashActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "466"
-            endingLineNumber = "466"
+            startingLineNumber = "592"
+            endingLineNumber = "592"
             landmarkName = "downloadDBRef(uid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -7991,8 +7925,8 @@
             filePath = "DoubleXP/PreSplashActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "509"
-            endingLineNumber = "509"
+            startingLineNumber = "635"
+            endingLineNumber = "635"
             landmarkName = "downloadDBRef(uid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -8311,8 +8245,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "469"
-            endingLineNumber = "469"
+            startingLineNumber = "680"
+            endingLineNumber = "680"
             landmarkName = "addFriendsRef()"
             landmarkType = "7">
          </BreakpointContent>
@@ -8407,8 +8341,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "417"
-            endingLineNumber = "417"
+            startingLineNumber = "427"
+            endingLineNumber = "427"
             landmarkName = "addTeamsRef()"
             landmarkType = "7">
          </BreakpointContent>
@@ -8471,8 +8405,8 @@
             filePath = "DoubleXP/CustomView/RequestsFoldingCell.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "167"
-            endingLineNumber = "167"
+            startingLineNumber = "179"
+            endingLineNumber = "179"
             landmarkName = "acceptClicked(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -8503,8 +8437,8 @@
             filePath = "DoubleXP/PreSplashActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "102"
-            endingLineNumber = "102"
+            startingLineNumber = "114"
+            endingLineNumber = "114"
             landmarkName = "getAppConfig()"
             landmarkType = "7">
          </BreakpointContent>
@@ -8519,8 +8453,8 @@
             filePath = "DoubleXP/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "216"
-            endingLineNumber = "216"
+            startingLineNumber = "228"
+            endingLineNumber = "228"
             landmarkName = "application(_:didReceiveRemoteNotification:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -8535,8 +8469,8 @@
             filePath = "DoubleXP/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "202"
-            endingLineNumber = "202"
+            startingLineNumber = "214"
+            endingLineNumber = "214"
             landmarkName = "getToken()"
             landmarkType = "7">
          </BreakpointContent>
@@ -8551,8 +8485,8 @@
             filePath = "DoubleXP/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "204"
-            endingLineNumber = "204"
+            startingLineNumber = "216"
+            endingLineNumber = "216"
             landmarkName = "getToken()"
             landmarkType = "7">
          </BreakpointContent>
@@ -8567,8 +8501,8 @@
             filePath = "DoubleXP/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "272"
-            endingLineNumber = "272"
+            startingLineNumber = "284"
+            endingLineNumber = "284"
             landmarkName = "application(_:didRegisterForRemoteNotificationsWithDeviceToken:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -8631,8 +8565,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "455"
-            endingLineNumber = "455"
+            startingLineNumber = "666"
+            endingLineNumber = "666"
             landmarkName = "addFriendsRef()"
             landmarkType = "7">
          </BreakpointContent>
@@ -8711,8 +8645,8 @@
             filePath = "DoubleXP/CustomView/FoldingCellCell.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "233"
-            endingLineNumber = "233"
+            startingLineNumber = "239"
+            endingLineNumber = "239"
             landmarkName = "collectionView(_:cellForItemAt:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -8743,8 +8677,8 @@
             filePath = "DoubleXP/SubViews/PlayerProfile.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "518"
-            endingLineNumber = "518"
+            startingLineNumber = "552"
+            endingLineNumber = "552"
             landmarkName = "tableView(_:cellForRowAt:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -8759,8 +8693,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "678"
-            endingLineNumber = "678"
+            startingLineNumber = "889"
+            endingLineNumber = "889"
             landmarkName = "backButtonClicked(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -8775,8 +8709,8 @@
             filePath = "DoubleXP/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "77"
-            endingLineNumber = "77"
+            startingLineNumber = "89"
+            endingLineNumber = "89"
             landmarkName = "clearAndAddToNavStack(vc:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -8791,8 +8725,8 @@
             filePath = "DoubleXP/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "72"
-            endingLineNumber = "72"
+            startingLineNumber = "84"
+            endingLineNumber = "84"
             landmarkName = "addToNavStack(vc:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -8807,8 +8741,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "679"
-            endingLineNumber = "679"
+            startingLineNumber = "890"
+            endingLineNumber = "890"
             landmarkName = "backButtonClicked(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -8823,8 +8757,8 @@
             filePath = "DoubleXP/NavigationPageController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "181"
-            endingLineNumber = "181"
+            startingLineNumber = "196"
+            endingLineNumber = "196"
             landmarkName = "navigateToTeams()"
             landmarkType = "7">
          </BreakpointContent>
@@ -8839,8 +8773,8 @@
             filePath = "DoubleXP/NavigationPageController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "239"
-            endingLineNumber = "239"
+            startingLineNumber = "256"
+            endingLineNumber = "256"
             landmarkName = "navigateToCreateFrag()"
             landmarkType = "7">
          </BreakpointContent>
@@ -8903,8 +8837,8 @@
             filePath = "DoubleXP/PreSplashActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "195"
-            endingLineNumber = "195"
+            startingLineNumber = "207"
+            endingLineNumber = "207"
             landmarkName = "getCompetitions(uid:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -8919,8 +8853,8 @@
             filePath = "DoubleXP/SubViews/GamerConnectFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "187"
-            endingLineNumber = "187"
+            startingLineNumber = "221"
+            endingLineNumber = "221"
             landmarkName = "collectionView(_:didSelectItemAt:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -8935,8 +8869,8 @@
             filePath = "DoubleXP/LandingActivity.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "781"
-            endingLineNumber = "781"
+            startingLineNumber = "1002"
+            endingLineNumber = "1002"
             landmarkName = "navigateToCompetition(competition:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -8967,8 +8901,8 @@
             filePath = "DoubleXP/SubViews/CompetitionFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "298"
-            endingLineNumber = "298"
+            startingLineNumber = "337"
+            endingLineNumber = "337"
             landmarkName = "actionClicked(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -8983,8 +8917,8 @@
             filePath = "DoubleXP/SubViews/CompetitionFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "176"
-            endingLineNumber = "176"
+            startingLineNumber = "215"
+            endingLineNumber = "215"
             landmarkName = "handleActionButton()"
             landmarkType = "7">
          </BreakpointContent>
@@ -8993,7 +8927,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "D17401DA-D63D-4C9E-84DE-C2DA878E10A0"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DoubleXP/Managers/SocialMediaManager.swift"
@@ -9079,8 +9013,8 @@
             filePath = "DoubleXP/SubViews/CompetitionFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "272"
-            endingLineNumber = "272"
+            startingLineNumber = "311"
+            endingLineNumber = "311"
             landmarkName = "actionClicked(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -9095,8 +9029,8 @@
             filePath = "DoubleXP/SubViews/CompetitionFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "633"
-            endingLineNumber = "633"
+            startingLineNumber = "672"
+            endingLineNumber = "672"
             landmarkName = "endEvent(currentdate:eventdate:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -9111,8 +9045,8 @@
             filePath = "DoubleXP/SubViews/CompetitionFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "236"
-            endingLineNumber = "236"
+            startingLineNumber = "275"
+            endingLineNumber = "275"
             landmarkName = "handleActionButton()"
             landmarkType = "7">
          </BreakpointContent>
@@ -9127,9 +9061,1095 @@
             filePath = "DoubleXP/SubViews/CompetitionFrag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "83"
-            endingLineNumber = "83"
+            startingLineNumber = "93"
+            endingLineNumber = "93"
             landmarkName = "figureRegistered()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "9CDDA30D-647C-46D0-A34B-B347ED8705C8"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/CompetitionFrag.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "80"
+            endingLineNumber = "80"
+            landmarkName = "fixUI()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "70D9DCAE-2170-4C55-B7C5-CE03FD2D5C69"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/PreSplashActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "462"
+            endingLineNumber = "462"
+            landmarkName = "downloadDBRef(uid:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "D18E26A0-8FA4-4778-BB1A-42FA9F770CF6"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/PreSplashActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "745"
+            endingLineNumber = "745"
+            landmarkName = "downloadDBRef(uid:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "02030BBE-BD30-4DE5-93F6-3F6D78CBBAB8"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/RegisterActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "128"
+            endingLineNumber = "128"
+            landmarkName = "loginWithReadPermissions()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "AC9F611C-0E8D-453D-85D7-EF4F19A10A2A"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/RegisterActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "392"
+            endingLineNumber = "392"
+            landmarkName = "registerUser(email:pass:facebook:google:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "AA191B9C-D1A4-4F1D-AEAF-FB6C811425E4"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/LoginController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "168"
+            endingLineNumber = "168"
+            landmarkName = "loginButtonClicked(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "110778E6-9E8F-4D65-8D01-A0CB4436DA45"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/LoginController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "84"
+            endingLineNumber = "84"
+            landmarkName = "loginManagerDidComplete(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "F5DDB642-4EC1-490D-B9DC-7F7D8EAA12DE"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/LoginController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "836"
+            endingLineNumber = "836"
+            landmarkName = "sign(_:didSignInFor:withError:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "8E2C1CD0-8FA8-48A4-85AE-9BB4CE509A9F"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/CompetitionFrag.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "132"
+            endingLineNumber = "132"
+            landmarkName = "handleActionButton()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "0263EF3D-CCCF-4D1B-A1C4-9157E0E66577"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/MediaFrag.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "443"
+            endingLineNumber = "443"
+            landmarkName = "collectionView(_:didSelectItemAt:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "B8CBCE4A-02A1-4300-8D8D-C0FD9EB74078"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/MediaFrag.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "462"
+            endingLineNumber = "462"
+            landmarkName = "collectionView(_:didSelectItemAt:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "B8CBCE4A-02A1-4300-8D8D-C0FD9EB74078 - 3176a2733b36a001"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "DoubleXP.MediaFrag.collectionView(_: __C.UICollectionView, didSelectItemAt: Foundation.IndexPath) -&gt; ()"
+                  moduleName = "DoubleXP"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/toussaintpeterson/Desktop/DoubleXP/DoubleXP/SubViews/MediaFrag.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "462"
+                  endingLineNumber = "462"
+                  offsetFromSymbolStart = "4615">
+               </Location>
+               <Location
+                  uuid = "B8CBCE4A-02A1-4300-8D8D-C0FD9EB74078 - 3176a2733b36a001"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "DoubleXP.MediaFrag.collectionView(_: __C.UICollectionView, didSelectItemAt: Foundation.IndexPath) -&gt; ()"
+                  moduleName = "DoubleXP"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/toussaintpeterson/Desktop/DoubleXP/DoubleXP/SubViews/MediaFrag.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "462"
+                  endingLineNumber = "462"
+                  offsetFromSymbolStart = "4637">
+               </Location>
+               <Location
+                  uuid = "B8CBCE4A-02A1-4300-8D8D-C0FD9EB74078 - 3176a2733b36a001"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "DoubleXP.MediaFrag.collectionView(_: __C.UICollectionView, didSelectItemAt: Foundation.IndexPath) -&gt; ()"
+                  moduleName = "DoubleXP"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/toussaintpeterson/Desktop/DoubleXP/DoubleXP/SubViews/MediaFrag.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "462"
+                  endingLineNumber = "462"
+                  offsetFromSymbolStart = "6060">
+               </Location>
+               <Location
+                  uuid = "B8CBCE4A-02A1-4300-8D8D-C0FD9EB74078 - 3176a2733b36a001"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "DoubleXP.MediaFrag.collectionView(_: __C.UICollectionView, didSelectItemAt: Foundation.IndexPath) -&gt; ()"
+                  moduleName = "DoubleXP"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/toussaintpeterson/Desktop/DoubleXP/DoubleXP/SubViews/MediaFrag.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "462"
+                  endingLineNumber = "462"
+                  offsetFromSymbolStart = "7688">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "EE4616EA-E5DD-442E-A04F-F59FD2CBCEC0"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/MediaFrag.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "503"
+            endingLineNumber = "503"
+            landmarkName = "collectionView(_:didSelectItemAt:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "D913FF5F-39F2-4626-97B4-9A675B9A2E2C"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/MediaFrag.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "515"
+            endingLineNumber = "515"
+            landmarkName = "collectionView(_:didSelectItemAt:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "D2E0EF77-C5BE-44AC-B123-5DDA5FE6C8F3"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/MediaFrag.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "808"
+            endingLineNumber = "808"
+            landmarkName = "onMediaReceived(category:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "0169DC78-4D34-4A39-862C-443FA3A3ED88"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/MediaFrag.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "504"
+            endingLineNumber = "504"
+            landmarkName = "collectionView(_:didSelectItemAt:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "7F82C0B9-8689-4605-9FF6-9DA689AD108E"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/TeamBuildFAResults.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "58"
+            endingLineNumber = "58"
+            landmarkName = "doSearch(needs:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "DF935FB4-1C9D-42EE-8BA8-50C181591DD1"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/TeamBuildFAResults.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "89"
+            endingLineNumber = "89"
+            landmarkName = "doSearch(needs:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "EC2DB4A7-16CE-4B5C-91CD-E8C98817339D"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/TeamBuildFAResults.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "80"
+            endingLineNumber = "80"
+            landmarkName = "doSearch(needs:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "C90A118D-E000-460E-8359-E32B9C88CFAD"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/TeamBuildFAResults.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "109"
+            endingLineNumber = "109"
+            landmarkName = "processResults(results:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "F6B88735-7B88-4D6A-92DF-FB6C03297E4A"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/TeamBuildFAResults.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "156"
+            endingLineNumber = "156"
+            landmarkName = "setup()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "B8D9A0F8-EFFA-4F19-A81D-5706499B3B3D"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/TeamBuildFAResults.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "115"
+            endingLineNumber = "115"
+            landmarkName = "processResults(results:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "74CB06EA-B64A-47EF-9EB6-CD0C9313A9F0"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/LandingActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "214"
+            endingLineNumber = "214"
+            landmarkName = "viewDidLoad()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "6CF2452F-E339-4D05-AE8B-B6854B951A68"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/LandingActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "848"
+            endingLineNumber = "848"
+            landmarkName = "searchClicked(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "A9159F84-02F8-4768-8983-219B43DF192A"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/LandingActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1281"
+            endingLineNumber = "1281"
+            landmarkName = "removeBottomNav(showNewNav:hideSearch:searchHint:searchButtonText:isMessaging:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "46D2EB3D-E9C9-47F9-97E7-C58A71C69F35"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/GamerConnectSearch.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "559"
+            endingLineNumber = "559"
+            landmarkName = "searchSubmitted(searchString:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "3CB4DFAA-ACFC-4AC4-B309-B44B683C79C5"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/GamerConnectSearch.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "265"
+            endingLineNumber = "265"
+            landmarkName = "searchUsers(userName:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "68281471-D2DC-470F-89B9-0BF54B77C17B"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/GamerConnectSearch.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "295"
+            endingLineNumber = "295"
+            landmarkName = "searchUsers(userName:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "09358B9A-2392-481A-B432-5949844418FA"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/AppDelegate.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "133"
+            endingLineNumber = "133"
+            landmarkName = "handleToken()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "122813E0-1CF9-4D17-8B03-33A7801F4197"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/LandingActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "466"
+            endingLineNumber = "466"
+            landmarkName = "addRivalsRef()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "560D67BB-386C-4C46-A2C1-6C2D85E898E3"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/LandingActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "467"
+            endingLineNumber = "467"
+            landmarkName = "addRivalsRef()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "5437E3D0-599C-4AF7-B9B3-3F5DB96807AC"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/LandingActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "465"
+            endingLineNumber = "465"
+            landmarkName = "addRivalsRef()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "6A1BC219-9F4A-4D97-B6D8-BA15AFD5283E"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/PreSplashActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "489"
+            endingLineNumber = "489"
+            landmarkName = "downloadDBRef(uid:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "23657388-03F9-4985-A95A-D72EC472F103"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/PreSplashActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "488"
+            endingLineNumber = "488"
+            landmarkName = "downloadDBRef(uid:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "3886D1A1-4C0F-4C5F-8A7A-C66982E8C0A7"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/PlayerProfile.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "920"
+            endingLineNumber = "920"
+            landmarkName = "checkRivals()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "3A6BB7D4-F4BE-438F-9CBB-9FCC1C41D206"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/PlayerProfile.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "980"
+            endingLineNumber = "980"
+            landmarkName = "checkRivals()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "AB72B04D-1A7D-4099-B26E-737217D25CEE"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/PlayerProfile.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "999"
+            endingLineNumber = "999"
+            landmarkName = "checkRivals()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "776AB473-3566-4640-ACDC-1984BBEC08A1"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/LandingActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "479"
+            endingLineNumber = "479"
+            landmarkName = "addRivalsRef()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "20D22351-0FB8-4ADE-AEF5-AD33CE926261"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/PreSplashActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "519"
+            endingLineNumber = "519"
+            landmarkName = "downloadDBRef(uid:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "5E91F958-91E6-4CC7-9864-400A47D9F9EC"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/PreSplashActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "491"
+            endingLineNumber = "491"
+            landmarkName = "downloadDBRef(uid:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "9C950388-4551-4782-B550-02E2CAF0BE11"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/PreSplashActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "534"
+            endingLineNumber = "534"
+            landmarkName = "downloadDBRef(uid:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "161612CE-9909-4BA5-B81C-3711F7576857"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/LandingActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "492"
+            endingLineNumber = "492"
+            landmarkName = "addRivalsRef()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "57790AEE-D175-4528-9F29-DF22CDA1BFEA"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/PreSplashActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "509"
+            endingLineNumber = "509"
+            landmarkName = "downloadDBRef(uid:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "4FA423D6-3F39-4E83-9ED6-6C8923CA269F"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/LandingActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "482"
+            endingLineNumber = "482"
+            landmarkName = "addRivalsRef()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "0FBE9BE1-03EA-4C22-AB58-E48C845E5F3F"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/LandingActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "491"
+            endingLineNumber = "491"
+            landmarkName = "addRivalsRef()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "85BACBC5-E79B-4D9B-85A2-E9CACA219C32"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/LandingActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "500"
+            endingLineNumber = "500"
+            landmarkName = "addRivalsRef()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "6A4FE509-1AC5-440F-BC1F-E8C3E3F5C949"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/PlayerProfile.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "924"
+            endingLineNumber = "924"
+            landmarkName = "checkRivals()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "77890381-D990-47F5-8093-3F00A7022419"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/PlayerProfile.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "954"
+            endingLineNumber = "954"
+            landmarkName = "checkRivals()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "D3301912-47BC-419A-A9B5-E01EF1613A23"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/PlayerProfile.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "967"
+            endingLineNumber = "967"
+            landmarkName = "checkRivals()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "0DE6495C-5866-4956-B588-3A74552E59A9"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/PlayerProfile.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "925"
+            endingLineNumber = "925"
+            landmarkName = "checkRivals()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "73F40839-F578-4341-B6E0-56E017E8AF45"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/Managers/FriendsManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "879"
+            endingLineNumber = "879"
+            landmarkName = "updateCurrentUserRivals(currentUser:otherUser:game:type:callbacks:gamerTags:dateString:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "082459A2-F35B-426B-9E25-0A5D947FF2CC"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/PlayerProfile.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "940"
+            endingLineNumber = "940"
+            landmarkName = "checkRivals()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "08D8B0B6-955D-4366-B47F-54378C9C6254"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/PlayerProfile.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "968"
+            endingLineNumber = "968"
+            landmarkName = "checkRivals()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "3863F621-9196-425E-A35B-E4A7AE0723C9"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/PlayerProfile.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "941"
+            endingLineNumber = "941"
+            landmarkName = "checkRivals()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "D9106452-79A3-4CFD-936B-29094A851928"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/Requests.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "125"
+            endingLineNumber = "125"
+            landmarkName = "checkRivals()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "23D43FF3-0127-48BA-877C-B93870825519"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/PlayerProfile.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "873"
+            endingLineNumber = "873"
+            landmarkName = "rivalRequestSuccess()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "C243FAFF-367E-45B7-8861-EDD1DF5A5FA8"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/PlayerProfile.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "944"
+            endingLineNumber = "944"
+            landmarkName = "checkRivals()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "F89E3EF8-7BE3-4A4E-9537-6C48F7B4533D"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/PreSplashActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "546"
+            endingLineNumber = "546"
+            landmarkName = "downloadDBRef(uid:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "BB0AFFDE-932D-4D9A-A853-9F5DB61B090E"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/PreSplashActivity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "542"
+            endingLineNumber = "542"
+            landmarkName = "downloadDBRef(uid:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "D76AC8B9-2277-43C8-BFB0-9E1EA28AA67A"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/LoginController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "568"
+            endingLineNumber = "568"
+            landmarkName = "downloadDBRef(uid:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "850DAC6E-6EF3-433C-8240-CE577BB4C9E2"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/LoginController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "531"
+            endingLineNumber = "531"
+            landmarkName = "downloadDBRef(uid:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "79370AA6-C616-4A6F-B881-7D37733C8507"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/LoginController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "526"
+            endingLineNumber = "526"
+            landmarkName = "downloadDBRef(uid:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "4E2B4BEC-04BB-4393-A1F7-09416F823E17"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/PlayerProfile.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "939"
+            endingLineNumber = "939"
+            landmarkName = "checkRivals()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "F701D55E-BA66-4CEA-9DE9-506AC7FB3294"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/LoginController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "533"
+            endingLineNumber = "533"
+            landmarkName = "downloadDBRef(uid:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "0AD02EF1-6788-4A55-886C-6D50AE9ACB28"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "DoubleXP/SubViews/PlayerProfile.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "935"
+            endingLineNumber = "935"
+            landmarkName = "checkRivals()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

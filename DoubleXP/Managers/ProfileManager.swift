@@ -22,6 +22,19 @@ class ProfileManage {
                     ref.child("Bio").setValue(bio)
                 }
                 
+                if(!profiles.isEmpty){
+                    if(!(profiles[0]["gamerTag"]!.isEmpty)){
+                        if(snapshot.hasChild("gamerTag")){
+                            let value = snapshot.value as? NSDictionary
+                            let gamerTag = value?["gamerTag"] as? String ?? ""
+                            
+                            if(gamerTag.isEmpty || gamerTag == "undefined"){
+                                ref.child("gamerTag").setValue(profiles[0]["gamerTag"]!)
+                            }
+                        }
+                    }
+                }
+                
                 ref.child("gamerTags").setValue(profiles)
                 
                 ref.child("games").setValue(games)

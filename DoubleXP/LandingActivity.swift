@@ -204,14 +204,22 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         addMessagingRef()
         addTeamRequestRef()
         addTeamsRef()
+        addRivalsRef()
+        addAcceptedRivalsRef()
+        addRejectedRivalsRef()
     
         appDelegate.handleToken()
-    
-        /*DispatchQueue.main.asyncAfter(deadline: .now() + 8.5) {
-            let test = ["gamerTag": "SUCCESSFUL!!!!!!!", "uid": "Test", "date": "date"]
-            let ref = Database.database().reference().child("Users").child("")
-            ref.child("friends").setValue(test)
-        }*/
+
+        //DispatchQueue.main.asyncAfter(deadline: .now() + 8.5) {
+            //var array = [[String: Any]]()
+            /*let test = ["gamerTag": "SUCCESSFUL!!!!!!!", "game": "Test", "observableTime": "0", "timeInMs": "50000"] as [String : String]
+            
+            //array.append(test)
+            //let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let allNewChildrenRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId)
+            allNewChildrenRef.child("tempRivals").setValue(test)
+        allNewChildrenRef.child("thisShitIsSoFuckingAnnoying").setValue("FUCK YOU!")*/
+        
         
         /*let allNewChildrenRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId)
         allNewChildrenRef.observe(.childAdded, with: { (snapshot) in
@@ -248,7 +256,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         }*/
     }
     
-    private func showAlert(alertText: String, tap: UITapGestureRecognizer){
+    private func showAlert(alertText: String, tap: UITapGestureRecognizer?){
         if(self.bannerShowing){
             //skip.
         }
@@ -256,8 +264,10 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             self.bannerShowing = true
             self.notificationLabel.text = alertText
             
-            self.notificationDrawer.isUserInteractionEnabled = true
-            self.notificationDrawer.addGestureRecognizer(tap)
+            if(tap != nil){
+                self.notificationDrawer.isUserInteractionEnabled = true
+                self.notificationDrawer.addGestureRecognizer(tap!)
+            }
             
             let top = CGAffineTransform(translationX: 0, y: -160)
             UIView.animate(withDuration: 0.8, delay: 0.0, options:[], animations: {
@@ -445,6 +455,207 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                     }
                 }
             })
+    }
+    
+    private func addRivalsRef(){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        
+        let newFriendRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("tempRivals")
+            newFriendRef.observe(.value, with: { (snapshot) in
+                var tempArray = [RivalObj]()
+                for rival in snapshot.children{
+                    let currentObj = rival as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let date = dict?["date"] as? String ?? ""
+                    let tag = dict?["gamerTag"] as? String ?? ""
+                    let game = dict?["game"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    let dbType = dict?["type"] as? String ?? ""
+                    
+                    let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                    
+                    let calendar = Calendar.current
+                    if(!date.isEmpty){
+                        let dbDate = self.stringToDate(date)
+                        
+                        if(dbDate != nil){
+                            let now = NSDate()
+                            let formatter = DateFormatter()
+                            formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+                            formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                            let future = formatter.string(from: now as Date)
+                            let dbFuture = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                            
+                            let validRival = dbDate.compare(.isEarlier(than: dbFuture))
+                            
+                            if(dbFuture != nil){
+                                if(validRival){
+                                    tempArray.append(request)
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                var notContained = [String]()
+                for tempRival in tempArray{
+                    var contained = false
+                    if(appDelegate.currentUser!.tempRivals.isEmpty){
+                        notContained.append(tempRival.gamerTag)
+                    }
+                    else{
+                        for currentRival in appDelegate.currentUser!.tempRivals{
+                            if(tempRival.gamerTag == currentRival.gamerTag){
+                                contained = true
+                            }
+                            
+                            if(!contained){
+                                notContained.append(tempRival.gamerTag)
+                            }
+                        }
+                    }
+                }
+                
+                
+                if(!notContained.isEmpty){
+                    appDelegate.currentUser!.tempRivals = tempArray
+                    let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.navigateToRequests))
+                    self.showAlert(alertText: "someone wants to play with you.", tap: drawerTap)
+                }
+            })
+    }
+    
+    private func addAcceptedRivalsRef(){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        
+        let newFriendRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("acceptedTempRivals")
+        newFriendRef.observe(.value, with: { (snapshot) in
+            var tempArray = [RivalObj]()
+            for rival in snapshot.children{
+                let currentObj = rival as! DataSnapshot
+                let dict = currentObj.value as? [String: Any]
+                let date = dict?["date"] as? String ?? ""
+                let tag = dict?["gamerTag"] as? String ?? ""
+                let game = dict?["game"] as? String ?? ""
+                let uid = dict?["uid"] as? String ?? ""
+                let dbType = dict?["type"] as? String ?? ""
+                
+                let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                tempArray.append(request)
+            }
+            
+            if(tempArray.count > appDelegate.currentUser!.acceptedTempRivals.count){
+                appDelegate.currentUser!.acceptedTempRivals = tempArray
+                
+                var payload = [String]()
+                
+                for newRival in tempArray{
+                    var contained = false
+                    for oldRival in appDelegate.currentUser!.acceptedTempRivals{
+                        if(oldRival.uid == newRival.uid){
+                            contained = true
+                        }
+                        
+                        if(!contained){
+                            payload.append(newRival.gamerTag)
+                        }
+                    }
+                }
+                
+                if(!payload.isEmpty){
+                    if(payload.count == 1){
+                        self.showAlert(alertText: payload[0] + " is ready to play!", tap: nil)
+                    }
+                    else{
+                        self.showAlert(alertText: "your friends are ready to play!", tap: nil)
+                    }
+                }
+            }
+        })
+    }
+    
+    private func addRejectedRivalsRef(){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        
+        let newFriendRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("rejectedTempRivals")
+        newFriendRef.observe(.value, with: { (snapshot) in
+            var tempArray = [RivalObj]()
+            for rival in snapshot.children{
+                let currentObj = rival as! DataSnapshot
+                let dict = currentObj.value as? [String: Any]
+                let date = dict?["date"] as? String ?? ""
+                let tag = dict?["gamerTag"] as? String ?? ""
+                let game = dict?["game"] as? String ?? ""
+                let uid = dict?["uid"] as? String ?? ""
+                let dbType = dict?["type"] as? String ?? ""
+                
+                let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                tempArray.append(request)
+            }
+            
+            if(tempArray.count > appDelegate.currentUser!.rejectedTempRivals.count){
+                appDelegate.currentUser!.rejectedTempRivals = tempArray
+                
+                var payload = [String]()
+                
+                for newRival in tempArray{
+                    var contained = false
+                    for oldRival in appDelegate.currentUser!.rejectedTempRivals{
+                        if(oldRival.uid == newRival.uid){
+                            contained = true
+                        }
+                        
+                        if(!contained){
+                            payload.append(newRival.gamerTag)
+                        }
+                    }
+                }
+                
+                if(!payload.isEmpty){
+                    if(payload.count == 1){
+                        let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.navigateToRequests))
+                        self.showAlert(alertText: payload[0] + " is not available to play.", tap: drawerTap)
+                    }
+                    else{
+                        let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.navigateToRequests))
+                        self.showAlert(alertText: "your friends are not available to play.", tap: drawerTap)
+                    }
+                }
+            }
+        })
+    }
+    
+    func checkRivals(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser!
+        
+        for rival in currentUser.currentTempRivals{
+            let dbDate = self.stringToDate(rival.date)
+            
+            if(dbDate != nil){
+                let now = NSDate()
+                let formatter = DateFormatter()
+                formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+                formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                let future = formatter.string(from: now as Date)
+                let dbFuture = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                
+                let validRival = dbDate.compare(.isEarlier(than: dbFuture))
+                
+                if(dbFuture != nil){
+                    if(!validRival){
+                        currentUser.currentTempRivals.remove(at: currentUser.currentTempRivals.index(of: rival)!)
+                    }
+                }
+            }
+        }
+    }
+    
+    func stringToDate(_ str: String)->Date{
+        let formatter = DateFormatter()
+        formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+        formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+        return formatter.date(from: str)!
     }
     
     private func addFriendsRef(){
@@ -720,16 +931,19 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                     }
                     
                     if(stack.count == 1){
+                        appDelegate.currentLanding!.checkRivals()
                         restoreBottomNav()
                     }
                 }
                 else{
+                    appDelegate.currentLanding!.checkRivals()
                     Broadcaster.notify(NavigateToProfile.self) {
                         $0.navigateToHome()
                     }
                 }
             }
             else{
+                appDelegate.currentLanding!.checkRivals()
                 navigateToHome()
             }
         }
@@ -739,6 +953,13 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Profile"))
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToProfile(uid: uid)
+        }
+    }
+    
+    func navigateToSponsor() {
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Sponsor"))
+        Broadcaster.notify(NavigateToProfile.self) {
+            $0.navigateToSponsor()
         }
     }
     
@@ -1315,8 +1536,8 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         let currentUser = appDelegate.currentUser
         
         self.menuItems.append(0)
-        self.menuItems.append("Friends")
         self.menuItems.append(1)
+        self.menuItems.append("Friends")
         self.menuItems.append(2)
         
         if let flowLayout = menuCollection?.collectionViewLayout as? UICollectionViewFlowLayout {
@@ -1574,5 +1795,11 @@ extension Array {
     func getElement(at index: Int) -> Element? {
         let isValidIndex = index >= 0 && index < count
         return isValidIndex ? self[index] : nil
+    }
+}
+
+extension Date {
+    init(milliseconds:Int64) {
+        self = Date(timeIntervalSince1970: TimeInterval(milliseconds) / 1000)
     }
 }

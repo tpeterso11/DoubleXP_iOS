@@ -215,8 +215,14 @@ class FoldingCellCell: FoldingCell, UICollectionViewDelegate, UICollectionViewDa
            
            cell.statLabel.text = "W/L Ratio"
             
-           let convert = current.codWlRatio.floatValue
-           cell.stat.text = convert.clean
+            let formatter = NumberFormatter()
+            formatter.maximumFractionDigits = 2
+            formatter.minimumFractionDigits = 2
+            
+            let convert = current.codWlRatio.floatValue
+            if let formattedString = formatter.string(for: convert) {
+                cell.stat.text = formattedString
+            }
            
            return cell
        }

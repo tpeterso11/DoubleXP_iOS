@@ -20,12 +20,12 @@ class FirebaseAuthManager {
         }
     }
     
-    func signIn(email: String, pass: String, completionBlock: @escaping (_ success: Bool) -> Void) {
+    func signIn(email: String, pass: String, completionBlock: @escaping (_ error: String, _ success: Bool) -> Void) {
         Auth.auth().signIn(withEmail: email, password: pass) { (result, error) in
             if let error = error, let _ = AuthErrorCode(rawValue: error._code) {
-                completionBlock(false)
+                completionBlock(String(error._code), false)
             } else {
-                completionBlock(true)
+                completionBlock(error?.localizedDescription ?? "", true)
             }
         }
     }

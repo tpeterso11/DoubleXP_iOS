@@ -22,6 +22,8 @@ class FAQuizPage: UIViewController, UICollectionViewDataSource, UICollectionView
     @IBOutlet weak var questionDescription: UILabel!
     @IBOutlet weak var questionLabel: UILabel!
     @IBOutlet weak var questionOptions: UICollectionView!
+    @IBOutlet weak var loadingOverlay: UIView!
+    @IBOutlet weak var loadingSpinner: UIActivityIndicatorView!
     
     private let reuseIdentifier = "cell"
     
@@ -165,7 +167,14 @@ class FAQuizPage: UIViewController, UICollectionViewDataSource, UICollectionView
     }
     
     func updateAnswer(answer: String, question: FAQuestion) {
-        interviewManager?.updateAnswer(answer: answer, question: question)
+        UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+            self.loadingOverlay.alpha = 1
+            self.loadingSpinner.startAnimating()
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self.interviewManager?.updateAnswer(answer: answer, question: question)
+            }
+        }, completion: nil)
     }
     
     func onInitialQuizLoaded() {

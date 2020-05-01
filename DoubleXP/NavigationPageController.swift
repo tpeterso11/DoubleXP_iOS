@@ -90,6 +90,21 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
     }
     
+    func navigateToSponsor() {
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "basicSponsor") as! BasicSponsorPage
+        currentViewController.pageName = "Basic Sponsor"
+        currentViewController.navDictionary = ["state": "backOnly"]
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.addToNavStack(vc: currentViewController)
+        appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
+        appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
+        appDelegate.currentFrag = currentViewController.pageName ?? "Basic Sponsor"
+        appDelegate.currentMediaFrag = nil
+        
+        selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
+    }
+    
     func navigateToSearch(game: GamerConnectGame){
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "gamerConnectSearch") as! GamerConnectSearch
         currentViewController.pageName = "GC Search"
@@ -196,11 +211,13 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "gamerConnectFrag") as! GamerConnectFrag
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.currentLanding!.checkRivals()
         currentViewController.pageName = "Home"
         currentViewController.navDictionary = ["state": "original"]
         appDelegate.clearAndAddToNavStack(vc: currentViewController)
         appDelegate.currentFrag = currentViewController.pageName ?? "Home"
         appDelegate.currentMediaFrag = nil
+        appDelegate.currentLanding!.restoreBottomNav()
         
         selectViewController(currentViewController, direction: .reverse, animated: true, completion: nil)
     }
@@ -344,8 +361,6 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         currentViewController.navDictionary = ["state": "backOnly"]
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        appDelegate.addToNavStack(vc: currentViewController)
-        appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
         appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
         appDelegate.currentFrag = currentViewController.pageName ?? "FA Front"
         

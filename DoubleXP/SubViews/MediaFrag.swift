@@ -13,7 +13,6 @@ import ImageLoader
 import moa
 import SwiftHTTP
 import SwiftNotificationCenter
-import Hero
 import WebKit
 import SwiftRichString
 import FBSDKCoreKit
@@ -72,6 +71,8 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     var channelConstraint : NSLayoutConstraint?
     var streams = [TwitchStreamObject]()
     var currentCategory = "news"
+    
+    var articlesLoaded = false
     private var streamsSet = false
     @IBOutlet weak var loadingViewSpinner: UIActivityIndicatorView!
     
@@ -439,131 +440,120 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if(collectionView == optionsCollection){
-            let current = self.options[indexPath.item]
-            
-            self.selectedCategory = current
-            let cell = collectionView.cellForItem(at: indexPath) as! MediaCategoryCell
-            cell.mediaCategory.font = UIFont.systemFont(ofSize: 18, weight: .bold)
-            if(cell.mediaCategory.text == "#twitch"){
-                cell.mediaCategory.textColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
-            }
-            
-            for cell in self.optionsCollection.visibleCells{
-                let currentCell = cell as! MediaCategoryCell
-                if(currentCell.mediaCategory.text != current){
-                    currentCell.mediaCategory.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
+            if(self.articlesLoaded){
+                let current = self.options[indexPath.item]
+                
+                self.selectedCategory = current
+                let cell = collectionView.cellForItem(at: indexPath) as! MediaCategoryCell
+                cell.mediaCategory.font = UIFont.systemFont(ofSize: 18, weight: .bold)
+                if(cell.mediaCategory.text == "#twitch"){
+                    cell.mediaCategory.textColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
                 }
-            }
-            
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-            
-            switch(self.selectedCategory){
-                case "#popular":
-                    self.currentCategory = "news"
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "Media - Popular Selected"))
-                    delegate.currentLanding?.updateNavColor(color: .darkGray)
-                    
-                    UIView.animate(withDuration: 0.3, animations: {
-                        self.loadingView.alpha = 1
-                    }, completion: { (finished: Bool) in
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                            delegate.currentLanding?.updateNavColor(color: .darkGray)
-                            
-                            if(!delegate.mediaCache.reviewsCache.isEmpty){
-                                self.onMediaReceived(category: "news")
-                            }
-                            else{
-                                self.getMedia()
-                            }
-                        }
-                    })
-                break;
-                case "#twitch":
-                    self.currentCategory = "twitch"
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "Media - Twitch Selected"))
-                    delegate.currentLanding?.updateNavColor(color: UIColor(named: "twitchPurpleDark")!)
-                    
-                    UIView.animate(withDuration: 0.3, animations: {
-                        self.loadingView.alpha = 1
-                    }, completion: { (finished: Bool) in
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                            self.articles = [Any]()
-                            
-                            //self.news?.collectionViewLayout = UICollectionViewFlowLayout()
-                            
-                            let manager = SocialMediaManager()
-                            manager.getTopGames(callbacks: self)
-                            /*let delegate = UIApplication.shared.delegate as! AppDelegate
-                            self.articles.append(contentsOf: delegate.twitchChannels)
-                            self.articles.append(0)
-                            
-                            self.news.reloadData()
-                            UIView.animate(withDuration: 0.8, delay: 1, options: [], animations: {
-                                self.loadingView.alpha = 0
-                            }, completion: nil)*/
-                            /*self.news.performBatchUpdates({
-                                let indexSet = IndexSet(integersIn: 0...0)
-                                self.news.reloadSections(indexSet)
-                            }, completion: { (finished: Bool) in
-                                UIView.animate(withDuration: 0.8, delay: 1, options: [], animations: {
-                                    self.loadingView.alpha = 0
-                                }, completion: nil)
-                            })*/
-                        }
-                    })
-                break;
-                case "#reviews":
-                    self.currentCategory = "reviews"
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "Media - Reviews Selected"))
-                    delegate.currentLanding?.updateNavColor(color: .darkGray)
-                    
-                    UIView.animate(withDuration: 0.3, animations: {
-                        self.loadingView.alpha = 1
-                    }, completion: { (finished: Bool) in
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                            self.news?.collectionViewLayout = TestCollection()
-                            delegate.currentLanding?.updateNavColor(color: .darkGray)
-                            
-                            if(!delegate.mediaCache.reviewsCache.isEmpty){
-                                self.onMediaReceived(category: "reviews")
-                            }
-                            else{
-                                self.getReviews()
-                            }
-                        }
-                    })
-                break;
-                default:
-                    self.articles = [Any]()
-                    articles.append(contentsOf: delegate.mediaCache.newsCache)
-                    delegate.currentLanding?.updateNavColor(color: .darkGray)
-                    
-                    if(self.twitchCoverShowing){
-                        UIView.transition(with: self.header, duration: 0.3, options: .curveEaseInOut, animations: {
-                            self.header.backgroundColor = UIColor(named: "dark")
-                            self.optionsCollection.backgroundColor = UIColor(named: "darkOpacity")
-                        })
-                        
+                
+                for cell in self.optionsCollection.visibleCells{
+                    let currentCell = cell as! MediaCategoryCell
+                    if(currentCell.mediaCategory.text != current){
+                        currentCell.mediaCategory.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
+                    }
+                }
+                
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                
+                switch(self.selectedCategory){
+                    case "#popular":
+                        self.currentCategory = "news"
+                        self.articlesLoaded = false
+                        AppEvents.logEvent(AppEvents.Name(rawValue: "Media - Popular Selected"))
                         delegate.currentLanding?.updateNavColor(color: .darkGray)
-                            
-                        UIView.animate(withDuration: 0.8, animations: {
-                                self.twitchCover.alpha = 0
+                        
+                        UIView.animate(withDuration: 0.3, animations: {
+                            self.loadingView.alpha = 1
                         }, completion: { (finished: Bool) in
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                delegate.currentLanding?.updateNavColor(color: .darkGray)
+                                
+                                if(!delegate.mediaCache.reviewsCache.isEmpty){
+                                    self.onMediaReceived(category: "news")
+                                }
+                                else{
+                                    self.getMedia()
+                                }
+                            }
+                        })
+                    
+                    break;
+                    case "#twitch":
+                        self.currentCategory = "twitch"
+                        self.articlesLoaded = false
+                        AppEvents.logEvent(AppEvents.Name(rawValue: "Media - Twitch Selected"))
+                        delegate.currentLanding?.updateNavColor(color: UIColor(named: "twitchPurpleDark")!)
+                        
+                        UIView.animate(withDuration: 0.3, animations: {
+                            self.loadingView.alpha = 1
+                        }, completion: { (finished: Bool) in
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                self.articles = [Any]()
+                                
+                                let manager = SocialMediaManager()
+                                manager.getTopGames(callbacks: self)
+                            }
+                        })
+                    break;
+                    case "#reviews":
+                        self.currentCategory = "reviews"
+                        self.articlesLoaded = false
+                        AppEvents.logEvent(AppEvents.Name(rawValue: "Media - Reviews Selected"))
+                        delegate.currentLanding?.updateNavColor(color: .darkGray)
+                        
+                        UIView.animate(withDuration: 0.3, animations: {
+                            self.loadingView.alpha = 1
+                        }, completion: { (finished: Bool) in
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                self.news?.collectionViewLayout = TestCollection()
+                                delegate.currentLanding?.updateNavColor(color: .darkGray)
+                                
+                                if(!delegate.mediaCache.reviewsCache.isEmpty){
+                                    self.onMediaReceived(category: "reviews")
+                                }
+                                else{
+                                    self.getReviews()
+                                }
+                            }
+                        })
+                    break;
+                    default:
+                        self.articles = [Any]()
+                        self.articlesLoaded = false
+                        articles.append(contentsOf: delegate.mediaCache.newsCache)
+                        delegate.currentLanding?.updateNavColor(color: .darkGray)
+                        
+                        if(self.twitchCoverShowing){
+                            UIView.transition(with: self.header, duration: 0.3, options: .curveEaseInOut, animations: {
+                                self.header.backgroundColor = UIColor(named: "dark")
+                                self.optionsCollection.backgroundColor = UIColor(named: "darkOpacity")
+                            })
+                            
+                            delegate.currentLanding?.updateNavColor(color: .darkGray)
+                                
+                            UIView.animate(withDuration: 0.8, animations: {
+                                    self.twitchCover.alpha = 0
+                            }, completion: { (finished: Bool) in
+                                self.news.performBatchUpdates({
+                                    let indexSet = IndexSet(integersIn: 0...0)
+                                    self.news.reloadSections(indexSet)
+                                }, completion: nil)
+                            })
+                            
+                            self.twitchCoverShowing = false
+                        }
+                        else{
                             self.news.performBatchUpdates({
                                 let indexSet = IndexSet(integersIn: 0...0)
                                 self.news.reloadSections(indexSet)
                             }, completion: nil)
-                        })
-                        
-                        self.twitchCoverShowing = false
-                    }
-                    else{
-                        self.news.performBatchUpdates({
-                            let indexSet = IndexSet(integersIn: 0...0)
-                            self.news.reloadSections(indexSet)
-                        }, completion: nil)
-                    }
-                break;
+                        }
+                    break;
+                }
             }
         }
         else if(collectionView == channelCollection){
@@ -845,6 +835,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                     UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
                         self.news.transform = top
                         self.news.alpha = 1
+                        self.articlesLoaded = true
                     }, completion: nil)
                 })
             }
@@ -858,6 +849,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                 }, completion: { (finished: Bool) in
                     UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
                         self.news.alpha = 1
+                        self.articlesLoaded = true
                     }, completion: nil)
                 })
             }
@@ -1067,19 +1059,6 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         let current = self.articlePayload[indexPath.item]
         let cell = tableView.dequeueReusableCell(withIdentifier: "text", for: indexPath) as! ArticleTextCell
         
-        /*if self.traitCollection.userInterfaceStyle == .dark {
-             let groupStyle = StyleXML.init(base: styleBase, ["strong" : testAttr])
-             let attr = (current as! String).htmlToAttributedString
-                           
-             cell.label.attributedText = attr?.string.set(style: groupStyle)
-             cell.label.lineBreakMode = .byWordWrapping
-        } else {
-             let groupStyle = StyleXML.init(base: styleBaseDark, ["strong" : testAttr])
-             let attr = (current as! String).htmlToAttributedString
-                           
-             cell.label.attributedText = attr?.string.set(style: groupStyle)
-             cell.label.lineBreakMode = .byWordWrapping
-        }*/
         let groupStyle = StyleXML.init(base: styleBase, ["strong" : testAttr])
         let attr = (current as! String).htmlToAttributedString
                       
@@ -1108,11 +1087,11 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     func onChannelsLoaded(channels: [TwitchChannelObj]) {
         DispatchQueue.main.async {
             self.articles.append(contentsOf: channels)
-            self.articles.append(0)
             
             self.news.reloadData()
             UIView.animate(withDuration: 0.8, delay: 1, options: [], animations: {
                 self.loadingView.alpha = 0
+                self.articlesLoaded = true
             }, completion: nil)
         }
     }

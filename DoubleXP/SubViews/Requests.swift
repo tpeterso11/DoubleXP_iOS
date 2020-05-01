@@ -10,10 +10,11 @@ import UIKit
 import Firebase
 import ImageLoader
 import moa
+import PopupDialog
 import MSPeekCollectionViewDelegateImplementation
 
 class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUpdate {
-    
+
     var userRequests = [Any]()
     var cellHeights: [CGFloat] = []
     
@@ -39,28 +40,7 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        let currentUser = delegate.currentUser
-        
-        let top = CGAffineTransform(translationX: 0, y: 30)
-        UIView.animate(withDuration: 0.8, delay: 0.3, options:[], animations: {
-            self.requestsHeader.alpha = 1
-            self.requestsHeader.transform = top
-            self.requestsSub.alpha = 1
-            self.requestsSub.transform = top
-        }, completion: { (finished: Bool) in
-            UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
-                if(currentUser != nil){
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                        self.buildRequests(user: currentUser!)
-                    }
-                }
-                else{
-                    return
-                }
-            }, completion: nil)
-        })
-        
+        checkRivals()
         //self.pageName = "Requests"
         //appDelegate.addToNavStack(vc: self)
     }
@@ -77,6 +57,12 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
     }
     
     private func buildRequests(user: User){
+        if(!user.tempRivals.isEmpty){
+            for rival in user.tempRivals{
+                self.userRequests.append(rival)
+            }
+        }
+        
         if(!user.pendingRequests.isEmpty){
             for request in user.pendingRequests{
                 self.userRequests.append(request)
@@ -115,6 +101,63 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
                 self.emptyLayout.transform = top
             }, completion: nil)
         }
+    }
+    
+    private func checkRivals(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser!
+        
+        for rival in currentUser.currentTempRivals{
+            let dbDate = self.stringToDate(rival.date)
+            
+            if(dbDate != nil){
+                let now = NSDate()
+                let formatter = DateFormatter()
+                formatter.dateFormat="yyyy.MM.dd hh:mm aaa"
+                formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                let future = formatter.string(from: now as Date)
+                let dbFuture = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                
+                let validRival = dbDate.compare(.isEarlier(than: dbFuture))
+                
+                if(dbFuture != nil){
+                    if(!validRival){
+                        currentUser.currentTempRivals.remove(at: currentUser.currentTempRivals.index(of: rival)!)
+                    }
+                }
+            }
+        }
+        self.showView()
+    }
+    
+    func showView(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser
+        let top = CGAffineTransform(translationX: 0, y: 30)
+        UIView.animate(withDuration: 0.8, delay: 0.3, options:[], animations: {
+            self.requestsHeader.alpha = 1
+            self.requestsHeader.transform = top
+            self.requestsSub.alpha = 1
+            self.requestsSub.transform = top
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
+                if(currentUser != nil){
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        self.buildRequests(user: currentUser!)
+                    }
+                }
+                else{
+                    return
+                }
+            }, completion: nil)
+        })
+    }
+    
+    func stringToDate(_ str: String)->Date{
+        let formatter = DateFormatter()
+        formatter.dateFormat="yyyy.MM.dd hh:mm aaa"
+        formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+        return formatter.date(from: str)!
     }
     
     @objc func refreshHandler() {
@@ -170,13 +213,16 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
             let current = userRequests[indexPath.item]
             
             if(current is FriendRequestObject){
-                cell.setUI(friendRequest: (current as! FriendRequestObject), team: nil, request: nil, indexPath: indexPath, currentTableView: self.requestList, callbacks: self)
+                cell.setUI(friendRequest: (current as! FriendRequestObject), team: nil, request: nil, rival: nil, indexPath: indexPath, currentTableView: self.requestList, callbacks: self)
             }
             else if(current is RequestObject){
-                cell.setUI(friendRequest: nil, team: nil, request: (current as! RequestObject), indexPath: indexPath, currentTableView: self.requestList, callbacks: self)
+                cell.setUI(friendRequest: nil, team: nil, request: (current as! RequestObject), rival: nil, indexPath: indexPath, currentTableView: self.requestList, callbacks: self)
+            }
+            else if(current is RivalObj){
+                cell.setUI(friendRequest: nil, team: nil, request: nil, rival: (current as! RivalObj), indexPath: indexPath, currentTableView: self.requestList, callbacks: self)
             }
             else{
-                cell.setUI(friendRequest: nil, team: (current as! TeamObject), request: nil, indexPath: indexPath, currentTableView: self.requestList, callbacks: self)
+                cell.setUI(friendRequest: nil, team: (current as! TeamObject), request: nil, rival: nil, indexPath: indexPath, currentTableView: self.requestList, callbacks: self)
             }
             
             cell.layoutMargins = UIEdgeInsets.zero
@@ -289,6 +335,62 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
             tableView.layoutIfNeeded()
             tableView.setContentOffset(contentOffset, animated: false)
         }
+    }
+    
+    func rivalRequestAlready() {
+    }
+    
+    func rivalRequestSuccess() {
+    }
+    
+    func rivalRequestFail() {
+    }
+    
+    func rivalResponseAccepted(indexPath: IndexPath) {
+        updateCell(indexPath: indexPath)
+        showConfirmation()
+    }
+    
+    func rivalResponseRejected(indexPath: IndexPath) {
+        updateCell(indexPath: indexPath)
+    }
+    
+    func rivalResponseFailed() {
+        showFail()
+    }
+    
+    func showConfirmation(){
+        var buttons = [PopupDialogButton]()
+        let title = "you accepted, we sent it."
+        let message = "looks like you both are ready to play. go get online!"
+        
+        let buttonOne = CancelButton(title: "game time!") { [weak self] in
+            //do nothing
+        }
+        buttons.append(buttonOne)
+        
+        let popup = PopupDialog(title: title, message: message)
+        popup.addButtons(buttons)
+
+        // Present dialog
+        self.present(popup, animated: true, completion: nil)
+    }
+    
+    func showFail(){
+        var buttons = [PopupDialogButton]()
+        let title = "there was an error with your request."
+        let message = "try again, or jump in the chat and let them know."
+        
+        let buttonOne = CancelButton(title: "gotcha") { [weak self] in
+            //do nothing
+        }
+        buttons.append(buttonOne)
+        
+        let popup = PopupDialog(title: title, message: message)
+        popup.addButtons(buttons)
+
+        // Present dialog
+        self.present(popup, animated: true, completion: nil)
     }
     
     struct Section {

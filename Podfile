@@ -24,13 +24,13 @@ target 'DoubleXP' do
   pod 'TwitchPlayer'
   pod 'MessageKit'
   pod 'Bartinter'
-  pod 'Hero'
   pod 'ExpyTableView'
   pod 'PINRemoteImage'
   pod 'AIFlatSwitch'
   pod 'SwiftRichString'
   pod 'PopupDialog', '~> 1.0'
-  pod 'FBSDKCoreKit/Swift'
+  pod 'FacebookCore'
+  pod 'FacebookLogin'
   pod 'ValidationComponents'
   pod 'UnderLineTextField', '~> 2.1'
   pod 'Giphy'
@@ -38,6 +38,9 @@ target 'DoubleXP' do
   pod 'SoftUIView'
   pod 'ElongationPreview'
   pod 'RAMPaperSwitch'
+  pod 'VideoBackground'
+  pod 'GoogleSignIn'
+  pod 'SwiftDate', '~> 5.0'
 
   # Pods for DoubleXP
 

@@ -64,9 +64,6 @@ static NSDictionary<NSString *, NSArray<NSString *> *> *_featureMapping;
       @"EventDeactivation" : @[
           @"FBSDKEventDeactivationManager",
       ],
-      @"Monitoring" : @[
-          @"FBSDKMonitor",
-      ],
     };
   }
 }

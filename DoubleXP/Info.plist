@@ -24,6 +24,14 @@
 				<string>fb289127408651992</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.582166005754-t8kcglj0t0oqgsr4p43052rpf00vnkvg</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
@@ -38,6 +46,8 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>MGLMapboxAccessToken</key>
+	<string>pk.eyJ1IjoidHBldGVyc28xMSIsImEiOiJjazkza3dzZDIwM2ZjM2RwaWJ4Mzg1bnhlIn0.HcG2NYBrB3nD62Cr6ozd_w</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -67,6 +77,8 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Showing location of competitions.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -88,9 +100,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
-	<key>MGLMapboxAccessToken</key>
-	<string>pk.eyJ1IjoidHBldGVyc28xMSIsImEiOiJjazkza3dzZDIwM2ZjM2RwaWJ4Mzg1bnhlIn0.HcG2NYBrB3nD62Cr6ozd_w</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Showing location of competitions.</string>
 </dict>
 </plist>

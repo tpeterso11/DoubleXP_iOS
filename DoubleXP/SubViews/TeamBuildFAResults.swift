@@ -116,7 +116,12 @@ class TeamBuildFAResults: ParentVC, UITableViewDelegate, UITableViewDataSource, 
                 }
             }
             
-            self.setup()
+            if(!finalList.isEmpty){
+                self.setup()
+            }
+            else{
+                self.showEmpty(teamNeeds: self.team!.selectedTeamNeeds.count > 0)
+            }
         }
         else{
             var amendedList = [FreeAgentObject]()

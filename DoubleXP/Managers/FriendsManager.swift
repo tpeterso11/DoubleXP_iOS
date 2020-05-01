@@ -790,4 +790,458 @@ class FriendsManager{
             print(error.localizedDescription)
         }
     }
+    
+    func createRivalRequest(otherUser: User, game: String, type: String, callbacks: RequestsUpdate, gamerTags: [GamerProfile]){
+        //send request
+        let ref = Database.database().reference().child("Users").child(otherUser.uId)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                let currentUser = delegate.currentUser
+                
+                var rivals = [RivalObj]()
+                if(snapshot.hasChild("tempRivals")){
+                    let pendingArray = snapshot.childSnapshot(forPath: "tempRivals")
+                    for rival in pendingArray.children{
+                        let currentObj = rival as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let date = dict?["date"] as? String ?? ""
+                        let tag = dict?["gamerTag"] as? String ?? ""
+                        let game = dict?["game"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
+                        let dbType = dict?["type"] as? String ?? ""
+                        
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                        
+                        let dbDate = self.stringToDate(date)
+                        
+                        if(dbDate != nil){
+                            let now = NSDate()
+                            let formatter = DateFormatter()
+                            formatter.timeZone = TimeZone(abbreviation: "UTC")
+                            formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+                            let future = formatter.string(from: now as Date)
+                            let dbFuture = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                            
+                            let validRival = dbDate.compare(.isEarlier(than: dbFuture))
+                            
+                            if(dbFuture != nil){
+                                if(validRival){
+                                    rivals.append(request)
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                let manager = GamerProfileManager()
+                var contained = false
+                for rival in rivals{
+                    if(rival.gamerTag == manager.getGamerTagForGame(gameName: game)){
+                        contained = true
+                        callbacks.rivalRequestAlready()
+                        return
+                    }
+                }
+                
+                if(!contained){
+                    let date = Date()
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "MM-dd-yyyy HH:mm zzz"
+                    formatter.timeZone = TimeZone(abbreviation: "UTC")
+                    let result = formatter.string(from: date)
+                    
+                    let currentRival = RivalObj(gamerTag: manager.getGamerTagForGame(gameName: game), date: result, game: game, uid: currentUser!.uId, type: type)
+                    
+                    rivals.append(currentRival)
+                    
+                    var sendList = [[String: Any]]()
+                    for rival in rivals{
+                        let current = ["gamerTag": rival.gamerTag, "date": rival.date, "uid": rival.uid, "game": rival.game, "type": rival.type] as [String : String]
+                        sendList.append(current)
+                    }
+                    
+                    ref.child("tempRivals").setValue(sendList)
+                    
+                    self.updateCurrentUserRivals(currentUser: currentUser!, otherUser: otherUser, game: game, type: type, callbacks: callbacks, gamerTags: gamerTags, dateString: result)
+                }
+            }
+            
+        }) { (error) in
+            print(error.localizedDescription)
+            callbacks.rivalRequestFail()
+        }
+    }
+    
+    private func updateCurrentUserRivals(currentUser: User, otherUser: User, game: String, type: String, callbacks: RequestsUpdate, gamerTags: [GamerProfile], dateString: String){
+        let ref = Database.database().reference().child("Users").child(currentUser.uId)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                let currentUser = delegate.currentUser
+                
+                var currentTag = ""
+                for tag in gamerTags{
+                    if(tag.game == game){
+                        currentTag = tag.gamerTag
+                    }
+                }
+                
+                let newRival = RivalObj(gamerTag: currentTag, date: dateString, game: game, uid: otherUser.uId, type: type)
+                currentUser!.currentTempRivals.append(newRival)
+                
+                var rivals = [RivalObj]()
+                if(snapshot.hasChild("currentTempRivals")){
+                    let pendingArray = snapshot.childSnapshot(forPath: "currentTempRivals")
+                    for rival in pendingArray.children{
+                        let currentObj = rival as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let date = dict?["date"] as? String ?? ""
+                        let tag = dict?["gamerTag"] as? String ?? ""
+                        let game = dict?["game"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
+                        let dbType = dict?["type"] as? String ?? ""
+                        
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                        
+                        let dbDate = self.stringToDate(date)
+                        if(dbDate != nil){
+                            let now = NSDate()
+                            let formatter = DateFormatter()
+                            formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+                            formatter.timeZone = TimeZone(abbreviation: "UTC")
+                            let future = formatter.string(from: now as Date)
+                            let dbFuture = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                            
+                            let validRival = dbDate.compare(.isEarlier(than: dbFuture))
+                            
+                            if(dbFuture != nil){
+                                if(validRival){
+                                    rivals.append(request)
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                let manager = GamerProfileManager()
+                var contained = false
+                for rival in rivals{
+                    if(rival.gamerTag == manager.getGamerTagForOtherUserForGame(gameName: game, returnedUser: otherUser)){
+                        contained = true
+                        return
+                    }
+                }
+                
+                if(!contained){
+                    rivals.append(newRival)
+                    
+                    var sendList = [[String: Any]]()
+                    for rival in rivals{
+                        let current = ["gamerTag": rival.gamerTag, "date": rival.date, "uid": rival.uid, "game": rival.game, "type": rival.type] as [String : String]
+                        sendList.append(current)
+                    }
+                    
+                    ref.child("currentTempRivals").setValue(sendList)
+                    
+                    callbacks.rivalRequestSuccess()
+                }
+            }
+            
+        }) { (error) in
+            print(error.localizedDescription)
+            callbacks.rivalRequestFail()
+        }
+    }
+    
+    func acceptPlayRequest(position: IndexPath, rival: RivalObj, callbacks: RequestsUpdate){
+        //update other user
+        let ref = Database.database().reference().child("Users").child(rival.uid)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                let currentUser = delegate.currentUser
+                
+                let manager = GamerProfileManager()
+                let tag = manager.getGamerTagForGame(gameName: rival.game)
+                
+                var tempRivals = [RivalObj]()
+                if(snapshot.hasChild("tempRivals")){
+                    let pendingArray = snapshot.childSnapshot(forPath: "tempRivals")
+                    for rival in pendingArray.children{
+                        let currentObj = rival as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let date = dict?["date"] as? String ?? ""
+                        let tag = dict?["gamerTag"] as? String ?? ""
+                        let game = dict?["game"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
+                        let dbType = dict?["type"] as? String ?? ""
+                        
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                        tempRivals.append(request)
+                    }
+                }
+                
+                for tempRival in tempRivals{
+                    if(tempRival.uid == currentUser!.uId){
+                        tempRivals.remove(at: tempRivals.index(of: tempRival)!)
+                    }
+                }
+                
+                ref.child("tempRivals").setValue(tempRivals)
+                
+                var rivals = [RivalObj]()
+                if(snapshot.hasChild("acceptedTempRivals")){
+                    let pendingArray = snapshot.childSnapshot(forPath: "acceptedTempRivals")
+                    for rival in pendingArray.children{
+                        let currentObj = rival as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let date = dict?["date"] as? String ?? ""
+                        let tag = dict?["gamerTag"] as? String ?? ""
+                        let game = dict?["game"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
+                        let dbType = dict?["type"] as? String ?? ""
+                        
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                        rivals.append(request)
+                    }
+                }
+                
+                let newRival = RivalObj(gamerTag: tag, date: rival.date, game: rival.game, uid: currentUser!.uId, type: rival.type)
+                rivals.append(newRival)
+                    
+                var sendList = [[String: Any]]()
+                for rival in rivals{
+                    let current = ["gamerTag": rival.gamerTag, "date": rival.date, "uid": rival.uid, "game": rival.game] as [String : String]
+                    sendList.append(current)
+                }
+                
+                ref.child("acceptedTempRivals").setValue(sendList)
+                
+                self.updateAcceptRejectCurrentUser(position: position, rival: rival, callbacks: callbacks, accepted: true)
+            }
+            
+        }) { (error) in
+            print(error.localizedDescription)
+            callbacks.rivalResponseFailed()
+        }
+    }
+    
+    func rejectPlayRequest(position: IndexPath, rival: RivalObj, callbacks: RequestsUpdate){
+        //update other user
+        let ref = Database.database().reference().child("Users").child(rival.uid)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                let currentUser = delegate.currentUser
+                
+                let manager = GamerProfileManager()
+                let tag = manager.getGamerTagForGame(gameName: rival.game)
+                
+                var rivals = [RivalObj]()
+                if(snapshot.hasChild("rejectedTempRivals")){
+                    let pendingArray = snapshot.childSnapshot(forPath: "rejectedTempRivals")
+                    for rival in pendingArray.children{
+                        let currentObj = rival as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let date = dict?["date"] as? String ?? ""
+                        let tag = dict?["gamerTag"] as? String ?? ""
+                        let game = dict?["game"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
+                        let dbType = dict?["type"] as? String ?? ""
+                        
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                        rivals.append(request)
+                    }
+                }
+                
+                var tempRivals = [RivalObj]()
+                if(snapshot.hasChild("tempRivals")){
+                    let pendingArray = snapshot.childSnapshot(forPath: "tempRivals")
+                    for rival in pendingArray.children{
+                        let currentObj = rival as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let date = dict?["date"] as? String ?? ""
+                        let tag = dict?["gamerTag"] as? String ?? ""
+                        let game = dict?["game"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
+                        let dbType = dict?["type"] as? String ?? ""
+                        
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                        tempRivals.append(request)
+                    }
+                }
+                
+                for tempRival in tempRivals{
+                    if(tempRival.uid == currentUser!.uId){
+                        tempRivals.remove(at: tempRivals.index(of: tempRival)!)
+                    }
+                }
+            
+                ref.child("tempRivals").setValue(tempRivals)
+                
+                let newRival = RivalObj(gamerTag: tag, date: rival.date, game: rival.game, uid: currentUser!.uId, type: rival.type)
+                rivals.append(newRival)
+                    
+                var sendList = [[String: Any]]()
+                for rival in rivals{
+                    let current = ["gamerTag": rival.gamerTag, "date": rival.date, "uid": rival.uid, "game": rival.game] as [String : String]
+                    sendList.append(current)
+                }
+                
+                ref.child("rejectedTempRivals").setValue(sendList)
+                
+                self.updateAcceptRejectCurrentUser(position: position, rival: rival, callbacks: callbacks, accepted: false)
+            }
+            
+        }) { (error) in
+            print(error.localizedDescription)
+            callbacks.rivalResponseFailed()
+        }
+    }
+    
+    private func updateAcceptRejectCurrentUser(position: IndexPath, rival: RivalObj, callbacks: RequestsUpdate, accepted: Bool){
+        
+        let ref = Database.database().reference().child("Users").child(rival.uid)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                let currentUser = delegate.currentUser
+                
+                var currentTempRivals = [RivalObj]()
+                if(snapshot.hasChild("currentTempRivals")){
+                    let pendingArray = snapshot.childSnapshot(forPath: "currentTempRivals")
+                    for rival in pendingArray.children{
+                        let currentObj = rival as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let date = dict?["date"] as? String ?? ""
+                        let tag = dict?["gamerTag"] as? String ?? ""
+                        let game = dict?["game"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
+                        let dbType = dict?["type"] as? String ?? ""
+                        
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                        currentTempRivals.append(request)
+                    }
+                }
+                
+                for tempRival in currentTempRivals{
+                    if(tempRival.uid == rival.uid){
+                        currentTempRivals.remove(at: currentTempRivals.index(of: tempRival)!)
+                    }
+                }
+            
+                ref.child("currentTempRivals").setValue(currentTempRivals)
+                
+                
+                var tempRivals = [RivalObj]()
+                if(snapshot.hasChild("tempRivals")){
+                    let pendingArray = snapshot.childSnapshot(forPath: "tempRivals")
+                    for rival in pendingArray.children{
+                        let currentObj = rival as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let date = dict?["date"] as? String ?? ""
+                        let tag = dict?["gamerTag"] as? String ?? ""
+                        let game = dict?["game"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
+                        let dbType = dict?["type"] as? String ?? ""
+                        
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                        tempRivals.append(request)
+                    }
+                }
+                
+                for tempRival in tempRivals{
+                    if(tempRival.uid == rival.uid){
+                        tempRivals.remove(at: tempRivals.index(of: tempRival)!)
+                    }
+                }
+                
+                if(accepted){
+                    var rivals = [RivalObj]()
+                    if(snapshot.hasChild("acceptedTempRivals")){
+                        let pendingArray = snapshot.childSnapshot(forPath: "acceptedTempRivals")
+                        for rival in pendingArray.children{
+                            let currentObj = rival as! DataSnapshot
+                            let dict = currentObj.value as? [String: Any]
+                            let date = dict?["date"] as? String ?? ""
+                            let tag = dict?["gamerTag"] as? String ?? ""
+                            let game = dict?["game"] as? String ?? ""
+                            let uid = dict?["uid"] as? String ?? ""
+                            let dbType = dict?["type"] as? String ?? ""
+                            
+                            let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                            rivals.append(request)
+                        }
+                    }
+                    
+                    let newRival = RivalObj(gamerTag: rival.gamerTag, date: rival.date, game: rival.game, uid: rival.uid, type: rival.type)
+                    rivals.append(newRival)
+                        
+                    var sendList = [[String: Any]]()
+                    for rival in rivals{
+                        let current = ["gamerTag": rival.gamerTag, "date": rival.date, "uid": rival.uid, "game": rival.game] as [String : String]
+                        sendList.append(current)
+                    }
+                    
+                    ref.child("acceptedTempRivals").setValue(sendList)
+                    
+                    callbacks.rivalResponseAccepted(indexPath: position)
+                }
+                else{
+                    var rivals = [RivalObj]()
+                    if(snapshot.hasChild("rejectedTempRivals")){
+                        let pendingArray = snapshot.childSnapshot(forPath: "rejectedTempRivals")
+                        for rival in pendingArray.children{
+                            let currentObj = rival as! DataSnapshot
+                            let dict = currentObj.value as? [String: Any]
+                            let date = dict?["date"] as? String ?? ""
+                            let tag = dict?["gamerTag"] as? String ?? ""
+                            let game = dict?["game"] as? String ?? ""
+                            let uid = dict?["uid"] as? String ?? ""
+                            let dbType = dict?["type"] as? String ?? ""
+                            
+                            let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                            rivals.append(request)
+                        }
+                    }
+                    
+                    let newRival = RivalObj(gamerTag: rival.gamerTag, date: rival.date, game: rival.game, uid: rival.uid, type: rival.type)
+                    rivals.append(newRival)
+                        
+                    var sendList = [[String: Any]]()
+                    for rival in rivals{
+                        let current = ["gamerTag": rival.gamerTag, "date": rival.date, "uid": rival.uid, "game": rival.game] as [String : String]
+                        sendList.append(current)
+                    }
+                    
+                    ref.child("rejectedTempRivals").setValue(sendList)
+                    
+                    callbacks.rivalResponseRejected(indexPath: position)
+                }
+            }
+            
+        }) { (error) in
+            print(error.localizedDescription)
+            callbacks.rivalResponseFailed()
+        }
+    }
+    
+    
+    func stringToDate(_ str: String)->Date{
+        let formatter = DateFormatter()
+        formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+        formatter.timeZone = TimeZone(abbreviation: "UTC")
+        return formatter.date(from: str)!
+    }
+    
+}
+
+extension Date {
+var millisecondsSince1970:Int64 {
+       return Int64((self.timeIntervalSince1970 * 1000.0).rounded())
+       //RESOLVED CRASH HERE
+   }
+    
+    
 }

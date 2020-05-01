@@ -21,4 +21,6 @@ class UserCell: UICollectionViewCell{
     @IBOutlet weak var twoTag: UILabel!
     @IBOutlet weak var threeTag: UILabel!
     @IBOutlet weak var fourTag: UILabel!
+    @IBOutlet weak var rivalTag: UILabel!
+    @IBOutlet weak var rivalButton: UIImageView!
 }

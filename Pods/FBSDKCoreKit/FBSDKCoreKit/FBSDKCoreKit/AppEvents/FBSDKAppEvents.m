@@ -172,6 +172,7 @@ FBSDKAppEventName FBSDKAppEventNameFBDialogsPresentShareDialogOG    = @"fb_dialo
 FBSDKAppEventName FBSDKAppEventNameFBDialogsPresentLikeDialogOG     = @"fb_dialogs_present_like_og";
 FBSDKAppEventName FBSDKAppEventNameFBDialogsPresentMessageDialog      = @"fb_dialogs_present_message";
 FBSDKAppEventName FBSDKAppEventNameFBDialogsPresentMessageDialogPhoto = @"fb_dialogs_present_message_photo";
+FBSDKAppEventName FBSDKAppEventNameFBDialogsPresentMessageDialogOG    = @"fb_dialogs_present_message_og";
 
 FBSDKAppEventName FBSDKAppEventNameFBDialogsNativeLoginDialogStart  = @"fb_dialogs_native_login_dialog_start";
 NSString *const FBSDKAppEventsNativeLoginDialogStartTime          = @"fb_native_login_dialog_start_time";
@@ -278,10 +279,14 @@ NSString *const FBSDKAppEventsDialogShareModeFeedBrowser    = @"FeedBrowser";
 NSString *const FBSDKAppEventsDialogShareModeFeedWeb        = @"FeedWeb";
 NSString *const FBSDKAppEventsDialogShareModeUnknown        = @"Unknown";
 
+NSString *const FBSDKAppEventsDialogShareContentTypeOpenGraph                         = @"OpenGraph";
 NSString *const FBSDKAppEventsDialogShareContentTypeStatus                            = @"Status";
 NSString *const FBSDKAppEventsDialogShareContentTypePhoto                             = @"Photo";
 NSString *const FBSDKAppEventsDialogShareContentTypeVideo                             = @"Video";
 NSString *const FBSDKAppEventsDialogShareContentTypeCamera                            = @"Camera";
+NSString *const FBSDKAppEventsDialogShareContentTypeMessengerGenericTemplate          = @"GenericTemplate";
+NSString *const FBSDKAppEventsDialogShareContentTypeMessengerMediaTemplate            = @"MediaTemplate";
+NSString *const FBSDKAppEventsDialogShareContentTypeMessengerOpenGraphMusicTemplate   = @"OpenGraphMusicTemplate";
 NSString *const FBSDKAppEventsDialogShareContentTypeUnknown                           = @"Unknown";
 
 NSString *const FBSDKGateKeeperAppEventsKillSwitch                                    = @"app_events_killswitch";
@@ -455,7 +460,7 @@ static NSString *g_overrideAppID = nil;
   [[FBSDKAppEvents singleton] instanceLogEvent:eventName
                                     valueToSum:valueToSum
                                     parameters:parameters
-                            isImplicitlyLogged:[parameters[FBSDKAppEventParameterImplicitlyLogged] boolValue]
+                            isImplicitlyLogged:(BOOL)parameters[FBSDKAppEventParameterImplicitlyLogged]
                                    accessToken:accessToken];
 }
 
@@ -830,11 +835,6 @@ static NSString *g_overrideAppID = nil;
   [request startWithCompletionHandler:handler];
 }
 
-+ (NSString *)anonymousID
-{
-  return [FBSDKBasicUtility anonymousID];
-}
-
 #if !TARGET_OS_TV
 + (void)augmentHybridWKWebView:(WKWebView *)webView {
   // Ensure we can instantiate WebKit before trying this
@@ -1035,6 +1035,7 @@ static dispatch_once_t *onceTokenPointer;
   }
   [self fetchServerConfiguration:^{
     NSDictionary *params = [FBSDKAppEventsUtility activityParametersDictionaryForEvent:@"MOBILE_APP_INSTALL"
+                                                                    implicitEventsOnly:NO
                                                              shouldAccessAdvertisingID:self->_serverConfiguration.isAdvertisingIDEnabled];
     NSString *path = [NSString stringWithFormat:@"%@/activities", appID];
     FBSDKGraphRequest *request = [[FBSDKGraphRequest alloc] initWithGraphPath:path
@@ -1294,6 +1295,7 @@ static dispatch_once_t *onceTokenPointer;
     }
     NSMutableDictionary *postParameters = [FBSDKAppEventsUtility
                                            activityParametersDictionaryForEvent:@"CUSTOM_APP_EVENTS"
+                                           implicitEventsOnly:appEventsState.areAllEventsImplicit
                                            shouldAccessAdvertisingID:self->_serverConfiguration.advertisingIDEnabled];
     NSInteger length = receipt_data.length;
     if (length > 0) {

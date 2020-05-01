@@ -88,7 +88,7 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         let currentUser = appDelegate.currentUser!
         
         for profile in currentUser.gamerTags{
-            let current = ["gamerTag": profile.gamerTag, "gameName": profile.game, "console": profile.console]
+            let current = ["gamerTag": profile.gamerTag, "game": profile.game, "console": profile.console]
             currentProfilePayload.append(current)
         }
         
@@ -139,7 +139,7 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
     
     func gameRemoved(gameName: String, indexPath: IndexPath) {
         for array in self.currentProfilePayload{
-            if(array["gameName"] == gameName){
+            if(array["game"] == gameName){
                 self.currentProfilePayload.remove(at: currentProfilePayload.index(of: array)!)
             }
         }
@@ -257,7 +257,7 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         
         dismissDrawer()
         
-        let current = ["gamerTag": gamerTagField.text!, "gameName": self.addedName, "console": self.chosenConsole]
+        let current = ["gamerTag": gamerTagField.text!, "game": self.addedName, "console": self.chosenConsole]
         self.currentProfilePayload.append(current)
         
         currentGamesCell?.updateCell(indexPath: self.addedIndex, gameName: self.addedName, show: true)
@@ -567,7 +567,7 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         
         var profiles = [GamerProfile]()
         for profile in self.currentProfilePayload{
-            let newProfile = GamerProfile(gamerTag: profile["gamerTag"]!, game: profile["gameName"]!, console: profile["console"]!)
+            let newProfile = GamerProfile(gamerTag: profile["gamerTag"]!, game: profile["game"]!, console: profile["console"]!)
             profiles.append(newProfile)
         }
         currentUser!.gamerTags = profiles
