@@ -63,7 +63,7 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             let currentLanding = appDelegate.currentLanding!
             let top = CGAffineTransform(translationX: 0, y: -10)
-            let top2 = CGAffineTransform(translationX: 0, y: -currentLanding.bottomNavHeight + 60)
+            let top2 = CGAffineTransform(translationX: 0, y: -currentLanding.bottomNavHeight + 80)
             UIView.animate(withDuration: 0.8, animations: {
                 self.emptyOverlay.alpha = 1
             }, completion: { (finished: Bool) in
@@ -234,9 +234,10 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
             chatMessages = [ChatMessage]()
             chatMessages.append(1)
             for message in messages{
+                 //Message created time in millisecond(UTC).
                 let date = NSDate(timeIntervalSince1970: TimeInterval(message.createdAt))
                 let formatter = DateFormatter()
-                formatter.dateFormat = "MMMM.dd.yyyy"
+                formatter.dateFormat = "MM-dd-yyyy HH:mm:ss"
                 let result = formatter.string(from: date as Date)
                 
                 let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -245,10 +246,7 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
                 let chatMessage = ChatMessage(message: message.message!, timeStamp: result)
                 chatMessage.data = message.data ?? ""
                 chatMessage.senderString = chatMessage.data
-                
-                //if(message.mentionedUsers != nil){
-                //    chatMessage.mentionedUsers = message.mentionedUsers!
-                //}
+                chatMessage.timeStampMillis = message.createdAt
                 
                 chatMessages.append(chatMessage)
             }

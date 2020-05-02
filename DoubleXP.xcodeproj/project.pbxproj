@@ -115,6 +115,10 @@
 		30634D7724074B9B00FEAD40 /* multimedia.png in Resources */ = {isa = PBXBuildFile; fileRef = 30634D7624074B9A00FEAD40 /* multimedia.png */; };
 		306450722457ACE400B8B50E /* friendship.png in Resources */ = {isa = PBXBuildFile; fileRef = 306450712457ACE300B8B50E /* friendship.png */; };
 		306450742457ACF400B8B50E /* friendship (1).png in Resources */ = {isa = PBXBuildFile; fileRef = 306450732457ACF400B8B50E /* friendship (1).png */; };
+		3064507A245DF62800B8B50E /* new_logo2_light.png in Resources */ = {isa = PBXBuildFile; fileRef = 30645079245DF62800B8B50E /* new_logo2_light.png */; };
+		3064507C245DFA3300B8B50E /* new_logo2.png in Resources */ = {isa = PBXBuildFile; fileRef = 3064507B245DFA3300B8B50E /* new_logo2.png */; };
+		3064507E245E239B00B8B50E /* new_logo3.png in Resources */ = {isa = PBXBuildFile; fileRef = 3064507D245E239A00B8B50E /* new_logo3.png */; };
+		30645080245E24D800B8B50E /* new_logo3_light.png in Resources */ = {isa = PBXBuildFile; fileRef = 3064507F245E24D700B8B50E /* new_logo3_light.png */; };
 		306793CD2447F0E1005158B2 /* marketers_guide_to_esports.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 306793CC2447F0E0005158B2 /* marketers_guide_to_esports.jpg */; };
 		306793CF2447F88E005158B2 /* joystick.png in Resources */ = {isa = PBXBuildFile; fileRef = 306793CE2447F88D005158B2 /* joystick.png */; };
 		306793D1244810A9005158B2 /* live_video.json in Resources */ = {isa = PBXBuildFile; fileRef = 306793D0244810A9005158B2 /* live_video.json */; };
@@ -461,6 +465,10 @@
 		30634D7624074B9A00FEAD40 /* multimedia.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = multimedia.png; sourceTree = "<group>"; };
 		306450712457ACE300B8B50E /* friendship.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = friendship.png; sourceTree = "<group>"; };
 		306450732457ACF400B8B50E /* friendship (1).png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "friendship (1).png"; sourceTree = "<group>"; };
+		30645079245DF62800B8B50E /* new_logo2_light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = new_logo2_light.png; sourceTree = "<group>"; };
+		3064507B245DFA3300B8B50E /* new_logo2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = new_logo2.png; sourceTree = "<group>"; };
+		3064507D245E239A00B8B50E /* new_logo3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = new_logo3.png; sourceTree = "<group>"; };
+		3064507F245E24D700B8B50E /* new_logo3_light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = new_logo3_light.png; sourceTree = "<group>"; };
 		306793CC2447F0E0005158B2 /* marketers_guide_to_esports.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = marketers_guide_to_esports.jpg; sourceTree = "<group>"; };
 		306793CE2447F88D005158B2 /* joystick.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = joystick.png; sourceTree = "<group>"; };
 		306793D0244810A9005158B2 /* live_video.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = live_video.json; sourceTree = "<group>"; };
@@ -1104,6 +1112,10 @@
 				306450732457ACF400B8B50E /* friendship (1).png */,
 				30A5199B2409774C00DCFC77 /* fix.png */,
 				4C790E872266B7A200FDA550 /* placeholder_landing.jpg */,
+				3064507B245DFA3300B8B50E /* new_logo2.png */,
+				3064507D245E239A00B8B50E /* new_logo3.png */,
+				3064507F245E24D700B8B50E /* new_logo3_light.png */,
+				30645079245DF62800B8B50E /* new_logo2_light.png */,
 				308759B924269ED2002C19CC /* aastandby.jpg */,
 			);
 			path = Images;
@@ -1331,6 +1343,7 @@
 				30591EB4243EA3FE004E54F4 /* lf20_OkHuIu.json in Resources */,
 				3059E63B2433AB930052E46F /* new (1).png in Resources */,
 				309F3A1323B40CA900FD0C48 /* left-arrow.png in Resources */,
+				3064507E245E239B00B8B50E /* new_logo3.png in Resources */,
 				305B52052415C1E50064B605 /* expand.png in Resources */,
 				307CE35923EC9C2100DCB12A /* send.png in Resources */,
 				304E17EE242EF4F9009BE1C0 /* hand-gesture (1).png in Resources */,
@@ -1346,6 +1359,7 @@
 				30A519932409716300DCFC77 /* 024db1146a8c15b.png in Resources */,
 				304E17FF2430F098009BE1C0 /* lf30_editor_ISR839.json in Resources */,
 				304E17F924300B31009BE1C0 /* data.json in Resources */,
+				30645080245E24D800B8B50E /* new_logo3_light.png in Resources */,
 				30781C93242820F100C5D886 /* sms.png in Resources */,
 				306450722457ACE400B8B50E /* friendship.png in Resources */,
 				30A519992409763800DCFC77 /* profile_white.png in Resources */,
@@ -1402,6 +1416,7 @@
 				30B6E1A323ADBD9700B69F00 /* press_start.png in Resources */,
 				30582414239C86B800FDEA7D /* list-interface-symbol.png in Resources */,
 				306450742457ACF400B8B50E /* friendship (1).png in Resources */,
+				3064507A245DF62800B8B50E /* new_logo2_light.png in Resources */,
 				30A84DF02381E86E007BEAA5 /* icon.png in Resources */,
 				30A60D8D2363C801004B2150 /* like.png in Resources */,
 				3058211D2454CA0900B76E67 /* 1273057-200_white.png in Resources */,
@@ -1419,6 +1434,7 @@
 				30C4EDB22267C1890046B615 /* double_xp_small_white.png in Resources */,
 				3080B3FA23BBC52400638B22 /* hello.png in Resources */,
 				30C4EDB52267C1890046B615 /* vintage_tv.png in Resources */,
+				3064507C245DFA3300B8B50E /* new_logo2.png in Resources */,
 				3095CBCD2455F2BC001C19E7 /* GoogleService-Info.plist in Resources */,
 				30781C952428231900C5D886 /* email.png in Resources */,
 				308669A724570B3E0032C46E /* person-killing-other-with-an-arm (1).png in Resources */,

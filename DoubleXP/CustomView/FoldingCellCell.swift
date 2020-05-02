@@ -15,6 +15,7 @@ class FoldingCellCell: FoldingCell, UICollectionViewDelegate, UICollectionViewDa
     @IBOutlet weak var gameName: UILabel!
     @IBOutlet weak var developer: UILabel!
     @IBOutlet weak var statLayout: UIView!
+    @IBOutlet weak var statsAvailable: UILabel!
     
     var currentStat: StatObject?
     var keys = [String]()
@@ -37,7 +38,6 @@ class FoldingCellCell: FoldingCell, UICollectionViewDelegate, UICollectionViewDa
     }
     
     func setCollectionView(stat: StatObject){
-        
         currentStat = stat
         
         statCollection.delegate = self

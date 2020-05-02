@@ -44,6 +44,9 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
     private var googleTokenString = ""
     private var registrationType = ""
     
+    var socialRegistered = ""
+    var socialRegisteredUid = ""
+    
     func supportsAlertController() -> Bool {
         return NSClassFromString("UIAlertController") != nil
     }
@@ -179,6 +182,26 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
         
         checkNextButton()
         
+        if(!socialRegistered.isEmpty && !socialRegisteredUid.isEmpty){
+            let top = CGAffineTransform(translationX: 0, y: 70)
+            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5,
+                           initialSpringVelocity: 0.5, options: [], animations: {
+                            self.emailLoginCover.transform = top
+                            self.emailLoginCover.alpha = 1
+                            self.emailField.alpha = 0.3
+                            self.emailField.isUserInteractionEnabled = false
+                            self.passwordField.alpha = 0.3
+                            self.passwordField.isUserInteractionEnabled = false
+            }, completion: nil)
+            
+            if(self.socialRegistered == "google"){
+                self.googleLoginAccepted = true
+            }
+            else{
+                self.facebookLoginAccepted = true
+            }
+        }
+        
         AppEvents.logEvent(AppEvents.Name(rawValue: "Register"))
     }
     
@@ -204,7 +227,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
     }
     
     func registerUser(email: String?, pass: String?, facebook: Bool, google: Bool){
-        if(facebook){
+        if(facebook && self.socialRegistered.isEmpty){
             let credential = FacebookAuthProvider.credential(withAccessToken: self.facebookTokenString)
             Auth.auth().signIn(with: credential) { (authResult, error) in
               if let error = error {
@@ -296,7 +319,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                 }
             }
         }
-        else if(google){
+        else if(google && self.socialRegistered.isEmpty){
                 let credential = GoogleAuthProvider.credential(withIDToken: self.googleToken,
                                                                accessToken: self.googleTokenString)
                 Auth.auth().signIn(with: credential) { (authResult, error) in
@@ -389,7 +412,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                     }
                 }
             }
-        else if(!self.emailField.text!.isEmpty && !self.passwordField.text!.isEmpty){
+        else if(!self.emailField.text!.isEmpty && !self.passwordField.text!.isEmpty && self.socialRegistered.isEmpty){
             if(email != nil && pass != nil){
                 Auth.auth().createUser(withEmail: email!, password: pass!) { authResult, error in
                     if let error = error {
@@ -475,25 +498,84 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
             }
         }
         else{
-            var buttons = [PopupDialogButton]()
-            let title = "login error."
-            let message = "there was an error getting you logged in. try again, or feel free to reach out if there is an issue."
-            
-            let button = DefaultButton(title: "try again.") { [weak self] in
-                self?.loginWithReadPermissions()
+            if(!self.socialRegistered.isEmpty && !socialRegisteredUid.isEmpty){
+                let user = User(uId: self.socialRegisteredUid)
+                
+                if(self.psSwitch.isOn){
+                    user.ps = true
+                }
+                
+                if(self.pcSwitch.isOn){
+                    user.pc = true
+                }
+                
+                if(self.xboxSwitch.isOn){
+                    user.xbox = true
+                }
+                
+                if(self.nintendoSwitch.isOn){
+                    user.nintendo = true
+                }
+                
+                let ref = Database.database().reference().child("Users").child(self.socialRegisteredUid)
+                ref.child("consoles").child("xbox").setValue(self.xboxSwitch.isOn)
+                ref.child("consoles").child("ps").setValue(self.psSwitch.isOn)
+                ref.child("consoles").child("nintendo").setValue(self.nintendoSwitch.isOn)
+                ref.child("consoles").child("pc").setValue(self.pcSwitch.isOn)
+                ref.child("platform").setValue("ios")
+                ref.child("search").setValue("true")
+                ref.child("registrationType").setValue(self.socialRegistered)
+                ref.child("model").setValue(UIDevice.modelName)
+                ref.child("notifications").setValue("true")
+                
+                DispatchQueue.main.async {
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    delegate.currentUser = user
+                    
+                    if(!user.pc && !user.xbox && !user.ps && !user.nintendo){
+                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - No GC"))
+                        self.performSegue(withIdentifier: "registerNoGC", sender: nil)
+                    }
+                    else{
+                        if(user.pc){
+                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PC User"))
+                        }
+                        if(user.xbox){
+                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - xBox User"))
+                        }
+                        if(user.ps){
+                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PS User"))
+                        }
+                        if(user.nintendo){
+                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Nintendo User"))
+                        }
+                        
+                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - GC"))
+                        self.performSegue(withIdentifier: "registerGC", sender: nil)
+                    }
+                }
             }
-            buttons.append(button)
-            
-            let buttonOne = CancelButton(title: "nevermind") { [weak self] in
-                self?.backButtonClicked(nil)
-            }
-            buttons.append(buttonOne)
-            
-            let popup = PopupDialog(title: title, message: message)
-            popup.addButtons(buttons)
+            else{
+                var buttons = [PopupDialogButton]()
+                let title = "login error."
+                let message = "there was an error getting you logged in. try again, or feel free to reach out if there is an issue."
+                
+                let button = DefaultButton(title: "try again.") { [weak self] in
+                    self?.loginWithReadPermissions()
+                }
+                buttons.append(button)
+                
+                let buttonOne = CancelButton(title: "nevermind") { [weak self] in
+                    self?.backButtonClicked(nil)
+                }
+                buttons.append(buttonOne)
+                
+                let popup = PopupDialog(title: title, message: message)
+                popup.addButtons(buttons)
 
-            // Present dialog
-            self.present(popup, animated: true, completion: nil)
+                // Present dialog
+                self.present(popup, animated: true, completion: nil)
+            }
         }
     }
     
@@ -874,6 +956,9 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
         else if(self.googleLoginAccepted && !self.googleTokenString.isEmpty && !self.googleToken.isEmpty){
             registerUser(email: nil, pass: nil, facebook: false, google: true)
         }
+        else if(!self.socialRegistered.isEmpty && !self.socialRegisteredUid.isEmpty){
+            registerUser(email: nil, pass: nil, facebook: socialRegistered == "facebook", google: socialRegistered == "google")
+        }
         else{
             if(!rule.evaluate(with: email)){
                 let message = "Must enter a valid email to continue."
@@ -959,6 +1044,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
         // Perform any operations when the user disconnects from app here.
         // ...
     }
+
     
     /*func showTextInputPrompt(withMessage message: String?,  completion: ((Bool, String) -> Void)? = nil) {
         if supportsAlertController() {

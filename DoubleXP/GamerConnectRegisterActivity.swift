@@ -607,6 +607,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
     }
     
     private func processAndSend(){
+        self.selectedGames = self.selectedGames.sorted(by: { !$0.importStats && $1.importStats })
         if(self.selectedGames.isEmpty){
             zipItUp()
         }

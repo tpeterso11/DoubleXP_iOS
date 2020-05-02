@@ -58,7 +58,7 @@ class ChatObject: NSObject, NSCoding {
     func encode(with coder: NSCoder) {
         coder.encode(self.chatUrl, forKey: "chatUrl")
         coder.encode(self.otherUser, forKey: "otherUser")
-        coder.encode(self.otherUser, forKey: "otherUserId")
+        coder.encode(self.otherUserId, forKey: "otherUserId")
     }
 }
 

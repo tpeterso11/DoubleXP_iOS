@@ -48,7 +48,7 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
     override func reloadView() {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.currentLanding!.restoreBottomNav()
-        appDelegate.currentLanding!.updateNavColor(color: .darkGray)
+        appDelegate.currentLanding!.updateNavColor(color: UIColor(named: "darker")!)
         appDelegate.currentLanding!.stackDepth = 1
     }
     

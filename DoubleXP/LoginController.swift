@@ -29,10 +29,15 @@ class LoginController: UIViewController, GIDSignInDelegate {
     @IBOutlet weak var workOverlay: UIView!
     @IBOutlet weak var workSpinner: UIActivityIndicatorView!
     
+    var socialRegisteredUid = ""
+    var selectedSocial = ""
+    
     func loginManagerDidComplete(_ result: LoginResult) {
         let alertController: UIAlertController
         switch result {
         case .cancelled:
+            hideWork()
+            
             AppEvents.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login Canceled"))
             
             var buttons = [PopupDialogButton]()
@@ -56,6 +61,8 @@ class LoginController: UIViewController, GIDSignInDelegate {
             // Present dialog
             self.present(popup, animated: true, completion: nil)
         case .failed(let error):
+            hideWork()
+            
             AppEvents.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login Fail - " + error.localizedDescription))
             
             var buttons = [PopupDialogButton]()
@@ -69,7 +76,7 @@ class LoginController: UIViewController, GIDSignInDelegate {
             buttons.append(button)
             
             let buttonOne = CancelButton(title: "nevermind") { [weak self] in
-                //do nothing
+                self?.hideWork()
             }
             buttons.append(buttonOne)
             
@@ -185,6 +192,8 @@ class LoginController: UIViewController, GIDSignInDelegate {
     
     @objc func facebookLoginClicked(_ sender: AnyObject?) {
         showWork()
+        
+        self.selectedSocial = "facebook"
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             self.loginWithReadPermissions()
         }
@@ -192,6 +201,8 @@ class LoginController: UIViewController, GIDSignInDelegate {
     
     @objc func googleLoginClicked(_ sender: AnyObject?) {
         showWork()
+        
+        self.selectedSocial = "google"
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             GIDSignIn.sharedInstance()?.presentingViewController = self
             GIDSignIn.sharedInstance().signIn()
@@ -214,10 +225,15 @@ class LoginController: UIViewController, GIDSignInDelegate {
         UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
             self.workOverlay.alpha = 1
             self.workSpinner.startAnimating()
-            
-            
         }, completion: nil)
     }
+    
+    private func hideWork(){
+           UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+            self.workSpinner.stopAnimating()
+               self.workOverlay.alpha = 0
+           }, completion: nil)
+       }
     
     private func downloadDBRef(uid: String){
         let ref = Database.database().reference().child("Users").child(uid)
@@ -656,7 +672,8 @@ class LoginController: UIViewController, GIDSignInDelegate {
                 }
             }
             else{
-                self.performSegue(withIdentifier: "register", sender: nil)
+                self.socialRegisteredUid = uid
+                self.performSegue(withIdentifier: "registerSocial", sender: nil)
             }
             
             }) { (error) in
@@ -809,7 +826,7 @@ class LoginController: UIViewController, GIDSignInDelegate {
         buttons.append(button)
         
         let buttonOne = CancelButton(title: "nevermind") { [weak self] in
-            //do nothing
+            self?.hideWork()
         }
         buttons.append(buttonOne)
         
@@ -847,68 +864,14 @@ class LoginController: UIViewController, GIDSignInDelegate {
         // ...
     }
     
-    /*private func convertTeamInvites(list: [String], pathString: String, teamName: String){
-        var newArray = [TeamInviteObject]()
-        let tempRequests = list
-        if(!tempRequests.isEmpty){
-            let ref = Database.database().reference().child("Users")
-            ref.observeSingleEvent(of: .value, with: { (snapshot) in
-                // Get user value
-                for _ in tempRequests{
-                    for user in snapshot.children{
-                        var contained = false
-                        
-                        let current = (user as! DataSnapshot)
-                        let uId = current.key
-                        var gamerTags = [GamerProfile]()
-                        let gamerTagsArray = current.childSnapshot(forPath: "gamerTags")
-                        for gamerTagObj in gamerTagsArray.children {
-                            let currentObj = gamerTagObj as! DataSnapshot
-                            let dict = currentObj.value as? [String: Any]
-                            let currentTag = dict?["gamerTag"] as? String ?? ""
-                            let currentGame = dict?["game"] as? String ?? ""
-                            let console = dict?["console"] as? String ?? ""
-                            
-                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
-                            gamerTags.append(currentGamerTagObj)
-                        }
-                        
-                        for tag in gamerTags{
-                            if(list.contains(tag.gamerTag)){
-                                let date = Date()
-                                let formatter = DateFormatter()
-                                formatter.dateFormat = "MMMM.dd.yyyy"
-                                let result = formatter.string(from: date)
-                                
-                                let newRequest = TeamInviteObject(gamerTag: tag.gamerTag, date: result, uid: uId)
-                                newArray.append(newRequest)
-                                
-                                contained = true
-                                break
-                            }
-                        }
-                        if(contained){
-                            break
-                        }
-                    }
-                }
-                
-                var requests = [Dictionary<String, String>]()
-                for request in newArray{
-                    let current = ["gamerTag": request.gamerTag, "date": request.date, "uid": request.uid]
-                    requests.append(current)
-                }
-                
-                if(!requests.isEmpty){
-                    let teamRef = Database.database().reference().child("Teams")
-                    teamRef.child(teamName).child(pathString).setValue(requests)
-                }
-                
-            }) { (error) in
-                print(error.localizedDescription)
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+         if (segue.identifier == "registerSocial") {
+            if let destination = segue.destination as? RegisterActivity {
+                destination.socialRegistered = self.selectedSocial
+                destination.socialRegisteredUid = self.socialRegisteredUid
             }
         }
-    }*/
+    }
 }
 
 extension UITextField {

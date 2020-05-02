@@ -1459,7 +1459,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             mediaAdded = false
         }
         
-        updateNavColor(color: .darkGray)
+        updateNavColor(color: UIColor(named: "darker")!)
     }
     
     @objc func mediaButtonClicked(_ sender: AnyObject?) {
@@ -1473,7 +1473,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             mediaAdded = true
         }
         
-        updateNavColor(color: .darkGray)
+        updateNavColor(color: UIColor(named: "darker")!)
     }
     
     @objc func teamButtonClicked(_ sender: AnyObject?) {
@@ -1487,7 +1487,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             mediaAdded = false
         }
         
-        updateNavColor(color: .darkGray)
+        updateNavColor(color: UIColor(named: "darker")!)
     }
     
     @objc func requestButtonClicked(_ sender: AnyObject?) {
@@ -1501,7 +1501,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             mediaAdded = false
         }
         
-        updateNavColor(color: .darkGray)
+        updateNavColor(color: UIColor(named: "darker")!)
     }
     
     @objc func menuButtonClicked(_ sender: AnyObject?) {

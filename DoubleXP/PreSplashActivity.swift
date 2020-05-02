@@ -32,7 +32,7 @@ class PreSplashActivity: UIViewController {
         //let social = SocialMediaManager()
         //social.getGame()
         //getTwitchToken()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
             self.getAppConfig()
         }
         

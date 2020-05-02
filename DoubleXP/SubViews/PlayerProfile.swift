@@ -21,7 +21,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     var userForProfile: User? = nil
     
     var keys = [String]()
-    var objects = [StatObject]()
+    var objects = [GamerConnectGame]()
     var cellHeights: [CGFloat] = []
     
     @IBOutlet weak var gamerTag: UILabel!
@@ -73,6 +73,8 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     
     var rivalSelectedGame = ""
     var rivalSelectedType = ""
+    
+    var gamesWithStats = [String]()
     
      enum Const {
            static let closeCellHeight: CGFloat = 72
@@ -283,7 +285,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 currentStat.codWins = codWins
                 currentStat.codWlRatio = codWlRatio
                 
-                self.objects.append(currentStat)
+                currentStats.append(currentStat)
             }
             
             let consoleArray = snapshot.childSnapshot(forPath: "consoles")
@@ -296,7 +298,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             let user = User(uId: uId)
             user.gamerTags = gamerTags
             user.teams = teams
-            user.stats = self.objects
+            user.stats = currentStats
             user.games = games
             user.gamerTag = gamerTag
             user.pc = pc
@@ -348,7 +350,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             }
         }
         
-        self.setup(statsEmpty: user.stats.isEmpty)
+        self.setup(gamesEmpty: user.games.isEmpty)
         
         if(friendsManager.checkListsForUser(user: userForProfile!, currentUser: currentUser!)){
             
@@ -392,18 +394,8 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         self.bio.text = "\"" + user.bio + "\""
     }
     
-    private func setup(statsEmpty: Bool) {
-        cellHeights = Array(repeating: Const.closeCellHeight, count: self.objects.count)
-        table.estimatedRowHeight = Const.closeCellHeight
-        table.rowHeight = UITableView.automaticDimension
-        
-        if #available(iOS 10.0, *) {
-            table.refreshControl = UIRefreshControl()
-            table.refreshControl?.addTarget(self, action: #selector(refreshHandler), for: .valueChanged)
-        }
-        
-        //statEmpty.isHidden = true
-        if(statsEmpty){
+    private func setup(gamesEmpty: Bool) {
+        if(gamesEmpty){
             self.bottomBlur.isHidden = true
             
             let top = CGAffineTransform(translationX: 0, y: -10)
@@ -413,6 +405,24 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             }, completion: nil)
         }
         else{
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            for game in self.userForProfile!.games{
+                for gcGame in delegate.gcGames{
+                    if(game == gcGame.gameName){
+                        self.objects.append(gcGame)
+                    }
+                }
+            }
+            
+            cellHeights = Array(repeating: Const.closeCellHeight, count: self.objects.count)
+            table.estimatedRowHeight = Const.closeCellHeight
+            table.rowHeight = UITableView.automaticDimension
+            
+            if #available(iOS 10.0, *) {
+                table.refreshControl = UIRefreshControl()
+                table.refreshControl?.addTarget(self, action: #selector(refreshHandler), for: .valueChanged)
+            }
+            
             self.table.dataSource = self
             self.table.delegate = self
             self.table.contentInset = UIEdgeInsets(top: 0,left: 0,bottom: 50,right: 0)
@@ -452,7 +462,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     
     private func updateToRequestButton(){
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(connectButtonClicked))
-        actionButton.applyGradient(colours:  [.darkGray, .lightGray], orientation: .horizontal)
+        actionButton.applyGradient(colours:  [UIColor(named: "darker")!, .lightGray], orientation: .horizontal)
         actionButtonIcon.image = #imageLiteral(resourceName: "follow.png")
         actionButtonText.text = "Send Friend Request"
 
@@ -530,26 +540,29 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! FoldingCellCell
-        
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let games = appDelegate.gcGames!
         let current = self.objects[indexPath.item]
         
         cell.gameName.text = ""
         cell.developer.text = ""
         
-        for game in games{
-            if(game.gameName == current.gameName){
-                cell.gameBack.moa.url = game.imageUrl
-                cell.gameBack.contentMode = .scaleAspectFill
-                cell.gameBack.clipsToBounds = true
+        cell.gameBack.moa.url =  current.imageUrl
+        cell.gameBack.contentMode = .scaleAspectFill
+        cell.gameBack.clipsToBounds = true
+        
+        cell.gameName.text = current.gameName
+        cell.developer.text = current.developer
+        
+        cell.statsAvailable.isHidden = true
+        
+        for stat in self.userForProfile!.stats{
+            if(stat.gameName == current.gameName){
+                self.objects[indexPath.item].stats = stat
+                cell.setCollectionView(stat: stat)
+                cell.statsAvailable.isHidden = false
                 
-                cell.gameName.text = game.gameName
-                cell.developer.text = game.developer
+                self.gamesWithStats.append(stat.gameName)
             }
         }
-        
-        cell.setCollectionView(stat: current)
         
         cell.layoutMargins = UIEdgeInsets.zero
         cell.separatorInset = UIEdgeInsets.zero
@@ -563,35 +576,38 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
-        let cell = tableView.cellForRow(at: indexPath) as! FoldingCell
+        let current = self.objects[indexPath.item]
+        if(self.gamesWithStats.contains(current.gameName)){
+            let cell = tableView.cellForRow(at: indexPath) as! FoldingCell
 
-        if cell.isAnimating() {
-            return
-        }
-
-        var duration = 0.0
-        let cellIsCollapsed = cellHeights[indexPath.row] == Const.closeCellHeight
-        if cellIsCollapsed {
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Friend Profile - View Stats (Open)"))
-            cellHeights[indexPath.row] = Const.openCellHeight
-            cell.unfold(true, animated: true, completion: nil)
-            duration = 0.6
-        } else {
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Friend Profile - View Stats (Close)"))
-            cellHeights[indexPath.row] = Const.closeCellHeight
-            cell.unfold(false, animated: true, completion: nil)
-            duration = 0.3
-        }
-
-        UIView.animate(withDuration: duration, delay: 0, options: .curveEaseOut, animations: { () -> Void in
-            tableView.beginUpdates()
-            tableView.endUpdates()
-            
-            // fix https://github.com/Ramotion/folding-cell/issues/169
-            if cell.frame.maxY > tableView.frame.maxY {
-                tableView.scrollToRow(at: indexPath, at: UITableView.ScrollPosition.bottom, animated: true)
+            if cell.isAnimating() {
+                return
             }
-        }, completion: nil)
+
+            var duration = 0.0
+            let cellIsCollapsed = cellHeights[indexPath.row] == Const.closeCellHeight
+            if cellIsCollapsed {
+                AppEvents.logEvent(AppEvents.Name(rawValue: "Friend Profile - View Stats (Open)"))
+                cellHeights[indexPath.row] = Const.openCellHeight
+                cell.unfold(true, animated: true, completion: nil)
+                duration = 0.6
+            } else {
+                AppEvents.logEvent(AppEvents.Name(rawValue: "Friend Profile - View Stats (Close)"))
+                cellHeights[indexPath.row] = Const.closeCellHeight
+                cell.unfold(false, animated: true, completion: nil)
+                duration = 0.3
+            }
+
+            UIView.animate(withDuration: duration, delay: 0, options: .curveEaseOut, animations: { () -> Void in
+                tableView.beginUpdates()
+                tableView.endUpdates()
+                
+                // fix https://github.com/Ramotion/folding-cell/issues/169
+                if cell.frame.maxY > tableView.frame.maxY {
+                    tableView.scrollToRow(at: indexPath, at: UITableView.ScrollPosition.bottom, animated: true)
+                }
+            }, completion: nil)
+        }
     }
     
     

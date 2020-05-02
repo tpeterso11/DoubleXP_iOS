@@ -121,6 +121,16 @@ class GamerConnectGame: NSObject, NSCoding {
         }
     }
     
+    var _stats: StatObject? = nil
+    var stats: StatObject? {
+        get {
+            return (_stats)!
+        }
+        set (newVal) {
+            _stats = newVal
+        }
+    }
+    
     init(imageUrl: String, gameName: String, developer: String, hook: String, statsAvailable: Bool, teamNeeds: [String],
          twitterHandle: String, twitchHandle: String)
     {

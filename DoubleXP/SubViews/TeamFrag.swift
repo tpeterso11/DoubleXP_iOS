@@ -42,9 +42,9 @@ class TeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate {
         teamSearchButton.isUserInteractionEnabled = true
         teamSearchButton.addGestureRecognizer(teamSearchTap)
         
-        createButton.applyGradient(colours:  [#colorLiteral(red: 0.3333052099, green: 0.3333491981, blue: 0.3332902789, alpha: 1), #colorLiteral(red: 0.4791436791, green: 0.4813652635, blue: 0.4867808223, alpha: 1)], orientation: .horizontal)
+        createButton.applyGradient(colours:  [#colorLiteral(red: 0.177384913, green: 0.172250092, blue: 0.1810538173, alpha: 1), #colorLiteral(red: 0.4791436791, green: 0.4813652635, blue: 0.4867808223, alpha: 1)], orientation: .horizontal)
         faDashButton.applyGradient(colours:  [#colorLiteral(red: 0.5893185735, green: 0.04998416454, blue: 0.09506303817, alpha: 1), #colorLiteral(red: 0.715370357, green: 0.04661592096, blue: 0.1113757268, alpha: 1)], orientation: .horizontal)
-        teamSearchButton.applyGradient(colours:  [#colorLiteral(red: 0.3333333433, green: 0.3333333433, blue: 0.3333333433, alpha: 1), #colorLiteral(red: 0.4791436791, green: 0.4813652635, blue: 0.4867808223, alpha: 1)], orientation: .horizontal)
+        teamSearchButton.applyGradient(colours:  [#colorLiteral(red: 0.177384913, green: 0.172250092, blue: 0.1810538173, alpha: 1), #colorLiteral(red: 0.4791436791, green: 0.4813652635, blue: 0.4867808223, alpha: 1)], orientation: .horizontal)
         
         //headerView.roundCorners(corners: [.topLeft, .topRight], radius: 25)
         

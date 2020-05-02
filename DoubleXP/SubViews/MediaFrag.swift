@@ -405,10 +405,6 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                 cell.image.contentMode = .scaleAspectFill
                 cell.image.clipsToBounds = true
                 
-                
-                //cell.image.contentMode = .scaleAspectFill
-                //cxell.image.clipsToBounds = true
-                
                 cell.contentView.layer.cornerRadius = 10.0
                 cell.contentView.layer.borderWidth = 1.0
                 cell.contentView.layer.borderColor = UIColor.clear.cgColor
@@ -464,13 +460,13 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                         self.currentCategory = "news"
                         self.articlesLoaded = false
                         AppEvents.logEvent(AppEvents.Name(rawValue: "Media - Popular Selected"))
-                        delegate.currentLanding?.updateNavColor(color: .darkGray)
+                        delegate.currentLanding?.updateNavColor(color: UIColor(named: "darker")!)
                         
                         UIView.animate(withDuration: 0.3, animations: {
                             self.loadingView.alpha = 1
                         }, completion: { (finished: Bool) in
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                delegate.currentLanding?.updateNavColor(color: .darkGray)
+                                delegate.currentLanding?.updateNavColor(color: UIColor(named: "darker")!)
                                 
                                 if(!delegate.mediaCache.reviewsCache.isEmpty){
                                     self.onMediaReceived(category: "news")
@@ -503,14 +499,14 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                         self.currentCategory = "reviews"
                         self.articlesLoaded = false
                         AppEvents.logEvent(AppEvents.Name(rawValue: "Media - Reviews Selected"))
-                        delegate.currentLanding?.updateNavColor(color: .darkGray)
+                        delegate.currentLanding?.updateNavColor(color: UIColor(named: "darker")!)
                         
                         UIView.animate(withDuration: 0.3, animations: {
                             self.loadingView.alpha = 1
                         }, completion: { (finished: Bool) in
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                 self.news?.collectionViewLayout = TestCollection()
-                                delegate.currentLanding?.updateNavColor(color: .darkGray)
+                                delegate.currentLanding?.updateNavColor(color: UIColor(named: "darker")!)
                                 
                                 if(!delegate.mediaCache.reviewsCache.isEmpty){
                                     self.onMediaReceived(category: "reviews")
@@ -525,7 +521,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                         self.articles = [Any]()
                         self.articlesLoaded = false
                         articles.append(contentsOf: delegate.mediaCache.newsCache)
-                        delegate.currentLanding?.updateNavColor(color: .darkGray)
+                        delegate.currentLanding?.updateNavColor(color: UIColor(named: "darker")!)
                         
                         if(self.twitchCoverShowing){
                             UIView.transition(with: self.header, duration: 0.3, options: .curveEaseInOut, animations: {
@@ -533,7 +529,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                                 self.optionsCollection.backgroundColor = UIColor(named: "darkOpacity")
                             })
                             
-                            delegate.currentLanding?.updateNavColor(color: .darkGray)
+                            delegate.currentLanding?.updateNavColor(color: UIColor(named: "darker")!)
                                 
                             UIView.animate(withDuration: 0.8, animations: {
                                     self.twitchCover.alpha = 0
@@ -947,7 +943,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     
     @objc func navigateToConnect(){
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        delegate.currentLanding?.updateNavColor(color: .darkGray)
+        delegate.currentLanding?.updateNavColor(color: UIColor(named: "darker")!)
         var currentGame: GamerConnectGame? = nil
         
         for game in delegate.gcGames{

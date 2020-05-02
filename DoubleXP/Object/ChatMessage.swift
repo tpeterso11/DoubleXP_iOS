@@ -61,6 +61,16 @@ class ChatMessage: NSObject, NSCoding {
         }
     }
     
+    var _timeStampMillis: Int64?
+    var timeStampMillis: Int64? {
+        get {
+            return (_timeStampMillis)
+        }
+        set (newVal) {
+            _timeStampMillis = newVal
+        }
+    }
+    
     var _type = ""
     var type: String {
         get {
