@@ -119,6 +119,8 @@
 		3064507C245DFA3300B8B50E /* new_logo2.png in Resources */ = {isa = PBXBuildFile; fileRef = 3064507B245DFA3300B8B50E /* new_logo2.png */; };
 		3064507E245E239B00B8B50E /* new_logo3.png in Resources */ = {isa = PBXBuildFile; fileRef = 3064507D245E239A00B8B50E /* new_logo3.png */; };
 		30645080245E24D800B8B50E /* new_logo3_light.png in Resources */ = {isa = PBXBuildFile; fileRef = 3064507F245E24D700B8B50E /* new_logo3_light.png */; };
+		30645082245E37E200B8B50E /* google_logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 30645081245E37E200B8B50E /* google_logo.png */; };
+		30645084245E382700B8B50E /* facebook_logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 30645083245E382700B8B50E /* facebook_logo.png */; };
 		306793CD2447F0E1005158B2 /* marketers_guide_to_esports.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 306793CC2447F0E0005158B2 /* marketers_guide_to_esports.jpg */; };
 		306793CF2447F88E005158B2 /* joystick.png in Resources */ = {isa = PBXBuildFile; fileRef = 306793CE2447F88D005158B2 /* joystick.png */; };
 		306793D1244810A9005158B2 /* live_video.json in Resources */ = {isa = PBXBuildFile; fileRef = 306793D0244810A9005158B2 /* live_video.json */; };
@@ -469,6 +471,8 @@
 		3064507B245DFA3300B8B50E /* new_logo2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = new_logo2.png; sourceTree = "<group>"; };
 		3064507D245E239A00B8B50E /* new_logo3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = new_logo3.png; sourceTree = "<group>"; };
 		3064507F245E24D700B8B50E /* new_logo3_light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = new_logo3_light.png; sourceTree = "<group>"; };
+		30645081245E37E200B8B50E /* google_logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = google_logo.png; sourceTree = "<group>"; };
+		30645083245E382700B8B50E /* facebook_logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = facebook_logo.png; sourceTree = "<group>"; };
 		306793CC2447F0E0005158B2 /* marketers_guide_to_esports.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = marketers_guide_to_esports.jpg; sourceTree = "<group>"; };
 		306793CE2447F88D005158B2 /* joystick.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = joystick.png; sourceTree = "<group>"; };
 		306793D0244810A9005158B2 /* live_video.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = live_video.json; sourceTree = "<group>"; };
@@ -1115,6 +1119,8 @@
 				3064507B245DFA3300B8B50E /* new_logo2.png */,
 				3064507D245E239A00B8B50E /* new_logo3.png */,
 				3064507F245E24D700B8B50E /* new_logo3_light.png */,
+				30645081245E37E200B8B50E /* google_logo.png */,
+				30645083245E382700B8B50E /* facebook_logo.png */,
 				30645079245DF62800B8B50E /* new_logo2_light.png */,
 				308759B924269ED2002C19CC /* aastandby.jpg */,
 			);
@@ -1361,6 +1367,7 @@
 				304E17F924300B31009BE1C0 /* data.json in Resources */,
 				30645080245E24D800B8B50E /* new_logo3_light.png in Resources */,
 				30781C93242820F100C5D886 /* sms.png in Resources */,
+				30645084245E382700B8B50E /* facebook_logo.png in Resources */,
 				306450722457ACE400B8B50E /* friendship.png in Resources */,
 				30A519992409763800DCFC77 /* profile_white.png in Resources */,
 				308E79C023FF4B2C00197035 /* hashtag.png in Resources */,
@@ -1371,6 +1378,7 @@
 				30F6FCB823CBFC000051813D /* user (1).png in Resources */,
 				308810F8244BD12700C2BEC7 /* warn.png in Resources */,
 				4CC1720122677EF9009A1B80 /* test_banner.png in Resources */,
+				30645082245E37E200B8B50E /* google_logo.png in Resources */,
 				30F798A2241EAD6D00740966 /* cod_test.jpg in Resources */,
 				30F6FCC223CD948E0051813D /* cancel-mark.png in Resources */,
 				305B520F2415D78A0064B605 /* expand_white2.png in Resources */,
@@ -1908,14 +1916,14 @@
 				CODE_SIGN_ENTITLEMENTS = DoubleXP/DoubleXP.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_TEAM = GU6KL76XP4;
 				INFOPLIST_FILE = DoubleXP/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.01;
 				PRODUCT_BUNDLE_IDENTIFIER = Encrypted.DoubleXP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1934,14 +1942,14 @@
 				CODE_SIGN_ENTITLEMENTS = DoubleXP/DoubleXP.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_TEAM = GU6KL76XP4;
 				INFOPLIST_FILE = DoubleXP/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.01;
 				PRODUCT_BUNDLE_IDENTIFIER = Encrypted.DoubleXP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

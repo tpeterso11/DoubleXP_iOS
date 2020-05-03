@@ -387,7 +387,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                     cell.authorImage.image = #imageLiteral(resourceName: "unknown_badge.png")
                 }
                 
-                cell.articleBack.image = #imageLiteral(resourceName: "team_thumbs_up.png")
+                cell.articleBack.image = #imageLiteral(resourceName: "new_logo3.png")
                 cell.articleBack.moa.url = (current as! NewsObject).imageUrl
                 
                 cell.tag = indexPath.item

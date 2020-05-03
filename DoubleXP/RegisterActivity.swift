@@ -109,14 +109,16 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
             self.facebookTokenString = token.tokenString
             self.facebookLoginAccepted = true
             
+            self.emailLoginCover.image = #imageLiteral(resourceName: "facebook_logo.png")
+            
             let top = CGAffineTransform(translationX: 0, y: 70)
             UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5,
                            initialSpringVelocity: 0.5, options: [], animations: {
                             self.emailLoginCover.transform = top
                             self.emailLoginCover.alpha = 1
-                            self.emailField.alpha = 0.3
+                            self.emailField.alpha = 0.1
                             self.emailField.isUserInteractionEnabled = false
-                            self.passwordField.alpha = 0.3
+                            self.passwordField.alpha = 0.1
                             self.passwordField.isUserInteractionEnabled = false
             }, completion: nil)
         }
@@ -183,14 +185,22 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
         checkNextButton()
         
         if(!socialRegistered.isEmpty && !socialRegisteredUid.isEmpty){
+            if(socialRegistered == "google"){
+                self.emailLoginCover.image = #imageLiteral(resourceName: "google_logo.png")
+            }
+            else{
+                self.emailLoginCover.image = #imageLiteral(resourceName: "facebook_logo.png")
+            }
+            
+            
             let top = CGAffineTransform(translationX: 0, y: 70)
-            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5,
+            UIView.animate(withDuration: 0.8, delay: 0.5, usingSpringWithDamping: 0.5,
                            initialSpringVelocity: 0.5, options: [], animations: {
                             self.emailLoginCover.transform = top
                             self.emailLoginCover.alpha = 1
-                            self.emailField.alpha = 0.3
+                            self.emailField.alpha = 0.1
                             self.emailField.isUserInteractionEnabled = false
-                            self.passwordField.alpha = 0.3
+                            self.passwordField.alpha = 0.1
                             self.passwordField.isUserInteractionEnabled = false
             }, completion: nil)
             
@@ -1027,14 +1037,16 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
         self.googleToken = authentication.idToken
         self.googleLoginAccepted = true
         
+        self.emailLoginCover.image = #imageLiteral(resourceName: "google_logo.png")
+        
         let top = CGAffineTransform(translationX: 0, y: 70)
         UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5,
                        initialSpringVelocity: 0.5, options: [], animations: {
                         self.emailLoginCover.transform = top
                         self.emailLoginCover.alpha = 1
-                        self.emailField.alpha = 0.3
+                        self.emailField.alpha = 0.1
                         self.emailField.isUserInteractionEnabled = false
-                        self.passwordField.alpha = 0.3
+                        self.passwordField.alpha = 0.1
                         self.passwordField.isUserInteractionEnabled = false
         }, completion: nil)
         

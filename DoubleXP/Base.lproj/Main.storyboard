@@ -26,11 +26,11 @@
                                 </constraints>
                             </imageView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="newlogobig" translatesAutoresizingMaskIntoConstraints="NO" id="RIv-Ey-eQk">
-                                <rect key="frame" x="16" y="125" width="343" height="241"/>
+                                <rect key="frame" x="52" y="125" width="269" height="175"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" secondItem="RIv-Ey-eQk" secondAttribute="height" multiplier="111:112" constant="104.15178571428569" id="PSA-n8-5ee"/>
-                                    <constraint firstAttribute="width" constant="343" id="fkX-in-EcM"/>
-                                    <constraint firstAttribute="height" constant="241" id="nmt-7Z-iVW"/>
+                                    <constraint firstAttribute="width" secondItem="RIv-Ey-eQk" secondAttribute="height" multiplier="111:112" constant="95.5625" id="PSA-n8-5ee"/>
+                                    <constraint firstAttribute="width" constant="269" id="fkX-in-EcM"/>
+                                    <constraint firstAttribute="height" constant="175" id="nmt-7Z-iVW"/>
                                 </constraints>
                             </imageView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Image-2" translatesAutoresizingMaskIntoConstraints="NO" id="iLQ-0N-jHK">
@@ -60,13 +60,13 @@
                         <color key="backgroundColor" name="whiteBackToDarkGrey"/>
                         <constraints>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="iLQ-0N-jHK" secondAttribute="bottom" constant="20" id="3Sx-nU-ZSL"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="RIv-Ey-eQk" secondAttribute="trailing" constant="16" id="70y-Xe-CIf"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="RIv-Ey-eQk" secondAttribute="trailing" constant="54" id="70y-Xe-CIf"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="iLQ-0N-jHK" secondAttribute="trailing" constant="30" id="BPT-NQ-Shg"/>
                             <constraint firstItem="RIv-Ey-eQk" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="125" id="CbU-YS-BrL"/>
                             <constraint firstItem="SPB-eb-DPw" firstAttribute="top" secondItem="2LK-Ls-sDb" secondAttribute="bottom" constant="8" id="JmA-TK-m1E"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="SPB-eb-DPw" secondAttribute="bottom" constant="20" id="Tj8-G8-xFT"/>
                             <constraint firstItem="2LK-Ls-sDb" firstAttribute="leading" secondItem="SPB-eb-DPw" secondAttribute="leading" id="Vyt-m2-reb"/>
-                            <constraint firstItem="RIv-Ey-eQk" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="Yrb-Zh-tnX"/>
+                            <constraint firstItem="RIv-Ey-eQk" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="52" id="Yrb-Zh-tnX"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="SPB-eb-DPw" secondAttribute="trailing" constant="281" id="doF-Pe-v00"/>
                             <constraint firstItem="iLQ-0N-jHK" firstAttribute="leading" secondItem="wxn-JW-GDn" secondAttribute="trailing" constant="23" id="drg-7k-wWg"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="wxn-JW-GDn" secondAttribute="bottom" constant="20" id="oMh-8H-LrK"/>
@@ -1233,7 +1233,7 @@
                             </label>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="desired email" textAlignment="right" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="hvR-CP-UVk" customClass="UnderLineTextField" customModule="UnderLineTextField">
                                 <rect key="frame" x="16" y="170" width="343" height="81.5"/>
-                                <color key="backgroundColor" name="whiteBackground"/>
+                                <color key="backgroundColor" name="whiteBackToDarkGrey"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="343" id="LEr-R3-dwV"/>
                                     <constraint firstAttribute="height" constant="81.5" id="efu-an-7D7"/>
@@ -1291,7 +1291,7 @@
                             </textField>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="desired password" textAlignment="right" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="chJ-qi-EYs" customClass="UnderLineTextField" customModule="UnderLineTextField">
                                 <rect key="frame" x="16" y="252" width="343" height="81.5"/>
-                                <color key="backgroundColor" name="whiteBackground"/>
+                                <color key="backgroundColor" name="whiteBackToDarkGrey"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="81.5" id="7y4-Rs-2z9"/>
                                     <constraint firstAttribute="width" constant="343" id="89r-ij-ddP"/>
@@ -1491,7 +1491,7 @@
                                     <constraint firstItem="RqI-7T-qlC" firstAttribute="leading" secondItem="nEQ-fM-85L" secondAttribute="trailing" constant="8" id="rEy-EF-cqF"/>
                                 </constraints>
                             </view>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="team_thumbs_up.png" translatesAutoresizingMaskIntoConstraints="NO" id="NWG-rK-Y3k">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="NWG-rK-Y3k">
                                 <rect key="frame" x="67" y="100" width="240" height="164"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="240" id="6Fo-ie-No9"/>
@@ -2345,7 +2345,7 @@
                                             <constraint firstAttribute="bottom" secondItem="kHJ-Ie-ggD" secondAttribute="bottom" id="zgE-Qc-LZA"/>
                                         </constraints>
                                     </view>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.050000000000000003" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="team_thumbs_up.png" translatesAutoresizingMaskIntoConstraints="NO" id="Ugj-Px-3E6">
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.050000000000000003" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="new_logo3_light.png" translatesAutoresizingMaskIntoConstraints="NO" id="Ugj-Px-3E6">
                                         <rect key="frame" x="199" y="-29" width="248" height="224"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="248" id="CSA-gV-eZi"/>
@@ -12710,9 +12710,9 @@
     <inferredMetricsTieBreakers>
         <segue reference="pcb-Ha-6jV"/>
         <segue reference="cWu-3e-tFU"/>
-        <segue reference="hHZ-nb-FHL"/>
-        <segue reference="qal-JJ-Hz3"/>
-        <segue reference="1je-c6-LAf"/>
+        <segue reference="Y9w-Mv-M8h"/>
+        <segue reference="nWX-a8-0Cy"/>
+        <segue reference="uqt-nY-QfI"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="15452i09942712B40CE95A.jpg" width="800" height="450"/>
@@ -30387,6 +30387,7 @@ AQAAAAAAAABQAAAAAAAAAAAAAAAAABAhHQ
         <image name="more.png" width="409.60000610351562" height="409.60000610351562"/>
         <image name="multimedia.png" width="384" height="384"/>
         <image name="new_logo2.png" width="445" height="437"/>
+        <image name="new_logo3_light.png" width="445" height="437"/>
         <image name="newlogo" width="445" height="437"/>
         <image name="newlogobig" width="445" height="437"/>
         <image name="open-menu.png" width="384" height="384"/>
