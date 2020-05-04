@@ -8,7 +8,6 @@
 
 import UIKit
 import Firebase
-import ImageLoader
 import ValidationComponents
 import FBSDKCoreKit
 import FacebookLogin

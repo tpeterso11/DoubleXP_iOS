@@ -7,9 +7,8 @@
 //
 import Foundation
 import CoreData
-import MessageKit
 
-class User: NSObject, NSCoding, SenderType {
+class User: NSObject, NSCoding {
     var displayName: String = "You"
     
     var _gamerTags = [GamerProfile]()

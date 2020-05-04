@@ -2,6 +2,7 @@
 
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![CocoaPods Version](https://img.shields.io/cocoapods/v/moa.svg?style=flat)](http://cocoadocs.org/docsets/moa)
+[![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
 [![License](https://img.shields.io/cocoapods/l/moa.svg?style=flat)](http://cocoadocs.org/docsets/moa)
 [![Platform](https://img.shields.io/cocoapods/p/moa.svg?style=flat)](http://cocoadocs.org/docsets/moa)
 
@@ -29,7 +30,7 @@ imageView.moa.url = "https://bit.ly/moa_image"
 
 ## Setup
 
-There are three ways you can add Moa to your Xcode project.
+There are multiple ways you can add Moa to your Xcode project.
 
 #### Add source (iOS 7+)
 
@@ -37,7 +38,7 @@ Simply add [MoaDistrib.swift](https://github.com/evgenyneu/moa/blob/master/Distr
 
 #### Setup with Carthage (iOS 8+)
 
-Alternatively, add `github "evgenyneu/moa" ~> 11.0` to your Cartfile and run `carthage update`.
+Alternatively, add `github "evgenyneu/moa" ~> 12.0` to your Cartfile and run `carthage update`.
 
 #### Setup with CocoaPods (iOS 8+)
 
@@ -46,8 +47,13 @@ If you are using CocoaPods add this text to your Podfile and run `pod install`.
 ```
 use_frameworks!
 target 'Your target name'
-pod 'moa', '~> 11.0'
+pod 'moa', '~> 12.0'
 ```
+
+#### Setup with Swift Package Manager
+
+* In Xcode 11+ select *File > Packages > Add Package Dependency...*.
+* Enter this project's URL: https://github.com/evgenyneu/moa.git
 
 
 ### Legacy Swift versions
@@ -57,7 +63,7 @@ Setup a [previous version](https://github.com/evgenyneu/moa/wiki/Legacy-Swift-ve
 
 ## Usage
 
-1. Add `import moa` to your source code if you used Carthage or CocoaPods setup methods.
+1. Add `import moa` to your source code (unless you used the file setup method).
 
 1. Drag an Image View to your view in the storyboard. Create an outlet property for this image view in your view controller. Alternatively, instead of using the storyboard you can create a `UIImageView` object in code.
 
@@ -259,4 +265,3 @@ If you notice any issue, got stuck or just want to chat feel free to create an i
 ## •ᴥ•
 
 This project is dedicated to [the moa](https://en.wikipedia.org/wiki/Moa), species of flightless birds that lived in New Zealand and became extinct in 15th century.
-

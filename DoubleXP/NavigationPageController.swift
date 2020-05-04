@@ -9,7 +9,6 @@
 import UIKit
 import EMPageViewController
 import SwiftNotificationCenter
-import MessageKit
 
 class NavigationPageController: EMPageViewController, EMPageViewControllerDataSource, NavigateToProfile {
     

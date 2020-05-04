@@ -14,32 +14,12 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>Bartinter.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>CollapsibleTableSectionViewController.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>DeepDiff.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
 		<key>DynamicBlurView.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 		</dict>
 		<key>EMPageViewController.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>ElongationPreview.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -55,11 +35,6 @@
 			<false/>
 		</dict>
 		<key>FBSDKLoginKit.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>FLAnimatedImage.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -149,11 +124,6 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>Giphy.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
 		<key>GoogleAppMeasurement.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -179,16 +149,6 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>ImageLoader.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>InputBarAccessoryView.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
 		<key>MSPeekCollectionViewDelegateImplementation.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -199,17 +159,12 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>MessageKit-MessageKitAssets.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>MessageKit.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
 		<key>PINCache.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>PINOperation.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -259,16 +214,6 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>SmoothButton.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>SoftUIView.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
 		<key>SwiftDate.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -295,11 +240,6 @@
 			<false/>
 		</dict>
 		<key>SwiftyGif.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>TwitchPlayer.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -335,11 +275,6 @@
 			<false/>
 		</dict>
 		<key>leveldb-library.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>libwebp.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>

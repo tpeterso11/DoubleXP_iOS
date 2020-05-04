@@ -8,11 +8,8 @@
 
 import UIKit
 import SwiftHTTP
-import ImageLoader
 import SwiftNotificationCenter
 import FBSDKCoreKit
-import GiphyUISDK
-import GiphyCoreSDK
 import moa
 import Firebase
 import Lottie
@@ -113,7 +110,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     var bottomNavHeight = CGFloat()
     
     private var giphyKey = "KCFi8XVyX2VzniYepciJJnEPUc8H4Hpk"
-    let giphy = GiphyViewController()
+    //let giphy = GiphyViewController()
 
     
     override func viewDidLoad() {
@@ -133,7 +130,11 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         
         stackDepth = appDelegate.navStack.count
         
-        Giphy.configure(apiKey: giphyKey)
+        gifButton.alpha = 0
+        
+        //import GiphyUISDK
+        //import GiphyCoreSDK
+        /*Giphy.configure(apiKey: giphyKey)
         giphy.layout = .waterfall
         giphy.mediaTypeConfig = [.gifs, .emoji]
         giphy.rating = .ratedPG13
@@ -149,7 +150,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             giphy.theme = .light
         }
         
-        giphy.delegate = self
+        giphy.delegate = self*/
         
         self.constraint = NSLayoutConstraint(item: self.secondaryNv, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0.0, constant: 0)
         self.constraint?.isActive = true
@@ -192,9 +193,9 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             object: nil
         )
         
-        let gifTap = UITapGestureRecognizer(target: self, action: #selector(gifClicked))
-        gifButton.isUserInteractionEnabled = true
-        gifButton.addGestureRecognizer(gifTap)
+        //let gifTap = UITapGestureRecognizer(target: self, action: #selector(gifClicked))
+        //gifButton.isUserInteractionEnabled = true
+        //gifButton.addGestureRecognizer(gifTap)
         
         //self.view.bringSubviewToFront(self.giphy)
         Broadcaster.register(LandingMenuCallbacks.self, observer: self)
@@ -853,9 +854,9 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         }
     }
     
-    @objc func gifClicked(_ sender: AnyObject?) {
+    /*@objc func gifClicked(_ sender: AnyObject?) {
         present(giphy, animated: true, completion: nil)
-    }
+    }*/
     
     @objc func sendMessage(_ sender: AnyObject?) {
         AppEvents.logEvent(AppEvents.Name(rawValue: "Messaging - Send Message"))
@@ -1273,14 +1274,14 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                     attributes: [NSAttributedString.Key.foregroundColor: UIColor(named:"dark")  ?? UIColor.darkGray])
                 }
                 
-                if(isMessaging){
+                /*if(isMessaging){
                     searchButton.addTarget(self, action: #selector(sendMessage), for: .touchUpInside)
                     self.gifButton.isHidden = false
                 }
                 else{
                     searchButton.addTarget(self, action: #selector(searchClicked), for: .touchUpInside)
                     self.gifButton.isHidden = true
-                }
+                }*/
                 
                 if(!backButtonShowing && !hideSearch){
                     primaryBack.slideInBottomSmall()
@@ -1775,7 +1776,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
 }
 
-extension LandingActivity: GiphyDelegate {
+/*extension LandingActivity: GiphyDelegate {
    func didSelectMedia(giphyViewController: GiphyViewController, media: GPHMedia)   {
    
         // your user tapped a GIF!
@@ -1789,7 +1790,7 @@ extension LandingActivity: GiphyDelegate {
    func didDismiss(controller: GiphyViewController?) {
         // your user dismissed the controller without selecting a GIF.
    }
-}
+}*/
 
 extension Array {
     func getElement(at index: Int) -> Element? {

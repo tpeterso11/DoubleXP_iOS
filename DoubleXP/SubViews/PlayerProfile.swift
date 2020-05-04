@@ -8,11 +8,9 @@
 
 import UIKit
 import Firebase
-import ImageLoader
 import moa
 import MSPeekCollectionViewDelegateImplementation
 import FoldingCell
-import Bartinter
 import FBSDKCoreKit
 
 class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, ProfileCallbacks, UICollectionViewDataSource, UICollectionViewDelegate, RequestsUpdate, UICollectionViewDelegateFlowLayout {
@@ -101,8 +99,6 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         
         self.actionOverlay.effect = nil
         actionOverlay.isHidden = false
-        
-        self.updatesStatusBarAppearanceAutomatically = true
     }
     
     @objc func messagingButtonClicked(_ sender: AnyObject?) {

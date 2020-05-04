@@ -8,11 +8,11 @@
 
 import UIKit
 import Firebase
-import ImageLoader
 import moa
 import MSPeekCollectionViewDelegateImplementation
+import MSPeekCollectionViewDelegateImplementation
 
-class FreeAgentFront: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, MSPeekImplementationDelegate {
+class FreeAgentFront: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     var user: User!
     var team: TeamObject?
     var games = [GamerConnectGame]()
@@ -23,6 +23,8 @@ class FreeAgentFront: ParentVC, UICollectionViewDataSource, UICollectionViewDele
     @IBOutlet weak var nextButton: UIImageView!
     @IBOutlet weak var gcGameList: UICollectionView!
     
+    var behavior: MSCollectionViewPeekingBehavior!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -31,6 +33,9 @@ class FreeAgentFront: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         
         gcGameList.delegate = self
         gcGameList.dataSource = self
+        
+        behavior = MSCollectionViewPeekingBehavior()
+        gcGameList.configureForPeekingBehavior(behavior: behavior)
         //gcGameList.configureForPeekingDelegate()
         
         handleNextButton(activate: false)

@@ -8,7 +8,6 @@
 
 import UIKit
 import SwiftHTTP
-import ImageLoader
 import Firebase
 import TwitterKit
 import SwiftTwitch

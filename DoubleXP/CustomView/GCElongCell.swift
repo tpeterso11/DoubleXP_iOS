@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import ElongationPreview
 import Lottie
 
 class GCElongCell: UICollectionViewCell{

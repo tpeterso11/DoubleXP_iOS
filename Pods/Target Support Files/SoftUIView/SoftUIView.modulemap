@@ -1,6 +1,0 @@
-framework module SoftUIView {
-  umbrella header "SoftUIView-umbrella.h"
-
-  export *
-  module * { export * }
-}

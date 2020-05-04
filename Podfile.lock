@@ -5,11 +5,7 @@ PODS:
     - AppAuth/ExternalUserAgent (= 1.3.0)
   - AppAuth/Core (1.3.0)
   - AppAuth/ExternalUserAgent (1.3.0)
-  - Bartinter (0.0.5)
-  - CollapsibleTableSectionViewController (1.0.1)
-  - DeepDiff (2.3.1)
   - DynamicBlurView (4.1.0)
-  - ElongationPreview (2.1.0)
   - EMPageViewController (4.0.0)
   - ExpyTableView (1.2.1)
   - FacebookCore (0.9.0):
@@ -28,65 +24,66 @@ PODS:
     - FBSDKLoginKit/Login (= 5.15.1)
   - FBSDKLoginKit/Login (5.15.1):
     - FBSDKCoreKit (~> 5.0)
-  - Firebase/Analytics (6.22.0):
+  - Firebase/Analytics (6.23.0):
     - Firebase/Core
-  - Firebase/Auth (6.22.0):
+  - Firebase/Auth (6.23.0):
     - Firebase/CoreOnly
-    - FirebaseAuth (~> 6.5.1)
-  - Firebase/Core (6.22.0):
+    - FirebaseAuth (~> 6.5.2)
+  - Firebase/Core (6.23.0):
     - Firebase/CoreOnly
-    - FirebaseAnalytics (= 6.4.1)
-  - Firebase/CoreOnly (6.22.0):
-    - FirebaseCore (= 6.6.6)
-  - Firebase/Database (6.22.0):
+    - FirebaseAnalytics (= 6.4.2)
+  - Firebase/CoreOnly (6.23.0):
+    - FirebaseCore (= 6.6.7)
+  - Firebase/Database (6.23.0):
     - Firebase/CoreOnly
-    - FirebaseDatabase (~> 6.1.4)
-  - Firebase/Messaging (6.22.0):
+    - FirebaseDatabase (~> 6.2.0)
+  - Firebase/Messaging (6.23.0):
     - Firebase/CoreOnly
-    - FirebaseMessaging (~> 4.3.0)
-  - FirebaseAnalytics (6.4.1):
+    - FirebaseMessaging (~> 4.3.1)
+  - FirebaseAnalytics (6.4.2):
     - FirebaseCore (~> 6.6)
-    - FirebaseInstallations (~> 1.1)
-    - GoogleAppMeasurement (= 6.4.1)
+    - FirebaseInstallations (~> 1.2)
+    - GoogleAppMeasurement (= 6.4.2)
     - GoogleUtilities/AppDelegateSwizzler (~> 6.0)
     - GoogleUtilities/MethodSwizzler (~> 6.0)
     - GoogleUtilities/Network (~> 6.0)
     - "GoogleUtilities/NSData+zlib (~> 6.0)"
     - nanopb (= 0.3.9011)
   - FirebaseAnalyticsInterop (1.5.0)
-  - FirebaseAuth (6.5.1):
+  - FirebaseAuth (6.5.2):
     - FirebaseAuthInterop (~> 1.0)
     - FirebaseCore (~> 6.6)
     - GoogleUtilities/AppDelegateSwizzler (~> 6.5)
     - GoogleUtilities/Environment (~> 6.5)
     - GTMSessionFetcher/Core (~> 1.1)
   - FirebaseAuthInterop (1.1.0)
-  - FirebaseCore (6.6.6):
+  - FirebaseCore (6.6.7):
     - FirebaseCoreDiagnostics (~> 1.2)
     - FirebaseCoreDiagnosticsInterop (~> 1.2)
     - GoogleUtilities/Environment (~> 6.5)
     - GoogleUtilities/Logger (~> 6.5)
-  - FirebaseCoreDiagnostics (1.2.3):
+  - FirebaseCoreDiagnostics (1.2.4):
     - FirebaseCoreDiagnosticsInterop (~> 1.2)
-    - GoogleDataTransportCCTSupport (~> 2.0)
+    - GoogleDataTransportCCTSupport (~> 3.0)
     - GoogleUtilities/Environment (~> 6.5)
     - GoogleUtilities/Logger (~> 6.5)
     - nanopb (~> 0.3.901)
   - FirebaseCoreDiagnosticsInterop (1.2.0)
-  - FirebaseDatabase (6.1.4):
+  - FirebaseDatabase (6.2.0):
     - FirebaseAuthInterop (~> 1.0)
     - FirebaseCore (~> 6.0)
     - leveldb-library (~> 1.22)
-  - FirebaseInstallations (1.1.1):
+  - FirebaseInstallations (1.2.0):
     - FirebaseCore (~> 6.6)
-    - GoogleUtilities/UserDefaults (~> 6.5)
+    - GoogleUtilities/Environment (~> 6.6)
+    - GoogleUtilities/UserDefaults (~> 6.6)
     - PromisesObjC (~> 1.2)
-  - FirebaseInstanceID (4.3.3):
+  - FirebaseInstanceID (4.3.4):
     - FirebaseCore (~> 6.6)
     - FirebaseInstallations (~> 1.0)
     - GoogleUtilities/Environment (~> 6.5)
     - GoogleUtilities/UserDefaults (~> 6.5)
-  - FirebaseMessaging (4.3.0):
+  - FirebaseMessaging (4.3.1):
     - FirebaseAnalyticsInterop (~> 1.5)
     - FirebaseCore (~> 6.6)
     - FirebaseInstanceID (~> 4.3)
@@ -95,101 +92,86 @@ PODS:
     - GoogleUtilities/Reachability (~> 6.5)
     - GoogleUtilities/UserDefaults (~> 6.5)
     - Protobuf (>= 3.9.2, ~> 3.9)
-  - FLAnimatedImage (1.0.12)
   - FoldingCell (5.0.2)
-  - Giphy (1.2.5):
-    - DeepDiff
-    - libwebp
-    - PINCache
-  - GoogleAppMeasurement (6.4.1):
+  - GoogleAppMeasurement (6.4.2):
     - GoogleUtilities/AppDelegateSwizzler (~> 6.0)
     - GoogleUtilities/MethodSwizzler (~> 6.0)
     - GoogleUtilities/Network (~> 6.0)
     - "GoogleUtilities/NSData+zlib (~> 6.0)"
     - nanopb (= 0.3.9011)
-  - GoogleDataTransport (5.1.1)
-  - GoogleDataTransportCCTSupport (2.0.3):
-    - GoogleDataTransport (~> 5.1)
+  - GoogleDataTransport (6.0.0)
+  - GoogleDataTransportCCTSupport (3.0.0):
+    - GoogleDataTransport (~> 6.0)
     - nanopb (~> 0.3.901)
   - GoogleSignIn (5.0.2):
     - AppAuth (~> 1.2)
     - GTMAppAuth (~> 1.0)
     - GTMSessionFetcher/Core (~> 1.1)
-  - GoogleUtilities/AppDelegateSwizzler (6.5.2):
+  - GoogleUtilities/AppDelegateSwizzler (6.6.0):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
     - GoogleUtilities/Network
-  - GoogleUtilities/Environment (6.5.2)
-  - GoogleUtilities/Logger (6.5.2):
+  - GoogleUtilities/Environment (6.6.0):
+    - PromisesObjC (~> 1.2)
+  - GoogleUtilities/Logger (6.6.0):
     - GoogleUtilities/Environment
-  - GoogleUtilities/MethodSwizzler (6.5.2):
+  - GoogleUtilities/MethodSwizzler (6.6.0):
     - GoogleUtilities/Logger
-  - GoogleUtilities/Network (6.5.2):
+  - GoogleUtilities/Network (6.6.0):
     - GoogleUtilities/Logger
     - "GoogleUtilities/NSData+zlib"
     - GoogleUtilities/Reachability
-  - "GoogleUtilities/NSData+zlib (6.5.2)"
-  - GoogleUtilities/Reachability (6.5.2):
+  - "GoogleUtilities/NSData+zlib (6.6.0)"
+  - GoogleUtilities/Reachability (6.6.0):
     - GoogleUtilities/Logger
-  - GoogleUtilities/UserDefaults (6.5.2):
+  - GoogleUtilities/UserDefaults (6.6.0):
     - GoogleUtilities/Logger
   - GTMAppAuth (1.0.0):
     - AppAuth/Core (~> 1.0)
     - GTMSessionFetcher (~> 1.1)
-  - GTMSessionFetcher (1.3.1):
-    - GTMSessionFetcher/Full (= 1.3.1)
-  - GTMSessionFetcher/Core (1.3.1)
-  - GTMSessionFetcher/Full (1.3.1):
-    - GTMSessionFetcher/Core (= 1.3.1)
-  - ImageLoader (0.15.0)
-  - InputBarAccessoryView (4.3.2):
-    - InputBarAccessoryView/Core (= 4.3.2)
-  - InputBarAccessoryView/Core (4.3.2)
+  - GTMSessionFetcher (1.4.0):
+    - GTMSessionFetcher/Full (= 1.4.0)
+  - GTMSessionFetcher/Core (1.4.0)
+  - GTMSessionFetcher/Full (1.4.0):
+    - GTMSessionFetcher/Core (= 1.4.0)
   - leveldb-library (1.22)
-  - libwebp (1.1.0):
-    - libwebp/demux (= 1.1.0)
-    - libwebp/mux (= 1.1.0)
-    - libwebp/webp (= 1.1.0)
-  - libwebp/demux (1.1.0):
-    - libwebp/webp
-  - libwebp/mux (1.1.0):
-    - libwebp/demux
-  - libwebp/webp (1.1.0)
-  - lottie-ios (3.1.6)
+  - lottie-ios (3.1.8)
   - Marshal (1.2.7)
-  - MessageKit (3.1.0):
-    - InputBarAccessoryView (~> 4.3.0)
-  - moa (11.0.1)
-  - MSPeekCollectionViewDelegateImplementation (2.0.0)
+  - moa (12.0.0)
+  - MSPeekCollectionViewDelegateImplementation (3.0.4)
   - nanopb (0.3.9011):
     - nanopb/decode (= 0.3.9011)
     - nanopb/encode (= 0.3.9011)
   - nanopb/decode (0.3.9011)
   - nanopb/encode (0.3.9011)
-  - PINCache (2.3)
-  - PINRemoteImage (2.1.4):
-    - PINRemoteImage/FLAnimatedImage (= 2.1.4)
-  - PINRemoteImage/Core (2.1.4):
-    - PINCache (>= 2.1)
-  - PINRemoteImage/FLAnimatedImage (2.1.4):
-    - FLAnimatedImage (>= 1.0)
+  - PINCache (3.0.1-beta.8):
+    - PINCache/Arc-exception-safe (= 3.0.1-beta.8)
+    - PINCache/Core (= 3.0.1-beta.8)
+  - PINCache/Arc-exception-safe (3.0.1-beta.8):
+    - PINCache/Core
+  - PINCache/Core (3.0.1-beta.8):
+    - PINOperation (~> 1.1.1)
+  - PINOperation (1.1.2)
+  - PINRemoteImage (3.0.0):
+    - PINRemoteImage/PINCache (= 3.0.0)
+  - PINRemoteImage/Core (3.0.0):
+    - PINOperation
+  - PINRemoteImage/PINCache (3.0.0):
+    - PINCache (= 3.0.1-beta.8)
     - PINRemoteImage/Core
   - PopupDialog (1.1.1):
     - DynamicBlurView (~> 4.0)
   - PromisesObjC (1.2.8)
   - Protobuf (3.11.4)
   - RAMPaperSwitch (3.1.0)
-  - SendBirdSDK (3.0.177)
-  - SmoothButton (0.0.3)
-  - SoftUIView (0.0.2)
-  - SwiftDate (5.1.0)
+  - SendBirdSDK (3.0.179)
+  - SwiftDate (6.1.0)
   - SwiftHTTP (3.0.1)
   - SwiftNotificationCenter (1.0.4)
   - SwiftRichString (3.7.1)
   - SwiftTwitch (0.1.0):
     - Marshal (~> 1.2.7)
   - SwiftyGif (5.2.0)
-  - TwitchPlayer (0.2.3)
   - TwitterCore (3.2.0)
   - TwitterKit (3.4.2):
     - TwitterCore (>= 3.2.0)
@@ -201,9 +183,6 @@ PODS:
 
 DEPENDENCIES:
   - AIFlatSwitch
-  - Bartinter
-  - CollapsibleTableSectionViewController (~> 1.0.0)
-  - ElongationPreview
   - EMPageViewController
   - ExpyTableView
   - FacebookCore
@@ -213,28 +192,22 @@ DEPENDENCIES:
   - Firebase/Database
   - Firebase/Messaging
   - FoldingCell
-  - Giphy
   - GoogleSignIn
-  - ImageLoader (~> 0.14)
   - lottie-ios
-  - MessageKit
-  - moa (~> 11.0)
-  - MSPeekCollectionViewDelegateImplementation (~> 2.0.0)
+  - moa
+  - MSPeekCollectionViewDelegateImplementation
   - PINRemoteImage
-  - PopupDialog (~> 1.0)
+  - PopupDialog
   - RAMPaperSwitch
   - SendBirdSDK
-  - SmoothButton
-  - SoftUIView
-  - SwiftDate (~> 5.0)
-  - SwiftHTTP (~> 3.0)
+  - SwiftDate
+  - SwiftHTTP
   - SwiftNotificationCenter
   - SwiftRichString
   - SwiftTwitch
   - SwiftyGif
-  - TwitchPlayer
   - TwitterKit
-  - UnderLineTextField (~> 2.1)
+  - UnderLineTextField
   - ValidationComponents
   - VideoBackground
 
@@ -242,11 +215,7 @@ SPEC REPOS:
   trunk:
     - AIFlatSwitch
     - AppAuth
-    - Bartinter
-    - CollapsibleTableSectionViewController
-    - DeepDiff
     - DynamicBlurView
-    - ElongationPreview
     - EMPageViewController
     - ExpyTableView
     - FacebookCore
@@ -265,9 +234,7 @@ SPEC REPOS:
     - FirebaseInstallations
     - FirebaseInstanceID
     - FirebaseMessaging
-    - FLAnimatedImage
     - FoldingCell
-    - Giphy
     - GoogleAppMeasurement
     - GoogleDataTransport
     - GoogleDataTransportCCTSupport
@@ -275,32 +242,26 @@ SPEC REPOS:
     - GoogleUtilities
     - GTMAppAuth
     - GTMSessionFetcher
-    - ImageLoader
-    - InputBarAccessoryView
     - leveldb-library
-    - libwebp
     - lottie-ios
     - Marshal
-    - MessageKit
     - moa
     - MSPeekCollectionViewDelegateImplementation
     - nanopb
     - PINCache
+    - PINOperation
     - PINRemoteImage
     - PopupDialog
     - PromisesObjC
     - Protobuf
     - RAMPaperSwitch
     - SendBirdSDK
-    - SmoothButton
-    - SoftUIView
     - SwiftDate
     - SwiftHTTP
     - SwiftNotificationCenter
     - SwiftRichString
     - SwiftTwitch
     - SwiftyGif
-    - TwitchPlayer
     - TwitterCore
     - TwitterKit
     - UnderLineTextField
@@ -311,65 +272,53 @@ SPEC REPOS:
 SPEC CHECKSUMS:
   AIFlatSwitch: fd56a5e6ab8769f0b52cef815c4f071e83050352
   AppAuth: 73574f3013a1e65b9601a3ddc8b3158cce68c09d
-  Bartinter: 3c1fc3bcb631b066fdd78f7e01f1635fbafffdea
-  CollapsibleTableSectionViewController: c41694de812a1039c5f8581c934cf0fc38e4e871
-  DeepDiff: e5ae6c50d0321568e4508cec5930b9f10bb293fc
   DynamicBlurView: 58e18fae80bb614e34681a4486870e7d257b62e8
-  ElongationPreview: 84b401d349bfcf855e94d6cc6b95d609260b6d96
   EMPageViewController: de8c8d6ea44c77bc2463f2cb9b4128390d2391f2
   ExpyTableView: 19cf224c2ff04b1ec215ec52bc4ba6f81fa809ed
   FacebookCore: ba86524b66cfa86d0f8e65d08faa8504a9f732dd
   FacebookLogin: 6cee9fd6e1fe976fe8f7eec199e27b28b14f5d63
   FBSDKCoreKit: 1d5acf7c9d7a2f92bb1a242dc60cae5b7adb91df
   FBSDKLoginKit: f1ea8026a58b52d30c9f2e6a58ca7d813619fb83
-  Firebase: 32f9520684e87c7af3f0704f7f88042626d6b536
-  FirebaseAnalytics: 83f822fd0d33a46f49f89b8c3ab16ab4d89df08a
+  Firebase: 585ae467b3edda6a5444e788fda6888f024d8d6f
+  FirebaseAnalytics: 558f7a03d19de451093032c806f39d5f9dff096e
   FirebaseAnalyticsInterop: 3f86269c38ae41f47afeb43ebf32a001f58fcdae
-  FirebaseAuth: a6da11d78dfd956b7f7af3222a0f0b1c93ef8fc9
+  FirebaseAuth: e50319ecc114acf93c2b9581e15d6604ddd7eeb2
   FirebaseAuthInterop: a0f37ae05833af156e72028f648d313f7e7592e9
-  FirebaseCore: 9aca0f1fffb405176ba15311a5621fcde4106fcf
-  FirebaseCoreDiagnostics: 13a6564cd6d5375066bbc8940cc1753af24497f3
+  FirebaseCore: a2788a0d5f6c1dff17b8f79b4a73654a8d4bfdbd
+  FirebaseCoreDiagnostics: b59c024493a409f8aecba02c99928d0d8431d159
   FirebaseCoreDiagnosticsInterop: 296e2c5f5314500a850ad0b83e9e7c10b011a850
-  FirebaseDatabase: 0144e0706a4761f1b0e8679572eba8095ddb59be
-  FirebaseInstallations: acb3216eb9784d3b1d2d2d635ff74fa892cc0c44
-  FirebaseInstanceID: 4b87a9a75ef628a53bb5de46e4d4cecfcce88c02
-  FirebaseMessaging: 4ec33842d36b3319e062e51fb8b35a74f726950d
-  FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
+  FirebaseDatabase: cbf2b9efe39b3f113616a2f1f140839f49d797e0
+  FirebaseInstallations: 2119fb3e46b0a88bfdbf12562f855ee3252462fa
+  FirebaseInstanceID: cef67c4967c7cecb56ea65d8acbb4834825c587b
+  FirebaseMessaging: 828e66eb357a893e3cebd9ee0f6bc1941447cc94
   FoldingCell: f92eb5fb9842319e7cd08c71533c98408b785099
-  Giphy: 76a033587d9291d5e6d2001897bd8fb11840c7df
-  GoogleAppMeasurement: e49be3954045b17d046f271b9cc1ec052bad9702
-  GoogleDataTransport: 6ffa4dd0b6d547f8d27b91bd92fa9e197a3f5f1f
-  GoogleDataTransportCCTSupport: 2d7e609f8c5af1a33d7d59053e6f8cba59365df5
+  GoogleAppMeasurement: 2253e99c1f22638cf234c059144660c338ad76c3
+  GoogleDataTransport: 061fe7d9b476710e3cd8ea51e8e07d8b67c2b420
+  GoogleDataTransportCCTSupport: 0f39025e8cf51f168711bd3fb773938d7e62ddb5
   GoogleSignIn: 7137d297ddc022a7e0aa4619c86d72c909fa7213
-  GoogleUtilities: ad0f3b691c67909d03a3327cc205222ab8f42e0e
+  GoogleUtilities: 39530bc0ad980530298e9c4af8549e991fd033b1
   GTMAppAuth: 4deac854479704f348309e7b66189e604cf5e01e
-  GTMSessionFetcher: cea130bbfe5a7edc8d06d3f0d17288c32ffe9925
-  ImageLoader: e0635d52020d64dc7687e3a3b14dc53212ac0442
-  InputBarAccessoryView: 7985d418040a05fe894bd4b8328dd43ab35517c3
+  GTMSessionFetcher: 6f5c8abbab8a9bce4bb3f057e317728ec6182b10
   leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
-  libwebp: 946cb3063cea9236285f7e9a8505d806d30e07f3
-  lottie-ios: 85ce835dd8c53e02509f20729fc7d6a4e6645a0a
+  lottie-ios: 48fac6be217c76937e36e340e2d09cf7b10b7f5f
   Marshal: ef480864a6af10a63f67be7e55bb5d8fe67a16d9
-  MessageKit: 3beb578737a5aa2bba25cc27c7b6d6faa09af5a7
-  moa: a26c4e97c7ac9345e87c4bb999e85116c8ec0310
-  MSPeekCollectionViewDelegateImplementation: 3091e9512b3cd03facdea3c02e57673a4a06246a
+  moa: e2346f12de6c65bbca4d103950d45db9e46785ef
+  MSPeekCollectionViewDelegateImplementation: eb11d5777c4f1dd1004ca9b75ea9e1a7e71e4924
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
-  PINCache: ce36ed282031b92fc7733ffe831f474ff80fddc2
-  PINRemoteImage: 4ac4011c5caefd6befd99758e09becede05d3226
+  PINCache: 534fd41d358d828dfdf227a0d327f3673a65e20b
+  PINOperation: 24b774353ca248fcf87d67b2d61eef42087c125a
+  PINRemoteImage: e2b89e19fb6e77ffc099f9d9f3b3fe1745e3f9f9
   PopupDialog: 720c92befd8bc23c13442254945213db5612f149
   PromisesObjC: c119f3cd559f50b7ae681fa59dc1acd19173b7e6
   Protobuf: 176220c526ad8bd09ab1fb40a978eac3fef665f7
   RAMPaperSwitch: 4ab6358e37cc90060693f10fb60fb6b73f6492c3
-  SendBirdSDK: 7e271e1945ac82dd8c504406c5e04947577d524b
-  SmoothButton: 993d5d9c80828754adac8444586fb06f392d5298
-  SoftUIView: e04596489fc59b5c50ba4b2f970d82a277430263
-  SwiftDate: 6329e58969a2de31cea7f1ee1143b247693196e7
+  SendBirdSDK: c16c053159760122a553e40ffe7c6d7c4cda368b
+  SwiftDate: fa2bb3962056bb44047b4b85a30044e5eae30b03
   SwiftHTTP: e94f1aa8cde58637dcc0100f6349de31a3337fde
   SwiftNotificationCenter: 760386da2ce03d3594cb5e96d1e22ec80b44b46f
   SwiftRichString: 9a6a70b4fe2cf428e38348b5ada5400da74621fd
   SwiftTwitch: 40957abccac5d6d40d8e047224178364ebbaf20c
   SwiftyGif: b85c6b33a9411859d9e1db998b6a8214aea942df
-  TwitchPlayer: 60e9999dec4f74121685eec0b6e9843c2b44d794
   TwitterCore: 8cbc9ad34d91c63a0035ea05bfbfc0d7ca72a28c
   TwitterKit: 5e4f41d70b9abdb41df5467f52d7aa2c0fd26ebb
   UnderLineTextField: b3f5307b56962331e30a965e81b79aae2df1de83
@@ -377,6 +326,6 @@ SPEC CHECKSUMS:
   ValidationToolkit: ce8e9c1a5d49eddc3266a009d46df5ea22042dbc
   VideoBackground: b4a2f39d3b16254b2bec9488cb2968a06dff69c5
 
-PODFILE CHECKSUM: 920fac22df93bcd5d4f29b14b625c1a4024d5ef3
+PODFILE CHECKSUM: 14346f00d26636dd99b2e0e3face4a1f95dd3aef
 
 COCOAPODS: 1.8.4

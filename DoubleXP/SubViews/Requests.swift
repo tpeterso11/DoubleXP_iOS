@@ -8,7 +8,6 @@
 
 import UIKit
 import Firebase
-import ImageLoader
 import moa
 import PopupDialog
 import MSPeekCollectionViewDelegateImplementation

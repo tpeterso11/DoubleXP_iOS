@@ -8,15 +8,15 @@
 
 import UIKit
 import Firebase
-import ImageLoader
 import moa
 import MSPeekCollectionViewDelegateImplementation
 import UnderLineTextField
 import SendBirdSDK
 import NotificationCenter
 import FBSDKCoreKit
+import MSPeekCollectionViewDelegateImplementation
 
-class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate, MSPeekImplementationDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, MessagingCallbacks {
+class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, MessagingCallbacks {
     
     @IBOutlet weak var cancelButton: UIButton!
     @IBOutlet weak var drawerBack: UIView!
@@ -49,14 +49,18 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
     private var drawerOpen = false
     private var clicked = false
     
+    var behavior: MSCollectionViewPeekingBehavior!
+    
     var gcGames = [GamerConnectGame]()
     override func viewDidLoad() {
         super.viewDidLoad()
         
         //animateView()
-        gcGameScroll.configureForPeekingDelegate()
         self.gcGameScroll.delegate = self
         self.gcGameScroll.dataSource = self
+        
+        behavior = MSCollectionViewPeekingBehavior()
+        self.gcGameScroll.configureForPeekingBehavior(behavior: behavior)
         
         switches.append(psSwitch)
         switches.append(xboxSwitch)

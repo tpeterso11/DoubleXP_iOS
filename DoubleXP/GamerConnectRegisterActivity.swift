@@ -9,17 +9,15 @@
 import UIKit
 import Firebase
 import SwiftHTTP
-import ImageLoader
 import moa
 import FBSDKCoreKit
-import ElongationPreview
-import SoftUIView
 import UnderLineTextField
 import Lottie
 import MSPeekCollectionViewDelegateImplementation
 import AIFlatSwitch
 
-class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, MSPeekImplementationDelegate {
+
+class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate {
     
     var availableGames = [GamerConnectGame]()
     var selectedGames = [GCRegisterTemp]()
@@ -37,7 +35,6 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
     @IBOutlet weak var gotItButton: UIButton!
     @IBOutlet weak var gcDrawer: UIView!
     @IBOutlet weak var drawerBlur: UIVisualEffectView!
-    @IBOutlet weak var importButton: SoftUIView!
     @IBOutlet weak var importButtonImage: UIImageView!
     @IBOutlet weak var allConsolesButton: UIButton!
     @IBOutlet weak var allConsolesCover: UIImageView!
@@ -72,6 +69,8 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
     var gamerTagValid = false
     var sendUpArray = [[String: String]]()
     var stats = [[String: String]]()
+    
+    var behavior: MSCollectionViewPeekingBehavior!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -153,6 +152,9 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         //gameCollection.configureForPeekingDelegate()
         gameCollection.delegate = self
         gameCollection.dataSource = self
+        
+        behavior = MSCollectionViewPeekingBehavior()
+        gameCollection.configureForPeekingBehavior(behavior: behavior)
     }
     
     private func showCreationView(){

@@ -129,8 +129,6 @@
 		306E6B5923DE23220069F426 /* TwitchStreamObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306E6B5823DE23220069F426 /* TwitchStreamObject.swift */; };
 		306E6B5B23DE49F70069F426 /* live_streaming.png in Resources */ = {isa = PBXBuildFile; fileRef = 306E6B5A23DE49F60069F426 /* live_streaming.png */; };
 		306E6B5D23DE4E4D0069F426 /* TwitchStreamCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306E6B5C23DE4E4D0069F426 /* TwitchStreamCell.swift */; };
-		306E6B5F23DE991B0069F426 /* TwitchPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306E6B5E23DE991B0069F426 /* TwitchPlayerViewController.swift */; };
-		306E6B6123DE99C40069F426 /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306E6B6023DE99C40069F426 /* Test.swift */; };
 		3071171123E1014A005F6355 /* 580b57fcd9996e24bc43c540.png in Resources */ = {isa = PBXBuildFile; fileRef = 3071171023E1014A005F6355 /* 580b57fcd9996e24bc43c540.png */; };
 		3071171323E1019F005F6355 /* TwitchDescCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3071171223E1019F005F6355 /* TwitchDescCell.swift */; };
 		3071171523E137A4005F6355 /* splash.png in Resources */ = {isa = PBXBuildFile; fileRef = 3071171423E137A4005F6355 /* splash.png */; };
@@ -148,7 +146,6 @@
 		307CE34B23EA0BDE00DCB12A /* ExpandedTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307CE34A23EA0BDE00DCB12A /* ExpandedTVCell.swift */; };
 		307CE34D23EA2B5000DCB12A /* message.png in Resources */ = {isa = PBXBuildFile; fileRef = 307CE34C23EA2B5000DCB12A /* message.png */; };
 		307CE34F23EA3EA100DCB12A /* information.png in Resources */ = {isa = PBXBuildFile; fileRef = 307CE34E23EA3EA100DCB12A /* information.png */; };
-		307CE35123EC3E1500DCB12A /* MockMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307CE35023EC3E1500DCB12A /* MockMessage.swift */; };
 		307CE35323EC452600DCB12A /* TestCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307CE35223EC452600DCB12A /* TestCell.swift */; };
 		307CE35523EC508600DCB12A /* InsetLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307CE35423EC508600DCB12A /* InsetLabel.swift */; };
 		307CE35723EC99B900DCB12A /* SlantedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307CE35623EC99B900DCB12A /* SlantedView.swift */; };
@@ -213,7 +210,6 @@
 		308EBA2623FDCCDC00DE186D /* live_menu.png in Resources */ = {isa = PBXBuildFile; fileRef = 308EBA2523FDCCDB00DE186D /* live_menu.png */; };
 		308ED71E242C2B920070DCEA /* MenuMyProfileCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308ED71D242C2B920070DCEA /* MenuMyProfileCell.swift */; };
 		308ED720242C38D00070DCEA /* tower_grey.png in Resources */ = {isa = PBXBuildFile; fileRef = 308ED71F242C38D00070DCEA /* tower_grey.png */; };
-		308ED722242EADDF0070DCEA /* TestElongationVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308ED721242EADDF0070DCEA /* TestElongationVC.swift */; };
 		30900A962401F32F00AEA2C8 /* ViewTeamsFoldingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30900A952401F32F00AEA2C8 /* ViewTeamsFoldingCell.swift */; };
 		30900A982402E09300AEA2C8 /* ViewTeamsNeedsHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30900A972402E09300AEA2C8 /* ViewTeamsNeedsHeader.swift */; };
 		30900A9A2402E18E00AEA2C8 /* ViewTeamsNeedsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30900A992402E18E00AEA2C8 /* ViewTeamsNeedsCell.swift */; };
@@ -481,8 +477,6 @@
 		306E6B5823DE23220069F426 /* TwitchStreamObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchStreamObject.swift; sourceTree = "<group>"; };
 		306E6B5A23DE49F60069F426 /* live_streaming.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = live_streaming.png; sourceTree = "<group>"; };
 		306E6B5C23DE4E4D0069F426 /* TwitchStreamCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchStreamCell.swift; sourceTree = "<group>"; };
-		306E6B5E23DE991B0069F426 /* TwitchPlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchPlayerViewController.swift; sourceTree = "<group>"; };
-		306E6B6023DE99C40069F426 /* Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Test.swift; sourceTree = "<group>"; };
 		3071171023E1014A005F6355 /* 580b57fcd9996e24bc43c540.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 580b57fcd9996e24bc43c540.png; sourceTree = "<group>"; };
 		3071171223E1019F005F6355 /* TwitchDescCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchDescCell.swift; sourceTree = "<group>"; };
 		3071171423E137A4005F6355 /* splash.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = splash.png; sourceTree = "<group>"; };
@@ -500,7 +494,6 @@
 		307CE34A23EA0BDE00DCB12A /* ExpandedTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandedTVCell.swift; sourceTree = "<group>"; };
 		307CE34C23EA2B5000DCB12A /* message.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = message.png; sourceTree = "<group>"; };
 		307CE34E23EA3EA100DCB12A /* information.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = information.png; sourceTree = "<group>"; };
-		307CE35023EC3E1500DCB12A /* MockMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockMessage.swift; sourceTree = "<group>"; };
 		307CE35223EC452600DCB12A /* TestCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestCell.swift; sourceTree = "<group>"; };
 		307CE35423EC508600DCB12A /* InsetLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsetLabel.swift; sourceTree = "<group>"; };
 		307CE35623EC99B900DCB12A /* SlantedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlantedView.swift; sourceTree = "<group>"; };
@@ -565,7 +558,6 @@
 		308EBA2523FDCCDB00DE186D /* live_menu.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = live_menu.png; sourceTree = "<group>"; };
 		308ED71D242C2B920070DCEA /* MenuMyProfileCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuMyProfileCell.swift; sourceTree = "<group>"; };
 		308ED71F242C38D00070DCEA /* tower_grey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tower_grey.png; sourceTree = "<group>"; };
-		308ED721242EADDF0070DCEA /* TestElongationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestElongationVC.swift; sourceTree = "<group>"; };
 		30900A952401F32F00AEA2C8 /* ViewTeamsFoldingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewTeamsFoldingCell.swift; sourceTree = "<group>"; };
 		30900A972402E09300AEA2C8 /* ViewTeamsNeedsHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewTeamsNeedsHeader.swift; sourceTree = "<group>"; };
 		30900A992402E18E00AEA2C8 /* ViewTeamsNeedsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewTeamsNeedsCell.swift; sourceTree = "<group>"; };
@@ -780,7 +772,6 @@
 				30B6E1A623AF15AA00B69F00 /* FAQuizConsoles.swift */,
 				30B6E1AA23B14F4400B69F00 /* FAQuizComplete.swift */,
 				3080B3ED23B8488E00638B22 /* EmbeddedTableView.swift */,
-				306E6B6023DE99C40069F426 /* Test.swift */,
 				30634D56240563EB00FEAD40 /* MediaFrag.swift */,
 				305B51F0240C39C80064B605 /* ProfileFrag.swift */,
 				30781C90242813F700C5D886 /* InviteFrag.swift */,
@@ -850,7 +841,6 @@
 				30EBC3FD23D949A0009CFAB2 /* FoldingRosterCell.swift */,
 				30EBC3FF23DA8CC7009CFAB2 /* TeamRosterCell.swift */,
 				306E6B5C23DE4E4D0069F426 /* TwitchStreamCell.swift */,
-				306E6B5E23DE991B0069F426 /* TwitchPlayerViewController.swift */,
 				305D8F0D23DFD03D007D0991 /* TestPlayer.swift */,
 				3071171223E1019F005F6355 /* TwitchDescCell.swift */,
 				3071171623E13864005F6355 /* TwitterDescCell.swift */,
@@ -896,7 +886,6 @@
 				308759B7242512BD002C19CC /* FADashFoldingCell.swift */,
 				30781C8E24270E0400C5D886 /* FAResultsFoldingCell.swift */,
 				308ED71D242C2B920070DCEA /* MenuMyProfileCell.swift */,
-				308ED721242EADDF0070DCEA /* TestElongationVC.swift */,
 				304E17E9242EB934009BE1C0 /* GCElongCell.swift */,
 				30591EB1243C0425004E54F4 /* RequestsQuizQuestionCell.swift */,
 				308810EB244B3ECC00C2BEC7 /* CompetitionCell.swift */,
@@ -1150,7 +1139,6 @@
 				30F6FCBD23CC07A20051813D /* GenericRequestObject.swift */,
 				30EBC40323DB6E5D009CFAB2 /* TweetObject.swift */,
 				306E6B5823DE23220069F426 /* TwitchStreamObject.swift */,
-				307CE35023EC3E1500DCB12A /* MockMessage.swift */,
 				30634D602405AE6900FEAD40 /* TestCollection.swift */,
 				30F7989D241E901B00740966 /* TwitchChannelObj.swift */,
 				304E1800243107C1009BE1C0 /* GCRegisterTemp.swift */,
@@ -1614,8 +1602,6 @@
 				30B583D4234FCBAA00736733 /* FirebaseAuthManager.swift in Sources */,
 				3080B3EC23B83C5B00638B22 /* FoldingCellCell.swift in Sources */,
 				30B6E17F23A0892500B69F00 /* FADash.swift in Sources */,
-				308ED722242EADDF0070DCEA /* TestElongationVC.swift in Sources */,
-				307CE35123EC3E1500DCB12A /* MockMessage.swift in Sources */,
 				308669A3245651E90032C46E /* RivalObj.swift in Sources */,
 				30634D6F240710FD00FEAD40 /* ArticleVideoCell.swift in Sources */,
 				30634D5B240572E800FEAD40 /* MediaCategoryCell.swift in Sources */,
@@ -1635,7 +1621,6 @@
 				30B583EE235E7A2E00736733 /* GCInfoCell.swift in Sources */,
 				305821172452682F00B76E67 /* BasicSponsorPage.swift in Sources */,
 				30B583EC2353A99200736733 /* GCGameCellTall.swift in Sources */,
-				306E6B6123DE99C40069F426 /* Test.swift in Sources */,
 				30900A982402E09300AEA2C8 /* ViewTeamsNeedsHeader.swift in Sources */,
 				30EBC40423DB6E5D009CFAB2 /* TweetObject.swift in Sources */,
 				3086956D23BD97E8001E51EF /* SegueFromLeft.swift in Sources */,
@@ -1691,7 +1676,6 @@
 				307B01D723E4D3D5006A5F1F /* TeamBuildFriendCell.swift in Sources */,
 				30B6E19723AC13BE00B69F00 /* QuizNavigationController.swift in Sources */,
 				30A84DEA2381C63A007BEAA5 /* FriendsManager.swift in Sources */,
-				306E6B5F23DE991B0069F426 /* TwitchPlayerViewController.swift in Sources */,
 				305B51F1240C39C80064B605 /* ProfileFrag.swift in Sources */,
 				30A84DEC2381DED0007BEAA5 /* Requests.swift in Sources */,
 				305B51F3240C532E0064B605 /* ProfileGamerTagCell.swift in Sources */,
@@ -1916,14 +1900,14 @@
 				CODE_SIGN_ENTITLEMENTS = DoubleXP/DoubleXP.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 23;
 				DEVELOPMENT_TEAM = GU6KL76XP4;
 				INFOPLIST_FILE = DoubleXP/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.01;
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Encrypted.DoubleXP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1942,14 +1926,14 @@
 				CODE_SIGN_ENTITLEMENTS = DoubleXP/DoubleXP.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 23;
 				DEVELOPMENT_TEAM = GU6KL76XP4;
 				INFOPLIST_FILE = DoubleXP/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.01;
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Encrypted.DoubleXP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

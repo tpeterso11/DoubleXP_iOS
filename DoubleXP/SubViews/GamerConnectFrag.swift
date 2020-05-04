@@ -8,14 +8,13 @@
 
 import UIKit
 import Firebase
-import ImageLoader
 import moa
 import MSPeekCollectionViewDelegateImplementation
-import Bartinter
 import FBSDKCoreKit
 import VideoBackground
+import MSPeekCollectionViewDelegateImplementation
 
-class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, MSPeekImplementationDelegate {
+class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     @IBOutlet weak var gcGameScroll: UICollectionView!
     @IBOutlet weak var recommendedUsers: UICollectionView!
     var selectedCell = false
@@ -23,15 +22,18 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
     @IBOutlet weak var connectHeader: UILabel!
     @IBOutlet weak var currentDate: UILabel!
     var gcGames = [GamerConnectGame]()
-    var delegate: MSPeekCollectionViewDelegateImplementation!
     var secondaryPayload = [Any]()
+    
+    var behavior: MSCollectionViewPeekingBehavior!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         animateView()
         
-        gcGameScroll.configureForPeekingDelegate()
+        behavior = MSCollectionViewPeekingBehavior()
+        self.gcGameScroll.configureForPeekingBehavior(behavior: behavior)
+        
         let todaysDate:NSDate = NSDate()
         let dateFormatter:DateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMMM.dd.yyyy"
@@ -41,8 +43,6 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         gcGames = appDelegate.gcGames
-        
-        self.updatesStatusBarAppearanceAutomatically = true
     }
     
     override func reloadView() {
