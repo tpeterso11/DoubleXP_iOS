@@ -16,7 +16,6 @@ target 'DoubleXP' do
   pod 'SendBirdSDK'
   pod 'FoldingCell'
   pod 'lottie-ios'
-  pod 'TwitterKit'
   pod 'SwiftTwitch'
   pod 'ExpyTableView'
   pod 'PINRemoteImage'

@@ -166,9 +166,6 @@ PODS:
   - SwiftTwitch (0.1.0):
     - Marshal (~> 1.2.7)
   - SwiftyGif (5.2.0)
-  - TwitterCore (3.2.0)
-  - TwitterKit (3.4.2):
-    - TwitterCore (>= 3.2.0)
   - UnderLineTextField (2.1.0)
   - ValidationComponents (0.3.0):
     - ValidationToolkit (~> 0.4.1)
@@ -199,7 +196,6 @@ DEPENDENCIES:
   - SwiftRichString
   - SwiftTwitch
   - SwiftyGif
-  - TwitterKit
   - UnderLineTextField
   - ValidationComponents
   - VideoBackground
@@ -253,8 +249,6 @@ SPEC REPOS:
     - SwiftRichString
     - SwiftTwitch
     - SwiftyGif
-    - TwitterCore
-    - TwitterKit
     - UnderLineTextField
     - ValidationComponents
     - ValidationToolkit
@@ -308,13 +302,11 @@ SPEC CHECKSUMS:
   SwiftRichString: 9a6a70b4fe2cf428e38348b5ada5400da74621fd
   SwiftTwitch: 40957abccac5d6d40d8e047224178364ebbaf20c
   SwiftyGif: b85c6b33a9411859d9e1db998b6a8214aea942df
-  TwitterCore: 8cbc9ad34d91c63a0035ea05bfbfc0d7ca72a28c
-  TwitterKit: 5e4f41d70b9abdb41df5467f52d7aa2c0fd26ebb
   UnderLineTextField: b3f5307b56962331e30a965e81b79aae2df1de83
   ValidationComponents: fad1f9e9d7fbf3e10c893c880ef9d27627e90382
   ValidationToolkit: ce8e9c1a5d49eddc3266a009d46df5ea22042dbc
   VideoBackground: b4a2f39d3b16254b2bec9488cb2968a06dff69c5
 
-PODFILE CHECKSUM: f3cd2b3c391cfca20a165a37a7d81740d9aa1ed9
+PODFILE CHECKSUM: 3c4e31306f288f6f287d54d9eb76b38b530beb2f
 
 COCOAPODS: 1.9.1

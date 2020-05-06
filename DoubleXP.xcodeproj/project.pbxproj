@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		10631A03541DDFBBBF45B91E /* Pods_DoubleXPTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7FBD397045996E190590EAE /* Pods_DoubleXPTests.framework */; };
+		2D10C865246331FC00AFB350 /* TwitterCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D10C862246331F500AFB350 /* TwitterCore.framework */; };
+		2D10C866246331FC00AFB350 /* TwitterCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2D10C862246331F500AFB350 /* TwitterCore.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2D10C868246331FF00AFB350 /* TwitterKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D10C861246331F500AFB350 /* TwitterKit.framework */; };
+		2D10C869246331FF00AFB350 /* TwitterKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2D10C861246331F500AFB350 /* TwitterKit.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3008EE782267F89800E0D9ED /* NewsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3008EE772267F89800E0D9ED /* NewsCell.swift */; };
 		301AEF4C23885B2F00339850 /* MessagingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301AEF4B23885B2F00339850 /* MessagingManager.swift */; };
 		301AEF4E23885CEC00339850 /* TeamFrag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301AEF4D23885CEC00339850 /* TeamFrag.swift */; };
@@ -353,8 +357,25 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		2D10C867246331FC00AFB350 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				2D10C866246331FC00AFB350 /* TwitterCore.framework in Embed Frameworks */,
+				2D10C869246331FF00AFB350 /* TwitterKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		0C5F4B174A53C96A2BCFB001 /* Pods-DoubleXPUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXPUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-DoubleXPUITests/Pods-DoubleXPUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		2D10C861246331F500AFB350 /* TwitterKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = TwitterKit.framework; sourceTree = "<group>"; };
+		2D10C862246331F500AFB350 /* TwitterCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = TwitterCore.framework; sourceTree = "<group>"; };
 		3008EE772267F89800E0D9ED /* NewsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsCell.swift; sourceTree = "<group>"; };
 		301AEF4B23885B2F00339850 /* MessagingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagingManager.swift; sourceTree = "<group>"; };
 		301AEF4D23885CEC00339850 /* TeamFrag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamFrag.swift; sourceTree = "<group>"; };
@@ -702,6 +723,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				CE992EE2BE093A8E429F315A /* Pods_DoubleXP.framework in Frameworks */,
+				2D10C865246331FC00AFB350 /* TwitterCore.framework in Frameworks */,
+				2D10C868246331FF00AFB350 /* TwitterKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -724,6 +747,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2D10C85F246331F500AFB350 /* Libs */ = {
+			isa = PBXGroup;
+			children = (
+				2D10C860246331F500AFB350 /* Twitter */,
+			);
+			path = Libs;
+			sourceTree = "<group>";
+		};
+		2D10C860246331F500AFB350 /* Twitter */ = {
+			isa = PBXGroup;
+			children = (
+				2D10C861246331F500AFB350 /* TwitterKit.framework */,
+				2D10C862246331F500AFB350 /* TwitterCore.framework */,
+			);
+			path = Twitter;
+			sourceTree = "<group>";
+		};
 		304E17F1242FF250009BE1C0 /* Json */ = {
 			isa = PBXGroup;
 			children = (
@@ -897,6 +937,7 @@
 		4C4D88172205F32900AD7090 = {
 			isa = PBXGroup;
 			children = (
+				2D10C85F246331F500AFB350 /* Libs */,
 				4C4D88222205F32900AD7090 /* DoubleXP */,
 				4C4D883A2205F33200AD7090 /* DoubleXPTests */,
 				4C4D88452205F33300AD7090 /* DoubleXPUITests */,
@@ -1187,6 +1228,7 @@
 				4C4D881E2205F32900AD7090 /* Resources */,
 				76084E605E46D4237B0B5091 /* [CP] Embed Pods Frameworks */,
 				0CEA5B16247F8ECA417CBD97 /* [CP] Copy Pods Resources */,
+				2D10C867246331FC00AFB350 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1902,6 +1944,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 23;
 				DEVELOPMENT_TEAM = GU6KL76XP4;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Libs/Twitter",
+				);
 				INFOPLIST_FILE = DoubleXP/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1928,6 +1974,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 23;
 				DEVELOPMENT_TEAM = GU6KL76XP4;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Libs/Twitter",
+				);
 				INFOPLIST_FILE = DoubleXP/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
