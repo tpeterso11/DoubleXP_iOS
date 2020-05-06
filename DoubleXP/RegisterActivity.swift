@@ -9,8 +9,7 @@
 import UIKit
 import Firebase
 import ValidationComponents
-import FBSDKCoreKit
-import FacebookLogin
+import FBSDKLoginKit
 import PopupDialog
 import GoogleSignIn
 
@@ -53,10 +52,8 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
     class SimpleTextPromptDelegate: NSObject, UIAlertViewDelegate {
     }
     
-    func loginManagerDidComplete(_ result: LoginResult) {
-        let alertController: UIAlertController
-        switch result {
-        case .cancelled:
+    func loginManagerDidComplete(_ result: LoginManagerLoginResult?, _ error: Error?) {
+        if let result = result, result.isCancelled {
             AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Canceled"))
             
             var buttons = [PopupDialogButton]()
@@ -79,57 +76,54 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
 
             // Present dialog
             self.present(popup, animated: true, completion: nil)
-        case .failed(let error):
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Fail - " + error.localizedDescription))
-            
-            var buttons = [PopupDialogButton]()
-            let title = "facebook login error."
-            let message = "there was an error getting you logged into facebook. try again, or try registering using your email."
-            
-            let button = DefaultButton(title: "try again.") { [weak self] in
-                self?.loginWithReadPermissions()
+        } else {
+            if let tokenString = result?.token?.tokenString {
+                self.facebookTokenString = tokenString
+                self.facebookLoginAccepted = true
                 
-            }
-            buttons.append(button)
-            
-            let buttonOne = CancelButton(title: "nevermind") { [weak self] in
-                //do nothing
-            }
-            buttons.append(buttonOne)
-            
-            let popup = PopupDialog(title: title, message: message)
-            popup.addButtons(buttons)
+                self.emailLoginCover.image = #imageLiteral(resourceName: "facebook_logo.png")
+                
+                let top = CGAffineTransform(translationX: 0, y: 70)
+                UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5,
+                               initialSpringVelocity: 0.5, options: [], animations: {
+                                self.emailLoginCover.transform = top
+                                self.emailLoginCover.alpha = 1
+                                self.emailField.alpha = 0.1
+                                self.emailField.isUserInteractionEnabled = false
+                                self.passwordField.alpha = 0.1
+                                self.passwordField.isUserInteractionEnabled = false
+                }, completion: nil)
+            } else {
+                AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Fail - " + "\(error?.localizedDescription ?? "")"))
+                
+                var buttons = [PopupDialogButton]()
+                let title = "facebook login error."
+                let message = "there was an error getting you logged into facebook. try again, or try registering using your email."
+                
+                let button = DefaultButton(title: "try again.") { [weak self] in
+                    self?.loginWithReadPermissions()
+                    
+                }
+                buttons.append(button)
+                
+                let buttonOne = CancelButton(title: "nevermind") { [weak self] in
+                    //do nothing
+                }
+                buttons.append(buttonOne)
+                
+                let popup = PopupDialog(title: title, message: message)
+                popup.addButtons(buttons)
 
-            // Present dialog
-            self.present(popup, animated: true, completion: nil)
-            
-
-        case .success(_, _, let token):
-            self.facebookTokenString = token.tokenString
-            self.facebookLoginAccepted = true
-            
-            self.emailLoginCover.image = #imageLiteral(resourceName: "facebook_logo.png")
-            
-            let top = CGAffineTransform(translationX: 0, y: 70)
-            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5,
-                           initialSpringVelocity: 0.5, options: [], animations: {
-                            self.emailLoginCover.transform = top
-                            self.emailLoginCover.alpha = 1
-                            self.emailField.alpha = 0.1
-                            self.emailField.isUserInteractionEnabled = false
-                            self.passwordField.alpha = 0.1
-                            self.passwordField.isUserInteractionEnabled = false
-            }, completion: nil)
+                // Present dialog
+                self.present(popup, animated: true, completion: nil)
+            }
         }
     }
 
     @IBAction private func loginWithReadPermissions() {
         let loginManager = LoginManager()
-        loginManager.logIn(
-            permissions: [.publicProfile, .email],
-            viewController: self
-        ) { result in
-            self.loginManagerDidComplete(result)
+        loginManager.logIn(permissions: ["public_profile", "email"], from: self) { [weak self] (result, error) in
+            self?.loginManagerDidComplete(result, error)
         }
     }
 
