@@ -160,6 +160,7 @@ PODS:
   - RAMPaperSwitch (3.1.0)
   - SendBirdSDK (3.0.179)
   - SwiftDate (6.1.0)
+  - Swifter (2.3.0)
   - SwiftHTTP (3.0.1)
   - SwiftNotificationCenter (1.0.4)
   - SwiftRichString (3.7.1)
@@ -191,6 +192,7 @@ DEPENDENCIES:
   - RAMPaperSwitch
   - SendBirdSDK
   - SwiftDate
+  - Swifter (from `https://github.com/mattdonnelly/Swifter.git`)
   - SwiftHTTP
   - SwiftNotificationCenter
   - SwiftRichString
@@ -254,6 +256,15 @@ SPEC REPOS:
     - ValidationToolkit
     - VideoBackground
 
+EXTERNAL SOURCES:
+  Swifter:
+    :git: https://github.com/mattdonnelly/Swifter.git
+
+CHECKOUT OPTIONS:
+  Swifter:
+    :commit: 8889232f27784f6f33cb689c77f233b578124a53
+    :git: https://github.com/mattdonnelly/Swifter.git
+
 SPEC CHECKSUMS:
   AIFlatSwitch: fd56a5e6ab8769f0b52cef815c4f071e83050352
   AppAuth: 73574f3013a1e65b9601a3ddc8b3158cce68c09d
@@ -297,6 +308,7 @@ SPEC CHECKSUMS:
   RAMPaperSwitch: 4ab6358e37cc90060693f10fb60fb6b73f6492c3
   SendBirdSDK: c16c053159760122a553e40ffe7c6d7c4cda368b
   SwiftDate: fa2bb3962056bb44047b4b85a30044e5eae30b03
+  Swifter: 114bb57823fb21d5ef0451930e9cbc184c3a867a
   SwiftHTTP: e94f1aa8cde58637dcc0100f6349de31a3337fde
   SwiftNotificationCenter: 760386da2ce03d3594cb5e96d1e22ec80b44b46f
   SwiftRichString: 9a6a70b4fe2cf428e38348b5ada5400da74621fd
@@ -307,6 +319,6 @@ SPEC CHECKSUMS:
   ValidationToolkit: ce8e9c1a5d49eddc3266a009d46df5ea22042dbc
   VideoBackground: b4a2f39d3b16254b2bec9488cb2968a06dff69c5
 
-PODFILE CHECKSUM: 3c4e31306f288f6f287d54d9eb76b38b530beb2f
+PODFILE CHECKSUM: a42dafb80be47c59aa8f33974061ec7d5a31dfc2
 
 COCOAPODS: 1.9.1

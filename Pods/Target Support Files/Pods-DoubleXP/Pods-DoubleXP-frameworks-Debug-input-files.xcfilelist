@@ -26,6 +26,7 @@ ${BUILT_PRODUCTS_DIR}/SwiftHTTP/SwiftHTTP.framework
 ${BUILT_PRODUCTS_DIR}/SwiftNotificationCenter/SwiftNotificationCenter.framework
 ${BUILT_PRODUCTS_DIR}/SwiftRichString/SwiftRichString.framework
 ${BUILT_PRODUCTS_DIR}/SwiftTwitch/SwiftTwitch.framework
+${BUILT_PRODUCTS_DIR}/Swifter/Swifter.framework
 ${BUILT_PRODUCTS_DIR}/SwiftyGif/SwiftyGif.framework
 ${BUILT_PRODUCTS_DIR}/UnderLineTextField/UnderLineTextField.framework
 ${BUILT_PRODUCTS_DIR}/ValidationComponents/ValidationComponents.framework

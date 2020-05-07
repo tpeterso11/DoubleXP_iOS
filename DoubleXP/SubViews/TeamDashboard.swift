@@ -10,7 +10,6 @@ import UIKit
 import Firebase
 import moa
 import MSPeekCollectionViewDelegateImplementation
-import TwitterKit
 import SwiftTwitch
 import WebKit
 

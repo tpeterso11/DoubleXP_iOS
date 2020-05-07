@@ -30,7 +30,8 @@ target 'DoubleXP' do
   pod 'VideoBackground'
   pod 'GoogleSignIn'
   pod 'SwiftDate'
-
+  pod 'Swifter', :git => 'https://github.com/mattdonnelly/Swifter.git'
+  
   # Pods for DoubleXP
 
   target 'DoubleXPTests' do
