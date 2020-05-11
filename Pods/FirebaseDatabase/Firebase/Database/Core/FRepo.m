@@ -238,7 +238,6 @@
       }
       lastWriteId = writeId;
       self.writeIdCounter = writeId + 1;
-
       if ([write isOverwrite]) {
           FFLog(@"I-RDB038001", @"Restoring overwrite with id %ld",
                 (long)write.writeId);
@@ -248,9 +247,7 @@
                       withCallback:callback];
           id<FNode> resolved =
               [FServerValues resolveDeferredValueSnapshot:write.overwrite
-                                             withSyncTree:self.serverSyncTree
-                                                   atPath:write.path
-                                             serverValues:serverValues];
+                                         withServerValues:serverValues];
           [self.serverSyncTree applyUserOverwriteAtPath:write.path
                                                 newData:resolved
                                                 writeId:writeId
@@ -261,11 +258,9 @@
           [self.connection mergeData:[write.merge valForExport:YES]
                              forPath:[write.path toString]
                         withCallback:callback];
-          FCompoundWrite *resolved = [FServerValues
-              resolveDeferredValueCompoundWrite:write.merge
-                                   withSyncTree:self.serverSyncTree
-                                         atPath:write.path
-                                   serverValues:serverValues];
+          FCompoundWrite *resolved =
+              [FServerValues resolveDeferredValueCompoundWrite:write.merge
+                                              withServerValues:serverValues];
           [self.serverSyncTree applyUserMergeAtPath:write.path
                                     changedChildren:resolved
                                             writeId:writeId];
@@ -319,12 +314,9 @@
     // where possible and / or (b) store unresolved paths on JSON parse
     NSDictionary *serverValues =
         [FServerValues generateServerValues:self.serverClock];
-    id<FNode> existing = [self.serverSyncTree calcCompleteEventCacheAtPath:path
-                                                           excludeWriteIds:@[]];
     id<FNode> newNode =
         [FServerValues resolveDeferredValueSnapshot:node
-                                       withExisting:existing
-                                       serverValues:serverValues];
+                                   withServerValues:serverValues];
 
     NSInteger writeId = [self nextWriteId];
     [self.persistenceManager saveUserOverwrite:node
@@ -368,9 +360,7 @@
         [FServerValues generateServerValues:self.serverClock];
     FCompoundWrite *resolved =
         [FServerValues resolveDeferredValueCompoundWrite:nodes
-                                            withSyncTree:self.serverSyncTree
-                                                  atPath:path
-                                            serverValues:serverValues];
+                                        withServerValues:serverValues];
 
     if (!resolved.isEmpty) {
         NSInteger writeId = [self nextWriteId];
@@ -780,22 +770,18 @@
     FFLog(@"I-RDB038019", @"Running onDisconnectEvents");
     NSDictionary *serverValues =
         [FServerValues generateServerValues:self.serverClock];
+    FSparseSnapshotTree *resolvedTree =
+        [FServerValues resolveDeferredValueTree:self.onDisconnect
+                               withServerValues:serverValues];
     NSMutableArray *events = [[NSMutableArray alloc] init];
 
-    [self.onDisconnect
+    [resolvedTree
         forEachTreeAtPath:[FPath empty]
                        do:^(FPath *path, id<FNode> node) {
-                         id<FNode> existing = [self.serverSyncTree
-                             calcCompleteEventCacheAtPath:path
-                                          excludeWriteIds:@[]];
-                         id<FNode> resolved = [FServerValues
-                             resolveDeferredValueSnapshot:node
-                                             withExisting:existing
-                                             serverValues:serverValues];
                          [events addObjectsFromArray:
                                      [self.serverSyncTree
                                          applyServerOverwriteAtPath:path
-                                                            newData:resolved]];
+                                                            newData:node]];
                          FPath *affectedPath =
                              [self abortTransactionsAtPath:path
                                                      error:kFTransactionSet];
@@ -925,8 +911,7 @@
         id<FNode> newValUnresolved = [result.update nodeValue];
         id<FNode> newVal =
             [FServerValues resolveDeferredValueSnapshot:newValUnresolved
-                                           withExisting:currentState
-                                           serverValues:serverValues];
+                                       withServerValues:serverValues];
         transaction.currentOutputSnapshotRaw = newValUnresolved;
         transaction.currentOutputSnapshotResolved = newVal;
         transaction.currentWriteId =
@@ -1207,9 +1192,7 @@
                     id<FNode> newVal = [result.update nodeValue];
                     id<FNode> newValResolved = [FServerValues
                         resolveDeferredValueSnapshot:newVal
-                                        withExisting:transaction
-                                                         .currentInputSnapshot
-                                        serverValues:serverValues];
+                                    withServerValues:serverValues];
 
                     transaction.currentOutputSnapshotRaw = newVal;
                     transaction.currentOutputSnapshotResolved = newValResolved;
