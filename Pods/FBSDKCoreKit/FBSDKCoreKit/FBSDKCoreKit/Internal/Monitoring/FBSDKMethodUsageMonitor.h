@@ -23,14 +23,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Used for tracking method usage.
 
- To use: pass a Class and Selector to identify the method you want to track.
- They will resolve to a string with the format: `Class::Selector:arg1:arg2`
-
+ To use: pass a selector with the method you want to track.
  This is essentially a name-spaced pass-through to `FBSDKMonitor`.
  */
 @interface FBSDKMethodUsageMonitor : NSObject
 
-+ (void)recordMethod:(SEL)method inClass:(Class)clazz;
++ (void)record:(SEL)method;
 
 @end
 

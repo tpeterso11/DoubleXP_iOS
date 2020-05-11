@@ -47,11 +47,6 @@ static NSString * const FBSDKPerformanceTimeSpentKey = @"time_spent";
   return entry;
 }
 
-- (NSString *)name
-{
-  return [_name copy];
-}
-
 - (void)encodeWithCoder:(nonnull NSCoder *)encoder {
   if (_name && _startTime && _endTime) {
     [encoder encodeObject:_name forKey:FBSDKPerformanceNameKey];

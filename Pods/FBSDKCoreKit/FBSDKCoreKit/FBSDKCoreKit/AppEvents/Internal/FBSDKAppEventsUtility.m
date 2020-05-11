@@ -69,7 +69,6 @@
   }
 
   parameters[@"application_tracking_enabled"] = @(!FBSDKSettings.limitEventAndDataUsage).stringValue;
-  parameters[@"advertiser_id_collection_enabled"] = @(FBSDKSettings.advertiserIDCollectionEnabled).stringValue;
 
   NSString *userID = [FBSDKAppEvents userID];
   if (userID) {

@@ -450,6 +450,7 @@ extern NSString *const FIRPhoneMultiFactorID;
                         }
 
                         NSString *IDToken = session.IDToken;
+                        NSString *multiFactorProvider = FIRPhoneMultiFactorID;
                         FIRAuthProtoStartMFAPhoneRequestInfo *startMFARequestInfo =
                             [[FIRAuthProtoStartMFAPhoneRequestInfo alloc]
                                 initWithPhoneNumber:phoneNumber
@@ -459,6 +460,7 @@ extern NSString *const FIRPhoneMultiFactorID;
                           FIRStartMFAEnrollmentRequest *request =
                               [[FIRStartMFAEnrollmentRequest alloc]
                                        initWithIDToken:IDToken
+                                   multiFactorProvider:multiFactorProvider
                                         enrollmentInfo:startMFARequestInfo
                                   requestConfiguration:self->_auth.requestConfiguration];
                           [FIRAuthBackend
@@ -510,10 +512,11 @@ extern NSString *const FIRPhoneMultiFactorID;
                                                 }];
                         } else {
                           FIRStartMFASignInRequest *request = [[FIRStartMFASignInRequest alloc]
-                              initWithMFAPendingCredential:session.MFAPendingCredential
-                                           MFAEnrollmentID:session.multiFactorInfo.UID
-                                                signInInfo:startMFARequestInfo
-                                      requestConfiguration:self->_auth.requestConfiguration];
+                               initWithMFAProvider:multiFactorProvider
+                              MFAPendingCredential:session.MFAPendingCredential
+                                   MFAEnrollmentID:session.multiFactorInfo.UID
+                                        signInInfo:startMFARequestInfo
+                              requestConfiguration:self->_auth.requestConfiguration];
                           [FIRAuthBackend
                               startMultiFactorSignIn:request
                                             callback:^(

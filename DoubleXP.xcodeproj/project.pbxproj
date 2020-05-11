@@ -12,9 +12,7 @@
 		3008EE782267F89800E0D9ED /* NewsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3008EE772267F89800E0D9ED /* NewsCell.swift */; };
 		301AEF4C23885B2F00339850 /* MessagingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301AEF4B23885B2F00339850 /* MessagingManager.swift */; };
 		301AEF4E23885CEC00339850 /* TeamFrag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301AEF4D23885CEC00339850 /* TeamFrag.swift */; };
-		301AEF502388604D00339850 /* opened-door-aperture.png in Resources */ = {isa = PBXBuildFile; fileRef = 301AEF4F2388604C00339850 /* opened-door-aperture.png */; };
 		301AEF54238862D000339850 /* TeamCellTeamFrag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301AEF53238862D000339850 /* TeamCellTeamFrag.swift */; };
-		301AEF5623886D7100339850 /* star.png in Resources */ = {isa = PBXBuildFile; fileRef = 301AEF5523886D7100339850 /* star.png */; };
 		301B4AE223F07DC900A6FE5B /* FreeAgentExpandingResultCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301B4AE123F07DC900A6FE5B /* FreeAgentExpandingResultCell.swift */; };
 		301B4AE423F07DEC00A6FE5B /* FreeAgentExpandingActionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301B4AE323F07DEC00A6FE5B /* FreeAgentExpandingActionCell.swift */; };
 		301B4AE623F4DB6F00A6FE5B /* FreeAgentDashCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301B4AE523F4DB6F00A6FE5B /* FreeAgentDashCell.swift */; };
@@ -198,10 +196,7 @@
 		308BD026238D7CB40034822B /* TeamNeedsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308BD025238D7CB40034822B /* TeamNeedsCell.swift */; };
 		308BD028238E1AB70034822B /* TeamManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308BD027238E1AB70034822B /* TeamManager.swift */; };
 		308BD02A238ECE150034822B /* TeamBuildFrag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308BD029238ECE150034822B /* TeamBuildFrag.swift */; };
-		308BD02C238ED0A10034822B /* invitation.png in Resources */ = {isa = PBXBuildFile; fileRef = 308BD02B238ED0A10034822B /* invitation.png */; };
-		308BD02E238ED0DA0034822B /* envelope.png in Resources */ = {isa = PBXBuildFile; fileRef = 308BD02D238ED0DA0034822B /* envelope.png */; };
 		308BD030238ED1370034822B /* DashFriendInviteCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308BD02F238ED1370034822B /* DashFriendInviteCell.swift */; };
-		308BD032238ED2450034822B /* restaurant-membership-card-tool.png in Resources */ = {isa = PBXBuildFile; fileRef = 308BD031238ED2450034822B /* restaurant-membership-card-tool.png */; };
 		308BD034238F5BE90034822B /* FriendObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308BD033238F5BE90034822B /* FriendObject.swift */; };
 		308BD0362391DB9C0034822B /* TeammateObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308BD0352391DB9C0034822B /* TeammateObject.swift */; };
 		308E79BC23FF471D00197035 /* meeting.png in Resources */ = {isa = PBXBuildFile; fileRef = 308E79BB23FF471D00197035 /* meeting.png */; };
@@ -224,7 +219,6 @@
 		30A519912409700000DCFC77 /* white_pixelated_heart.png in Resources */ = {isa = PBXBuildFile; fileRef = 30A519902409700000DCFC77 /* white_pixelated_heart.png */; };
 		30A519932409716300DCFC77 /* 024db1146a8c15b.png in Resources */ = {isa = PBXBuildFile; fileRef = 30A519922409716300DCFC77 /* 024db1146a8c15b.png */; };
 		30A51995240975CD00DCFC77 /* profile.png in Resources */ = {isa = PBXBuildFile; fileRef = 30A51994240975CD00DCFC77 /* profile.png */; };
-		30A519992409763800DCFC77 /* profile_white.png in Resources */ = {isa = PBXBuildFile; fileRef = 30A519982409763800DCFC77 /* profile_white.png */; };
 		30A5199C2409774D00DCFC77 /* fix_white.png in Resources */ = {isa = PBXBuildFile; fileRef = 30A5199A2409774B00DCFC77 /* fix_white.png */; };
 		30A5199D2409774D00DCFC77 /* fix.png in Resources */ = {isa = PBXBuildFile; fileRef = 30A5199B2409774C00DCFC77 /* fix.png */; };
 		30A5199F240A007300DCFC77 /* AGVideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A5199E240A007300DCFC77 /* AGVideoPlayerView.swift */; };
@@ -320,6 +314,11 @@
 		30FC34C123E7DAE8007F0080 /* settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 30FC34C023E7DAE8007F0080 /* settings.png */; };
 		30FC34C323E914CA007F0080 /* MenuHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FC34C223E914CA007F0080 /* MenuHeaderCell.swift */; };
 		30FC34C723E927BE007F0080 /* MenuSettingsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FC34C623E927BE007F0080 /* MenuSettingsCell.swift */; };
+		48343FFE2465CE580034CF12 /* envelope.png in Resources */ = {isa = PBXBuildFile; fileRef = 48343FF92465CE570034CF12 /* envelope.png */; };
+		48343FFF2465CE580034CF12 /* star.png in Resources */ = {isa = PBXBuildFile; fileRef = 48343FFA2465CE570034CF12 /* star.png */; };
+		483440002465CE580034CF12 /* restaurant-membership-card-tool.png in Resources */ = {isa = PBXBuildFile; fileRef = 48343FFB2465CE570034CF12 /* restaurant-membership-card-tool.png */; };
+		483440012465CE580034CF12 /* profile_white.png in Resources */ = {isa = PBXBuildFile; fileRef = 48343FFC2465CE580034CF12 /* profile_white.png */; };
+		483440022465CE580034CF12 /* opened-door-aperture.png in Resources */ = {isa = PBXBuildFile; fileRef = 48343FFD2465CE580034CF12 /* opened-door-aperture.png */; };
 		4C4D88242205F32900AD7090 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4D88232205F32900AD7090 /* AppDelegate.swift */; };
 		4C4D88262205F32900AD7090 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4D88252205F32900AD7090 /* ViewController.swift */; };
 		4C4D88292205F32900AD7090 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4C4D88272205F32900AD7090 /* Main.storyboard */; };
@@ -373,9 +372,7 @@
 		3008EE772267F89800E0D9ED /* NewsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsCell.swift; sourceTree = "<group>"; };
 		301AEF4B23885B2F00339850 /* MessagingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagingManager.swift; sourceTree = "<group>"; };
 		301AEF4D23885CEC00339850 /* TeamFrag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamFrag.swift; sourceTree = "<group>"; };
-		301AEF4F2388604C00339850 /* opened-door-aperture.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "opened-door-aperture.png"; path = "../../../../Downloads/opened-door-aperture.png"; sourceTree = "<group>"; };
 		301AEF53238862D000339850 /* TeamCellTeamFrag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamCellTeamFrag.swift; sourceTree = "<group>"; };
-		301AEF5523886D7100339850 /* star.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = star.png; path = ../../../../Downloads/star.png; sourceTree = "<group>"; };
 		301B4AE123F07DC900A6FE5B /* FreeAgentExpandingResultCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeAgentExpandingResultCell.swift; sourceTree = "<group>"; };
 		301B4AE323F07DEC00A6FE5B /* FreeAgentExpandingActionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeAgentExpandingActionCell.swift; sourceTree = "<group>"; };
 		301B4AE523F4DB6F00A6FE5B /* FreeAgentDashCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeAgentDashCell.swift; sourceTree = "<group>"; };
@@ -560,10 +557,7 @@
 		308BD025238D7CB40034822B /* TeamNeedsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamNeedsCell.swift; sourceTree = "<group>"; };
 		308BD027238E1AB70034822B /* TeamManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamManager.swift; sourceTree = "<group>"; };
 		308BD029238ECE150034822B /* TeamBuildFrag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamBuildFrag.swift; sourceTree = "<group>"; };
-		308BD02B238ED0A10034822B /* invitation.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = invitation.png; path = ../../../../Downloads/invitation.png; sourceTree = "<group>"; };
-		308BD02D238ED0DA0034822B /* envelope.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = envelope.png; path = ../../../../Downloads/envelope.png; sourceTree = "<group>"; };
 		308BD02F238ED1370034822B /* DashFriendInviteCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashFriendInviteCell.swift; sourceTree = "<group>"; };
-		308BD031238ED2450034822B /* restaurant-membership-card-tool.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "restaurant-membership-card-tool.png"; path = "../../../../Downloads/restaurant-membership-card-tool.png"; sourceTree = "<group>"; };
 		308BD033238F5BE90034822B /* FriendObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendObject.swift; sourceTree = "<group>"; };
 		308BD0352391DB9C0034822B /* TeammateObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeammateObject.swift; sourceTree = "<group>"; };
 		308E79BB23FF471D00197035 /* meeting.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = meeting.png; sourceTree = "<group>"; };
@@ -586,7 +580,6 @@
 		30A519902409700000DCFC77 /* white_pixelated_heart.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = white_pixelated_heart.png; sourceTree = "<group>"; };
 		30A519922409716300DCFC77 /* 024db1146a8c15b.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 024db1146a8c15b.png; sourceTree = "<group>"; };
 		30A51994240975CD00DCFC77 /* profile.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = profile.png; sourceTree = "<group>"; };
-		30A519982409763800DCFC77 /* profile_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = profile_white.png; path = ../../../profile_white.png; sourceTree = "<group>"; };
 		30A5199A2409774B00DCFC77 /* fix_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fix_white.png; sourceTree = "<group>"; };
 		30A5199B2409774C00DCFC77 /* fix.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fix.png; sourceTree = "<group>"; };
 		30A5199E240A007300DCFC77 /* AGVideoPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AGVideoPlayerView.swift; sourceTree = "<group>"; };
@@ -682,6 +675,11 @@
 		30FC34C023E7DAE8007F0080 /* settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = settings.png; sourceTree = "<group>"; };
 		30FC34C223E914CA007F0080 /* MenuHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuHeaderCell.swift; sourceTree = "<group>"; };
 		30FC34C623E927BE007F0080 /* MenuSettingsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuSettingsCell.swift; sourceTree = "<group>"; };
+		48343FF92465CE570034CF12 /* envelope.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = envelope.png; sourceTree = "<group>"; };
+		48343FFA2465CE570034CF12 /* star.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = star.png; sourceTree = "<group>"; };
+		48343FFB2465CE570034CF12 /* restaurant-membership-card-tool.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "restaurant-membership-card-tool.png"; sourceTree = "<group>"; };
+		48343FFC2465CE580034CF12 /* profile_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = profile_white.png; sourceTree = "<group>"; };
+		48343FFD2465CE580034CF12 /* opened-door-aperture.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "opened-door-aperture.png"; sourceTree = "<group>"; };
 		4C4D88202205F32900AD7090 /* DoubleXP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DoubleXP.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C4D88232205F32900AD7090 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4C4D88252205F32900AD7090 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -987,6 +985,11 @@
 		4CB84C432205F74800183D28 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				48343FF92465CE570034CF12 /* envelope.png */,
+				48343FFD2465CE580034CF12 /* opened-door-aperture.png */,
+				48343FFC2465CE580034CF12 /* profile_white.png */,
+				48343FFB2465CE570034CF12 /* restaurant-membership-card-tool.png */,
+				48343FFA2465CE570034CF12 /* star.png */,
 				308669A824570ED70032C46E /* person-killing-other-with-an-arm_flipped.png */,
 				308669A624570B3D0032C46E /* person-killing-other-with-an-arm (1).png */,
 				308669A424570ACF0032C46E /* face (1).png */,
@@ -1034,13 +1037,8 @@
 				30582415239C8D1D00FDEA7D /* user.png */,
 				305B52022415B3760064B605 /* close_black.png */,
 				30582413239C86B800FDEA7D /* list-interface-symbol.png */,
-				308BD031238ED2450034822B /* restaurant-membership-card-tool.png */,
-				308BD02D238ED0DA0034822B /* envelope.png */,
-				308BD02B238ED0A10034822B /* invitation.png */,
-				301AEF5523886D7100339850 /* star.png */,
 				30B6E1A223ADBD9700B69F00 /* press_start.png */,
 				30B6E1A023ADBD8B00B69F00 /* game_over_PNG15.png */,
-				301AEF4F2388604C00339850 /* opened-door-aperture.png */,
 				30A84DF12381E877007BEAA5 /* plus-symbol-in-a-rounded-black-square.png */,
 				30A84DEF2381E86E007BEAA5 /* icon.png */,
 				30A60D8E2363C91B004B2150 /* group.png */,
@@ -1075,7 +1073,6 @@
 				308E79BD23FF492600197035 /* connection_white.png */,
 				305B52062415C2AF0064B605 /* expand_white.png */,
 				30C4EDAF2267C1890046B615 /* doublexp_white.png */,
-				30A519982409763800DCFC77 /* profile_white.png */,
 				30634D5C24059B1500FEAD40 /* 498852.png */,
 				30634D722407219C00FEAD40 /* unknown_badge.png */,
 				30C4EDB02267C1890046B615 /* team_thumbs_up.png */,
@@ -1309,6 +1306,7 @@
 				30634D732407219C00FEAD40 /* unknown_badge.png in Resources */,
 				30F6FCBC23CC02AD0051813D /* cross.png in Resources */,
 				3080B40623BC089E00638B22 /* check.png in Resources */,
+				48343FFF2465CE580034CF12 /* star.png in Resources */,
 				30F6FCC023CD7F9D0051813D /* open-menu.png in Resources */,
 				305B520124144EAB0064B605 /* close.png in Resources */,
 				305821192454BB6000B76E67 /* basketball-jersey.png in Resources */,
@@ -1316,20 +1314,20 @@
 				3080B3F223B9362C00638B22 /* more.png in Resources */,
 				30781C992428268000C5D886 /* sms (1).png in Resources */,
 				3059E6332432C2CA0052E46F /* notification.png in Resources */,
+				483440022465CE580034CF12 /* opened-door-aperture.png in Resources */,
 				30BD4FF6244E6D1E00822EE6 /* basketball.mov in Resources */,
 				301B4AEA23F649A300A6FE5B /* hqdefault.jpg in Resources */,
 				30F6FCBA23CBFF9D0051813D /* more (1).png in Resources */,
 				308759B42423F8CB002C19CC /* gif.png in Resources */,
-				301AEF5623886D7100339850 /* star.png in Resources */,
 				307CE34F23EA3EA100DCB12A /* information.png in Resources */,
 				30B583E42352A22B00736733 /* point_rights.png in Resources */,
 				4C4D88312205F33200AD7090 /* LaunchScreen.storyboard in Resources */,
 				305B51FD240C9B760064B605 /* edit_white.png in Resources */,
 				3058211524525C8C00B76E67 /* 18th-map.png in Resources */,
 				30A84DF22381E877007BEAA5 /* plus-symbol-in-a-rounded-black-square.png in Resources */,
-				308BD02E238ED0DA0034822B /* envelope.png in Resources */,
 				30A519912409700000DCFC77 /* white_pixelated_heart.png in Resources */,
 				309A38B924500FAB00B4FF35 /* google-logo-png-open-2000.png in Resources */,
+				48343FFE2465CE580034CF12 /* envelope.png in Resources */,
 				3080B40223BBD0C500638B22 /* new.png in Resources */,
 				306793CD2447F0E1005158B2 /* marketers_guide_to_esports.jpg in Resources */,
 				3059E6392433AB840052E46F /* new (2).png in Resources */,
@@ -1362,6 +1360,7 @@
 				304E17F5242FFCE3009BE1C0 /* lf30_editor_JRIPtN.json in Resources */,
 				309A38B7244EA3CD00B4FF35 /* division_new_dark.png in Resources */,
 				308E79BC23FF471D00197035 /* meeting.png in Resources */,
+				483440012465CE580034CF12 /* profile_white.png in Resources */,
 				30A5199D2409774D00DCFC77 /* fix.png in Resources */,
 				30B583CB2347B5E500736733 /* gamespot_icon_ios.png in Resources */,
 				30BD4FEC244CEFF300822EE6 /* facebook-button-png-6.png in Resources */,
@@ -1374,7 +1373,6 @@
 				30781C93242820F100C5D886 /* sms.png in Resources */,
 				30645084245E382700B8B50E /* facebook_logo.png in Resources */,
 				306450722457ACE400B8B50E /* friendship.png in Resources */,
-				30A519992409763800DCFC77 /* profile_white.png in Resources */,
 				308E79C023FF4B2C00197035 /* hashtag.png in Resources */,
 				30F6FCC423CD96620051813D /* dashboard.png in Resources */,
 				305DA86F2400BE94002ED813 /* stop.png in Resources */,
@@ -1414,9 +1412,7 @@
 				301B4AEC23F7462400A6FE5B /* bubble.png in Resources */,
 				305B52032415B3760064B605 /* close_black.png in Resources */,
 				3080B3FC23BBCB1D00638B22 /* comment-black-oval-bubble-shape.png in Resources */,
-				308BD02C238ED0A10034822B /* invitation.png in Resources */,
 				30A60D8F2363C91B004B2150 /* group.png in Resources */,
-				301AEF502388604D00339850 /* opened-door-aperture.png in Resources */,
 				305821132452596000B76E67 /* 15452i09942712B40CE95A.jpg in Resources */,
 				30A51995240975CD00DCFC77 /* profile.png in Resources */,
 				30634D5524055E6900FEAD40 /* tower_dark.png in Resources */,
@@ -1434,7 +1430,6 @@
 				30A60D8D2363C801004B2150 /* like.png in Resources */,
 				3058211D2454CA0900B76E67 /* 1273057-200_white.png in Resources */,
 				30634D5D24059B1500FEAD40 /* 498852.png in Resources */,
-				308BD032238ED2450034822B /* restaurant-membership-card-tool.png in Resources */,
 				3080B40423BC07BE00638B22 /* x-mark.png in Resources */,
 				3059E6352432C2D50052E46F /* notification (1).png in Resources */,
 				308EBA2623FDCCDC00DE186D /* live_menu.png in Resources */,
@@ -1443,6 +1438,7 @@
 				305821112452563C00B76E67 /* JuneteenthKC_PrimaryLogo(Transparent).png in Resources */,
 				3080B3E423B80A5B00638B22 /* request2.png in Resources */,
 				305B520B2415D7490064B605 /* collapse_black.png in Resources */,
+				483440002465CE580034CF12 /* restaurant-membership-card-tool.png in Resources */,
 				306E6B5B23DE49F70069F426 /* live_streaming.png in Resources */,
 				30C4EDB22267C1890046B615 /* double_xp_small_white.png in Resources */,
 				3080B3FA23BBC52400638B22 /* hello.png in Resources */,

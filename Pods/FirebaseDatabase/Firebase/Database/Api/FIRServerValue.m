@@ -15,6 +15,7 @@
  */
 
 #import "FIRServerValue.h"
+#import "FIRDatabaseReference.h"
 
 @implementation FIRServerValue
 
@@ -24,10 +25,6 @@
         timestamp = @{@".sv" : @"timestamp"};
     }
     return timestamp;
-}
-
-+ (NSDictionary *)increment:(NSNumber *)delta {
-    return @{@".sv" : @{@"increment" : delta}};
 }
 
 @end

@@ -286,6 +286,7 @@ class ViewTeams: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate,
               return image
             }
 
+            cell.backgroundImage.image = Utility.Image.placeholder
             cell.backgroundImage.moa.url = game.imageUrl
             cell.backgroundImage.contentMode = .scaleAspectFill
             cell.backgroundImage.clipsToBounds = true
@@ -379,6 +380,7 @@ class ViewTeams: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate,
         //cell.gameBack.contentMode = .scaleAspectFill
         //cell.gameBack.clipsToBounds = true
         
+        cell.underImage.image = Utility.Image.placeholder
         cell.underImage.moa.url = current.imageUrl
         cell.underImage.contentMode = .scaleAspectFill
         cell.underImage.clipsToBounds = true

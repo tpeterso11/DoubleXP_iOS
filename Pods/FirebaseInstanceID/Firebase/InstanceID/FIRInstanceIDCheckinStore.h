@@ -22,6 +22,8 @@
 
 // These values exposed for testing
 extern NSString *const kFIRInstanceIDCheckinKeychainService;
+extern NSString *const kFIRInstanceIDLegacyCheckinKeychainAccount;
+extern NSString *const kFIRInstanceIDLegacyCheckinKeychainService;
 
 /**
  *  Checkin preferences backing store.
@@ -92,5 +94,15 @@ extern NSString *const kFIRInstanceIDCheckinKeychainService;
  *  @return The cached checkin preferences if present else nil.
  */
 - (FIRInstanceIDCheckinPreferences *)cachedCheckinPreferences;
+
+/**
+ * Migrate the checkin item from old service/account to the new one.
+ * The new account is dynamic as it uses bundle ID.
+ * This is to ensure checkin is not shared across apps, but still the same
+ * if app has used GCM before.
+ * This call should only happen once.
+ *
+ */
+- (void)migrateCheckinItemIfNeeded;
 
 @end

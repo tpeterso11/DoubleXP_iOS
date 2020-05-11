@@ -55,9 +55,11 @@ static NSDictionary<NSString *, NSArray<NSString *> *> *_featureMapping;
       @"SuggestedEvents" : @[
           @"FBSDKSuggestedEventsIndexer",
           @"FBSDKFeatureExtractor",
+          @"FBSDKEventInferencer",
       ],
-      @"IntelligentIntegrity" : @[
-          @"FBSDKIntegrityManager",
+      @"PIIFiltering" : @[
+          @"FBSDKAddressFilterManager",
+          @"FBSDKAddressInferencer",
       ],
       @"EventDeactivation" : @[
           @"FBSDKEventDeactivationManager",

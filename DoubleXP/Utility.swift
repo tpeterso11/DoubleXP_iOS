@@ -10,7 +10,9 @@ import Foundation
 import UIKit
 
 class Utility: NSObject{
-    
+    struct Image {
+        static let placeholder = #imageLiteral(resourceName: "newlogo")
+    }
 }
 
 extension UIView {

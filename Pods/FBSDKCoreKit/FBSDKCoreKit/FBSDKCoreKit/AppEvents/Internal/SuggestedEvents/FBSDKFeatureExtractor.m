@@ -83,7 +83,7 @@ void sum(float *val0, float *val1);
   return [[NSString stringWithFormat:@"%@ | %@, %@", appName, screenName, text] lowercaseString];
 }
 
-+ (nullable float *)getDenseFeatures:(NSDictionary *)viewHierarchy
++ (float *)getDenseFeatures:(NSDictionary *)viewHierarchy
 {
   if (!_rules) {
     return nil;

@@ -39,7 +39,6 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol FBSDKMonitorEntry <NSObject, NSCoding, FBSDKDictionaryRepresentable>
 
 + (instancetype)new NS_UNAVAILABLE;
-- (NSString *)name;
 
 @end
 

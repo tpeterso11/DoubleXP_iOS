@@ -23,9 +23,9 @@
 
 @implementation FBSDKMethodUsageMonitor
 
-+ (void)recordMethod:(SEL)method inClass:(Class)clazz
++ (void)record:(SEL)method
 {
-  FBSDKMethodUsageMonitorEntry *entry = [FBSDKMethodUsageMonitorEntry entryFromClass:clazz withMethod:method];
+  FBSDKMethodUsageMonitorEntry *entry = [FBSDKMethodUsageMonitorEntry entryWithMethod:method];
   [FBSDKMonitor record:entry];
 }
 

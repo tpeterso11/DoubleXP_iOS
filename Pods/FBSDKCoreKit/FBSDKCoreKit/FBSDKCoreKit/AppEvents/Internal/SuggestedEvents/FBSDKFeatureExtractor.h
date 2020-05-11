@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)loadRulesForKey:(NSString *)useCaseKey;
 + (NSString *)getTextFeature:(NSString *)text
               withScreenName:(NSString *)screenName;
-+ (nullable float *)getDenseFeatures:(NSDictionary *)viewHierarchy;
++ (float *)getDenseFeatures:(NSDictionary *)viewHierarchy;
 
 @end
 
