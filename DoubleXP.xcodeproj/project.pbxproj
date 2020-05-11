@@ -296,6 +296,11 @@
 		30EBC40023DA8CC7009CFAB2 /* TeamRosterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30EBC3FF23DA8CC7009CFAB2 /* TeamRosterCell.swift */; };
 		30EBC40223DB632E009CFAB2 /* SocialMediaManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30EBC40123DB632E009CFAB2 /* SocialMediaManager.swift */; };
 		30EBC40423DB6E5D009CFAB2 /* TweetObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30EBC40323DB6E5D009CFAB2 /* TweetObject.swift */; };
+		30F0977E2462358E00D94C2F /* star.png in Resources */ = {isa = PBXBuildFile; fileRef = 30F0977D2462358D00D94C2F /* star.png */; };
+		30F097802462362B00D94C2F /* opened-door-aperture.png in Resources */ = {isa = PBXBuildFile; fileRef = 30F0977F2462362B00D94C2F /* opened-door-aperture.png */; };
+		30F097822462371000D94C2F /* profile_white.png in Resources */ = {isa = PBXBuildFile; fileRef = 30F097812462371000D94C2F /* profile_white.png */; };
+		30F097842462374D00D94C2F /* invitation.png in Resources */ = {isa = PBXBuildFile; fileRef = 30F097832462374D00D94C2F /* invitation.png */; };
+		30F097862462380F00D94C2F /* envelope.png in Resources */ = {isa = PBXBuildFile; fileRef = 30F097852462380F00D94C2F /* envelope.png */; };
 		30F6FCB423C58F580051813D /* show-more-button-with-three-dots.png in Resources */ = {isa = PBXBuildFile; fileRef = 30F6FCB323C58F570051813D /* show-more-button-with-three-dots.png */; };
 		30F6FCB623CBF65B0051813D /* RequestsFoldingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6FCB523CBF65B0051813D /* RequestsFoldingCell.swift */; };
 		30F6FCB823CBFC000051813D /* user (1).png in Resources */ = {isa = PBXBuildFile; fileRef = 30F6FCB723CBFC000051813D /* user (1).png */; };
@@ -657,6 +662,11 @@
 		30EBC3FF23DA8CC7009CFAB2 /* TeamRosterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamRosterCell.swift; sourceTree = "<group>"; };
 		30EBC40123DB632E009CFAB2 /* SocialMediaManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialMediaManager.swift; sourceTree = "<group>"; };
 		30EBC40323DB6E5D009CFAB2 /* TweetObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TweetObject.swift; sourceTree = "<group>"; };
+		30F0977D2462358D00D94C2F /* star.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = star.png; sourceTree = "<group>"; };
+		30F0977F2462362B00D94C2F /* opened-door-aperture.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "opened-door-aperture.png"; sourceTree = "<group>"; };
+		30F097812462371000D94C2F /* profile_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = profile_white.png; path = ../../../profile_white.png; sourceTree = "<group>"; };
+		30F097832462374D00D94C2F /* invitation.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = invitation.png; sourceTree = "<group>"; };
+		30F097852462380F00D94C2F /* envelope.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = envelope.png; sourceTree = "<group>"; };
 		30F6FCB323C58F570051813D /* show-more-button-with-three-dots.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "show-more-button-with-three-dots.png"; sourceTree = "<group>"; };
 		30F6FCB523CBF65B0051813D /* RequestsFoldingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestsFoldingCell.swift; sourceTree = "<group>"; };
 		30F6FCB723CBFC000051813D /* user (1).png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "user (1).png"; sourceTree = "<group>"; };
@@ -1027,13 +1037,16 @@
 				3080B3E523B80BE400638B22 /* request_highlight.png */,
 				3080B3E323B80A5A00638B22 /* request2.png */,
 				3071171023E1014A005F6355 /* 580b57fcd9996e24bc43c540.png */,
+				30F0977F2462362B00D94C2F /* opened-door-aperture.png */,
 				3080B3E123B7FAA600638B22 /* request.png */,
 				3059F027241D83300090380B /* twitch_white.png */,
 				308ED71F242C38D00070DCEA /* tower_grey.png */,
 				30634D5324055E6900FEAD40 /* tower_dark.png */,
 				30634D5224055E6900FEAD40 /* tower_white.png */,
 				309F3A1223B40CA900FD0C48 /* left-arrow.png */,
+				30F097852462380F00D94C2F /* envelope.png */,
 				30B6E18E23A6EEA700B69F00 /* question.png */,
+				30F097832462374D00D94C2F /* invitation.png */,
 				30582415239C8D1D00FDEA7D /* user.png */,
 				305B52022415B3760064B605 /* close_black.png */,
 				30582413239C86B800FDEA7D /* list-interface-symbol.png */,
@@ -1041,6 +1054,7 @@
 				30B6E1A023ADBD8B00B69F00 /* game_over_PNG15.png */,
 				30A84DF12381E877007BEAA5 /* plus-symbol-in-a-rounded-black-square.png */,
 				30A84DEF2381E86E007BEAA5 /* icon.png */,
+				30F0977D2462358D00D94C2F /* star.png */,
 				30A60D8E2363C91B004B2150 /* group.png */,
 				30F6FCC123CD948D0051813D /* cancel-mark.png */,
 				307CE34E23EA3EA100DCB12A /* information.png */,
@@ -1060,6 +1074,7 @@
 				30C4EDAE2267C1890046B615 /* double_xp_small_white.png */,
 				308EBA2323FDCC4200DE186D /* connection.png */,
 				301B4AEB23F7462300A6FE5B /* bubble.png */,
+				30F097812462371000D94C2F /* profile_white.png */,
 				30634D662406067B00FEAD40 /* hodges_badge.png */,
 				308EBA2523FDCCDB00DE186D /* live_menu.png */,
 				307CE34C23EA2B5000DCB12A /* message.png */,
@@ -1303,6 +1318,7 @@
 				305B520D2415D76F0064B605 /* expand_black.png in Resources */,
 				30781C972428261D00C5D886 /* email (1).png in Resources */,
 				30C4EDB32267C1890046B615 /* doublexp_white.png in Resources */,
+				30F097862462380F00D94C2F /* envelope.png in Resources */,
 				30634D732407219C00FEAD40 /* unknown_badge.png in Resources */,
 				30F6FCBC23CC02AD0051813D /* cross.png in Resources */,
 				3080B40623BC089E00638B22 /* check.png in Resources */,
@@ -1316,6 +1332,7 @@
 				3059E6332432C2CA0052E46F /* notification.png in Resources */,
 				483440022465CE580034CF12 /* opened-door-aperture.png in Resources */,
 				30BD4FF6244E6D1E00822EE6 /* basketball.mov in Resources */,
+				30F097802462362B00D94C2F /* opened-door-aperture.png in Resources */,
 				301B4AEA23F649A300A6FE5B /* hqdefault.jpg in Resources */,
 				30F6FCBA23CBFF9D0051813D /* more (1).png in Resources */,
 				308759B42423F8CB002C19CC /* gif.png in Resources */,
@@ -1336,6 +1353,7 @@
 				3059E62F2432BFF80052E46F /* cogs (1).png in Resources */,
 				3080B3E823B81B5B00638B22 /* messaging_button.png in Resources */,
 				304E17F7243000DC009BE1C0 /* lf30_editor_HxosFZ.json in Resources */,
+				30F0977E2462358E00D94C2F /* star.png in Resources */,
 				306793D3244B3733005158B2 /* game-controller (1).png in Resources */,
 				309A38B5244EA15000B4FF35 /* division_new_logo.png in Resources */,
 				3080B3F023B92A5900638B22 /* Rainbow_Six_Siege.jpg in Resources */,
@@ -1344,6 +1362,7 @@
 				308E79BE23FF492600197035 /* connection_white.png in Resources */,
 				304E17FB2430E13F009BE1C0 /* peace.png in Resources */,
 				3080B3E623B80BE400638B22 /* request_highlight.png in Resources */,
+				30F097842462374D00D94C2F /* invitation.png in Resources */,
 				30634D672406067C00FEAD40 /* hodges_badge.png in Resources */,
 				3058198223D27152008684A7 /* observation.png in Resources */,
 				305B52092415D72E0064B605 /* collapse_white.png in Resources */,
@@ -1425,6 +1444,7 @@
 				30B6E1A323ADBD9700B69F00 /* press_start.png in Resources */,
 				30582414239C86B800FDEA7D /* list-interface-symbol.png in Resources */,
 				306450742457ACF400B8B50E /* friendship (1).png in Resources */,
+				30F097822462371000D94C2F /* profile_white.png in Resources */,
 				3064507A245DF62800B8B50E /* new_logo2_light.png in Resources */,
 				30A84DF02381E86E007BEAA5 /* icon.png in Resources */,
 				30A60D8D2363C801004B2150 /* like.png in Resources */,
