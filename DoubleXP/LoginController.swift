@@ -9,8 +9,7 @@
 import UIKit
 import Firebase
 import UnderLineTextField
-import FBSDKCoreKit
-import FacebookLogin
+import FBSDKLoginKit
 import GoogleSignIn
 import PopupDialog
 import SwiftDate
@@ -31,10 +30,8 @@ class LoginController: UIViewController, GIDSignInDelegate {
     var socialRegisteredUid = ""
     var selectedSocial = ""
     
-    func loginManagerDidComplete(_ result: LoginResult) {
-        let alertController: UIAlertController
-        switch result {
-        case .cancelled:
+    func loginManagerDidComplete(_ result: LoginManagerLoginResult?, _ error: Error?) {
+        if let result = result, result.isCancelled {
             hideWork()
             
             AppEvents.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login Canceled"))
@@ -59,60 +56,57 @@ class LoginController: UIViewController, GIDSignInDelegate {
 
             // Present dialog
             self.present(popup, animated: true, completion: nil)
-        case .failed(let error):
-            hideWork()
-            
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login Fail - " + error.localizedDescription))
-            
-            var buttons = [PopupDialogButton]()
-            let title = "facebook login error."
-            let message = "there was an error getting you logged into facebook. try again, or try registering using your email."
-            
-            let button = DefaultButton(title: "try again.") { [weak self] in
-                self?.loginWithReadPermissions()
+        } else {
+            if let tokenString = result?.token?.tokenString {
+                let credential = FacebookAuthProvider.credential(withAccessToken: tokenString)
+                    Auth.auth().signIn(with: credential) { (authResult, error) in
+                    if let error = error {
+                        let authError = error as NSError
+                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Fail Firebase - " + authError.localizedDescription))
+                    }
+                    else{
+                        if(authResult != nil){
+                            let uId = authResult?.user.uid ?? ""
+                            self.downloadDBRef(uid: uId)
+                        }
+                        else{
+                            self.performSegue(withIdentifier: "register", sender: nil)
+                        }
+                    }
+                }
+            } else {
+                hideWork()
                 
-            }
-            buttons.append(button)
-            
-            let buttonOne = CancelButton(title: "nevermind") { [weak self] in
-                self?.hideWork()
-            }
-            buttons.append(buttonOne)
-            
-            let popup = PopupDialog(title: title, message: message)
-            popup.addButtons(buttons)
-
-            // Present dialog
-            self.present(popup, animated: true, completion: nil)
-            
-
-        case .success(_, _, let token):
-            let credential = FacebookAuthProvider.credential(withAccessToken: token.tokenString)
-            Auth.auth().signIn(with: credential) { (authResult, error) in
-            if let error = error {
-                let authError = error as NSError
-                AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Fail Firebase - " + authError.localizedDescription))
-            }
-            else{
-                if(authResult != nil){
-                    let uId = authResult?.user.uid ?? ""
-                    self.downloadDBRef(uid: uId)
+                AppEvents.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login Fail - " + "\(error?.localizedDescription ?? "")"))
+                
+                var buttons = [PopupDialogButton]()
+                let title = "facebook login error."
+                let message = "there was an error getting you logged into facebook. try again, or try registering using your email."
+                
+                let button = DefaultButton(title: "try again.") { [weak self] in
+                    self?.loginWithReadPermissions()
+                    
                 }
-                else{
-                    self.performSegue(withIdentifier: "register", sender: nil)
+                buttons.append(button)
+                
+                let buttonOne = CancelButton(title: "nevermind") { [weak self] in
+                    self?.hideWork()
                 }
-            }
+                buttons.append(buttonOne)
+                
+                let popup = PopupDialog(title: title, message: message)
+                popup.addButtons(buttons)
+
+                // Present dialog
+                self.present(popup, animated: true, completion: nil)
             }
         }
     }
 
     @IBAction private func loginWithReadPermissions() {
         let loginManager = LoginManager()
-        loginManager.logIn(
-            permissions: [.publicProfile, .email],
-            viewController: self
-        ) { result in
-            self.loginManagerDidComplete(result)
+        loginManager.logIn(permissions: ["public_profile", "email"], from: self) { [weak self] (result, error) in
+            self?.loginManagerDidComplete(result, error)
         }
     }
 

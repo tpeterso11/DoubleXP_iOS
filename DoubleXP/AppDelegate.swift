@@ -9,7 +9,6 @@
 import UIKit
 import CoreData
 import Firebase
-import TwitterKit
 import FBSDKCoreKit
 import GoogleSignIn
 
@@ -45,8 +44,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         
         Messaging.messaging().delegate = self
         
-        
-        TWTRTwitter.sharedInstance().start(withConsumerKey: "sEWJZFZjZAIaxwZUrzdd2JPeI", consumerSecret: "K2yk5yy8AHmyC4mMFHecB1WBoowFnf4uMs4ET7zEjFe06hWmCm")
+        TwitterHelper.shared.start(withConsumerKey: "sEWJZFZjZAIaxwZUrzdd2JPeI", consumerSecret: "K2yk5yy8AHmyC4mMFHecB1WBoowFnf4uMs4ET7zEjFe06hWmCm")
         
         if #available(iOS 10.0, *) {
           // For iOS 10 display notification (sent via APNS)

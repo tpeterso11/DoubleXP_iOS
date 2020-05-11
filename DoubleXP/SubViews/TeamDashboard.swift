@@ -10,7 +10,6 @@ import UIKit
 import Firebase
 import moa
 import MSPeekCollectionViewDelegateImplementation
-import TwitterKit
 import SwiftTwitch
 import WebKit
 
@@ -237,6 +236,7 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
                     let str = currentStream.thumbnail
                     let replaced = str.replacingOccurrences(of: "{width}x{height}", with: "800x500")
                     
+                    cell.previewImage.image = Utility.Image.placeholder
                     cell.previewImage.moa.url = replaced
                     cell.previewImage.contentMode = .scaleAspectFill
                     cell.previewImage.clipsToBounds = true

@@ -9,7 +9,6 @@
 import UIKit
 import SwiftHTTP
 import Firebase
-import TwitterKit
 import SwiftTwitch
 import Marshal
 import SwiftDate

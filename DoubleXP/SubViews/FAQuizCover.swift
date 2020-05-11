@@ -98,6 +98,7 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
     }
     
     private func setImage(){
+        gameImage.image = Utility.Image.placeholder
         gameImage.moa.url = gcGame?.imageUrl
         gameImage.contentMode = .scaleAspectFill
         gameImage.clipsToBounds = true

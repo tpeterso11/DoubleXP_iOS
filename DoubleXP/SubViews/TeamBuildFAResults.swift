@@ -261,6 +261,7 @@ class TeamBuildFAResults: ParentVC, UITableViewDelegate, UITableViewDataSource, 
             cell.quizButton.tag = indexPath.item
             cell.inviteButton.tag = indexPath.item
             
+            cell.gameBack.image = Utility.Image.placeholder
             cell.gameBack.moa.url = currentGame?.imageUrl
             cell.gameBack.contentMode = .scaleAspectFill
             cell.gameBack.clipsToBounds = true

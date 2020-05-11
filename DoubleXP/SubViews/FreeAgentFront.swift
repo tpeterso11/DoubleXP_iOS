@@ -59,6 +59,7 @@ class FreeAgentFront: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! homeGCCell
         
         let game = games[indexPath.item]
+        cell.backgroundImage.image = Utility.Image.placeholder
         cell.backgroundImage.moa.url = game.imageUrl
         cell.backgroundImage.contentMode = .scaleAspectFill
         cell.backgroundImage.clipsToBounds = true

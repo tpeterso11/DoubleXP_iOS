@@ -337,6 +337,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                 
                 let str = current.thumbnail
                 let replaced = str.replacingOccurrences(of: "{width}x{height}", with: "800x500")
+                cell.contentImage.image = Utility.Image.placeholder
                 cell.contentImage.moa.url = replaced
                 cell.contentImage.contentMode = .scaleAspectFill
                 cell.contentImage.clipsToBounds = true
@@ -400,6 +401,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                 let str = (current as! TwitchChannelObj).imageUrlIOS
                 let replaced = str.replacingOccurrences(of: "{width}x{height}", with: "800x500")
                 
+                cell.image.image = Utility.Image.placeholder
                 cell.image.moa.url = replaced
                 cell.image.contentMode = .scaleAspectFill
                 cell.image.clipsToBounds = true

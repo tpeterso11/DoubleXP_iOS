@@ -16,15 +16,13 @@ target 'DoubleXP' do
   pod 'SendBirdSDK'
   pod 'FoldingCell'
   pod 'lottie-ios'
-  pod 'TwitterKit'
   pod 'SwiftTwitch'
   pod 'ExpyTableView'
   pod 'PINRemoteImage'
   pod 'AIFlatSwitch'
   pod 'SwiftRichString'
   pod 'PopupDialog'
-  pod 'FacebookCore'
-  pod 'FacebookLogin'
+  pod 'FBSDKLoginKit'
   pod 'ValidationComponents'
   pod 'UnderLineTextField'
   pod 'SwiftyGif'
@@ -32,7 +30,8 @@ target 'DoubleXP' do
   pod 'VideoBackground'
   pod 'GoogleSignIn'
   pod 'SwiftDate'
-
+  pod 'Swifter', :git => 'https://github.com/mattdonnelly/Swifter.git'
+  
   # Pods for DoubleXP
 
   target 'DoubleXPTests' do

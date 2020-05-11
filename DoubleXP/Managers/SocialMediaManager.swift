@@ -9,7 +9,6 @@
 import Foundation
 import UIKit
 import SwiftTwitch
-import TwitterKit
 
 class SocialMediaManager{
     var token = "053ae1qjehp1xi4oo05gxkkow6otoc"
@@ -77,42 +76,37 @@ class SocialMediaManager{
     
     func loadTweets(team: TeamObject, gcGame: GamerConnectGame, callbacks: SocialMediaManagerCallback){
         var tweets = [TweetObject]()
-        let parameters = ["screen_name": gcGame.twitterHandle, "count": "10", "include_entities": "true"]
-        var error : NSError?
-        let req = TWTRAPIClient().urlRequest(withMethod: "GET", urlString: "https://api.twitter.com/1.1/statuses/user_timeline.json", parameters: parameters, error: &error)
-        TWTRAPIClient().sendTwitterRequest(req, completion: { (response, data, error) in
-            do {
-                let response = try JSONSerialization.jsonObject(with: data!, options: .allowFragments) as? [[String : Any]]
-                if response != nil {
-                    print((response! as NSArray).debugDescription)
-                    for tweet in response!{
-                        var tweetText = ""
-                        var handle = ""
-                   
-                        for array in tweet{
-                            if(array.key == "text" && tweetText.isEmpty){
-                                tweetText = array.value as! String
+        TwitterHelper.shared.getTimeline(screenName: gcGame.twitterHandle) { (json) in
+            if let tweetJSONs = json?.array {
+                for tweetJSON in tweetJSONs {
+                var tweetText = ""
+                var handle = ""
+
+                let tweetObject = tweetJSON.object ?? [:]
+                    for array in tweetObject {
+                        if (array.key == "text" && tweetText.isEmpty) {
+                            tweetText = array.value.string!
                         }
-                       
-                        if(array.key == "user" && handle.isEmpty){
-                            let payload = array.value as! [String: Any]
-                            for pair in payload{
+
+                        if (array.key == "user" && handle.isEmpty) {
+                            let payloadObject = array.value.object!
+                            for pair in payloadObject {
                                 if (pair.key == "name") {
-                                    handle = "@" + (pair.value as! String)
+                                    handle = "@" + (pair.value.string!)
                                 }
                             }
                         }
                     }
+
                     let tweet = TweetObject(handle: handle, tweet: tweetText)
                     tweets.append(tweet)
                 }
-                    callbacks.onTweetsLoaded(tweets: tweets)
+                
+                callbacks.onTweetsLoaded(tweets: tweets)
+            } else {
+                callbacks.onTweetsLoaded(tweets: [])
             }
-         }
-         catch {
-           print(error.localizedDescription)
-         }
-       })
+        }
     }
     
     
