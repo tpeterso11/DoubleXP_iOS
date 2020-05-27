@@ -489,8 +489,10 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                 self.articles = [Any]()
                                 
-                                let manager = SocialMediaManager()
-                                manager.getTopGames(callbacks: self)
+                                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                                let manager = appDelegate.socialMediaManager
+                                manager.getTwitchGames(callbacks: self)
+                                //manager.getTopGames(callbacks: self)
                             }
                         })
                     break;
@@ -906,8 +908,9 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         UIView.animate(withDuration: 0.8, animations: {
             self.channelLoading.alpha = 1
         }, completion: { (finished: Bool) in
-            let manager = SocialMediaManager()
-            manager.getChannelTopStreams(currentChannel: self.selectedChannel, callbacks: self)
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let manager = appDelegate.socialMediaManager
+            manager.loadTwitchStreams2DotOhChannel(currentChannel: self.selectedChannel, callbacks: self)
         })
     }
     
@@ -921,7 +924,8 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         UIView.animate(withDuration: 0.8, animations: {
             self.channelLoading.alpha = 1
         }, completion: { (finished: Bool) in
-            let manager = SocialMediaManager()
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let manager = appDelegate.socialMediaManager
             manager.getChannelTopVideos(currentChannel: self.selectedChannel, callbacks: self)
         })
     }
@@ -1092,14 +1096,14 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     }
     
     func onStreamsLoaded(streams: [TwitchStreamObject]) {
-        if(self.channelRefreshControl.isRefreshing){
-            self.channelRefreshControl.endRefreshing()
-        }
-        
-        self.streams = [TwitchStreamObject]()
-        self.streams.append(contentsOf: streams)
-        
         DispatchQueue.main.async {
+            if(self.channelRefreshControl.isRefreshing){
+                self.channelRefreshControl.endRefreshing()
+            }
+            
+            self.streams = [TwitchStreamObject]()
+            self.streams.append(contentsOf: streams)
+        
             if(!self.streamsSet){
                 self.channelCollection.collectionViewLayout = UICollectionViewFlowLayout()
                 self.channelCollection.dataSource = self

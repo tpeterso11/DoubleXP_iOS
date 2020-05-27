@@ -359,9 +359,9 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
                         
                         //if the returned user plays the game being searched AND the returned users gamertag
                         //does not equal the current users gamertag, then add to list.
-                        
-                        if(returnedUser.games.contains(self.game!.gameName) && self.currentUser.uId != returnedUser.uId){
-                            
+                        let manager = FriendsManager()
+                        if(returnedUser.games.contains(self.game!.gameName) && self.currentUser.uId != returnedUser.uId &&
+                            !manager.isInFriendList(user: returnedUser, currentUser: self.currentUser)){
                             if(self.searchPS && returnedUser.ps){
                                 self.addUserToList(returnedUser: returnedUser)
                             }
@@ -382,7 +382,6 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
                                 }
                             }
                         }
-                        
                     }
                     else if(userName != nil){
                         let trimmedUser = userName!.trimmingCharacters(in: .whitespacesAndNewlines)

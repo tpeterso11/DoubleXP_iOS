@@ -36,7 +36,7 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
         
         let todaysDate:NSDate = NSDate()
         let dateFormatter:DateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMMM.dd.yyyy"
+        dateFormatter.dateFormat = "MMM d, yyyy"
         let todayString:String = dateFormatter.string(from: todaysDate as Date)
         
         currentDate.text = todayString

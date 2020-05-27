@@ -450,7 +450,7 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
     func messageSuccessfullyReceived(message: SBDUserMessage) {
         let date = NSDate(timeIntervalSince1970: TimeInterval(message.createdAt))
                    let formatter = DateFormatter()
-                   formatter.dateFormat = "MMMM.dd.yyyy"
+                   formatter.dateFormat = "MM-dd-yyyy"
                    let result = formatter.string(from: date as Date)
         
         let chatMessage = ChatMessage(message: message.message!, timeStamp: result)
@@ -700,7 +700,7 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
     func messageTextSubmitted(string: String, list: [String]?) {
         let date = Date()
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMMM.dd.yyyy"
+        formatter.dateFormat = "MM-dd-yyyy"
         let result = formatter.string(from: date)
         
         let message = ChatMessage(message: string, timeStamp: result)

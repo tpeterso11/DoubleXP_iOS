@@ -14,15 +14,33 @@ class FriendsManager{
     func isInFriendList(user: User, currentUser: User) -> Bool{
         var contained = false
         
-        var otherUserTags = [String]()
-        for tag in user.gamerTags{
-            otherUserTags.append(tag.gamerTag)
+        for friend in currentUser.friends{
+            if(friend.uid == user.uId){
+                contained = true
+            }
         }
         
-        for friend in currentUser.friends{
-            if(otherUserTags.contains(friend.gamerTag)){
+        return contained
+    }
+    
+    func isPendingRequest(user: User, currentUser: User) -> Bool{
+        var contained = false
+        
+        for friend in currentUser.pendingRequests {
+            if(friend.uid == user.uId){
                 contained = true
-                break
+            }
+        }
+        
+        return contained
+    }
+    
+    func isSentRequest(user: User, currentUser: User) -> Bool{
+        var contained = false
+        
+        for friend in currentUser.sentRequests {
+            if(friend.uid == user.uId){
+                contained = true
             }
         }
         
@@ -988,7 +1006,18 @@ class FriendsManager{
                     }
                 }
                 
-                ref.child("tempRivals").setValue(tempRivals)
+                var sendArray = [[String: String]]()
+                for rival in tempRivals{
+                    var newMap = [String: String]()
+                    newMap["gamerTag"] = rival.gamerTag
+                    newMap["game"] = rival.game
+                    newMap["uid"] = rival.uid
+                    newMap["type"] = rival.type
+                    newMap["date"] = rival.date
+                    
+                    sendArray.append(newMap)
+                }
+                ref.child("tempRivals").setValue(sendArray)
                 
                 var rivals = [RivalObj]()
                 if(snapshot.hasChild("acceptedTempRivals")){
@@ -1077,8 +1106,19 @@ class FriendsManager{
                         tempRivals.remove(at: tempRivals.index(of: tempRival)!)
                     }
                 }
-            
-                ref.child("tempRivals").setValue(tempRivals)
+                
+                var sendArray = [[String: String]]()
+                for rival in tempRivals{
+                    var newMap = [String: String]()
+                    newMap["gamerTag"] = rival.gamerTag
+                    newMap["game"] = rival.game
+                    newMap["uid"] = rival.uid
+                    newMap["type"] = rival.type
+                    newMap["date"] = rival.date
+                    
+                    sendArray.append(newMap)
+                }
+                ref.child("tempRivals").setValue(sendArray)
                 
                 let newRival = RivalObj(gamerTag: tag, date: rival.date, game: rival.game, uid: currentUser!.uId, type: rival.type)
                 rivals.append(newRival)
@@ -1101,13 +1141,12 @@ class FriendsManager{
     }
     
     private func updateAcceptRejectCurrentUser(position: IndexPath, rival: RivalObj, callbacks: RequestsUpdate, accepted: Bool){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser!
         
-        let ref = Database.database().reference().child("Users").child(rival.uid)
+        let ref = Database.database().reference().child("Users").child(currentUser.uId)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             if(snapshot.exists()){
-                let delegate = UIApplication.shared.delegate as! AppDelegate
-                let currentUser = delegate.currentUser
-                
                 var currentTempRivals = [RivalObj]()
                 if(snapshot.hasChild("currentTempRivals")){
                     let pendingArray = snapshot.childSnapshot(forPath: "currentTempRivals")
@@ -1130,8 +1169,19 @@ class FriendsManager{
                         currentTempRivals.remove(at: currentTempRivals.index(of: tempRival)!)
                     }
                 }
-            
-                ref.child("currentTempRivals").setValue(currentTempRivals)
+                
+                var sendArray = [[String: String]]()
+                for rival in currentTempRivals{
+                    var newMap = [String: String]()
+                    newMap["gamerTag"] = rival.gamerTag
+                    newMap["game"] = rival.game
+                    newMap["uid"] = rival.uid
+                    newMap["type"] = rival.type
+                    newMap["date"] = rival.date
+                    
+                    sendArray.append(newMap)
+                }
+                ref.child("currentTempRivals").setValue(sendArray)
                 
                 
                 var tempRivals = [RivalObj]()

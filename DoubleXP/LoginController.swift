@@ -176,11 +176,15 @@ class LoginController: UIViewController, GIDSignInDelegate {
                     }
                     
                     let alertController = UIAlertController(title: "login error", message: message, preferredStyle: .alert)
-                    alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                    alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: self.dismissedAlert(alert:)))
                     self.display(alertController: alertController)
                 }
             }
         }
+    }
+    
+    func dismissedAlert(alert: UIAlertAction!) {
+        hideWork()
     }
     
     @objc func facebookLoginClicked(_ sender: AnyObject?) {
@@ -243,6 +247,15 @@ class LoginController: UIViewController, GIDSignInDelegate {
                 let search = value?["search"] as? String ?? ""
                 if(search.isEmpty){
                     ref.child("search").setValue("true")
+                }
+                
+                let twitchToken = value?["twitchAppToken"] as? String ?? ""
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                let manager = delegate.socialMediaManager
+                if(twitchToken.isEmpty){
+                    manager.getTwitchAppToken(token: nil, uid: uid)
+                } else {
+                    manager.getTwitchAppToken(token: twitchToken, uid: uid)
                 }
                 
                 let notifications = value?["notifications"] as? String ?? ""
@@ -536,14 +549,17 @@ class LoginController: UIViewController, GIDSignInDelegate {
                                 let formatter = DateFormatter()
                                 formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
                                 formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                                let future = formatter.string(from: now as Date)
-                                let dbFuture = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                                let future = formatter.string(from: dbDate as Date)
+                                let dbTimeOut = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
                                 
-                                let validRival = dbDate.compareCloseTo(dbFuture, precision: 10.minutes.timeInterval)
+                                let validRival = (now as Date).compare(.isEarlier(than: dbTimeOut))
                                 
-                                if(dbFuture != nil){
+                                if(dbTimeOut != nil){
                                     if(validRival){
                                         rivals.append(request)
+                                    }
+                                    else{
+                                        ref.child("tempRivals").child(currentObj.key).removeValue()
                                     }
                                 }
                             }
@@ -573,14 +589,17 @@ class LoginController: UIViewController, GIDSignInDelegate {
                                 let formatter = DateFormatter()
                                 formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
                                 formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                                let future = formatter.string(from: now as Date)
-                                let dbFuture = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                                let future = formatter.string(from: dbDate as Date)
+                                let dbTimeOut = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
                                 
-                                let validRival = dbDate.compareCloseTo(dbFuture, precision: 10.minutes.timeInterval)
+                                let validRival = (now as Date).compare(.isEarlier(than: dbTimeOut))
                                 
-                                if(dbFuture != nil){
+                                if(dbTimeOut != nil){
                                     if(validRival){
                                         tempRivals.append(request)
+                                    }
+                                    else{
+                                        ref.child("tempRivals").child(currentObj.key).removeValue()
                                     }
                                 }
                             }

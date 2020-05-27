@@ -26,6 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var currentFrag: String = ""
     var interviewManager = InterviewManager()
     var mediaManager = MediaManager()
+    var socialMediaManager = SocialMediaManager()
     var navStack = KeepOrderDictionary<String, ParentVC>() //pageNames
     var mediaCache = MediaCache()
     var twitchChannels = [TwitchChannelObj]()

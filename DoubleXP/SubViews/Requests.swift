@@ -112,12 +112,12 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
             if(dbDate != nil){
                 let now = NSDate()
                 let formatter = DateFormatter()
-                formatter.dateFormat="yyyy.MM.dd hh:mm aaa"
+                formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
                 formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
                 let future = formatter.string(from: now as Date)
                 let dbFuture = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
                 
-                let validRival = dbDate.compare(.isEarlier(than: dbFuture))
+                let validRival = !dbDate.compare(.isEarlier(than: dbFuture))
                 
                 if(dbFuture != nil){
                     if(!validRival){
@@ -154,7 +154,7 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
     
     func stringToDate(_ str: String)->Date{
         let formatter = DateFormatter()
-        formatter.dateFormat="yyyy.MM.dd hh:mm aaa"
+        formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
         formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
         return formatter.date(from: str)!
     }

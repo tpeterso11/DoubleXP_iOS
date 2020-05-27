@@ -72,6 +72,8 @@ class CompetitionFrag: ParentVC, UITextFieldDelegate {
         grandPrize.text = competition.topPrize
         
         AppEvents.logEvent(AppEvents.Name(rawValue: "Competition " + competition.competitionId + " viewed"))
+        addEmergencyLiveRef()
+        addEmergencyRegOverRef()
         figureRegistered()
         fixUI()
     }
@@ -305,6 +307,79 @@ class CompetitionFrag: ParentVC, UITextFieldDelegate {
                 self.actionButton.isHidden = true
             }
         }
+        
+        if(competition.emergencyShowRegistrationOver == "true" && competition.emergencyShowLiveStream != "true"){
+            forceShowNotify()
+        } else if(competition.emergencyShowLiveStream == "true"){
+            showLive()
+        }
+    }
+    
+    private func forceShowNotify(){
+        self.actionTag.alpha = 0
+        self.notifyView.alpha = 1
+        self.streamAnimation.isHidden = true
+        self.countdownLabel.isHidden = true
+        self.actionTag.text = ""
+        
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser!
+        
+        if(currentUser.subscriptions.contains(competition.subscriptionId)){
+            self.notifyMe.setSelected(true, animated: false)
+        }
+        else{
+            self.notifyMe.setSelected(false, animated: false)
+        }
+        
+        self.notifyMe.addTarget(self, action: #selector(notifySwitchChanged), for: UIControl.Event.valueChanged)
+        
+        
+        self.actionButton.backgroundColor = UIColor(named: "darkOpacity")
+    }
+    
+    private func showLive(){
+        self.notifyView.alpha = 0
+        self.actionTag.alpha = 1
+        
+        self.countdownLabel.text = ""
+        self.actionTag.text = "stream it live"
+        self.showCompLive = true
+        
+        self.countdownLabel.isHidden = true
+        self.streamAnimation.isHidden = false
+        self.streamAnimation.loopMode = .playOnce
+        self.streamAnimation.play()
+        
+        self.actionButton.backgroundColor = UIColor(named: "greenToDarker")
+        
+        let actionTap = UITapGestureRecognizer(target: self, action: #selector(actionClicked))
+        self.actionButton.isUserInteractionEnabled = true
+        self.actionButton.addGestureRecognizer(actionTap)
+    }
+    
+    private func addEmergencyLiveRef(){
+        let newFriendRef = Database.database().reference().child("Competitions").child(competition.competitionId).child("emergencyShowLiveStream")
+        newFriendRef.observe(.value, with: { (snapshot) in
+            if(snapshot.value as? String == "true"){
+                self.showLive()
+                
+                self.competition.emergencyShowRegistrationOver = "false"
+                self.competition.emergencyShowLiveStream = "true"
+            }
+        })
+    }
+    
+    private func addEmergencyRegOverRef(){
+        let newFriendRef = Database.database().reference().child("Competitions").child(competition.competitionId).child("emergencyShowRegistrationOver")
+        newFriendRef.observe(.value, with: { (snapshot) in
+            if(snapshot.value as? String == "true"){
+                self.forceShowNotify()
+                
+                self.competition.emergencyShowRegistrationOver = "true"
+                self.competition.emergencyShowLiveStream = "false"
+            }
+        })
     }
     
     @objc func actionClicked(_ sender: AnyObject?) {

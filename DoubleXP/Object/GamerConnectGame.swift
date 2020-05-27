@@ -21,6 +21,16 @@ class GamerConnectGame: NSObject, NSCoding {
         }
     }
     
+    var _twitchGameId:String = ""
+    var twitchGameId:String {
+        get {
+            return (_twitchGameId)
+        }
+        set (newVal) {
+            _twitchGameId = newVal
+        }
+    }
+    
     var _gameName:String? = nil
     var gameName:String {
         get {
@@ -158,6 +168,7 @@ class GamerConnectGame: NSObject, NSCoding {
         self.gameModes = (decoder.decodeObject(forKey: "gameModes") as! [String])
         self.twitterHandle = (decoder.decodeObject(forKey: "twitterHandle") as! String)
         self.twitchHandle = (decoder.decodeObject(forKey: "twitchHandle") as! String)
+        self.twitchGameId = (decoder.decodeObject(forKey: "twitchGameId") as! String)
     }
     
     func encode(with coder: NSCoder) {
@@ -171,5 +182,6 @@ class GamerConnectGame: NSObject, NSCoding {
         coder.encode(self.gameModes, forKey: "gameModes")
         coder.encode(self.twitterHandle, forKey: "twitterHandle")
         coder.encode(self.twitchHandle, forKey: "twitchHandle")
+        coder.encode(self.twitchGameId, forKey: "twitchGameId")
     }
 }

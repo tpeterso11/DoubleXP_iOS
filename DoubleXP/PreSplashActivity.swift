@@ -112,6 +112,8 @@ class PreSplashActivity: UIViewController {
                         appDelegate.appProperties = appProps
                     }
                     self.destroyCache()
+                   
+                    //self.getTwitchAppToken()
                     self.loadGCGames()
                 }
             }
@@ -212,6 +214,8 @@ class PreSplashActivity: UIViewController {
                     let competitionDate = dict?["competitionDate"] as? String ?? ""
                     let competitionAirDate = dict?["competitionAirDate"] as? String ?? ""
                     let competitionAirDateString = dict?["competitionAirDateString"] as? String ?? ""
+                    let emergencyShowRegistrationOver = dict?["emergencyShowRegistrationOver"] as? String ?? ""
+                    let emergencyShowLiveStream = dict?["emergencyShowLiveStream"] as? String ?? ""
                     let competitionDateString = dict?["competitionDateString"] as? String ?? ""
                     let registrationDeadlineMillis = dict?["registrationDeadlineMillis"] as? CLong ?? 0
                     let twitchChannelId = dict?["twitchChannelId"] as? String ?? ""
@@ -242,6 +246,8 @@ class PreSplashActivity: UIViewController {
                     newCompetition.competitionAirDateString = competitionAirDateString
                     newCompetition.gcName = gcName
                     newCompetition.subscriptionId = subscriptionId
+                    newCompetition.emergencyShowLiveStream = emergencyShowLiveStream
+                    newCompetition.emergencyShowRegistrationOver = emergencyShowRegistrationOver
                     
                     displayCompetitions.append(newCompetition)
                 }
@@ -306,6 +312,15 @@ class PreSplashActivity: UIViewController {
             let search = value?["search"] as? String ?? ""
             if(search.isEmpty){
                 ref.child("search").setValue("true")
+            }
+            
+            let twitchToken = value?["twitchAppToken"] as? String ?? ""
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            let manager = delegate.socialMediaManager
+            if(twitchToken.isEmpty){
+                manager.getTwitchAppToken(token: nil, uid: uid)
+            } else {
+                manager.getTwitchAppToken(token: twitchToken, uid: uid)
             }
             
             let notifications = value?["notifications"] as? String ?? ""
@@ -491,22 +506,18 @@ class PreSplashActivity: UIViewController {
                         let dbDate = self.stringToDate(date)
                         
                         if(dbDate != nil){
-                            let dbDateFuture = calendar.date(byAdding: .minute, value: 5, to: dbDate as Date)
+                            let now = NSDate()
+                            let formatter = DateFormatter()
+                            formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+                            formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                            let future = formatter.string(from: dbDate as Date)
+                            let dbTimeOut = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
                             
-                            if(dbDateFuture != nil){
-                                let now = NSDate()
-                                let formatter = DateFormatter()
-                                formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
-                                formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                                let future = formatter.string(from: now as Date)
-                                let dbFuture = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
-                                
-                                let validRival = dbDate.compare(.isEarlier(than: dbFuture))
-                                
-                                if(dbFuture != nil){
-                                    if(validRival){
-                                        rivals.append(request)
-                                    }
+                            let validRival = (now as Date).compare(.isEarlier(than: dbTimeOut))
+                            
+                            if(dbTimeOut != nil){
+                                if(validRival){
+                                    rivals.append(request)
                                 }
                             }
                         }
@@ -536,12 +547,12 @@ class PreSplashActivity: UIViewController {
                             let formatter = DateFormatter()
                             formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
                             formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                            let future = formatter.string(from: now as Date)
-                            let dbFuture = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                            let future = formatter.string(from: dbDate as Date)
+                            let dbTimeOut = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
                             
-                            let validRival = dbDate.compare(.isEarlier(than: dbFuture))
+                            let validRival = (now as Date).compare(.isEarlier(than: dbTimeOut))
                             
-                            if(dbFuture != nil){
+                            if(dbTimeOut != nil){
                                 if(validRival){
                                     tempRivals.append(request)
                                 }
@@ -803,7 +814,7 @@ class PreSplashActivity: UIViewController {
                             if(list.contains(tag.gamerTag)){
                                 let date = Date()
                                 let formatter = DateFormatter()
-                                formatter.dateFormat = "MMMM.dd.yyyy"
+                                formatter.dateFormat = "MM-dd-yyyy HH:mm zzz"
                                 let result = formatter.string(from: date)
                                 
                                 let newFriend = ["gamerTag": tag.gamerTag, "date": result, "uid": uId]
@@ -868,7 +879,7 @@ class PreSplashActivity: UIViewController {
                             if(list.contains(tag.gamerTag)){
                                 let date = Date()
                                 let formatter = DateFormatter()
-                                formatter.dateFormat = "MMMM.dd.yyyy"
+                                formatter.dateFormat = "MM-dd-yyyy HH:mm zzz"
                                 let result = formatter.string(from: date)
                                 
                                 let newRequest = FriendRequestObject(gamerTag: tag.gamerTag, date: result, uid: uId)

@@ -484,12 +484,12 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                             let formatter = DateFormatter()
                             formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
                             formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                            let future = formatter.string(from: now as Date)
-                            let dbFuture = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                            let future = formatter.string(from: dbDate as Date)
+                            let dbTimeOut = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
                             
-                            let validRival = dbDate.compare(.isEarlier(than: dbFuture))
+                            let validRival = (now as Date).compare(.isEarlier(than: dbTimeOut))
                             
-                            if(dbFuture != nil){
+                            if(dbTimeOut != nil){
                                 if(validRival){
                                     tempArray.append(request)
                                 }
@@ -638,12 +638,12 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                 let formatter = DateFormatter()
                 formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
                 formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                let future = formatter.string(from: now as Date)
-                let dbFuture = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                let future = formatter.string(from: dbDate as Date)
+                let dbTimeOut = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
                 
-                let validRival = dbDate.compare(.isEarlier(than: dbFuture))
+                let validRival = (now as Date).compare(.isEarlier(than: dbTimeOut))
                 
-                if(dbFuture != nil){
+                if(dbTimeOut != nil){
                     if(!validRival){
                         currentUser.currentTempRivals.remove(at: currentUser.currentTempRivals.index(of: rival)!)
                     }

@@ -523,7 +523,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        return CGSize(width: 250, height: 320)
+        return CGSize(width: 250, height: 300)
     }
     
     @objc func backButtonClicked(_ sender: AnyObject?) {

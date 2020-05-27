@@ -394,10 +394,9 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         currentViewController.navDictionary = ["state": "backOnly"]
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        appDelegate.addToNavStack(vc: currentViewController)
-        appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
         appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
         appDelegate.currentFrag = currentViewController.pageName ?? "FA Quiz"
+        appDelegate.currentLanding?.stackDepth += 1
         
         currentViewController.gcGame = gcGame
         currentViewController.user = currentUser
@@ -417,10 +416,9 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         currentViewController.navDictionary = ["state": "backOnly"]
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        appDelegate.addToNavStack(vc: currentViewController)
-        appDelegate.currentLanding?.stackDepth = appDelegate.navStack.count
         appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
         appDelegate.currentFrag = currentViewController.pageName ?? "FA Quiz"
+        appDelegate.currentLanding?.stackDepth += 1
         
         currentViewController.gcGame = gcGame
         currentViewController.user = currentUser

@@ -481,6 +481,9 @@ import SwiftTwitch
                                        isStringValued: false))
         }
 
+        let test = TestPlayer.playerHtmlContent
+        .replacingOccurrences(of: TestPlayer.initializationReplacementKey,
+                              with: currentPlayerParameters.joined(separator: TestPlayer.jsonParameterDelimiter))
         return TestPlayer.playerHtmlContent
             .replacingOccurrences(of: TestPlayer.initializationReplacementKey,
                                   with: currentPlayerParameters.joined(separator: TestPlayer.jsonParameterDelimiter))

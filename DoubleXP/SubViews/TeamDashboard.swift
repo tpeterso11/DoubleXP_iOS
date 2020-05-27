@@ -19,7 +19,7 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
     var tweets = [Any]()
     var streams = [Any]()
     var teammates = [TeammateObject]()
-    let manager = SocialMediaManager()
+    var manager: SocialMediaManager!
     
     var viewLoadedBool = false
     
@@ -60,8 +60,7 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
                         self.tweetCollection.transform = top
                         self.tweetCollection.alpha = 1
                     }) { (finished) in
-                        
-                        self.manager.loadTwitchStreams(team: self.team!, gcGame: self.gcGame, callbacks: self)
+                        self.manager.loadTwitchStreams2DotOhTeam(team: self.team!, gcGame: self.gcGame, callbacks: self)
                     }
             }
         case 1:
@@ -92,6 +91,8 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
     
     override func viewWillAppear(_ animated: Bool) {
         DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + 0.3) {
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            self.manager = delegate.socialMediaManager
             self.loadSocial()
         }
     }
@@ -102,6 +103,7 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
         //setup nav
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let currentUser = delegate.currentUser
+        manager = delegate.socialMediaManager
     
         teamLabel.text = team?.teamName
         
@@ -139,8 +141,7 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
     }
     
     private func getTwitch(){
-        let manager = SocialMediaManager()
-        manager.loadTwitchStreams(team: team!, gcGame: self.gcGame, callbacks: self)
+        manager.loadTwitchStreams2DotOhTeam(team: self.team!, gcGame: self.gcGame, callbacks: self)
     }
     
     private func buildRoster(){
@@ -290,8 +291,7 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
     }
     
     private func loadSocial() {
-        let manager = SocialMediaManager()
-        manager.loadTwitchStreams(team: self.team!, gcGame: self.gcGame, callbacks: self)
+        manager.loadTwitchStreams2DotOhTeam(team: self.team!, gcGame: self.gcGame, callbacks: self)
     }
     
     func onTweetsLoaded(tweets: [TweetObject]) {
