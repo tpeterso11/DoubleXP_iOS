@@ -185,6 +185,7 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! homeGCCell
             
             let game = gcGames[indexPath.item]
+            cell.backgroundImage.image = Utility.Image.placeholder
             cell.backgroundImage.moa.url = game.imageUrl
             cell.backgroundImage.contentMode = .scaleAspectFill
             cell.backgroundImage.clipsToBounds = true

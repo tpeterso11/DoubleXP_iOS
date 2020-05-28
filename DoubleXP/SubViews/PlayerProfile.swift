@@ -541,6 +541,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         cell.gameName.text = ""
         cell.developer.text = ""
         
+        cell.gameBack.image = Utility.Image.placeholder
         cell.gameBack.moa.url =  current.imageUrl
         cell.gameBack.contentMode = .scaleAspectFill
         cell.gameBack.clipsToBounds = true

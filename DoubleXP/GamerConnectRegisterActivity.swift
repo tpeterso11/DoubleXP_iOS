@@ -365,6 +365,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! GCElongCell
         let current = self.availableGames[indexPath.item]
         
+        cell.backgroundImage.image = Utility.Image.placeholder
         cell.backgroundImage.moa.url = current.imageUrl
         cell.backgroundImage.contentMode = .scaleAspectFill
         cell.backgroundImage.clipsToBounds = true

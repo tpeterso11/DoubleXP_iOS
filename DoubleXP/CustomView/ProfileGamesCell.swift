@@ -35,6 +35,8 @@ class ProfileGamesCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ProfileGameSelectionCell
         let current = self.gcGames[indexPath.item]
+        
+        cell.gameImage.image = Utility.Image.placeholder
         cell.gameImage.moa.url = current.imageUrl
         cell.gameImage.contentMode = .scaleAspectFill
         cell.gameImage.clipsToBounds = true

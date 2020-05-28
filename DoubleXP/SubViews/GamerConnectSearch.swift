@@ -46,6 +46,7 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
         if(game != nil){
             //gameHeaderImage.alpha = 0
             
+            gameHeaderImage.image = Utility.Image.placeholder
             gameHeaderImage.moa.url = game?.imageUrl
             gameHeaderImage.contentMode = .scaleAspectFill
             //gameImageHeader.clipsToBounds = true
