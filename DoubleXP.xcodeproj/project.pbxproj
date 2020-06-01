@@ -290,6 +290,8 @@
 		30C4EDB32267C1890046B615 /* doublexp_white.png in Resources */ = {isa = PBXBuildFile; fileRef = 30C4EDAF2267C1890046B615 /* doublexp_white.png */; };
 		30C4EDB42267C1890046B615 /* team_thumbs_up.png in Resources */ = {isa = PBXBuildFile; fileRef = 30C4EDB02267C1890046B615 /* team_thumbs_up.png */; };
 		30C4EDB52267C1890046B615 /* vintage_tv.png in Resources */ = {isa = PBXBuildFile; fileRef = 30C4EDB12267C1890046B615 /* vintage_tv.png */; };
+		30E8CC7F248532F500B1BE98 /* apple (2).png in Resources */ = {isa = PBXBuildFile; fileRef = 30E8CC7E248532F500B1BE98 /* apple (2).png */; };
+		30E8CC812485551F00B1BE98 /* dxp_circle.png in Resources */ = {isa = PBXBuildFile; fileRef = 30E8CC802485551F00B1BE98 /* dxp_circle.png */; };
 		30EBC3FA23D608DB009CFAB2 /* TeamTweetCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30EBC3F923D608DB009CFAB2 /* TeamTweetCell.swift */; };
 		30EBC3FC23D60A23009CFAB2 /* twitter_PNG3.png in Resources */ = {isa = PBXBuildFile; fileRef = 30EBC3FB23D60A23009CFAB2 /* twitter_PNG3.png */; };
 		30EBC3FE23D949A0009CFAB2 /* FoldingRosterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30EBC3FD23D949A0009CFAB2 /* FoldingRosterCell.swift */; };
@@ -651,6 +653,8 @@
 		30C4EDAF2267C1890046B615 /* doublexp_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = doublexp_white.png; sourceTree = "<group>"; };
 		30C4EDB02267C1890046B615 /* team_thumbs_up.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = team_thumbs_up.png; sourceTree = "<group>"; };
 		30C4EDB12267C1890046B615 /* vintage_tv.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = vintage_tv.png; sourceTree = "<group>"; };
+		30E8CC7E248532F500B1BE98 /* apple (2).png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "apple (2).png"; sourceTree = "<group>"; };
+		30E8CC802485551F00B1BE98 /* dxp_circle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dxp_circle.png; sourceTree = "<group>"; };
 		30EBC3F923D608DB009CFAB2 /* TeamTweetCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamTweetCell.swift; sourceTree = "<group>"; };
 		30EBC3FB23D60A23009CFAB2 /* twitter_PNG3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = twitter_PNG3.png; sourceTree = "<group>"; };
 		30EBC3FD23D949A0009CFAB2 /* FoldingRosterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoldingRosterCell.swift; sourceTree = "<group>"; };
@@ -1122,6 +1126,8 @@
 				3064507D245E239A00B8B50E /* new_logo3.png */,
 				3064507F245E24D700B8B50E /* new_logo3_light.png */,
 				30645081245E37E200B8B50E /* google_logo.png */,
+				30E8CC802485551F00B1BE98 /* dxp_circle.png */,
+				30E8CC7E248532F500B1BE98 /* apple (2).png */,
 				30645083245E382700B8B50E /* facebook_logo.png */,
 				30645079245DF62800B8B50E /* new_logo2_light.png */,
 				308759B924269ED2002C19CC /* aastandby.jpg */,
@@ -1308,6 +1314,7 @@
 				3080B40623BC089E00638B22 /* check.png in Resources */,
 				48343FFF2465CE580034CF12 /* star.png in Resources */,
 				30F6FCC023CD7F9D0051813D /* open-menu.png in Resources */,
+				30E8CC812485551F00B1BE98 /* dxp_circle.png in Resources */,
 				305B520124144EAB0064B605 /* close.png in Resources */,
 				305821192454BB6000B76E67 /* basketball-jersey.png in Resources */,
 				305B52072415C2AF0064B605 /* expand_white.png in Resources */,
@@ -1323,6 +1330,7 @@
 				30B583E42352A22B00736733 /* point_rights.png in Resources */,
 				4C4D88312205F33200AD7090 /* LaunchScreen.storyboard in Resources */,
 				305B51FD240C9B760064B605 /* edit_white.png in Resources */,
+				30E8CC7F248532F500B1BE98 /* apple (2).png in Resources */,
 				3058211524525C8C00B76E67 /* 18th-map.png in Resources */,
 				30A84DF22381E877007BEAA5 /* plus-symbol-in-a-rounded-black-square.png in Resources */,
 				30A519912409700000DCFC77 /* white_pixelated_heart.png in Resources */,
@@ -1913,8 +1921,8 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = DoubleXP/DoubleXP.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 34;
 				DEVELOPMENT_TEAM = GU6KL76XP4;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = DoubleXP/Info.plist;
@@ -1922,10 +1930,10 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Encrypted.DoubleXP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = DXP2;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -1940,8 +1948,8 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = DoubleXP/DoubleXP.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 32;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 34;
 				DEVELOPMENT_TEAM = GU6KL76XP4;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = DoubleXP/Info.plist;
@@ -1949,10 +1957,10 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Encrypted.DoubleXP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = DXP2;
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -1964,7 +1972,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = GU6KL76XP4;
 				INFOPLIST_FILE = DoubleXPTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1974,6 +1982,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = Encrypted.DoubleXPTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DoubleXP.app/DoubleXP";
@@ -1986,7 +1996,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = GU6KL76XP4;
 				INFOPLIST_FILE = DoubleXPTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1996,6 +2006,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = Encrypted.DoubleXPTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DoubleXP.app/DoubleXP";
@@ -2007,6 +2019,8 @@
 			baseConfigurationReference = 0C5F4B174A53C96A2BCFB001 /* Pods-DoubleXPUITests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = GU6KL76XP4;
 				INFOPLIST_FILE = DoubleXPUITests/Info.plist;
@@ -2017,6 +2031,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = Encrypted.DoubleXPUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = DoubleXP;
@@ -2028,6 +2044,8 @@
 			baseConfigurationReference = B9ADA8C4012D66B1172D0841 /* Pods-DoubleXPUITests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = GU6KL76XP4;
 				INFOPLIST_FILE = DoubleXPUITests/Info.plist;
@@ -2038,6 +2056,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = Encrypted.DoubleXPUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = DoubleXP;

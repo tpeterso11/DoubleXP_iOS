@@ -1030,7 +1030,6 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                 UIView.animate(withDuration: 0.8, delay: 0.5, options: [], animations: {
                     self.welcomeText.transform = top
                     self.welcomeText.alpha = 1
-                    self.creationThumb.alpha = 0.4
                 }, completion: { (finished: Bool) in
                     
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {

@@ -86,12 +86,12 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         secondaryPayload.append(contentsOf: appDelegate.competitions)
         
-        let userOne = RecommendedUser(gamerTag: "allthesaints011", uid: "UNrTyfFOeHZB3T2HQvUVevIxHkE2")
-        let userTwo = RecommendedUser(gamerTag: "fitboy_", uid: "oFdx8UequuOs77s8daWFifODVhJ3")
+        let userOne = RecommendedUser(gamerTag: "allthesaints011", uid: "HMv30El7nmWXPEnriV3irMsnS3V2")
+        //let userTwo = RecommendedUser(gamerTag: "fitboy_", uid: "oFdx8UequuOs77s8daWFifODVhJ3")
         let userThree = RecommendedUser(gamerTag: "Kwatakye Raven", uid: "N1k1BqmvEvdOXrbmi2p91kTNLOo1")
         
         secondaryPayload.append(userOne)
-        secondaryPayload.append(userTwo)
+        //secondaryPayload.append(userTwo)
         secondaryPayload.append(userThree)
     }
     

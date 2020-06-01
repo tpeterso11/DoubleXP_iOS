@@ -13,8 +13,12 @@ import FBSDKLoginKit
 import GoogleSignIn
 import PopupDialog
 import SwiftDate
+import CryptoKit
+import AuthenticationServices
 
-class LoginController: UIViewController, GIDSignInDelegate {
+
+class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
+    
     private var data: [NewsObject]!
     private var games: [GamerConnectGame]!
     var handle: AuthStateDidChangeListenerHandle?
@@ -26,6 +30,7 @@ class LoginController: UIViewController, GIDSignInDelegate {
     @IBOutlet weak var googleSignIn: UIView!
     @IBOutlet weak var workOverlay: UIView!
     @IBOutlet weak var workSpinner: UIActivityIndicatorView!
+    @IBOutlet weak var appleLogin: UIImageView!
     
     var socialRegisteredUid = ""
     var selectedSocial = ""
@@ -121,6 +126,11 @@ class LoginController: UIViewController, GIDSignInDelegate {
         present(alertController, animated: true, completion: nil)
     }
     
+    @available(iOS 13.0, *)
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        return self.view.window!
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         games = [GamerConnectGame]()
@@ -139,6 +149,18 @@ class LoginController: UIViewController, GIDSignInDelegate {
         let googleTap = UITapGestureRecognizer(target: self, action: #selector(googleLoginClicked))
         googleSignIn.isUserInteractionEnabled = true
         googleSignIn.addGestureRecognizer(googleTap)
+        
+        if #available(iOS 13, *) {
+            appleLogin.alpha = 1
+            
+            let appleTap = UITapGestureRecognizer(target: self, action: #selector(appleLoginClicked))
+            appleLogin.isUserInteractionEnabled = true
+            appleLogin.addGestureRecognizer(appleTap)
+        } else {
+            appleLogin.alpha = 0.3
+            appleLogin.isUserInteractionEnabled = false
+        }
+        //todo IMPLEMET APPLE LOGIN~!!!!
         
         GIDSignIn.sharedInstance().delegate = self
         
@@ -206,6 +228,16 @@ class LoginController: UIViewController, GIDSignInDelegate {
         }
     }
     
+    @available(iOS 13, *)
+    @objc func appleLoginClicked(_ sender: AnyObject?) {
+        //showWork()
+        
+        self.selectedSocial = "apple"
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            self.startSignInWithAppleFlow()
+        }
+    }
+    
     @objc func registerClicked(_ sender: AnyObject?) {
         self.performSegue(withIdentifier: "register", sender: nil)
     }
@@ -231,6 +263,45 @@ class LoginController: UIViewController, GIDSignInDelegate {
                self.workOverlay.alpha = 0
            }, completion: nil)
        }
+    
+    @available(iOS 13.0, *)
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
+          guard let nonce = currentNonce else {
+            fatalError("Invalid state: A login callback was received, but no login request was sent.")
+          }
+          guard let appleIDToken = appleIDCredential.identityToken else {
+            print("Unable to fetch identity token")
+            return
+          }
+          guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
+            print("Unable to serialize token string from data: \(appleIDToken.debugDescription)")
+            return
+          }
+          // Initialize a Firebase credential.
+          let credential = OAuthProvider.credential(withProviderID: "apple.com",
+                                                    idToken: idTokenString,
+                                                    rawNonce: nonce)
+          // Sign in with Firebase.
+          Auth.auth().signIn(with: credential) { (authResult, error) in
+            if (error != nil) {
+              // Error. If error.code == .MissingOrInvalidNonce, make sure
+              // you're sending the SHA256-hashed nonce as a hex string with
+              // your request to Apple.
+                AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Apple Login Fail Firebase"))
+            }
+            else{
+                if(authResult != nil){
+                    let uId = authResult?.user.uid ?? ""
+                    self.downloadDBRef(uid: uId)
+                }
+                else{
+                    self.performSegue(withIdentifier: "register", sender: nil)
+                }
+            }
+        }
+      }
+    }
     
     private func downloadDBRef(uid: String){
         let ref = Database.database().reference().child("Users").child(uid)
@@ -758,6 +829,65 @@ class LoginController: UIViewController, GIDSignInDelegate {
                 print(error.localizedDescription)
             }
         }
+    }
+    
+    fileprivate var currentNonce: String?
+    @available(iOS 13, *)
+    func startSignInWithAppleFlow() {
+      let nonce = randomNonceString()
+      currentNonce = nonce
+      let appleIDProvider = ASAuthorizationAppleIDProvider()
+      let request = appleIDProvider.createRequest()
+      request.requestedScopes = [.fullName, .email]
+      request.nonce = sha256(nonce)
+
+      let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+      authorizationController.delegate = self
+      authorizationController.presentationContextProvider = self
+      authorizationController.performRequests()
+    }
+
+    @available(iOS 13, *)
+    private func sha256(_ input: String) -> String {
+      let inputData = Data(input.utf8)
+      let hashedData = SHA256.hash(data: inputData)
+      let hashString = hashedData.compactMap {
+        return String(format: "%02x", $0)
+      }.joined()
+
+      return hashString
+    }
+    
+    private func randomNonceString(length: Int = 32) -> String {
+      precondition(length > 0)
+      let charset: Array<Character> =
+          Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
+      var result = ""
+      var remainingLength = length
+
+      while remainingLength > 0 {
+        let randoms: [UInt8] = (0 ..< 16).map { _ in
+          var random: UInt8 = 0
+          let errorCode = SecRandomCopyBytes(kSecRandomDefault, 1, &random)
+          if errorCode != errSecSuccess {
+            fatalError("Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)")
+          }
+          return random
+        }
+
+        randoms.forEach { random in
+          if remainingLength == 0 {
+            return
+          }
+
+          if random < charset.count {
+            result.append(charset[Int(random)])
+            remainingLength -= 1
+          }
+        }
+      }
+
+      return result
     }
     
     private func convertRequests(list: [String], pathString: String, userUid: String){

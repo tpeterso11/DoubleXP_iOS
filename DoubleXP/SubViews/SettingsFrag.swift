@@ -26,12 +26,6 @@ class SettingsFrag: ParentVC{
         notificationSwitch.addTarget(self, action: #selector(notificationSwitchChanged), for: UIControl.Event.valueChanged)
         findSwitch.addTarget(self, action: #selector(findSwitchChanged), for: UIControl.Event.valueChanged)
         
-        let backTap = UITapGestureRecognizer(target: self, action: #selector(backButtonClicked))
-        self.closeButton.isUserInteractionEnabled = true
-        self.closeButton.addGestureRecognizer(backTap)
-        self.closeText.isUserInteractionEnabled = true
-        self.closeText.addGestureRecognizer(backTap)
-        
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         if(appDelegate.currentUser!.notifications == "true"){
             self.notificationSwitch.setOn(true, animated: false)
@@ -66,6 +60,14 @@ class SettingsFrag: ParentVC{
                         self.closeText.transform = top
                         self.closeButton.alpha = 1
                         self.closeText.alpha = 1
+                        
+                        let closeTap = UITapGestureRecognizer(target: self, action: #selector(self.backButtonClicked))
+                        self.closeButton.isUserInteractionEnabled = true
+                        self.closeButton.addGestureRecognizer(closeTap)
+                        
+                        let backTap = UITapGestureRecognizer(target: self, action: #selector(self.backButtonClicked))
+                        self.closeText.isUserInteractionEnabled = true
+                        self.closeText.addGestureRecognizer(backTap)
                     }, completion: nil)
                 })
             })

@@ -12,9 +12,11 @@ import ValidationComponents
 import FBSDKLoginKit
 import PopupDialog
 import GoogleSignIn
+import CryptoKit
+import AuthenticationServices
 
 
-class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate {
+class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
     @IBOutlet weak var headerImage: UIImageView!
     
     @IBOutlet weak var emailLoginCover: UIImageView!
@@ -28,6 +30,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
     @IBOutlet weak var nextButton: UIButton!
     @IBOutlet weak var facebook: UIImageView!
     @IBOutlet weak var googleSignIn: UIView!
+    @IBOutlet weak var appleRegister: UIImageView!
     
     private var emailEntered = false
     private var passwordEntered = false
@@ -36,14 +39,17 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
     private var switches = [UISwitch]()
     private var facebookLoginAccepted = false
     private var googleLoginAccepted = false
+    private var appleLoginAccepted = false
     private var googleToken = ""
     private var facebookLoginUid = ""
     private var facebookTokenString = ""
     private var googleTokenString = ""
+    private var appleTokenString = ""
     private var registrationType = ""
     
     var socialRegistered = ""
     var socialRegisteredUid = ""
+    fileprivate var currentNonce: String?
     
     func supportsAlertController() -> Bool {
         return NSClassFromString("UIAlertController") != nil
@@ -163,6 +169,17 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
         googleSignIn.isUserInteractionEnabled = true
         googleSignIn.addGestureRecognizer(googleTap)
         
+        if #available(iOS 13, *) {
+           appleRegister.alpha = 1
+           
+           let appleTap = UITapGestureRecognizer(target: self, action: #selector(appleClicked))
+           appleRegister.isUserInteractionEnabled = true
+           appleRegister.addGestureRecognizer(appleTap)
+       } else {
+           appleRegister.alpha = 0.3
+           appleRegister.isUserInteractionEnabled = false
+       }
+        
         switches.append(psSwitch)
         switches.append(xboxSwitch)
         switches.append(pcSwitch)
@@ -181,10 +198,12 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
             if(socialRegistered == "google"){
                 self.emailLoginCover.image = #imageLiteral(resourceName: "google_logo.png")
             }
+            else if(socialRegistered == "apple"){
+                self.emailLoginCover.image = #imageLiteral(resourceName: "apple (2).png")
+            }
             else{
                 self.emailLoginCover.image = #imageLiteral(resourceName: "facebook_logo.png")
             }
-            
             
             let top = CGAffineTransform(translationX: 0, y: 70)
             UIView.animate(withDuration: 0.8, delay: 0.5, usingSpringWithDamping: 0.5,
@@ -200,7 +219,10 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
             if(self.socialRegistered == "google"){
                 self.googleLoginAccepted = true
             }
-            else{
+            else if(self.socialRegistered == "apple"){
+                self.appleLoginAccepted = true
+            }
+            else if(self.socialRegistered == "facebook"){
                 self.facebookLoginAccepted = true
             }
         }
@@ -211,6 +233,11 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
     @objc func googleClicked(){
         GIDSignIn.sharedInstance()?.presentingViewController = self
         GIDSignIn.sharedInstance().signIn()
+    }
+    
+    @available(iOS 13, *)
+    @objc func appleClicked(){
+        startSignInWithAppleFlow()
     }
     
     @objc func psSwitchChanged(stationSwitch: UISwitch) {
@@ -229,7 +256,112 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
         checkNextButton()
     }
     
-    func registerUser(email: String?, pass: String?, facebook: Bool, google: Bool){
+    @available(iOS 13.0, *)
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
+          guard let nonce = currentNonce else {
+            fatalError("Invalid state: A login callback was received, but no login request was sent.")
+          }
+          guard let appleIDToken = appleIDCredential.identityToken else {
+            print("Unable to fetch identity token")
+            return
+          }
+          guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
+            print("Unable to serialize token string from data: \(appleIDToken.debugDescription)")
+            return
+          }
+            
+          self.appleTokenString = idTokenString
+            self.appleLoginAccepted = true
+            self.emailLoginCover.image = #imageLiteral(resourceName: "apple (2).png")
+        
+            let top = CGAffineTransform(translationX: 0, y: 70)
+            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5,
+                       initialSpringVelocity: 0.5, options: [], animations: {
+                        self.emailLoginCover.transform = top
+                        self.emailLoginCover.alpha = 1
+                        self.emailField.alpha = 0.1
+                        self.emailField.isUserInteractionEnabled = false
+                        self.passwordField.alpha = 0.1
+                        self.passwordField.isUserInteractionEnabled = false
+            }, completion: nil)
+        }
+    }
+    
+    @available(iOS 13, *)
+    func startSignInWithAppleFlow() {
+      let nonce = randomNonceString()
+      currentNonce = nonce
+      let appleIDProvider = ASAuthorizationAppleIDProvider()
+      let request = appleIDProvider.createRequest()
+      request.requestedScopes = [.fullName, .email]
+      request.nonce = sha256(nonce)
+
+      let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+      authorizationController.delegate = self
+      authorizationController.presentationContextProvider = self
+      authorizationController.performRequests()
+    }
+
+    @available(iOS 13, *)
+    private func sha256(_ input: String) -> String {
+      let inputData = Data(input.utf8)
+      let hashedData = SHA256.hash(data: inputData)
+      let hashString = hashedData.compactMap {
+        return String(format: "%02x", $0)
+      }.joined()
+
+      return hashString
+    }
+    
+    private func randomNonceString(length: Int = 32) -> String {
+      precondition(length > 0)
+      let charset: Array<Character> =
+          Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
+      var result = ""
+      var remainingLength = length
+
+      while remainingLength > 0 {
+        let randoms: [UInt8] = (0 ..< 16).map { _ in
+          var random: UInt8 = 0
+          let errorCode = SecRandomCopyBytes(kSecRandomDefault, 1, &random)
+          if errorCode != errSecSuccess {
+            fatalError("Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)")
+          }
+          return random
+        }
+
+        randoms.forEach { random in
+          if remainingLength == 0 {
+            return
+          }
+
+          if random < charset.count {
+            result.append(charset[Int(random)])
+            remainingLength -= 1
+          }
+        }
+      }
+
+      return result
+    }
+    
+    @available(iOS 13.0, *)
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        return self.view.window!
+    }
+    
+    @available(iOS 13, *)
+    @objc func appleLoginClicked(_ sender: AnyObject?) {
+        //showWork()
+        
+       // self.selectedSocial = "apple"
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            self.startSignInWithAppleFlow()
+        }
+    }
+    
+    func registerUser(email: String?, pass: String?, facebook: Bool, google: Bool, apple: Bool){
         if(facebook && self.socialRegistered.isEmpty){
             let credential = FacebookAuthProvider.credential(withAccessToken: self.facebookTokenString)
             Auth.auth().signIn(with: credential) { (authResult, error) in
@@ -415,6 +547,102 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                     }
                 }
             }
+            else if(apple && self.socialRegistered.isEmpty){
+                // Initialize a Firebase credential.
+                let credential = OAuthProvider.credential(withProviderID: "apple.com",
+                                                          idToken: self.appleTokenString,
+                                                          rawNonce: currentNonce)
+                // Sign in with Firebase.
+                Auth.auth().signIn(with: credential) { (authResult, error) in
+                  if (error != nil) {
+                    let authError = error! as NSError
+                    AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Apple Login Fail Firebase"))
+                      
+                      var message: String = ""
+                      let code = String(error!._code)
+                      
+                      switch(code){
+                          case "17007": message = "sorry, that email is already in use."
+                          case "17008": message = "sorry, please enter a valid email to continue."
+                          case "17009": message = "sorry, that password is incorrect. please try again."
+                          case "17011": message = "sorry, we do not have that user in our database."
+                          default: message = "there was an error logging you in. please try again."
+                      }
+                      
+                      let alertController = UIAlertController(title: "registration error", message: message, preferredStyle: .alert)
+                      alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                      self.display(alertController: alertController)
+                  }
+                  else{
+                      if(authResult != nil){
+                          let checkRef = Database.database().reference().child("Users").child((authResult?.user.uid)!)
+                          checkRef.observeSingleEvent(of: .value, with: { (snapshot) in
+                              if(snapshot.exists()){
+                                  self.downloadDBRef(uid: (authResult?.user.uid)!)
+                              }
+                              else{
+                                  let uId = authResult?.user.uid ?? ""
+                                      let user = User(uId: uId)
+                                          
+                                      if(self.psSwitch.isOn){
+                                          user.ps = true
+                                      }
+                                      
+                                      if(self.pcSwitch.isOn){
+                                          user.pc = true
+                                      }
+                                      
+                                      if(self.xboxSwitch.isOn){
+                                          user.xbox = true
+                                      }
+                                      
+                                      if(self.nintendoSwitch.isOn){
+                                          user.nintendo = true
+                                      }
+                                      checkRef.child("consoles").child("xbox").setValue(self.xboxSwitch.isOn)
+                                      checkRef.child("consoles").child("ps").setValue(self.psSwitch.isOn)
+                                      checkRef.child("consoles").child("nintendo").setValue(self.nintendoSwitch.isOn)
+                                      checkRef.child("consoles").child("pc").setValue(self.pcSwitch.isOn)
+                                      checkRef.child("platform").setValue("ios")
+                                      checkRef.child("search").setValue("true")
+                                      checkRef.child("registrationType").setValue("apple")
+                                      checkRef.child("model").setValue(UIDevice.modelName)
+                                      checkRef.child("notifications").setValue("true")
+                                          
+                                      DispatchQueue.main.async {
+                                          let delegate = UIApplication.shared.delegate as! AppDelegate
+                                          delegate.currentUser = user
+                                              
+                                          if(!user.pc && !user.xbox && !user.ps && !user.nintendo){
+                                              AppEvents.logEvent(AppEvents.Name(rawValue: "Register - No GC"))
+                                              self.performSegue(withIdentifier: "registerNoGC", sender: nil)
+                                          }
+                                          else{
+                                              if(user.pc){
+                                                  AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PC User"))
+                                              }
+                                              if(user.xbox){
+                                                  AppEvents.logEvent(AppEvents.Name(rawValue: "Register - xBox User"))
+                                              }
+                                              if(user.ps){
+                                                  AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PS User"))
+                                              }
+                                              if(user.nintendo){
+                                                  AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Nintendo User"))
+                                              }
+                                              
+                                              AppEvents.logEvent(AppEvents.Name(rawValue: "Register - GC"))
+                                              self.performSegue(withIdentifier: "registerGC", sender: nil)
+                                          }
+                                          }
+                                      }
+                                  }) { (error) in
+                                      print(error.localizedDescription)
+                                    }
+                    }
+                }
+            }
+        }
         else if(!self.emailField.text!.isEmpty && !self.passwordField.text!.isEmpty && self.socialRegistered.isEmpty){
             if(email != nil && pass != nil){
                 Auth.auth().createUser(withEmail: email!, password: pass!) { authResult, error in
@@ -897,7 +1125,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
     }
 
     func checkNextButton(){
-        if((self.emailEntered && passwordEntered && checkSwitches()) || (self.emailLoginCover.alpha == 1 && self.facebookLoginAccepted && checkSwitches()) || (self.googleLoginAccepted && checkSwitches())){
+        if((self.emailEntered && passwordEntered && checkSwitches()) || (self.emailLoginCover.alpha == 1 && self.facebookLoginAccepted && checkSwitches()) || (self.googleLoginAccepted && checkSwitches()) || (self.appleLoginAccepted && checkSwitches())){
             self.nextButton.alpha = 1
         }
         else{
@@ -951,16 +1179,19 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
         
         //registerUser(email: email, pass: pass)
         if(!email.isEmpty && !pass.isEmpty && rule.evaluate(with: email)){
-            registerUser(email: email, pass: pass, facebook: false, google: false)
+            registerUser(email: email, pass: pass, facebook: false, google: false, apple: false)
         }
         else if(self.facebookLoginAccepted && !self.facebookTokenString.isEmpty){
-            registerUser(email: nil, pass: nil, facebook: true, google: false)
+            registerUser(email: nil, pass: nil, facebook: true, google: false, apple: false)
         }
         else if(self.googleLoginAccepted && !self.googleTokenString.isEmpty && !self.googleToken.isEmpty){
-            registerUser(email: nil, pass: nil, facebook: false, google: true)
+            registerUser(email: nil, pass: nil, facebook: false, google: true, apple: false)
+        }
+        else if(self.appleLoginAccepted && !self.appleTokenString.isEmpty){
+            registerUser(email: nil, pass: nil, facebook: false, google: false, apple: true)
         }
         else if(!self.socialRegistered.isEmpty && !self.socialRegisteredUid.isEmpty){
-            registerUser(email: nil, pass: nil, facebook: socialRegistered == "facebook", google: socialRegistered == "google")
+            registerUser(email: nil, pass: nil, facebook: socialRegistered == "facebook", google: socialRegistered == "google", apple: socialRegistered == "apple")
         }
         else{
             if(!rule.evaluate(with: email)){
