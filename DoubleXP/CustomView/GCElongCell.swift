@@ -17,4 +17,5 @@ class GCElongCell: UICollectionViewCell{
     @IBOutlet weak var gameName: UILabel!
     @IBOutlet weak var backgroundImage: UIImageView!
     @IBOutlet weak var lottie: AnimationView!
+    @IBOutlet weak var statsAvailable: UIView!
 }

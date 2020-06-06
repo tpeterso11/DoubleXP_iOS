@@ -57,6 +57,8 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
     @IBOutlet weak var finishButton: UIButton!
     @IBOutlet weak var welcomeText: UILabel!
     @IBOutlet weak var creationThumb: UIImageView!
+    @IBOutlet weak var dxpStatsIndicator: UILabel!
+    @IBOutlet weak var seeStatsHeader: UILabel!
     
     var importToggled = false
     var allGamesChecked = false
@@ -68,7 +70,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
     var currentIndexPath: IndexPath?
     var gamerTagValid = false
     var sendUpArray = [[String: String]]()
-    var stats = [[String: String]]()
+    var stats = [[String: Any]]()
     
     var behavior: MSCollectionViewPeekingBehavior!
     
@@ -373,6 +375,10 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         cell.gameName.text = current.gameName
         cell.developer.text = current.developer
         
+        if(current.statsAvailable){
+            cell.statsAvailable.isHidden = false
+        }
+        
         cell.contentView.layer.cornerRadius = 20.0
         cell.contentView.layer.borderWidth = 1.0
         cell.contentView.layer.borderColor = UIColor.clear.cgColor
@@ -427,6 +433,14 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         else{
             let current = availableGames[indexPath.item]
             self.currentIndexPath = indexPath
+            
+            if(current.statsAvailable){
+                dxpStatsIndicator.isHidden = false
+                seeStatsHeader.isHidden = false
+            } else {
+                dxpStatsIndicator.isHidden = true
+                seeStatsHeader.isHidden = true
+            }
             
             if(!self.savedTag.isEmpty){
                 self.gcDrawerGamertag.text = self.savedTag
@@ -639,6 +653,18 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                 saveGamerProfile(gamerTag: gamerTag, gameName: gameName, console: console)
                 getCODStats(gamerTag: gamerTag, console: console)
             }
+            else if(gameName == "Fortnite"){
+                saveGamerProfile(gamerTag: gamerTag, gameName: gameName, console: console)
+                getFortnitePlayerId(gamertag: gamerTag)
+            }
+            else if(gameName == "Apex Legends"){
+                saveGamerProfile(gamerTag: gamerTag, gameName: gameName, console: console)
+                getApexLegendsStats(gamerTag: gamerTag, console: console)
+            }
+            else if(gameName == "Overwatch"){
+                saveGamerProfile(gamerTag: gamerTag, gameName: gameName, console: console)
+                getOverwatchStats(gamerTag: gamerTag, console: console)
+            }
             else{
                 saveGamerProfile(gamerTag: gamerTag, gameName: gameName, console: console)
                 finishAndMoveToNext()
@@ -663,6 +689,120 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         }
         
         self.sendUpArray.append(sendUp)
+    }
+    
+    private func getApexLegendsStats(gamerTag: String, console: String){
+        var userConsole = ""
+        if(console == "ps"){
+            userConsole = "psn"
+        }
+        if(console == "xbox"){
+            userConsole = "xbl"
+        }
+        if(console == "pc"){
+            userConsole = "origin"
+        }
+        
+        if(gamerTag.isEmpty){
+            self.gamerTag = ""
+            tagSaved = false
+            
+            let message = "There was an error with your gamertag. Please re-enter it below and try again."
+            let alertController = UIAlertController(title: "GamerTag Error", message: message, preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "Gotcha.", style: .default, handler: nil))
+            self.display(alertController: alertController)
+            
+            return
+        }
+        
+        if(!userConsole.isEmpty){
+            let url = "https://public-api.tracker.gg/v2/apex/standard/profile/"+userConsole+"/"+gamerTag
+            getApexLegendsProfileStats(url: url)
+        }
+    }
+    
+    private func getOverwatchStats(gamerTag: String, console: String){
+        var userConsole = ""
+        if(console == "ps"){
+            userConsole = "psn"
+        }
+        if(console == "xbox"){
+            userConsole = "xbl"
+        }
+        if(console == "pc"){
+            userConsole = "battlenet"
+        }
+        
+        if(gamerTag.isEmpty){
+            self.gamerTag = ""
+            tagSaved = false
+            
+            let message = "There was an error with your gamertag. Please re-enter it below and try again."
+            let alertController = UIAlertController(title: "GamerTag Error", message: message, preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "Gotcha.", style: .default, handler: nil))
+            self.display(alertController: alertController)
+            
+            return
+        }
+        
+        if(!userConsole.isEmpty){
+            let url = "https://public-api.tracker.gg/v2/overwatch/standard/profile/"+userConsole+"/"+gamerTag
+            getOverwatchProfileStats(url: url)
+        }
+    }
+    
+    private func getApexLegendsProfileStats(url: String){
+        HTTP.GET(url, headers: ["TRN-Api-Key": "7fa6a9d9-6fbc-4350-adf3-79bfe45a303c"]) { response in
+            if let err = response.error {
+                self.finishAndMoveToNext()
+                print("error: \(err.localizedDescription)")
+                return //also notify app of failure as needed
+            }
+            else{
+                if let jsonObj = try! JSONSerialization.jsonObject(with: response.data, options: JSONSerialization.ReadingOptions()) as? [String: Any] {
+                    
+                    let newStatObj = StatObject(gameName: "Apex Legends")
+                    let data = jsonObj["data"] as? [String: Any] ?? [String: Any]()
+                    let segments = data["segments"] as? [[String: Any]] ?? [[String: Any]]()
+                    for array in segments{
+                        let meta = array["metadata"] as? [String: Any] ?? [String: Any]()
+                        if(meta["name"] as? String ?? "" == "Lifetime"){
+                            let stats = array["stats"] as? [String: Any] ?? [String: Any]()
+                            let levelStats = stats["level"] as? [String: Any] ?? [String: Any]()
+                            newStatObj.playerLevelPVP = levelStats["displayValue"] as? String ?? ""
+                            
+                            let killStats = stats["kills"] as? [String: Any] ?? [String: Any]()
+                            newStatObj.killsPVP = killStats["displayValue"] as? String ?? ""
+                            
+                            let kpmStats = stats["killsPerMatch"] as? [String: Any] ?? [String: Any]()
+                            newStatObj.killsPerMatch = kpmStats["displayValue"] as? String ?? ""
+                            
+                            let matchesStats = stats["matchesPlayed"] as? [String: Any] ?? [String: Any]()
+                            newStatObj.matchesPlayed = matchesStats["displayValue"] as? String ?? ""
+                            
+                            let seasonWinsStats = stats["seasonWins"] as? [String: Any] ?? [String: Any]()
+                            newStatObj.seasonWins = seasonWinsStats["displayValue"] as? String ?? ""
+                            
+                            let seasonKillsStats = stats["seasonKills"] as? [String: Any] ?? [String: Any]()
+                            newStatObj.seasonKills = seasonKillsStats["displayValue"] as? String ?? ""
+                        }
+                        else if(meta["isActive"] as? Bool == true){
+                            newStatObj.suppImage = meta["tallImageUrl"] as? String ?? ""
+                            break
+                        }
+                    }
+                    newStatObj.statUrl = url
+                    newStatObj.setPublic = "true"
+                    newStatObj.authorized = "true"
+                    
+                    self.saveAndProceed(statObj: newStatObj)
+                    AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Overwatch Stats Received"))
+                }
+                else{
+                    self.finishAndMoveToNext()
+                }
+            }
+        }
     }
     
     private func getDivisionStats(gamerTag: String, console: String){
@@ -975,6 +1115,346 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         }
     }
     
+    private func getFortnitePlayerId(gamertag: String){
+        HTTP.GET("https://fortniteapi.io/lookup?username="+gamertag, headers: ["authorization": "2192fa37-951e6ed9-15f5d6d5-f1080fcf"]) { response in
+            if let err = response.error {
+                self.finishAndMoveToNext()
+                print("error: \(err.localizedDescription)")
+                return //also notify app of failure as needed
+            }
+            else{
+                if let jsonObj = try! JSONSerialization.jsonObject(with: response.data, options: JSONSerialization.ReadingOptions()) as? [String: Any] {
+                    
+                    let available = jsonObj["result"] as! Bool
+                    if(available){
+                        let id = jsonObj["account_id"] as? String ?? ""
+                        
+                        if(!id.isEmpty){
+                            self.getFortniteStats(playerId: id)
+                        } else {
+                            AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Fortnite no Id"))
+                            self.finishAndMoveToNext()
+                        }
+                    }
+                    else{
+                        AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Fortnite no Id"))
+                        self.finishAndMoveToNext()
+                    }
+                }
+                else{
+                    AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Fortnite Wrong Payload"))
+                    self.finishAndMoveToNext()
+                }
+            }
+        }
+    }
+    
+    private func getFortniteStats(playerId: String){
+        let url = "https://fortniteapi.io/stats?account="+playerId
+        HTTP.GET(url, headers: ["authorization": "2192fa37-951e6ed9-15f5d6d5-f1080fcf"]) { response in
+            if let err = response.error {
+                AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Fortnite Stats Error"))
+                self.finishAndMoveToNext()
+                print("error: \(err.localizedDescription)")
+                return //also notify app of failure as needed
+            }
+            else{
+                if let jsonObj = try! JSONSerialization.jsonObject(with: response.data, options: JSONSerialization.ReadingOptions()) as? [String: Any] {
+                    
+                    let available = jsonObj["result"] as! Bool
+                    if(available){
+                        let account = jsonObj["account"] as? [String: Any] ?? [String: Any]()
+                        let playerLevel = account["level"] as? Int ?? -1
+                        
+                        let globalStats = jsonObj["global_stats"] as? [String: Any] ?? [String: Any]()
+                        
+                        //duo
+                        let duoStats = globalStats["duo"] as? [String: Any] ?? [String: Any]()
+                        let duoKd = duoStats["kd"] as? Double ?? 0.0
+                        let duoWinRate = duoStats["winrate"] as? Double ?? 0.0
+                        let duoKills = duoStats["kills"] as? Double ?? 0.0
+                        let duoMatchesPlayed = duoStats["matchesplayed"] as? Double ?? 0.0
+                        
+                        let duoStatsObj = ["kd": self.convertToUsableString(float:duoKd), "win rate": self.convertToUsableString(float:duoWinRate), "kills": self.convertToUsableString(float: duoKills), "matches played": self.convertToUsableString(float: duoMatchesPlayed)]
+                        
+                        
+                        //solo
+                        let soloStats = globalStats["solo"] as? [String: Any] ?? [String: Any]()
+                        let soloKd = soloStats["kd"] as? Double ?? 0.0
+                        let soloWinRate = soloStats["winrate"] as? Double ?? 0.0
+                        let soloKills = soloStats["kills"] as? Double ?? 0.0
+                        let soloMatchesPlayed = soloStats["matchesplayed"] as? Double ?? 0.0
+                        let soloStatsObj = ["kd": self.convertToUsableString(float: soloKd), "win rate": self.convertToUsableString(float: soloWinRate), "kills": self.convertToUsableString(float: soloKills), "matches played": self.convertToUsableString(float: soloMatchesPlayed)]
+                        //solo
+                        let squadStats = globalStats["squad"] as? [String: Any] ?? [String: Any]()
+                        let squadKd = squadStats["kd"] as? Double ?? 0.0
+                        let squadWinRate = squadStats["winrate"] as? Double ?? 0.0
+                        let squadKills = squadStats["kills"] as? Double ?? 0.0
+                        let squadMatchesPlayed = squadStats["matchesplayed"] as? Double ?? 0.0
+                        let squadStatsObj = ["kd": self.convertToUsableString(float: squadKd), "win rate": self.convertToUsableString(float: squadWinRate), "kills": self.convertToUsableString(float: squadKills), "matches played": self.convertToUsableString(float: squadMatchesPlayed)]
+                        
+                        let statObj = StatObject(gameName: "Fortnite")
+                        statObj.playerLevelPVP = String(playerLevel)
+                        statObj.fortniteDuoStats = duoStatsObj
+                        statObj.fortniteSoloStats = soloStatsObj
+                        statObj.fortniteSquadStats = squadStatsObj
+                        statObj.statUrl = url
+                        statObj.setPublic = "true"
+                        statObj.authorized = "true"
+                        
+                        self.saveAndProceed(statObj: statObj)
+                        AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - COD Stats Received"))
+                    }
+                    else{
+                        AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Fortnite Not Available"))
+                        self.finishAndMoveToNext()
+                    }
+                }
+                else{
+                    AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Fortnite Wrong Payload"))
+                    self.finishAndMoveToNext()
+                }
+            }
+        }
+    }
+    
+    private func convertToUsableString(float: Double) -> String{
+        let formatter = NumberFormatter()
+            formatter.maximumFractionDigits = 2
+            formatter.minimumFractionDigits = 2
+        
+            let convert = float
+            if let formattedString = formatter.string(for: convert) {
+                return formattedString
+            } else {
+                return ""
+        }
+    }
+    
+    private func getOverwatchProfileStats(url: String){
+        HTTP.GET(url, headers: ["TRN-Api-Key": "7fa6a9d9-6fbc-4350-adf3-79bfe45a303c"]) { response in
+            if let err = response.error {
+                AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Overwatch Profile Stats Error"))
+                self.finishAndMoveToNext()
+                return //also notify app of failure as needed
+            }
+            else{
+                if let jsonObj = try! JSONSerialization.jsonObject(with: response.data, options: JSONSerialization.ReadingOptions()) as? [String: Any] {
+                    
+                    let newStatObj = StatObject(gameName: "Overwatch")
+                    let data = jsonObj["data"] as? [String: Any] ?? [String: Any]()
+                    let segments = data["segments"] as? [[String: Any]] ?? [[String: Any]]()
+                    for array in segments{
+                        let meta = array["metadata"] as? [String: Any] ?? [String: Any]()
+                        if(meta["name"] as? String ?? "" == "Casual"){
+                            var casual = [String: String]()
+                            
+                            let stats = array["stats"] as? [String: Any] ?? [String: Any]()
+                            let wins = stats["wins"] as? [String: Any] ?? [String: Any]()
+                            let winsVal = wins["displayValue"] as? String ?? ""
+                            if(!winsVal.isEmpty){
+                                casual["Wins"] = winsVal
+                            }
+                            
+                            let matchesStats = stats["matchesPlayed"] as? [String: Any] ?? [String: Any]()
+                            let matchesPlayedVal = matchesStats["displayValue"] as? String ?? ""
+                            if(!matchesPlayedVal.isEmpty){
+                                casual["Matches Played"] = matchesPlayedVal
+                            }
+                            
+                            let goldMedals = stats["goldMedals"] as? [String: Any] ?? [String: Any]()
+                            let goldMedalVal = goldMedals["displayValue"] as? String ?? ""
+                            if(!goldMedalVal.isEmpty){
+                                casual["Gold Medals"] = goldMedalVal
+                            }
+                            
+                            let silverMedals = stats["silverMedals"] as? [String: Any] ?? [String: Any]()
+                            let silverMedalsVal = silverMedals["displayValue"] as? String ?? ""
+                            if(!silverMedalsVal.isEmpty){
+                                casual["Silver Medals"] = silverMedalsVal
+                            }
+                            
+                            let bronzeMedals = stats["bronzeMedals"] as? [String: Any] ?? [String: Any]()
+                            let bronzeMedalsVal = bronzeMedals["displayValue"] as? String ?? ""
+                            if(!bronzeMedalsVal.isEmpty){
+                                casual["Bronze Medals"] = bronzeMedalsVal
+                            }
+                            
+                            let multiKills = stats["multiKills"] as? [String: Any] ?? [String: Any]()
+                            let multiKillsVal = multiKills["displayValue"] as? String ?? ""
+                            if(!multiKillsVal.isEmpty){
+                                casual["Multi Kills"] = multiKillsVal
+                            }
+                            
+                            let soloKills = stats["soloKills"] as? [String: Any] ?? [String: Any]()
+                            let soloKillsVal = soloKills["displayValue"] as? String ?? ""
+                            if(!soloKillsVal.isEmpty){
+                                casual["Solo Kills"] = soloKillsVal
+                            }
+                            
+                            let objectiveKills = stats["objectiveKills"] as? [String: Any] ?? [String: Any]()
+                            let objectiveKillsVal = objectiveKills["displayValue"] as? String ?? ""
+                            if(!objectiveKillsVal.isEmpty){
+                                casual["Objective Kills"] = objectiveKillsVal
+                            }
+                            
+                            let finalBlows = stats["finalBlows"] as? [String: Any] ?? [String: Any]()
+                            let finalBlowsVal = finalBlows["displayValue"] as? String ?? ""
+                            if(!finalBlowsVal.isEmpty){
+                                casual["Final Blows"] = finalBlowsVal
+                            }
+                            
+                            let damageDone = stats["damageDone"] as? [String: Any] ?? [String: Any]()
+                            let damageDoneVal = damageDone["displayValue"] as? String ?? ""
+                            if(!damageDoneVal.isEmpty){
+                                casual["Damage Done"] = damageDoneVal
+                            }
+                            
+                            let healingDone = stats["healingDone"] as? [String: Any] ?? [String: Any]()
+                            let healingDoneVal = healingDone["displayValue"] as? String ?? ""
+                            if(!healingDoneVal.isEmpty){
+                                casual["Healing Done"] = healingDoneVal
+                            }
+                            
+                            let eliminations = stats["eliminations"] as? [String: Any] ?? [String: Any]()
+                            let eliminationsVal = eliminations["displayValue"] as? String ?? ""
+                            if(!eliminationsVal.isEmpty){
+                                casual["Eliminations"] = eliminationsVal
+                            }
+                            
+                            let kd = stats["kd"] as? [String: Any] ?? [String: Any]()
+                            let kdVal = kd["displayValue"] as? String ?? ""
+                            if(!kdVal.isEmpty){
+                                casual["KD"] = kdVal
+                            }
+                            
+                            let defensiveAssists = stats["defensiveAssists"] as? [String: Any] ?? [String: Any]()
+                            let defensiveAssistsVal = defensiveAssists["displayValue"] as? String ?? ""
+                            if(!defensiveAssistsVal.isEmpty){
+                                casual["Defensive Assists"] = defensiveAssistsVal
+                            }
+                            
+                            let offensiveAssists = stats["offensiveAssists"] as? [String: Any] ?? [String: Any]()
+                            let offensiveAssistsVal = offensiveAssists["displayValue"] as? String ?? ""
+                            if(!offensiveAssistsVal.isEmpty){
+                                casual["Offensive Assists"] = offensiveAssistsVal
+                            }
+                            
+                            newStatObj.overwatchCasualStats = casual
+                        }
+                        else if(meta["name"] as? String ?? "" == "Competitive"){
+                            var competitive = [String: String]()
+                            
+                            let stats = array["stats"] as? [String: Any] ?? [String: Any]()
+                            let wins = stats["wins"] as? [String: Any] ?? [String: Any]()
+                            let winsVal = wins["displayValue"] as? String ?? ""
+                            if(!winsVal.isEmpty){
+                                competitive["Wins"] = winsVal
+                            }
+                            
+                            let matchesStats = stats["matchesPlayed"] as? [String: Any] ?? [String: Any]()
+                            let matchesPlayedVal = matchesStats["displayValue"] as? String ?? ""
+                            if(!matchesPlayedVal.isEmpty){
+                                competitive["Matches Played"] = matchesPlayedVal
+                            }
+                            
+                            let goldMedals = stats["goldMedals"] as? [String: Any] ?? [String: Any]()
+                            let goldMedalVal = goldMedals["displayValue"] as? String ?? ""
+                            if(!goldMedalVal.isEmpty){
+                                competitive["Gold Medals"] = goldMedalVal
+                            }
+                            
+                            let silverMedals = stats["silverMedals"] as? [String: Any] ?? [String: Any]()
+                            let silverMedalsVal = silverMedals["displayValue"] as? String ?? ""
+                            if(!silverMedalsVal.isEmpty){
+                                competitive["Silver Medals"] = silverMedalsVal
+                            }
+                            
+                            let bronzeMedals = stats["bronzeMedals"] as? [String: Any] ?? [String: Any]()
+                            let bronzeMedalsVal = bronzeMedals["displayValue"] as? String ?? ""
+                            if(!bronzeMedalsVal.isEmpty){
+                                competitive["Bronze Medals"] = bronzeMedalsVal
+                            }
+                            
+                            let multiKills = stats["multiKills"] as? [String: Any] ?? [String: Any]()
+                            let multiKillsVal = multiKills["displayValue"] as? String ?? ""
+                            if(!multiKillsVal.isEmpty){
+                                competitive["Multi Kills"] = multiKillsVal
+                            }
+                            
+                            let soloKills = stats["soloKills"] as? [String: Any] ?? [String: Any]()
+                            let soloKillsVal = soloKills["displayValue"] as? String ?? ""
+                            if(!soloKillsVal.isEmpty){
+                                competitive["Solo Kills"] = soloKillsVal
+                            }
+                            
+                            let objectiveKills = stats["objectiveKills"] as? [String: Any] ?? [String: Any]()
+                            let objectiveKillsVal = objectiveKills["displayValue"] as? String ?? ""
+                            if(!objectiveKillsVal.isEmpty){
+                                competitive["Objective Kills"] = objectiveKillsVal
+                            }
+                            
+                            let finalBlows = stats["finalBlows"] as? [String: Any] ?? [String: Any]()
+                            let finalBlowsVal = finalBlows["displayValue"] as? String ?? ""
+                            if(!finalBlowsVal.isEmpty){
+                                competitive["Final Blows"] = finalBlowsVal
+                            }
+                            
+                            let damageDone = stats["damageDone"] as? [String: Any] ?? [String: Any]()
+                            let damageDoneVal = damageDone["displayValue"] as? String ?? ""
+                            if(!damageDoneVal.isEmpty){
+                                competitive["Damage Done"] = damageDoneVal
+                            }
+                            
+                            let healingDone = stats["healingDone"] as? [String: Any] ?? [String: Any]()
+                            let healingDoneVal = healingDone["displayValue"] as? String ?? ""
+                            if(!healingDoneVal.isEmpty){
+                                competitive["Healing Done"] = healingDoneVal
+                            }
+                            
+                            let eliminations = stats["eliminations"] as? [String: Any] ?? [String: Any]()
+                            let eliminationsVal = eliminations["displayValue"] as? String ?? ""
+                            if(!eliminationsVal.isEmpty){
+                                competitive["Eliminations"] = eliminationsVal
+                            }
+                            
+                            let kd = stats["kd"] as? [String: Any] ?? [String: Any]()
+                            let kdVal = kd["displayValue"] as? String ?? ""
+                            if(!kdVal.isEmpty){
+                                competitive["KD"] = kdVal
+                            }
+                            
+                            let defensiveAssists = stats["defensiveAssists"] as? [String: Any] ?? [String: Any]()
+                            let defensiveAssistsVal = defensiveAssists["displayValue"] as? String ?? ""
+                            if(!defensiveAssistsVal.isEmpty){
+                                competitive["Defensive Assists"] = defensiveAssistsVal
+                            }
+                            
+                            let offensiveAssists = stats["offensiveAssists"] as? [String: Any] ?? [String: Any]()
+                            let offensiveAssistsVal = offensiveAssists["displayValue"] as? String ?? ""
+                            if(!offensiveAssistsVal.isEmpty){
+                                competitive["Offensive Assists"] = offensiveAssistsVal
+                            }
+                            
+                            newStatObj.overwatchCompetitiveStats = competitive
+                            break
+                        }
+                    }
+                    newStatObj.statUrl = url
+                    newStatObj.setPublic = "true"
+                    newStatObj.authorized = "true"
+                    
+                    self.saveAndProceed(statObj: newStatObj)
+                    AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Overwatch Stats Received"))
+                }
+                else{
+                    AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Overwatch Profile Stats Incorrect Payload"))
+                    self.finishAndMoveToNext()
+                }
+            }
+        }
+    }
+    
     
     private func saveAndProceed(statObj: StatObject){
         DispatchQueue.main.async {
@@ -983,7 +1463,8 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
 
             let current = ["gameName": statObj.gameName, "killsPVE": statObj.killsPVE, "killsPVP": statObj.killsPVP, "playerLevelGame": statObj.playerLevelGame, "playerLevelPVP": statObj.playerLevelPVP, "statUrl": statObj.statUrl, "setPublic": statObj.setPublic, "authorized": statObj.authorized, "currentRank": statObj.currentRank, "totalRankedWins": statObj.totalRankedWins, "totalRankedLosses": statObj.totalRankedLosses, "totalRankedKills": statObj.totalRankedKills, "totalRankedDeaths": statObj.totalRankedLosses, "mostUsedAttacker": statObj.mostUsedAttacker, "mostUsedDefender": statObj.mostUsedDefender, "gearScore": statObj.gearScore,
                 "codLevel": statObj.codLevel, "codBestKills": statObj.codBestKills, "codKills": statObj.codKills,
-                "codWlRatio": statObj.codWlRatio, "codWins": statObj.codWins, "codKd": statObj.codKd]
+                "codWlRatio": statObj.codWlRatio, "codWins": statObj.codWins, "codKd": statObj.codKd, "fortniteSoloStats": statObj.fortniteSoloStats, "fortniteDuoStats": statObj.fortniteDuoStats, "fortniteSquadStats": statObj.fortniteSquadStats, "overwatchCasualStats" : statObj.overwatchCasualStats, "overwatchCompetitiveStats": statObj.overwatchCompetitiveStats, "killsPerMatch": statObj.killsPerMatch, "matchesPlayed" : statObj.matchesPlayed,
+                "seasonWins" : statObj.seasonWins, "seasonKills" : statObj.seasonKills, "supImage": statObj.suppImage] as [String : Any]
             
             self.stats.append(current)
             user?.stats.append(statObj)

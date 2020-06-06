@@ -138,6 +138,7 @@ PODS:
     - nanopb/encode (= 0.3.9011)
   - nanopb/decode (0.3.9011)
   - nanopb/encode (0.3.9011)
+  - OrderedDictionary (1.4)
   - PINCache (3.0.1-beta.8):
     - PINCache/Arc-exception-safe (= 3.0.1-beta.8)
     - PINCache/Core (= 3.0.1-beta.8)
@@ -187,6 +188,7 @@ DEPENDENCIES:
   - lottie-ios
   - moa
   - MSPeekCollectionViewDelegateImplementation
+  - OrderedDictionary
   - PINRemoteImage
   - PopupDialog
   - RAMPaperSwitch
@@ -237,6 +239,7 @@ SPEC REPOS:
     - moa
     - MSPeekCollectionViewDelegateImplementation
     - nanopb
+    - OrderedDictionary
     - PINCache
     - PINOperation
     - PINRemoteImage
@@ -299,6 +302,7 @@ SPEC CHECKSUMS:
   moa: e2346f12de6c65bbca4d103950d45db9e46785ef
   MSPeekCollectionViewDelegateImplementation: eb11d5777c4f1dd1004ca9b75ea9e1a7e71e4924
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
+  OrderedDictionary: 138c8d2e358d3a0c9adda15c6c7db24e8e3b09e6
   PINCache: 534fd41d358d828dfdf227a0d327f3673a65e20b
   PINOperation: 24b774353ca248fcf87d67b2d61eef42087c125a
   PINRemoteImage: e2b89e19fb6e77ffc099f9d9f3b3fe1745e3f9f9
@@ -319,6 +323,6 @@ SPEC CHECKSUMS:
   ValidationToolkit: ce8e9c1a5d49eddc3266a009d46df5ea22042dbc
   VideoBackground: b4a2f39d3b16254b2bec9488cb2968a06dff69c5
 
-PODFILE CHECKSUM: a42dafb80be47c59aa8f33974061ec7d5a31dfc2
+PODFILE CHECKSUM: 7e4ef045bfabea7a36c3ec6fd3c9bc865801273a
 
 COCOAPODS: 1.9.1

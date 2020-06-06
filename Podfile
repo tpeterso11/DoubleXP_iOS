@@ -31,6 +31,7 @@ target 'DoubleXP' do
   pod 'GoogleSignIn'
   pod 'SwiftDate'
   pod 'Swifter', :git => 'https://github.com/mattdonnelly/Swifter.git'
+  pod 'OrderedDictionary'
   
   # Pods for DoubleXP
 

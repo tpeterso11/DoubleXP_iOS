@@ -25,24 +25,9 @@ class PreSplashActivity: UIViewController {
         super.viewDidLoad()
         
         games = [GamerConnectGame]()
-        // Do any additional setup after loading the view, typically from a nib.
-        
-        //let social = SocialMediaManager()
-        //social.getGame()
-        //getTwitchToken()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
             self.getAppConfig()
         }
-        
-        //let test = ["gamerTag": "SUCCESSFUL!!!!!!!", "game": "Test", "observableTime": "0", "timeInMs": "50000"]
-                   
-                   //array.append(test)
-                   //let appDelegate = UIApplication.shared.delegate as! AppDelegate
-                   //let allNewChildrenRef = Database.database().reference().child("Users").child("UNrTyfFOeHZB3T2HQvUVevIxHkE2")
-                   //allNewChildrenRef.child("tempRivals").setValue(test)
-               //allNewChildrenRef.child("thisShitIsSoAnnoying").setValue("YOU!")
-        
-        //testLoadTwitter()
     }
     
     func getAppConfig(){
@@ -709,8 +694,25 @@ class PreSplashActivity: UIViewController {
                 let codBestKills = dict?["codBestKills"] as? String ?? ""
                 let codWins = dict?["codWins"] as? String ?? ""
                 let codWlRatio = dict?["codWlRatio"] as? String ?? ""
+                let fortniteDuoStats = dict?["fortniteDuoStats"] as? [String:String] ?? [String: String]()
+                let fortniteSoloStats = dict?["fortniteSoloStats"] as? [String:String] ?? [String: String]()
+                let fortniteSquadStats = dict?["fortniteSquadStats"] as? [String:String] ?? [String: String]()
+                let overwatchCasualStats = dict?["overwatchCasualStats"] as? [String:String] ?? [String: String]()
+                let overwatchCompetitiveStats = dict?["overwatchCompetitiveStats"] as? [String:String] ?? [String: String]()
+                let killsPerMatch = dict?["killsPerMatch"] as? String ?? ""
+                let matchesPlayed = dict?["matchesPlayed"] as? String ?? ""
+                let seasonWins = dict?["seasonWins"] as? String ?? ""
+                let seasonKills = dict?["seasonKills"] as? String ?? ""
+                let supImage = dict?["supImage"] as? String ?? ""
                 
                 let currentStat = StatObject(gameName: gameName)
+                currentStat.overwatchCasualStats = overwatchCasualStats
+                currentStat.overwatchCompetitiveStats = overwatchCompetitiveStats
+                currentStat.killsPerMatch = killsPerMatch
+                currentStat.matchesPlayed = matchesPlayed
+                currentStat.seasonWins = seasonWins
+                currentStat.seasonKills = seasonKills
+                currentStat.suppImage = supImage
                 currentStat.authorized = authorized
                 currentStat.playerLevelGame = playerLevelGame
                 currentStat.playerLevelPVP = playerLevelPVP
@@ -733,6 +735,9 @@ class PreSplashActivity: UIViewController {
                 currentStat.codBestKills = codBestKills
                 currentStat.codWins = codWins
                 currentStat.codWlRatio = codWlRatio
+                currentStat.fortniteDuoStats = fortniteDuoStats
+                currentStat.fortniteSoloStats = fortniteSoloStats
+                currentStat.fortniteSquadStats = fortniteSquadStats
                 
                 currentStats.append(currentStat)
             }

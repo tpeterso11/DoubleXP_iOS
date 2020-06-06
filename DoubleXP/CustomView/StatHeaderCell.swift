@@ -8,7 +8,7 @@
 
 import UIKit
 
-class StatsHeaderCell: UICollectionReusableView{
+class StatsHeaderCell: UITableViewCell{
     
     @IBOutlet weak var headerText: UILabel!
 }

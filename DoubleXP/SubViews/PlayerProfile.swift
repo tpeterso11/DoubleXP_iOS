@@ -12,6 +12,7 @@ import moa
 import MSPeekCollectionViewDelegateImplementation
 import FoldingCell
 import FBSDKCoreKit
+import OrderedDictionary
 
 class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, ProfileCallbacks, UICollectionViewDataSource, UICollectionViewDelegate, RequestsUpdate, UICollectionViewDelegateFlowLayout {
     
@@ -21,6 +22,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     var keys = [String]()
     var objects = [GamerConnectGame]()
     var cellHeights: [CGFloat] = []
+    var statsPayload = [String]()
     
     @IBOutlet weak var gamerTag: UILabel!
     @IBOutlet weak var profileLine2: UILabel!
@@ -64,6 +66,13 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     @IBOutlet weak var rivalOverlayHeader: UILabel!
     @IBOutlet weak var rivalGameView: UIView!
     @IBOutlet weak var rivalGameCollection: UICollectionView!
+    @IBOutlet weak var statOverlayCard: UIView!
+    @IBOutlet weak var statsOverlay: UIVisualEffectView!
+    @IBOutlet weak var statCardBack: UIImageView!
+    @IBOutlet weak var statCardTitle: UILabel!
+    @IBOutlet weak var statCardClose: UIImageView!
+    @IBOutlet weak var statOverlayTable: UITableView!
+    @IBOutlet weak var statsOverlayCollection: UICollectionView!
     
     var rivalOverlayPayload = [GamerConnectGame]()
     var sections = [Section]()
@@ -71,6 +80,9 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     
     var rivalSelectedGame = ""
     var rivalSelectedType = ""
+    var currentStatsGame: GamerConnectGame?
+    var statsSet = false
+    var currentKey = ""
     
     var gamesWithStats = [String]()
     
@@ -256,8 +268,28 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 let codBestKills = dict["codBestKills"] as? String ?? ""
                 let codWins = dict["codWins"] as? String ?? ""
                 let codWlRatio = dict["codWlRatio"] as? String ?? ""
+                let fortniteDuoStats = dict["fortniteDuoStats"] as? [String:String] ?? [String: String]()
+                let fortniteSoloStats = dict["fortniteSoloStats"] as? [String:String] ?? [String: String]()
+                let fortniteSquadStats = dict["fortniteSquadStats"] as? [String:String] ?? [String: String]()
+                let overwatchCasualStats = dict["overwatchCasualStats"] as? [String:String] ?? [String: String]()
+                let overwatchCompetitiveStats = dict["overwatchCompetitiveStats"] as? [String:String] ?? [String: String]()
+                let killsPerMatch = dict["killsPerMatch"] as? String ?? ""
+                let matchesPlayed = dict["matchesPlayed"] as? String ?? ""
+                let seasonWins = dict["seasonWins"] as? String ?? ""
+                let seasonKills = dict["seasonKills"] as? String ?? ""
+                let supImage = dict["supImage"] as? String ?? ""
                 
                 let currentStat = StatObject(gameName: gameName)
+                currentStat.fortniteDuoStats = fortniteDuoStats
+                currentStat.fortniteSoloStats = fortniteSoloStats
+                currentStat.fortniteSquadStats = fortniteSquadStats
+                currentStat.overwatchCasualStats = overwatchCasualStats
+                currentStat.overwatchCompetitiveStats = overwatchCompetitiveStats
+                currentStat.killsPerMatch = killsPerMatch
+                currentStat.matchesPlayed = matchesPlayed
+                currentStat.seasonWins = seasonWins
+                currentStat.seasonKills = seasonKills
+                currentStat.suppImage = supImage
                 currentStat.authorized = authorized
                 currentStat.playerLevelGame = playerLevelGame
                 currentStat.playerLevelPVP = playerLevelPVP
@@ -514,11 +546,11 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         actionOverlay.isUserInteractionEnabled = false
     }
     
-    func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
+    func tableView(_ tableview: UITableView, numberOfRowsInSection _: Int) -> Int {
         return self.objects.count
     }
 
-    func tableView(_: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    func tableView(_ tableview: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         guard case let cell as FoldingCellCell = cell else {
             return
         }
@@ -530,12 +562,10 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         } else {
             cell.unfold(true, animated: false, completion: nil)
         }
-
-        //cell.number = indexPath.row
     }
 
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! FoldingCellCell
+    func tableView(_ tableview: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableview.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! FoldingCellCell
         let current = self.objects[indexPath.item]
         
         cell.gameName.text = ""
@@ -553,8 +583,8 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         
         for stat in self.userForProfile!.stats{
             if(stat.gameName == current.gameName){
-                self.objects[indexPath.item].stats = stat
-                cell.setCollectionView(stat: stat)
+                //self.objects[indexPath.item].stats = stat
+                //cell.setCollectionView(stat: stat)
                 cell.statsAvailable.isHidden = false
                 
                 self.gamesWithStats.append(stat.gameName)
@@ -567,15 +597,15 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         return cell
     }
 
-    func tableView(_: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    func tableView(_ tableview: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return cellHeights[indexPath.row]
     }
 
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-
+    func tableView(_ tableview: UITableView, didSelectRowAt indexPath: IndexPath) {
         let current = self.objects[indexPath.item]
         if(self.gamesWithStats.contains(current.gameName)){
-            let cell = tableView.cellForRow(at: indexPath) as! FoldingCell
+            self.showStatsOverlay(gameName: current.gameName)
+            /*let cell = tableView.cellForRow(at: indexPath) as! FoldingCell
 
             if cell.isAnimating() {
                 return
@@ -603,16 +633,21 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 if cell.frame.maxY > tableView.frame.maxY {
                     tableView.scrollToRow(at: indexPath, at: UITableView.ScrollPosition.bottom, animated: true)
                 }
-            }, completion: nil)
+            }, completion: nil)*/
         }
     }
     
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        self.rivalOverlayPayload.count
+        if(collectionView == rivalGameCollection){
+            return self.rivalOverlayPayload.count
+        } else {
+            return self.statsPayload.count
+        }
     }
        
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if(collectionView == rivalGameCollection){
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! homeGCCell
         
         let game = self.rivalOverlayPayload[indexPath.item]
@@ -635,21 +670,53 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
            cell.layer.masksToBounds = false
            cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
            return cell
+        } else {
+           let current = self.statsPayload[indexPath.item]
+           let currentArr = current.characters.split{$0 == "/"}.map(String.init)
+            let key = currentArr[0]
+            let value = currentArr[1]
+           
+            if(key.contains("HEADER")){
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "statsHeaderCell", for: indexPath) as! ProfileStatHeader
+                cell.headerText.text = value
+                
+                cell.isUserInteractionEnabled = false
+                return cell
+            } else {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "statsCell", for: indexPath) as! StatsCollectionCell
+                cell.statLabel.text = key
+                cell.stat.text = value
+                
+                cell.isUserInteractionEnabled = false
+                return cell
+            
+          }
+       }
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let current = self.rivalOverlayPayload[indexPath.item]
-        
-        self.rivalSelectedGame = current.gameName
-        
-        self.progressRival()
+        if(collectionView == rivalGameCollection){
+            let current = self.rivalOverlayPayload[indexPath.item]
+            
+            self.rivalSelectedGame = current.gameName
+            
+            self.progressRival()
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
-        
-        return CGSize(width: self.rivalGameCollection.bounds.width - 10, height: CGFloat(80))
+        if(collectionView == rivalGameCollection){
+            return CGSize(width: self.rivalGameCollection.bounds.width - 10, height: CGFloat(80))
+        } else {
+            let current = self.statsPayload[indexPath.item]
+            if(current.contains("HEADER")){
+                return CGSize(width: self.statsOverlayCollection.bounds.width - 10, height: CGFloat(50))
+            } else {
+                return CGSize(width: 150, height: CGFloat(130))
+            }
+        }
     }
     
     func onFriendRequested(){
@@ -668,6 +735,128 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                     }, completion: nil)
                 }
             })
+        })
+    }
+    
+    private func showStatsOverlay(gameName: String){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        var currentStat: StatObject? = nil
+        
+        for stat in userForProfile!.stats{
+            if(stat.gameName == gameName){
+                currentStat = stat
+            }
+        }
+        
+        for game in delegate.gcGames{
+            if(gameName == game.gameName){
+                self.currentStatsGame = game
+            }
+        }
+        
+        if(self.currentStatsGame != nil){
+            if(currentStat != nil && !currentStat!.suppImage.isEmpty){
+                self.statCardBack.moa.url = currentStat!.suppImage
+            } else {
+                self.statCardBack.moa.url = self.currentStatsGame!.imageUrl
+            }
+            
+            if(gameName == "Fortnite"){
+                var build = [String]()
+                build.append("HEADER_0/Solo Stats")
+                
+                for (key, value) in currentStat!.fortniteSoloStats{
+                    if((value as! String).contains(".00")){
+                        let newVal = (value as! String).prefix(upTo: (value as! String).index(of: ".")!)
+                        build.append(key+"/"+newVal)
+                    } else {
+                        build.append(key+"/"+(value as? String ?? ""))
+                    }
+                }
+                
+                build.append("HEADER_1/Competitive Stats")
+                for (key, value) in currentStat!.fortniteDuoStats{
+                  if((value as! String).contains(".00")){
+                      let newVal = (value as! String).prefix(upTo: (value as! String).index(of: ".")!)
+                      build.append(key+"/"+newVal)
+                  } else {
+                      build.append(key+"/"+(value as? String ?? ""))
+                  }
+                }
+                
+                build.append("HEADER_1/Competitive Stats")
+                for (key, value) in currentStat!.fortniteSquadStats{
+                  if((value as! String).contains(".00")){
+                      let newVal = (value as! String).prefix(upTo: (value as! String).index(of: ".")!)
+                      build.append(key+"/"+newVal)
+                  } else {
+                      build.append(key+"/"+(value as? String ?? ""))
+                  }
+                }
+                
+                self.statsPayload = build
+            } else if(gameName == "Overwatch"){
+                var build = [String]()
+                build.append("HEADER_0/Casual Stats")
+                
+                for (key, value) in currentStat!.overwatchCasualStats{
+                    build.append(key+"/"+(value as? String ?? ""))
+                }
+                
+                build.append("HEADER_1/Competitive Stats")
+                for (key, value) in currentStat!.overwatchCompetitiveStats{
+                  build.append(key+"/"+(value as? String ?? ""))
+                }
+                
+                self.statsPayload = build
+            } else {
+                self.statsPayload = currentStat!.createBasicPayload()
+            }
+            
+            if(!self.statsSet){
+                self.statsOverlayCollection.dataSource = self
+                self.statsOverlayCollection.delegate = self
+                self.statsSet = true
+            } else {
+                self.statsOverlayCollection.reloadData()
+            }
+    
+            self.statCardBack.contentMode = .scaleAspectFill
+            self.statCardBack.clipsToBounds = true
+            self.statCardTitle.text = gameName
+            
+            let overlayCloseTap = UITapGestureRecognizer(target: self, action: #selector(hideStatsOverlay))
+            self.statCardClose.isUserInteractionEnabled = true
+            self.statCardClose.addGestureRecognizer(overlayCloseTap)
+            
+            let top = CGAffineTransform(translationX: -338, y: 0)
+            UIView.animate(withDuration: 0.8, animations: {
+                self.statsOverlay.alpha = 1
+            }, completion: { (finished: Bool) in
+                UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                    self.statOverlayCard.transform = top
+                    self.statOverlayCard.alpha = 1
+                }, completion: nil)
+            })
+        }
+    }
+    
+    func reload(tableView: UITableView) {
+        let contentOffset = tableView.contentOffset
+        tableView.reloadData()
+        tableView.layoutIfNeeded()
+        tableView.setContentOffset(contentOffset, animated: false)
+    }
+    
+    @objc private func hideStatsOverlay(){
+        let top = CGAffineTransform(translationX: 0, y: 0)
+        UIView.animate(withDuration: 0.8, animations: {
+            self.statOverlayCard.transform = top
+            self.statOverlayCard.alpha = 0
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                self.statsOverlay.alpha = 0
+            }, completion: nil)
         })
     }
     
@@ -1227,5 +1416,13 @@ extension UIVisualEffectView {
 extension Date {
     func adding(minutes: Int) -> Date {
         return Calendar.current.date(byAdding: .minute, value: minutes, to: self)!
+    }
+}
+
+extension Dictionary {
+    mutating func merge(dict: [Key: Value]){
+        for (k, v) in dict {
+            updateValue(v, forKey: k)
+        }
     }
 }

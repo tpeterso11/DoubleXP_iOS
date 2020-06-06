@@ -569,8 +569,22 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                     let codBestKills = dict?["codBestKills"] as? String ?? ""
                     let codWins = dict?["codWins"] as? String ?? ""
                     let codWlRatio = dict?["codWlRatio"] as? String ?? ""
+                    let overwatchCasualStats = dict?["overwatchCasualStats"] as? [String:String] ?? [String: String]()
+                    let overwatchCompetitiveStats = dict?["overwatchCompetitiveStats"] as? [String:String] ?? [String: String]()
+                    let killsPerMatch = dict?["killsPerMatch"] as? String ?? ""
+                    let matchesPlayed = dict?["matchesPlayed"] as? String ?? ""
+                    let seasonWins = dict?["seasonWins"] as? String ?? ""
+                    let seasonKills = dict?["seasonKills"] as? String ?? ""
+                    let supImage = dict?["supImage"] as? String ?? ""
                     
                     let currentStat = StatObject(gameName: gameName)
+                    currentStat.overwatchCasualStats = overwatchCasualStats
+                    currentStat.overwatchCompetitiveStats = overwatchCompetitiveStats
+                    currentStat.killsPerMatch = killsPerMatch
+                    currentStat.matchesPlayed = matchesPlayed
+                    currentStat.seasonWins = seasonWins
+                    currentStat.seasonKills = seasonKills
+                    currentStat.suppImage = supImage
                     currentStat.authorized = authorized
                     currentStat.playerLevelGame = playerLevelGame
                     currentStat.playerLevelPVP = playerLevelPVP
