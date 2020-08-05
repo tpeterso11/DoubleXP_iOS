@@ -17,7 +17,7 @@ import CryptoKit
 import AuthenticationServices
 
 
-class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
+class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding, UITextFieldDelegate {
     
     private var data: [NewsObject]!
     private var games: [GamerConnectGame]!
@@ -165,9 +165,18 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
         GIDSignIn.sharedInstance().delegate = self
         
         AppEvents.logEvent(AppEvents.Name(rawValue: "Login"))
+        
+        emailField.returnKeyType = .done
+        emailField.delegate = self
+        passwordFieild.returnKeyType = .done
+        passwordFieild.delegate = self
     }
     
-    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool
+    {
+        textField.resignFirstResponder()
+        return true
+    }
     
     @objc func loginButtonClicked(_ sender: AnyObject?) {
         self.showWork()
@@ -210,6 +219,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
     }
     
     @objc func facebookLoginClicked(_ sender: AnyObject?) {
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login"))
         showWork()
         
         self.selectedSocial = "facebook"
@@ -219,6 +229,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
     }
     
     @objc func googleLoginClicked(_ sender: AnyObject?) {
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Login - Google Login"))
         showWork()
         
         self.selectedSocial = "google"
@@ -230,7 +241,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
     
     @available(iOS 13, *)
     @objc func appleLoginClicked(_ sender: AnyObject?) {
-        //showWork()
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Login - Apple Login"))
         
         self.selectedSocial = "apple"
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {

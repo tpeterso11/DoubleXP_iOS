@@ -52,8 +52,13 @@ protocol Profile {
     func goToProfile()
 }
 
-class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile, SearchCallbacks, LandingMenuCallbacks, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate {
+class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile, SearchCallbacks, LandingMenuCallbacks, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, LandingUICallbacks {
     
+    @IBOutlet weak var moreClickArea: UIView!
+    @IBOutlet weak var teamsClickArea: UIView!
+    @IBOutlet weak var connectClickArea: UIView!
+    @IBOutlet weak var requestsClickArea: UIView!
+    @IBOutlet weak var mediaClickArea: UIView!
     @IBOutlet weak var gifButton: UIImageView!
     @IBOutlet weak var navigationView: UIView!
     @IBOutlet weak var navContainer: UIView!
@@ -71,8 +76,16 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     @IBOutlet weak var bottomNavSearch: UITextField!
     @IBOutlet weak var primaryBack: UIImageView!
     @IBOutlet weak var searchButton: UIButton!
+    @IBOutlet weak var scoob: AnimationView!
+    @IBOutlet weak var universalLoading: UIVisualEffectView!
+    @IBOutlet weak var scoobSub: UIView!
+    @IBOutlet weak var scoobCancel: UIButton!
+    @IBOutlet weak var scoobText: UILabel!
+    @IBOutlet weak var dismissHead: UILabel!
+    @IBOutlet weak var dismissBody: UILabel!
     var mainNavShowing = false
     var bannerShowing = false
+    var met = false
     //@IBOutlet weak var newNav: UIView!
     
     @IBOutlet weak var alertSubjectStatus: UILabel!
@@ -210,7 +223,8 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         addRejectedRivalsRef()
     
         appDelegate.handleToken()
-
+        
+        setupScoob()
         //DispatchQueue.main.asyncAfter(deadline: .now() + 8.5) {
             //var array = [[String: Any]]()
             /*let test = ["gamerTag": "SUCCESSFUL!!!!!!!", "game": "Test", "observableTime": "0", "timeInMs": "50000"] as [String : String]
@@ -877,6 +891,9 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         if(menuVie.viewShowing){
             dismissMenu()
         }
+        else if(appDelegate.currentProfileFrag != nil && appDelegate.currentProfileFrag!.drawerOpen){
+            appDelegate.currentProfileFrag!.hideStatsOverlay()
+        }
         else if(appDelegate.currentMediaFrag != nil){
             if(appDelegate.currentMediaFrag!.articleOpen){
                 appDelegate.currentMediaFrag!.closeOverlay()
@@ -918,28 +935,35 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             
             
             if self.stackDepth >= 0 && self.stackDepth < stack.count {
-                let current = Array(stack)[self.stackDepth].value
-                let key = Array(stack)[self.stackDepth - 1].value
-                
-                if(stack.count > 0 && key != nil){
-                    Broadcaster.notify(NavigateToProfile.self) {
-                        $0.programmaticallyLoad(vc: key, fragName: key.pageName!)
-                    }
-                    
-                    if(stack.count > 1){
-                        stack.removeValue(forKey: current.pageName!)
-                        appDelegate.navStack = stack
-                    }
-                    
-                    if(stack.count == 1){
+                do {
+                    //safe:[index] makes so we can get null returned if it's out of bounds and we can catch it and just send them home.
+                    guard let current = Array(stack)[safe: self.stackDepth]?.value else {
                         appDelegate.currentLanding!.checkRivals()
-                        restoreBottomNav()
+                        navigateToHome()
+                        return
                     }
-                }
-                else{
-                    appDelegate.currentLanding!.checkRivals()
-                    Broadcaster.notify(NavigateToProfile.self) {
-                        $0.navigateToHome()
+                    let key = Array(stack)[self.stackDepth - 1].value
+                    
+                    if(stack.count > 0 && key != nil){
+                        Broadcaster.notify(NavigateToProfile.self) {
+                            $0.programmaticallyLoad(vc: key, fragName: key.pageName!)
+                        }
+                        
+                        if(stack.count > 1){
+                            stack.removeValue(forKey: current.pageName!)
+                            appDelegate.navStack = stack
+                        }
+                        
+                        if(stack.count == 1){
+                            appDelegate.currentLanding!.checkRivals()
+                            restoreBottomNav()
+                        }
+                    }
+                    else{
+                        appDelegate.currentLanding!.checkRivals()
+                        Broadcaster.notify(NavigateToProfile.self) {
+                            $0.navigateToHome()
+                        }
                     }
                 }
             }
@@ -1217,6 +1241,103 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         }
     }
     
+    func showScoob(callback: LandingUICallbacks, cancelableWV: WKWebView?){
+        resetDismissScoob()
+        setupScoobCancel(cancelableWV: cancelableWV)
+        
+        let top = CGAffineTransform(translationX: 0, y: 40)
+        UIView.animate(withDuration: 0.5, animations: {
+            self.universalLoading.alpha = 1
+            self.scoobSub.transform = top
+            self.scoobSub.alpha = 1
+        
+            DispatchQueue.main.asyncAfter(deadline: .now() + 30.0) {
+                self.showDismissScoob()
+            }
+        }, completion: nil)
+        
+        scoob.loopMode = .loop
+        scoob.play()
+    }
+    
+    func setupScoobCancel(cancelableWV: WKWebView?) {
+        if(cancelableWV != nil){
+            cancelableWV?.stopLoading()
+            cancelableWV?.loadHTMLString("", baseURL: nil)
+        } else {
+            hideScoob()
+        }
+    }
+    
+    func showDismissScoob(){
+        let top3 = CGAffineTransform(translationX: 0, y: -40)
+        UIView.animate(withDuration: 0.5, animations: {
+            self.scoobCancel.transform = top3
+            self.dismissHead.transform = top3
+            self.dismissBody.transform = top3
+            self.scoobCancel.alpha = 1
+            self.dismissHead.alpha = 1
+            self.dismissBody.alpha = 1
+        }, completion: nil)
+    }
+    
+    func resetDismissScoob(){
+        let top3 = CGAffineTransform(translationX: 0, y: 0)
+        UIView.animate(withDuration: 0.01, animations: {
+            self.scoobCancel.transform = top3
+            self.dismissHead.transform = top3
+            self.dismissBody.transform = top3
+            self.scoobCancel.alpha = 0
+            self.dismissHead.alpha = 0
+            self.dismissBody.alpha = 0
+        }, completion: nil)
+    }
+    
+    func setupScoob(){
+        scoobSub.layer.cornerRadius = 10.0
+        scoobSub.layer.borderWidth = 1.0
+        scoobSub.layer.borderColor = UIColor.clear.cgColor
+        scoobSub.layer.masksToBounds = true
+        
+        scoobSub.layer.shadowColor = UIColor.black.cgColor
+        scoobSub.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+        scoobSub.layer.shadowRadius = 2.0
+        scoobSub.layer.shadowOpacity = 0.5
+        scoobSub.layer.masksToBounds = false
+        scoobSub.layer.shadowPath = UIBezierPath(roundedRect: scoobSub.layer.bounds, cornerRadius: scoobSub.layer.cornerRadius).cgPath
+        
+        scoobCancel.layer.shadowColor = UIColor.black.cgColor
+        scoobCancel.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+        scoobCancel.layer.shadowRadius = 2.0
+        scoobCancel.layer.shadowOpacity = 0.5
+        scoobCancel.layer.masksToBounds = false
+        scoobCancel.layer.shadowPath = UIBezierPath(roundedRect: scoobCancel.bounds, cornerRadius: scoobCancel.layer.cornerRadius).cgPath
+        //add more scoob layouts
+        // -- like one that is like  (ACTUAL CONTROLLER SYMBOLS ->) " triangle triangle back forward" and then below have "Sub Zero's ice move" somethin like that. We can create a small library of these to pop up throughout the app whenever the loading screen shows.
+   
+        scoobCancel.addTarget(self, action: #selector(hideScoob), for: .touchUpInside)
+    }
+    
+    
+    @objc func hideScoob(){
+        if(self.universalLoading.alpha == 1){
+            let top = CGAffineTransform(translationX: 0, y: 0)
+            UIView.animate(withDuration: 0.5, animations: {
+                self.universalLoading.alpha = 0
+            }, completion: { (finished: Bool) in
+                UIView.animate(withDuration: 0.5, delay: 0.8, options: [], animations: {
+                    self.scoobSub.transform = top
+                    self.scoobSub.alpha = 0
+                    self.resetDismissScoob()
+                    
+                    self.scoob.stop()
+                }, completion: nil)
+            })
+        }
+    }
+    
+    
+    
     func programmaticallyLoad(vc: UIViewController, fragName: String) {
     }
     
@@ -1426,24 +1547,24 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     private func enableButtons(){
         let singleTapTeam = UITapGestureRecognizer(target: self, action: #selector(teamButtonClicked))
-        team.isUserInteractionEnabled = true
-        team.addGestureRecognizer(singleTapTeam)
+        self.teamsClickArea.isUserInteractionEnabled = true
+        self.teamsClickArea.addGestureRecognizer(singleTapTeam)
         
         let singleTapHome = UITapGestureRecognizer(target: self, action: #selector(homeButtonClicked))
-        connect.isUserInteractionEnabled = true
-        connect.addGestureRecognizer(singleTapHome)
+        self.connectClickArea.isUserInteractionEnabled = true
+        self.connectClickArea.addGestureRecognizer(singleTapHome)
         
         let singleTapRequests = UITapGestureRecognizer(target: self, action: #selector(requestButtonClicked))
-        requests.isUserInteractionEnabled = true
-        requests.addGestureRecognizer(singleTapRequests)
+        self.requestsClickArea.isUserInteractionEnabled = true
+        self.requestsClickArea.addGestureRecognizer(singleTapRequests)
         
         let singleTapMenu = UITapGestureRecognizer(target: self, action: #selector(menuButtonClicked))
-        menuButton.isUserInteractionEnabled = true
-        menuButton.addGestureRecognizer(singleTapMenu)
+        self.moreClickArea.isUserInteractionEnabled = true
+        self.moreClickArea.addGestureRecognizer(singleTapMenu)
         
         let singleTapMedia = UITapGestureRecognizer(target: self, action: #selector(mediaButtonClicked))
-        mediaButton.isUserInteractionEnabled = true
-        mediaButton.addGestureRecognizer(singleTapMedia)
+        self.mediaClickArea.isUserInteractionEnabled = true
+        self.mediaClickArea.addGestureRecognizer(singleTapMedia)
         
         bottomNav.isHidden = false
         bottomNav.isUserInteractionEnabled = true
@@ -1802,5 +1923,11 @@ extension Array {
 extension Date {
     init(milliseconds:Int64) {
         self = Date(timeIntervalSince1970: TimeInterval(milliseconds) / 1000)
+    }
+}
+
+extension Collection where Indices.Iterator.Element == Index {
+    subscript (safe index: Index) -> Iterator.Element? {
+        return indices.contains(index) ? self[index] : nil
     }
 }

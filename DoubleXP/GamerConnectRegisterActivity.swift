@@ -155,8 +155,8 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         gameCollection.delegate = self
         gameCollection.dataSource = self
         
-        behavior = MSCollectionViewPeekingBehavior()
-        gameCollection.configureForPeekingBehavior(behavior: behavior)
+        //behavior = MSCollectionViewPeekingBehavior()
+        //gameCollection.configureForPeekingBehavior(behavior: behavior)
     }
     
     private func showCreationView(){
@@ -367,8 +367,20 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! GCElongCell
         let current = self.availableGames[indexPath.item]
         
-        cell.backgroundImage.image = Utility.Image.placeholder
-        cell.backgroundImage.moa.url = current.imageUrl
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let cache = appDelegate.imageCache
+        if(cache.object(forKey: current.imageUrl as NSString) != nil){
+            cell.backgroundImage.image = cache.object(forKey: current.imageUrl as NSString)
+        } else {
+            cell.backgroundImage.image = Utility.Image.placeholder
+            cell.backgroundImage.moa.onSuccess = { image in
+                cell.backgroundImage.image = image
+                appDelegate.imageCache.setObject(image, forKey: current.imageUrl as NSString)
+                return image
+            }
+            cell.backgroundImage.moa.url = current.imageUrl
+        }
+        
         cell.backgroundImage.contentMode = .scaleAspectFill
         cell.backgroundImage.clipsToBounds = true
         
@@ -377,6 +389,8 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         
         if(current.statsAvailable){
             cell.statsAvailable.isHidden = false
+        } else {
+            cell.statsAvailable.isHidden = true
         }
         
         cell.contentView.layer.cornerRadius = 20.0

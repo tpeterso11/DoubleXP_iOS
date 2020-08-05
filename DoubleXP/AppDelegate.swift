@@ -23,6 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var currentUser: User?
     var currentLanding: LandingActivity?
     var currentMediaFrag: MediaFrag?
+    var currentProfileFrag: PlayerProfile?
     var currentFrag: String = ""
     var interviewManager = InterviewManager()
     var mediaManager = MediaManager()
@@ -31,6 +32,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var mediaCache = MediaCache()
     var twitchChannels = [TwitchChannelObj]()
     var competitions = [CompetitionObj]()
+    var imageCache = NSCache<NSString, UIImage>()
     
     private var apnsToken: String = ""
     private var fcmToken: String = ""

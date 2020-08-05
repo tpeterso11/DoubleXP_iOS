@@ -384,6 +384,26 @@ class FAQuestion: NSObject, NSCoding {
         }
     }
     
+    var _optionsUrl = ""
+    var optionsUrl: String {
+        get {
+            return (_optionsUrl)
+        }
+        set (newVal) {
+            _optionsUrl = newVal
+        }
+    }
+    
+    var _maxOptions = ""
+    var maxOptions: String {
+        get {
+            return (_maxOptions)
+        }
+        set (newVal) {
+            _maxOptions = newVal
+        }
+    }
+    
     var _questionAnswered = false
     var questionAnswered: Bool {
         get {
@@ -401,6 +421,16 @@ class FAQuestion: NSObject, NSCoding {
         }
         set (newVal) {
             _answer = newVal
+        }
+    }
+    
+    var _answerArray = [String]()
+    var answerArray: [String] {
+        get {
+            return (_answerArray)
+        }
+        set (newVal) {
+            _answerArray = newVal
         }
     }
     
@@ -435,6 +465,9 @@ class FAQuestion: NSObject, NSCoding {
         self.option1Description = (decoder.decodeObject(forKey: "option1Description") as! String)
         self.option1 = (decoder.decodeObject(forKey: "option1") as! String)
         self.teamNeedQuestion = (decoder.decodeObject(forKey: "teamNeedQuestion") as! String)
+        self.optionsUrl = (decoder.decodeObject(forKey: "optionsUrl") as! String)
+        self.maxOptions = (decoder.decodeObject(forKey: "maxOptions") as! String)
+        self.answerArray = (decoder.decodeObject(forKey: "answerArray") as! [String])
     }
 
     func encode(with coder: NSCoder) {
@@ -460,5 +493,8 @@ class FAQuestion: NSObject, NSCoding {
         coder.encode(self.option1Description, forKey: "option1Description")
         coder.encode(self.option1, forKey: "option1")
         coder.encode(self.teamNeedQuestion, forKey: "teamNeedQuestion")
+        coder.encode(self.optionsUrl, forKey: "optionsUrl")
+        coder.encode(self.maxOptions, forKey: "maxOptions")
+        coder.encode(self.answerArray, forKey: "answerArray")
     }
 }

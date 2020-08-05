@@ -359,37 +359,37 @@ class StatObject: NSObject, NSCoding {
     func createBasicPayload() -> [String]{
         var payload = [String]()
         if(!killsPVE.isEmpty){
-            payload.append("Kills PVE/"+killsPVE)
+            payload.append("kills pve/"+killsPVE)
         }
         if(!killsPVP.isEmpty){
-            payload.append("Kills PVP/"+killsPVP)
+            payload.append("kills pvp/"+killsPVP)
         }
         if(!playerLevelGame.isEmpty){
-            payload.append("Player Level: Game/"+playerLevelGame)
+            payload.append("player level: game/"+playerLevelGame)
         }
         if(!playerLevelPVP.isEmpty){
-            payload.append("Player Level PVP/"+playerLevelPVP)
+            payload.append("player level pvp/"+playerLevelPVP)
         }
         if(!currentRank.isEmpty){
-            payload.append("Current Rank/"+currentRank)
+            payload.append("current rank/"+currentRank)
         }
         if(!totalRankedWins.isEmpty){
-            payload.append("Total Ranked Wins/"+totalRankedWins)
+            payload.append("total ranked wins/"+totalRankedWins)
         }
         if(!totalRankedLosses.isEmpty){
-            payload.append("Total Ranked Losses/"+totalRankedLosses)
+            payload.append("total ranked losses/"+totalRankedLosses)
         }
         if(!totalRankedKills.isEmpty){
-            payload.append("Total Ranked Kills/"+totalRankedKills)
+            payload.append("total ranked kills/"+totalRankedKills)
         }
         if(!totalRankedDeaths.isEmpty){
-           payload.append("Total Ranked Deaths/"+totalRankedDeaths)
+           payload.append("total ranked deaths/"+totalRankedDeaths)
         }
         if(!mostUsedAttacker.isEmpty){
-            payload.append("Most Used Attacker/"+mostUsedAttacker)
+            payload.append("most used attacker/"+mostUsedAttacker)
         }
         if(!mostUsedDefender.isEmpty){
-            payload.append("Most Used Defender/"+mostUsedDefender)
+            payload.append("most used defender/"+mostUsedDefender)
         }
         /*if(!codWins.isEmpty){
             payload["Wins"] = codWins
@@ -404,16 +404,16 @@ class StatObject: NSObject, NSCoding {
             payload["KD"] = codKd
         }*/
         if(!killsPerMatch.isEmpty){
-            payload.append("Kills Per Match/"+killsPerMatch)
+            payload.append("kills per match/"+killsPerMatch)
         }
         if(!matchesPlayed.isEmpty){
-            payload.append("Matches Played/"+matchesPlayed)
+            payload.append("matches played/"+matchesPlayed)
         }
         if(!seasonWins.isEmpty){
-            payload.append("Season Wins/"+seasonWins)
+            payload.append("season wins/"+seasonWins)
         }
         if(!seasonKills.isEmpty){
-            payload.append("Season Kills/"+seasonKills)
+            payload.append("season kills/"+seasonKills)
         }
         
         return payload

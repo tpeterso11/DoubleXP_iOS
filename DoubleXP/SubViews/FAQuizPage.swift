@@ -13,6 +13,7 @@ import SwiftHTTP
 import SwiftNotificationCenter
 
 class FAQuizPage: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, FreeAgentQuizNav{
+    
     var question: FAQuestion?
     private var options = [String]()
     private var optionDescriptions = [String]()
@@ -101,6 +102,9 @@ class FAQuizPage: UIViewController, UICollectionViewDataSource, UICollectionView
         questionOptions.dataSource = self
     }
     
+    func addQuestion(question: FAQuestion, interviewManager: InterviewManager) {
+    }
+    
     func addQuestion(question: FAQuestion) {
     }
     
@@ -171,7 +175,7 @@ class FAQuizPage: UIViewController, UICollectionViewDataSource, UICollectionView
             self.loadingSpinner.startAnimating()
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                self.interviewManager?.updateAnswer(answer: answer, question: question)
+                self.interviewManager?.updateAnswer(answer: answer, answerArray: nil, question: question)
             }
         }, completion: nil)
     }
@@ -192,6 +196,9 @@ class FAQuizPage: UIViewController, UICollectionViewDataSource, UICollectionView
     }
     
     func showEmpty() {
+    }
+    
+    func updateAnswerArray(answerArray: [String], question: FAQuestion) {
     }
 }
 

@@ -14,6 +14,7 @@ import SwiftNotificationCenter
 import FBSDKCoreKit
 
 class FAQuizCover: ParentVC, FreeAgentQuizNav{
+    
     var question: FAQuestion?
     var gcGame: GamerConnectGame?
     var questions = [FAQuestion]()
@@ -124,6 +125,9 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
         }
     }
     
+    func addQuestion(question: FAQuestion, interviewManager: InterviewManager) {
+    }
+    
     func addQuestion(question: FAQuestion) {
     }
     
@@ -140,6 +144,9 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
     }
     
     func showSubmitted() {
+    }
+    
+    func updateAnswerArray(answerArray: [String], question: FAQuestion) {
     }
     
     func onInitialQuizLoaded() {

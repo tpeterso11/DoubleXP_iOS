@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "apple.png",
+      "filename" : "new_apple1.png",
       "idiom" : "universal"
     },
     {
@@ -11,7 +11,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "apple (1).png",
+      "filename" : "new_apple2.png",
       "idiom" : "universal"
     }
   ],

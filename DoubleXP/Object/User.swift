@@ -121,6 +121,16 @@ class User: NSObject, NSCoding {
         }
     }
     
+    var _twitchConnect = ""
+    var twitchConnect: String {
+        get {
+            return (_twitchConnect)
+        }
+        set (newVal) {
+            _twitchConnect = newVal
+        }
+    }
+    
     var _messagingNotifications = false
     var messagingNotifications: Bool {
         get {
@@ -370,6 +380,7 @@ class User: NSObject, NSCoding {
         self.acceptedTempRivals = (decoder.decodeObject(forKey: "acceptedTempRivals") as! [RivalObj])
         self.rejectedTempRivals = (decoder.decodeObject(forKey: "rejectedTempRivals") as! [RivalObj])
         self.tempRivals = (decoder.decodeObject(forKey: "tempRivals") as! [RivalObj])
+        self.twitchConnect = (decoder.decodeObject(forKey: "twitchConnect") as! String)
     }
     
     func encode(with coder: NSCoder) {
@@ -394,6 +405,7 @@ class User: NSObject, NSCoding {
         coder.encode(self.acceptedTempRivals, forKey: "acceptedTempRivals")
         coder.encode(self.rejectedTempRivals, forKey: "rejectedTempRivals")
         coder.encode(self.tempRivals, forKey: "tempRivals")
+        coder.encode(self.twitchConnect, forKey: "twitchConnect")
     }
 }
 

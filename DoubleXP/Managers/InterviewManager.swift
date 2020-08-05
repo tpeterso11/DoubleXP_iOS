@@ -11,13 +11,15 @@ import UIKit
 import SwiftHTTP
 import Firebase
 import SwiftNotificationCenter
+import moa
 
 class InterviewManager{
     var questions = [FAQuestion]()
+    var imageCache = NSCache<NSString, UIImage>()
     var currentQuestionIndex = -1
     var faObject: FreeAgentObject?
     var multiStepQuiz = false
-    
+    var optionCache = [OptionObj]()
     
     func initialize(gameName: String, uId: String){
         let profileManager = GamerProfileManager()
@@ -49,7 +51,7 @@ class InterviewManager{
     
     func showFirstQuestion(){
         Broadcaster.notify(FreeAgentQuizNav.self) {
-            $0.addQuestion(question: questions[0])
+            $0.addQuestion(question: questions[0], interviewManager: self)
         }
     }
     
@@ -57,19 +59,19 @@ class InterviewManager{
         currentQuestionIndex += 1
         if(questions.count + 1 != (currentQuestionIndex + 1)){
             Broadcaster.notify(FreeAgentQuizNav.self) {
-                $0.addQuestion(question: questions[currentQuestionIndex])
+                $0.addQuestion(question: questions[currentQuestionIndex], interviewManager: self)
             }
         }
     }
     
-    func updateAnswer(answer: String, question: FAQuestion){
+    func updateAnswer(answer: String?, answerArray: [String]?, question: FAQuestion){
         if(currentQuestionIndex == 0 && !question.question1SetURL.isEmpty){
-            updateQuestions(answer: answer, faQuestion: question)
+            updateQuestions(answer: answer, answerArray: answerArray, faQuestion: question)
             
             getQuiz(url: question.question1SetURL, secondary: true, callbacks: nil)
         }
         else{
-            updateQuestions(answer: answer, faQuestion: question)
+            updateQuestions(answer: answer, answerArray: answerArray, faQuestion: question)
             
             if((currentQuestionIndex + 1) != self.questions.count){
                 showNextQuestion()
@@ -80,10 +82,14 @@ class InterviewManager{
         }
     }
     
-    func updateQuestions(answer: String, faQuestion: FAQuestion){
+    func updateQuestions(answer: String?, answerArray: [String]?, faQuestion: FAQuestion){
         for question in self.questions{
             if(question.question == faQuestion.question){
-                question.answer = answer
+                if(!question.optionsUrl.isEmpty){
+                    question.answerArray = answerArray!
+                } else {
+                    question.answer = answer!
+                }
                 break
             }
         }
@@ -142,6 +148,8 @@ class InterviewManager{
                         var question3SetURL = ""
                         var question4SetURL = ""
                         var question5SetURL = ""
+                        var optionsURL = ""
+                        var maxOptions = ""
                     
                         if let configDict = item as? [String: Any]{
                             for (key, value) in configDict {
@@ -238,6 +246,12 @@ class InterviewManager{
                                 if(key == "teamNeedQuestion"){
                                     teamNeedQuestion = (value as? String) ?? "false"
                                 }
+                                if(key == "optionsUrl"){
+                                    optionsURL = (value as? String) ?? ""
+                                }
+                                if(key == "maxOptions"){
+                                    maxOptions = (value as? String) ?? ""
+                                }
                             }
                         }
                         let faQuestion = FAQuestion(question: question)
@@ -272,6 +286,11 @@ class InterviewManager{
                         faQuestion.acceptMultiple = acceptMultiple
                         faQuestion.questionDescription = questionDescription
                         faQuestion.teamNeedQuestion = teamNeedQuestion
+                        faQuestion.optionsUrl = optionsURL
+                        faQuestion.maxOptions = maxOptions
+                        if(!optionsURL.isEmpty){
+                            self.getOptions(url: optionsURL)
+                        }
                         
                         self.questions.append(faQuestion)
                     }
@@ -287,6 +306,51 @@ class InterviewManager{
                             
                             self.checkProfileExists(multiStep: self.multiStepQuiz, callbacks: callbacks!)
                         }
+                    }
+                }
+            }
+        }
+    }
+    
+    func getOptions(url: String){
+        HTTP.GET(url) { response in
+            if let err = response.error {
+                print("error: \(err.localizedDescription)")
+                return //also notify app of failure as needed
+            }
+            else{
+                if let jsonObj = try? JSONSerialization.jsonObject(with: response.data, options: .allowFragments) as? NSDictionary {
+                    if let resultArr = jsonObj!.value(forKey: "data") as? [String: Any] {
+                        var options = [OptionObj]()
+                        var tagOps = [String]()
+                        for (key, value) in resultArr {
+                            let option = value as? [String: Any] ?? [String: Any]()
+                            let label = option["name"] as? String ?? ""
+                            let title = option["title"] as? String ?? ""
+                            let imageChild = option["image"] as? [String: Any] ?? [String: Any]()
+                            let image = imageChild["full"] as? String ?? ""
+                            let tags = option["tags"] as? [String] ?? [String]()
+                            for tag in tags{
+                                if(!tagOps.contains(tag)){
+                                    tagOps.append(tag)
+                                }
+                            }
+                            
+                            let imageUrl = self.convertLoLImageUrl(imageName: image)
+                            let moa = Moa()
+                            moa.onSuccess = { image in
+                              // image is loaded
+                                self.imageCache.setObject(image, forKey: imageUrl as NSString)
+                                return image
+                            }
+                            moa.url = imageUrl
+                            
+                            let optionObj = OptionObj(optionLabel: label, imageUrl: imageUrl, sortingTags: tags)
+                            optionObj.title = title
+                            options.append(optionObj)
+                        }
+                        
+                        self.optionCache = options.sorted { $0.optionLabel < $1.optionLabel }
                     }
                 }
             }
@@ -372,21 +436,21 @@ class InterviewManager{
             
             var array = [[String: Any]]()
             for profile in profileList{
-                if(!(currentUser?.stats.isEmpty)!){
-                    for statObj in currentUser!.stats{
-                        if(statObj.gameName == self.faObject!.game){
-                            if(statObj.gameName == "The Division 2"){
-                                let statTree = ["gearScore": statObj.gearScore, "killsPVP": statObj.killsPVP, "playerLevelGame": statObj.playerLevelGame, "playerLevelPVP": statObj.playerLevelPVP]
-                                
-                                profile.statTree = statTree
-                            }
-                            else if(statObj.gameName == "Rainbow Six Siege"){
-                                let statTree = ["currentRank": statObj.currentRank, "killsPVP": statObj.killsPVP, "totalRankedWins": statObj.totalRankedWins, "totalRankedLosses": statObj.totalRankedLosses, "totalRankedKills": statObj.totalRankedKills, "totalRankedDeaths": statObj.totalRankedDeaths, "mostUsedAttacker": statObj.mostUsedAttacker, "mostUsedDefender": statObj.mostUsedDefender]
-                                profile.statTree = statTree
-                            }
-                        }
-                    }
-                }
+//                if(!(currentUser?.stats.isEmpty)!){
+//                    for statObj in currentUser!.stats{
+//                        if(statObj.gameName == self.faObject!.game){
+//                            if(statObj.gameName == "The Division 2"){
+//                                let statTree = ["gearScore": statObj.gearScore, "killsPVP": statObj.killsPVP, "playerLevelGame": statObj.playerLevelGame, "playerLevelPVP": statObj.playerLevelPVP]
+//
+//                                profile.statTree = statTree
+//                            }
+//                            else if(statObj.gameName == "Rainbow Six Siege"){
+//                                let statTree = ["currentRank": statObj.currentRank, "killsPVP": statObj.killsPVP, "totalRankedWins": statObj.totalRankedWins, "totalRankedLosses": statObj.totalRankedLosses, "totalRankedKills": statObj.totalRankedKills, "totalRankedDeaths": statObj.totalRankedDeaths, "mostUsedAttacker": statObj.mostUsedAttacker, "mostUsedDefender": statObj.mostUsedDefender]
+//                                profile.statTree = statTree
+//                            }
+//                        }
+//                    }
+//                }
                 
                 array.append(["gamerTag": profile.gamerTag, "competitionId": profile.competitionId, "consoles": profile.consoles, "game": profile.game, "userId": profile.userId, "questions": profile.questions, "statTree": profile.statTree])
             }
@@ -399,12 +463,21 @@ class InterviewManager{
         }
     }
     
+    private func convertLoLImageUrl(imageName: String) -> String{
+        return "http://ddragon.leagueoflegends.com/cdn/10.11.1/img/champion/"+imageName
+    }
+    
     private func processQuestions(){
         var questionsArray = [[String]]()
         for question in self.questions{
             var questionArray = [String]()
-            questionArray.append(question.question)
-            questionArray.append(question.answer)
+            if(!question.answerArray.isEmpty){
+                questionArray.append(question.question)
+                questionArray.append(contentsOf: question.answerArray)
+            } else {
+                questionArray.append(question.question)
+                questionArray.append(question.answer)
+            }
             
             questionsArray.append(questionArray)
         }

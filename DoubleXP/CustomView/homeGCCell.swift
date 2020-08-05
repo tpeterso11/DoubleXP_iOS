@@ -15,6 +15,8 @@ class homeGCCell: UICollectionViewCell{
     @IBOutlet weak var backgroundImage: UIImageView!
     @IBOutlet weak var hook: UILabel!
     @IBOutlet weak var cover: UIView!
+    @IBOutlet weak var gameName: UILabel!
+    @IBOutlet weak var developer: UILabel!
     
     var searchName: String = ""
     

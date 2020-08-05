@@ -31,8 +31,8 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
         
         animateView()
         
-        behavior = MSCollectionViewPeekingBehavior()
-        self.gcGameScroll.configureForPeekingBehavior(behavior: behavior)
+        //behavior = MSCollectionViewPeekingBehavior()
+        //self.gcGameScroll.configureForPeekingBehavior(behavior: behavior)
         
         let todaysDate:NSDate = NSDate()
         let dateFormatter:DateFormatter = DateFormatter()
@@ -73,6 +73,7 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
             UIView.animate(withDuration: 0.8, animations: {
                 self.gcGameScroll.alpha = 1
                 self.gcGameScroll.transform = top
+                self.gcGameScroll.reloadData()
             }, completion: { (finished: Bool) in
                 UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
                     self.recommendedUsers.transform = top
@@ -185,10 +186,26 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! homeGCCell
             
             let game = gcGames[indexPath.item]
-            cell.backgroundImage.image = Utility.Image.placeholder
-            cell.backgroundImage.moa.url = game.imageUrl
+    
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let cache = appDelegate.imageCache
+            if(cache.object(forKey: game.imageUrl as NSString) != nil){
+                cell.backgroundImage.image = cache.object(forKey: game.imageUrl as NSString)
+            } else {
+                cell.backgroundImage.image = Utility.Image.placeholder
+                cell.backgroundImage.moa.onSuccess = { image in
+                    cell.backgroundImage.image = image
+                    appDelegate.imageCache.setObject(image, forKey: game.imageUrl as NSString)
+                    return image
+                }
+                cell.backgroundImage.moa.url = game.imageUrl
+            }
+            
             cell.backgroundImage.contentMode = .scaleAspectFill
             cell.backgroundImage.clipsToBounds = true
+            
+            cell.gameName.text = game.gameName
+            cell.developer.text = game.developer
             
             cell.hook.text = game.hook
             AppEvents.logEvent(AppEvents.Name(rawValue: "GC-Connect " + game.gameName + " Click"))
@@ -234,7 +251,6 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let kWhateverHeightYouWant = 150
         if collectionView == self.recommendedUsers {
             let current = self.secondaryPayload[indexPath.item]
             if(current is CompetitionObj){
@@ -244,8 +260,10 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
                 return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(100))
             }
         }
-        else{
-            return CGSize(width: 260, height: CGFloat(150))
+        if collectionView == self.gcGameScroll {
+            return CGSize(width: 280, height: CGFloat(160))
         }
+        
+        return CGSize(width: 260, height: CGFloat(100))
     }
 }

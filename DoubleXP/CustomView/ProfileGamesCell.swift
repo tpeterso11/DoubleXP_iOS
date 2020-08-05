@@ -36,7 +36,20 @@ class ProfileGamesCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ProfileGameSelectionCell
         let current = self.gcGames[indexPath.item]
         
-        cell.gameImage.image = Utility.Image.placeholder
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let cache = delegate.imageCache
+        if(cache.object(forKey: current.imageUrl as NSString) != nil){
+            cell.gameImage.image = cache.object(forKey: current.imageUrl as NSString)
+        } else {
+            cell.gameImage.image = Utility.Image.placeholder
+            cell.gameImage.moa.onSuccess = { image in
+                cell.gameImage.image = image
+                delegate.imageCache.setObject(image, forKey: current.imageUrl as NSString)
+                return image
+            }
+            cell.gameImage.moa.url = current.imageUrl
+        }
+        
         cell.gameImage.moa.url = current.imageUrl
         cell.gameImage.contentMode = .scaleAspectFill
         cell.gameImage.clipsToBounds = true

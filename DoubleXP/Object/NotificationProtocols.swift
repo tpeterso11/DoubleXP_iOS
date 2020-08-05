@@ -102,9 +102,11 @@ protocol TeamInteractionCallbacks: class{
 }
 
 protocol FreeAgentQuizNav: class {
-    func addQuestion(question: FAQuestion)
+    func addQuestion(question: FAQuestion, interviewManager: InterviewManager)
     
     func updateAnswer(answer: String, question: FAQuestion)
+    
+    func updateAnswerArray(answerArray: [String], question: FAQuestion)
     
     func onInitialQuizLoaded()
     

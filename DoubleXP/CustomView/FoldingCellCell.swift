@@ -16,6 +16,10 @@ class FoldingCellCell: FoldingCell, UICollectionViewDelegate, UICollectionViewDa
     @IBOutlet weak var developer: UILabel!
     @IBOutlet weak var statLayout: UIView!
     @IBOutlet weak var statsAvailable: UILabel!
+    @IBOutlet weak var statsAvailableContainer: UIView!
+    @IBOutlet weak var coverGameName: UILabel!
+    @IBOutlet weak var quizAvailableContainer: UIView!
+    
     
     var payload = [Any]()
     var currentStat: StatObject?

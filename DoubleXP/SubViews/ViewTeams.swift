@@ -274,23 +274,20 @@ class ViewTeams: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate,
         let game = delegate.gcGames[indexPath.item]
         cell.searchName = game.gameName
         
-        if(game.cachedImage.imageData != nil){
-            cell.backgroundImage.image = game.cachedImage
-            cell.backgroundImage.contentMode = .scaleAspectFill
-            cell.backgroundImage.clipsToBounds = true
-        }
-        else{
-            cell.backgroundImage.moa.onSuccess = { image in
-                game.cachedImage = image
-                
-              return image
-            }
-
+        let cache = delegate.imageCache
+        if(cache.object(forKey: game.imageUrl as NSString) != nil){
+            cell.backgroundImage.image = cache.object(forKey: game.imageUrl as NSString)
+        } else {
             cell.backgroundImage.image = Utility.Image.placeholder
+            cell.backgroundImage.moa.onSuccess = { image in
+                cell.backgroundImage.image = image
+                delegate.imageCache.setObject(image, forKey: game.imageUrl as NSString)
+                return image
+            }
             cell.backgroundImage.moa.url = game.imageUrl
-            cell.backgroundImage.contentMode = .scaleAspectFill
-            cell.backgroundImage.clipsToBounds = true
         }
+        cell.backgroundImage.contentMode = .scaleAspectFill
+        cell.backgroundImage.clipsToBounds = true
         
         cell.hook.text = game.secondaryName
         

@@ -45,9 +45,19 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
         
         if(game != nil){
             //gameHeaderImage.alpha = 0
-            
-            gameHeaderImage.image = Utility.Image.placeholder
-            gameHeaderImage.moa.url = game?.imageUrl
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let cache = appDelegate.imageCache
+            if(cache.object(forKey: game!.imageUrl as NSString) != nil){
+                gameHeaderImage.image = cache.object(forKey: game!.imageUrl as NSString)
+            } else {
+                gameHeaderImage.image = Utility.Image.placeholder
+                gameHeaderImage.moa.onSuccess = { image in
+                    self.gameHeaderImage.image = image
+                    appDelegate.imageCache.setObject(image, forKey: self.game!.imageUrl as NSString)
+                    return image
+                }
+                gameHeaderImage.moa.url = game!.imageUrl
+            }
             gameHeaderImage.contentMode = .scaleAspectFill
             //gameImageHeader.clipsToBounds = true
             

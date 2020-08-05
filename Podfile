@@ -32,6 +32,7 @@ target 'DoubleXP' do
   pod 'SwiftDate'
   pod 'Swifter', :git => 'https://github.com/mattdonnelly/Swifter.git'
   pod 'OrderedDictionary'
+  pod 'AnimatedCollectionViewLayout'
   
   # Pods for DoubleXP
 

@@ -61,6 +61,16 @@ class GamerConnectGame: NSObject, NSCoding {
         }
     }
     
+    var _hasQuiz: Bool = false
+    var hasQuiz:Bool {
+        get {
+            return (_hasQuiz)
+        }
+        set (newVal) {
+            _hasQuiz = newVal
+        }
+    }
+    
     var _twitterHandle:String? = nil
     var twitterHandle:String {
         get {

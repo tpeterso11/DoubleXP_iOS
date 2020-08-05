@@ -10,6 +10,7 @@ import UIKit
 import SwiftNotificationCenter
 
 class QuizNavigationController: EMPageViewController, EMPageViewControllerDataSource, FreeAgentQuizNav {
+    
     func em_pageViewController(_ pageViewController: EMPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
         return nil
     }
@@ -23,6 +24,7 @@ class QuizNavigationController: EMPageViewController, EMPageViewControllerDataSo
     }
     
     fileprivate var items: [UIViewController] = []
+    var interviewManager: InterviewManager?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,12 +41,21 @@ class QuizNavigationController: EMPageViewController, EMPageViewControllerDataSo
         Broadcaster.register(FreeAgentQuizNav.self, observer: self)
     }
     
-    func addQuestion(question: FAQuestion) {
-        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "faQuestion") as! FAQuizPage
-        
-        currentViewController.question = question
-        
-        selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
+    func addQuestion(question: FAQuestion, interviewManager: InterviewManager) {
+        if(!question.optionsUrl.isEmpty){
+            let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "faOptionQuestion") as! QuizOptionPage
+            
+            currentViewController.question = question
+            currentViewController.interviewManager = interviewManager
+            
+            selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
+        } else {
+            let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "faQuestion") as! FAQuizPage
+            
+            currentViewController.question = question
+            
+            selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
+        }
     }
     
     func showConsoles() {
@@ -113,6 +124,9 @@ class QuizNavigationController: EMPageViewController, EMPageViewControllerDataSo
     }
     
     func showEmpty() {
+    }
+    
+    func updateAnswerArray(answerArray: [String], question: FAQuestion) {
     }
 }
 

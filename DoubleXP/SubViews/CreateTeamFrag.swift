@@ -469,8 +469,20 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! homeGCCell
         
         let game = gcGames[indexPath.item]
-        cell.backgroundImage.image = Utility.Image.placeholder
-        cell.backgroundImage.moa.url = game.imageUrl
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let cache = appDelegate.imageCache
+        if(cache.object(forKey: game.imageUrl as NSString) != nil){
+            cell.backgroundImage.image = cache.object(forKey: game.imageUrl as NSString)
+        } else {
+            cell.backgroundImage.image = Utility.Image.placeholder
+            cell.backgroundImage.moa.onSuccess = { image in
+                cell.backgroundImage.image = image
+                appDelegate.imageCache.setObject(image, forKey: game.imageUrl as NSString)
+                return image
+            }
+            cell.backgroundImage.moa.url = game.imageUrl
+        }
         cell.backgroundImage.contentMode = .scaleAspectFill
         cell.backgroundImage.clipsToBounds = true
         

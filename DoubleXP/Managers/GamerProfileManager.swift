@@ -64,4 +64,34 @@ class GamerProfileManager{
         
         return tags
     }
+    
+    func currentUserHasGamertagAvailable() -> Bool {
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let user = delegate.currentUser
+        
+        if(user != nil){
+            for gamerProfile in user!.gamerTags{
+                if(!gamerProfile.gamerTag.isEmpty){
+                    return true
+                }
+            }
+        }
+        
+        return !user!.gamerTag.isEmpty
+    }
+    
+    func gamertagBelongsToUser(gamerTag: String) -> Bool {
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let user = delegate.currentUser
+        
+        if(user != nil){
+            for gamerProfile in user!.gamerTags{
+                if(gamerProfile.gamerTag == gamerTag){
+                    return true
+                }
+            }
+        }
+        
+        return user!.gamerTag == gamerTag
+    }
 }

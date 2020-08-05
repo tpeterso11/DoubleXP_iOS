@@ -127,6 +127,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
     }
 
     @IBAction private func loginWithReadPermissions() {
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login"))
         let loginManager = LoginManager()
         loginManager.logIn(permissions: ["public_profile", "email"], from: self) { [weak self] (result, error) in
             self?.loginManagerDidComplete(result, error)
@@ -231,12 +232,14 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
     }
     
     @objc func googleClicked(){
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Google Login"))
         GIDSignIn.sharedInstance()?.presentingViewController = self
         GIDSignIn.sharedInstance().signIn()
     }
     
     @available(iOS 13, *)
     @objc func appleClicked(){
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Apple Login"))
         startSignInWithAppleFlow()
     }
     

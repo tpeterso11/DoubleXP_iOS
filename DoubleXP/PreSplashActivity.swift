@@ -27,6 +27,9 @@ class PreSplashActivity: UIViewController {
         games = [GamerConnectGame]()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
             self.getAppConfig()
+            
+            //let manager = InterviewManager()
+            //manager.getOpions(url: "http://doublexpstorage.tech/app-json/champion.json")
         }
     }
     
