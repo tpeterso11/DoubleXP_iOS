@@ -71,6 +71,16 @@ class User: NSObject, NSCoding {
         }
     }
     
+    var _viewedAnnouncements = [String]()
+    var viewedAnnouncements:[String] {
+        get {
+            return (_viewedAnnouncements)
+        }
+        set (newVal) {
+            _viewedAnnouncements = newVal
+        }
+    }
+    
     var _competitions = [String]()
     var competitions: [String] {
         get {
@@ -381,6 +391,7 @@ class User: NSObject, NSCoding {
         self.rejectedTempRivals = (decoder.decodeObject(forKey: "rejectedTempRivals") as! [RivalObj])
         self.tempRivals = (decoder.decodeObject(forKey: "tempRivals") as! [RivalObj])
         self.twitchConnect = (decoder.decodeObject(forKey: "twitchConnect") as! String)
+        self.viewedAnnouncements = (decoder.decodeObject(forKey: "viewedAnnouncements") as! [String])
     }
     
     func encode(with coder: NSCoder) {
@@ -406,6 +417,7 @@ class User: NSObject, NSCoding {
         coder.encode(self.rejectedTempRivals, forKey: "rejectedTempRivals")
         coder.encode(self.tempRivals, forKey: "tempRivals")
         coder.encode(self.twitchConnect, forKey: "twitchConnect")
+        coder.encode(self.viewedAnnouncements, forKey: "viewedAnnouncements")
     }
 }
 

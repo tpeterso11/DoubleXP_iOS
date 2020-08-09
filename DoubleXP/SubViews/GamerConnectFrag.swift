@@ -19,10 +19,18 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
     @IBOutlet weak var recommendedUsers: UICollectionView!
     var selectedCell = false
     
+    @IBOutlet weak var announcementShare: UIButton!
+    @IBOutlet weak var announcementClose: UIButton!
+    @IBOutlet weak var announcementDetails: UILabel!
+    @IBOutlet weak var announcementSender: UILabel!
+    @IBOutlet weak var announcementTitle: UILabel!
+    @IBOutlet weak var announcementBox: UIView!
+    @IBOutlet weak var announcementLayout: UIVisualEffectView!
     @IBOutlet weak var connectHeader: UILabel!
     @IBOutlet weak var currentDate: UILabel!
     var gcGames = [GamerConnectGame]()
     var secondaryPayload = [Any]()
+    private var currentAnnouncement: AnnouncementObj?
     
     var behavior: MSCollectionViewPeekingBehavior!
     
@@ -84,7 +92,17 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
     }
     
     private func buildSecondaryPayload(){
+        secondaryPayload = [Any]()
+        
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let manager = appDelegate.announcementManager
+        
+        for announcement in manager.announcments{
+            if(manager.shouldSeeAnnouncement(user: appDelegate.currentUser!, announcement: announcement)){
+                secondaryPayload.append(announcement)
+            }
+        }
+        
         secondaryPayload.append(contentsOf: appDelegate.competitions)
         
         let userOne = RecommendedUser(gamerTag: "allthesaints011", uid: "HMv30El7nmWXPEnriV3irMsnS3V2")
@@ -127,6 +145,26 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
                 }
                 
                 
+                cell.contentView.layer.borderColor = UIColor.clear.cgColor
+                cell.contentView.layer.masksToBounds = true
+                
+                cell.layer.shadowColor = UIColor.black.cgColor
+                cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+                cell.layer.shadowRadius = 2.0
+                cell.layer.shadowOpacity = 0.5
+                cell.layer.masksToBounds = false
+                cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
+                
+                return cell
+            }
+            else if(current is AnnouncementObj){
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "announcementCell", for: indexPath) as! AnnouncementCell
+                
+                cell.announcementGame.text = (current as! AnnouncementObj).announcementGames[0]
+                cell.announcementTitle.text = (current as! AnnouncementObj).announcementTitle
+                
+                cell.contentView.layer.cornerRadius = 10.0
+                cell.contentView.layer.borderWidth = 1.0
                 cell.contentView.layer.borderColor = UIColor.clear.cgColor
                 cell.contentView.layer.masksToBounds = true
                 
@@ -235,6 +273,10 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
                 let appDelegate = UIApplication.shared.delegate as! AppDelegate
                 appDelegate.currentLanding!.navigateToProfile(uid: (current as! RecommendedUser).uid)
             }
+            else if (cell is AnnouncementCell){
+                let current = self.secondaryPayload[indexPath.item]
+                self.showAnnouncement(announcement: current as! AnnouncementObj)
+            }
             else{
                 let current = self.secondaryPayload[indexPath.item]
                 
@@ -256,6 +298,9 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
             if(current is CompetitionObj){
                 return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(180))
             }
+            else if(current is AnnouncementObj){
+                return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(80))
+            }
             else{
                 return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(100))
             }
@@ -265,5 +310,72 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
         }
         
         return CGSize(width: 260, height: CGFloat(100))
+    }
+    
+    private func showAnnouncement(announcement: AnnouncementObj){
+        self.currentAnnouncement = announcement
+        self.announcementSender.text = currentAnnouncement?.announcementSender
+        self.announcementDetails.text = currentAnnouncement?.announcementDetails
+        self.announcementTitle.text = currentAnnouncement?.announcementTitle
+        self.announcementClose.addTarget(self, action: #selector(self.dismissAnnouncement), for: .touchUpInside)
+        self.announcementShare.isHidden = true
+        
+        let top = CGAffineTransform(translationX: 0, y: 40)
+        UIView.animate(withDuration: 0.8, animations: {
+            self.announcementLayout.alpha = 1
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                self.announcementBox.transform = top
+                self.announcementBox.alpha = 1
+            }, completion: nil)
+        })
+    }
+    
+    @objc private func dismissAnnouncement(){
+        if(self.currentAnnouncement != nil){
+            registerAnnouncementView(announcement: self.currentAnnouncement!)
+        }
+        
+        let top = CGAffineTransform(translationX: 0, y: 0)
+        UIView.animate(withDuration: 0.5, animations: {
+            self.announcementBox.transform = top
+            self.announcementBox.alpha = 0
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                self.announcementLayout.alpha = 0
+            }, completion: nil)
+        })
+    }
+    
+    private func registerAnnouncementView(announcement: AnnouncementObj){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let ref = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                if(snapshot.hasChild("viewedAnnouncements")){
+                    var viewed = snapshot.childSnapshot(forPath: "viewedAnnouncements").value as! [String]
+                    viewed.append(announcement.announcementId)
+                    
+                    ref.child("viewedAnnouncements").setValue(viewed)
+                } else {
+                    var viewed = [String]()
+                    viewed.append(announcement.announcementId)
+                    
+                    ref.child("viewedAnnouncements").setValue(viewed)
+                }
+                
+                if(!appDelegate.currentUser!.viewedAnnouncements.contains(announcement.announcementId)){
+                    appDelegate.currentUser!.viewedAnnouncements.append(announcement.announcementId)
+                }
+                
+                self.buildSecondaryPayload()
+                self.recommendedUsers.reloadData()
+            }
+            
+        }) { (error) in
+            print(error.localizedDescription)
+            
+        }
+        
     }
 }

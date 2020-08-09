@@ -243,6 +243,87 @@ class PreSplashActivity: UIViewController {
                 let delegate = UIApplication.shared.delegate as! AppDelegate
                 delegate.competitions = displayCompetitions
                 
+                self.getAnnouncements(uid: uid)
+            }
+            else{
+                self.getAnnouncements(uid: uid)
+            }
+            
+        }) { (error) in
+            print(error.localizedDescription)
+            
+            self.getAnnouncements(uid: uid)
+        }
+    }
+    
+    func getAnnouncements(uid: String?){
+        let ref = Database.database().reference().child("Announcements")
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                var announcements = [AnnouncementObj]()
+                for announcement in snapshot.children {
+                    var games = [String]()
+                    var active = "false"
+                    var title = ""
+                    var message = ""
+                    var duration = ""
+                    var id = ""
+                    var sender = ""
+                    var details = ""
+                    var audience = [String]()
+                    
+                    let current = announcement as! DataSnapshot
+                    id = current.key
+                    
+                    if(current.hasChild("games")){
+                        let gameList = current.childSnapshot(forPath: "games")
+                        for game in gameList.children {
+                            games.append((game as! DataSnapshot).value as? String ?? "")
+                        }
+                    }
+                    
+                    if(current.hasChild("active")){
+                        active = current.childSnapshot(forPath: "active").value as! String
+                    }
+                    
+                    if(current.hasChild("title")){
+                        title = current.childSnapshot(forPath: "title").value as! String
+                    }
+                    
+                    if(current.hasChild("message")){
+                        message = current.childSnapshot(forPath: "message").value as! String
+                    }
+                    
+                    if(current.hasChild("sender")){
+                        sender = current.childSnapshot(forPath: "sender").value as! String
+                    }
+                    
+                    if(current.hasChild("details")){
+                        details = current.childSnapshot(forPath: "details").value as! String
+                    }
+                    
+                    if(current.hasChild("audience")){
+                        if(current.childSnapshot(forPath: "audience").value is String){
+                            audience = [current.childSnapshot(forPath: "audience").value as! String]
+                        } else {
+                            audience = current.childSnapshot(forPath: "audience").value as! [String]
+                        }
+                    }
+                    
+                    if(current.hasChild("duration")){
+                        duration = current.childSnapshot(forPath: "duration").value as! String
+                    }
+                    
+                    if(!games.isEmpty && active == "true" && !title.isEmpty && !message.isEmpty){
+                        let newAnnouncement = AnnouncementObj(announcementId: id, announcementTitle: title, announcementMessage: message, announcementActive: active, announcementGames: games, announcementDuration: duration, announcementAudience: audience, announcementSender: sender, announcementDetails: details)
+                        
+                        announcements.append(newAnnouncement)
+                    }
+                }
+                
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                delegate.announcementManager.announcments.append(contentsOf: announcements)
+                
                 if(uid != nil){
                     if(!uid!.isEmpty){
                         self.downloadDBRef(uid: uid!)
@@ -254,8 +335,8 @@ class PreSplashActivity: UIViewController {
                 else{
                     self.performSegue(withIdentifier: "newLogin", sender: nil)
                 }
-            }
-            else{
+                
+            } else {
                 if(uid != nil){
                     if(!uid!.isEmpty){
                         self.downloadDBRef(uid: uid!)
@@ -315,6 +396,8 @@ class PreSplashActivity: UIViewController {
             if(notifications.isEmpty){
                 ref.child("notifications").setValue("true")
             }
+            
+            let viewedAnnouncements = value?["viewedAnnouncements"] as? [String] ?? [String]()
             
             var sentRequests = [FriendRequestObject]()
             
@@ -778,6 +861,7 @@ class PreSplashActivity: UIViewController {
             user.acceptedTempRivals = acceptedRivals
             user.rejectedTempRivals = rejectedRivals
             user.tempRivals = tempRivals
+            user.viewedAnnouncements = viewedAnnouncements
             
             DispatchQueue.main.async {
                 let delegate = UIApplication.shared.delegate as! AppDelegate

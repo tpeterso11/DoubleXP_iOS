@@ -32,6 +32,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var mediaCache = MediaCache()
     var twitchChannels = [TwitchChannelObj]()
     var competitions = [CompetitionObj]()
+    var announcementManager = AnnouncementManager()
     var imageCache = NSCache<NSString, UIImage>()
     
     private var apnsToken: String = ""
