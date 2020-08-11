@@ -146,6 +146,8 @@ class PreSplashActivity: UIViewController {
                             var secondaryName = ""
                             var twitterHandle = ""
                             var twitchHandle = ""
+                            var hasQuiz = false
+                            var mobileGame = ""
                             var gameModes = [String]()
                             var statsAvailable = false
                             var teamNeeds = [String]()
@@ -160,11 +162,21 @@ class PreSplashActivity: UIViewController {
                                 gameModes = (gameDict).value(forKey: "gameModes") as? [String] ?? [String]()
                                 twitterHandle = (gameDict).value(forKey: "twitterHandle") as? String ?? ""
                                 twitchHandle = (gameDict).value(forKey: "twitchHandle") as? String ?? ""
+                                mobileGame = (gameDict).value(forKey: "mobileGame") as? String ?? "false"
+                                
+                                let quiz = (gameDict).value(forKey: "quiz") as? String ?? ""
+                                if(quiz == "true"){
+                                    hasQuiz = true
+                                } else {
+                                    hasQuiz = false
+                                }
                                 
                                 let newGame  = GamerConnectGame(imageUrl: imageUrl, gameName: gameName, developer: developer, hook: hook, statsAvailable: statsAvailable, teamNeeds: teamNeeds,
                                                                 twitterHandle: twitterHandle, twitchHandle: twitchHandle)
                                 newGame.secondaryName = secondaryName
                                 newGame.gameModes = gameModes
+                                newGame.hasQuiz = hasQuiz
+                                newGame.mobileGame = mobileGame
                                 self.games.append(newGame)
                                 }
                             }

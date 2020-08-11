@@ -197,6 +197,63 @@ class SocialMediaManager{
         }
     }
     
+    func searchStreams(searchQuery: String, callbacks: SocialMediaManagerCallback){
+        HTTP.GET("https://us-central1-gameterminal-767f7.cloudfunctions.net/searchForStream?search_query=" + searchQuery + "&token=" + token) { response in
+            if let err = response.error {
+                return
+            }
+            else{
+                if let jsonObj = try? JSONSerialization.jsonObject(with: response.data, options: .allowFragments) as? NSDictionary {
+                    if let resultArray = jsonObj!.value(forKey: "data") as? NSArray {
+                        var streams = [TwitchStreamObject]()
+                        for stream in resultArray{
+                            var isLive = ""
+                            var thumbnail = ""
+                            var handle = ""
+                            var id = ""
+                            var title = ""
+                            if let gameDict = stream as? NSDictionary {
+                                if((gameDict.value(forKey: "is_live") is Bool)){
+                                    if((gameDict.value(forKey: "is_live") as! Bool) == false){
+                                        isLive = "false"
+                                    } else {
+                                        isLive = "true"
+                                    }
+                                }
+                                handle = (gameDict.value(forKey: "display_name") as? String)!
+                                thumbnail = (gameDict.value(forKey: "thumbnail_url") as? String)!
+                                id = (gameDict.value(forKey: "id") as? String)!
+                                title = (gameDict.value(forKey: "title") as? String)!
+                                
+                                let newStream  = TwitchStreamObject(handle: handle)
+                                newStream.id = id
+                                newStream.thumbnail = thumbnail
+                                newStream.title = title
+                                newStream.isLive = isLive
+                                
+                                streams.append(newStream)
+                            }
+                        }
+                        
+                        var exactMatch = false
+                        for stream in streams {
+                            if(stream.handle == searchQuery){
+                                exactMatch = true
+                                callbacks.onStreamsLoaded(streams: [stream])
+                                break
+                            }
+                        }
+                        
+                        if(!exactMatch){
+                            callbacks.onStreamsLoaded(streams: streams)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    
     func checkTwitchStream(twitchId: String, callbacks: SocialMediaManagerCallback){
         HTTP.GET("https://us-central1-gameterminal-767f7.cloudfunctions.net/checkTwitchStream?token=" + token + "&twitch_login=" + twitchId) { response in
             if let err = response.error {

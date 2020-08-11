@@ -345,6 +345,8 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                     ref.child("notifications").setValue("true")
                 }
                 
+                let viewedAnnouncements = value?["viewedAnnouncements"] as? [String] ?? [String]()
+                
                 var sentRequests = [FriendRequestObject]()
                 
                 //if sent requests have not been converted, we convert NOW.
@@ -769,6 +771,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                 user.acceptedTempRivals = acceptedRivals
                 user.rejectedTempRivals = rejectedRivals
                 user.tempRivals = tempRivals
+                user.viewedAnnouncements = viewedAnnouncements
                 
                 DispatchQueue.main.async {
                     let delegate = UIApplication.shared.delegate as! AppDelegate

@@ -245,6 +245,11 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
             cell.gameName.text = game.gameName
             cell.developer.text = game.developer
             
+            if(game.mobileGame == "true"){
+                cell.mobile.isHidden = false
+            } else {
+                cell.mobile.isHidden = true
+            }
             cell.hook.text = game.hook
             AppEvents.logEvent(AppEvents.Name(rawValue: "GC-Connect " + game.gameName + " Click"))
             

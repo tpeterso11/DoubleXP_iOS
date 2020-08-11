@@ -61,6 +61,16 @@ class GamerConnectGame: NSObject, NSCoding {
         }
     }
     
+    var _mobileGame:String = ""
+    var mobileGame :String {
+        get {
+            return (_mobileGame)
+        }
+        set (newVal) {
+            _mobileGame = newVal
+        }
+    }
+    
     var _hasQuiz: Bool = false
     var hasQuiz:Bool {
         get {
@@ -179,6 +189,8 @@ class GamerConnectGame: NSObject, NSCoding {
         self.twitterHandle = (decoder.decodeObject(forKey: "twitterHandle") as! String)
         self.twitchHandle = (decoder.decodeObject(forKey: "twitchHandle") as! String)
         self.twitchGameId = (decoder.decodeObject(forKey: "twitchGameId") as! String)
+        self.hasQuiz = (decoder.decodeObject(forKey: "hasQuiz") as! Bool)
+        self.mobileGame = (decoder.decodeObject(forKey: "mobileGame") as! String)
     }
     
     func encode(with coder: NSCoder) {
@@ -193,5 +205,7 @@ class GamerConnectGame: NSObject, NSCoding {
         coder.encode(self.twitterHandle, forKey: "twitterHandle")
         coder.encode(self.twitchHandle, forKey: "twitchHandle")
         coder.encode(self.twitchGameId, forKey: "twitchGameId")
+        coder.encode(self.hasQuiz, forKey: "hasQuiz")
+        coder.encode(self.mobileGame, forKey: "mobileGame")
     }
 }

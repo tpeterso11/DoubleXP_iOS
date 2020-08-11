@@ -31,6 +31,12 @@ class FreeAgentFront: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         let delegate = UIApplication.shared.delegate as! AppDelegate
         games = delegate.gcGames
         
+        for game in games {
+            if(!game.hasQuiz){
+                games.remove(at: games.index(of: game)!)
+            }
+        }
+        
         gcGameList.delegate = self
         gcGameList.dataSource = self
         

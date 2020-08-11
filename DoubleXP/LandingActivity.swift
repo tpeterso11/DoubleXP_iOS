@@ -1383,7 +1383,14 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                 bottomNavSearch.isHidden = false
                 
                 if(searchButtonText != nil){
+                    searchButton.alpha = 1
                     searchButton.setTitle(searchButtonText, for: .normal)
+                    
+                    if(isMessaging){
+                        searchButton.addTarget(self, action: #selector(sendMessage), for: .touchUpInside)
+                    } else {
+                        searchButton.addTarget(self, action: #selector(searchClicked), for: .touchUpInside)
+                    }
                 }
                 
                 if(searchHint != nil){
@@ -1395,30 +1402,20 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                     attributes: [NSAttributedString.Key.foregroundColor: UIColor(named:"dark")  ?? UIColor.darkGray])
                 }
                 
-                /*if(isMessaging){
-                    searchButton.addTarget(self, action: #selector(sendMessage), for: .touchUpInside)
-                    self.gifButton.isHidden = false
-                }
-                else{
-                    searchButton.addTarget(self, action: #selector(searchClicked), for: .touchUpInside)
-                    self.gifButton.isHidden = true
-                }*/
-                
                 if(!backButtonShowing && !hideSearch){
                     primaryBack.slideInBottomSmall()
                     backButtonShowing = true
                 }
                 
+                self.constraint?.constant = self.bottomNav.bounds.height + 60
                 UIView.animate(withDuration: 0.3, delay: 0.2, options: [], animations: {
-                    self.constraint?.constant = self.bottomNav.bounds.height + 60
-                    
-                    UIView.animate(withDuration: 0.5) {
+                
                         //self.articleOverlay.alpha = 1
                         //self.view.bringSubviewToFront(self.secondaryNv)
                         self.view.layoutIfNeeded()
                         
                         self.isSecondaryNavShowing = true
-                    }
+                    
                 
                 }, completion: nil)
             }
@@ -1689,6 +1686,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         UIView.transition(with: self.bottomNav, duration: 0.3, options: .curveEaseInOut, animations: {
             self.bottomNav.backgroundColor = color
             self.mainNavView.backgroundColor = color
+            self.secondaryNv.backgroundColor = color
         }, completion: nil)
     }
     
@@ -1747,10 +1745,10 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     }
     
     func extendBottom(height: CGFloat){
-        let top = CGAffineTransform(translationX: 0, y: 50)
+        //let top = CGAffineTransform(translationX: 0, y: 50)
         UIView.animate(withDuration: 0.3, animations: {
-            self.searchButton.alpha = 1
-            self.bottomNavSearch.transform = top
+            //self.searchButton.alpha = 1
+            //self.bottomNavSearch.transform = top
             
             self.messagingDeckHeight = height + 120
             self.constraint?.constant = self.messagingDeckHeight!
@@ -1767,7 +1765,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     func restoreBottom(height: CGFloat){
         let top = CGAffineTransform(translationX: 0, y: 0)
         UIView.animate(withDuration: 0.3, animations: {
-            self.searchButton.alpha = 0
             self.bottomNavSearch.transform = top
             self.constraint?.constant = self.bottomNav.bounds.height + 60
             

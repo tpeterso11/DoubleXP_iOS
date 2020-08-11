@@ -204,6 +204,11 @@
 		308C0A7824DF26C700C2027C /* AnnouncementCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308C0A7724DF26C700C2027C /* AnnouncementCell.swift */; };
 		308C0A7A24DF38F600C2027C /* AnnouncementObj.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308C0A7924DF38F600C2027C /* AnnouncementObj.swift */; };
 		308C0A7C24DF4D3D00C2027C /* AnnouncementManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308C0A7B24DF4D3D00C2027C /* AnnouncementManager.swift */; };
+		308C0A7E24E067FC00C2027C /* live_inactive.png in Resources */ = {isa = PBXBuildFile; fileRef = 308C0A7D24E067FB00C2027C /* live_inactive.png */; };
+		308C0A8024E0680400C2027C /* live_active.png in Resources */ = {isa = PBXBuildFile; fileRef = 308C0A7F24E0680300C2027C /* live_active.png */; };
+		308C0A8224E06A0100C2027C /* TwitchOptionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308C0A8124E06A0100C2027C /* TwitchOptionCell.swift */; };
+		308C0A8424E2209300C2027C /* phone.png in Resources */ = {isa = PBXBuildFile; fileRef = 308C0A8324E2209200C2027C /* phone.png */; };
+		308C0A8624E2212D00C2027C /* phone-white.png in Resources */ = {isa = PBXBuildFile; fileRef = 308C0A8524E2212D00C2027C /* phone-white.png */; };
 		308E79BC23FF471D00197035 /* meeting.png in Resources */ = {isa = PBXBuildFile; fileRef = 308E79BB23FF471D00197035 /* meeting.png */; };
 		308E79BE23FF492600197035 /* connection_white.png in Resources */ = {isa = PBXBuildFile; fileRef = 308E79BD23FF492600197035 /* connection_white.png */; };
 		308E79C023FF4B2C00197035 /* hashtag.png in Resources */ = {isa = PBXBuildFile; fileRef = 308E79BF23FF4B2C00197035 /* hashtag.png */; };
@@ -589,6 +594,11 @@
 		308C0A7724DF26C700C2027C /* AnnouncementCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnouncementCell.swift; sourceTree = "<group>"; };
 		308C0A7924DF38F600C2027C /* AnnouncementObj.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnouncementObj.swift; sourceTree = "<group>"; };
 		308C0A7B24DF4D3D00C2027C /* AnnouncementManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnouncementManager.swift; sourceTree = "<group>"; };
+		308C0A7D24E067FB00C2027C /* live_inactive.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = live_inactive.png; sourceTree = "<group>"; };
+		308C0A7F24E0680300C2027C /* live_active.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = live_active.png; sourceTree = "<group>"; };
+		308C0A8124E06A0100C2027C /* TwitchOptionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchOptionCell.swift; sourceTree = "<group>"; };
+		308C0A8324E2209200C2027C /* phone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = phone.png; sourceTree = "<group>"; };
+		308C0A8524E2212D00C2027C /* phone-white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "phone-white.png"; sourceTree = "<group>"; };
 		308E79BB23FF471D00197035 /* meeting.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = meeting.png; sourceTree = "<group>"; };
 		308E79BD23FF492600197035 /* connection_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = connection_white.png; sourceTree = "<group>"; };
 		308E79BF23FF4B2C00197035 /* hashtag.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = hashtag.png; sourceTree = "<group>"; };
@@ -964,6 +974,7 @@
 				30E0B1DC249C6658007F0B9B /* OptionCollectionCell.swift */,
 				30A7DD2024D1E3550028B128 /* TwitchWebPlayerKeys.swift */,
 				308C0A7724DF26C700C2027C /* AnnouncementCell.swift */,
+				308C0A8124E06A0100C2027C /* TwitchOptionCell.swift */,
 			);
 			path = CustomView;
 			sourceTree = "<group>";
@@ -1045,6 +1056,8 @@
 		4CB84C432205F74800183D28 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				308C0A8524E2212D00C2027C /* phone-white.png */,
+				308C0A8324E2209200C2027C /* phone.png */,
 				308C0A7524DF16AB00C2027C /* shout.png */,
 				30B20AAE248D622800558187 /* apple (3).png */,
 				48343FF92465CE570034CF12 /* envelope.png */,
@@ -1195,6 +1208,8 @@
 				30B20AAC248C626800558187 /* twitch_logo_light.png */,
 				30645079245DF62800B8B50E /* new_logo2_light.png */,
 				308759B924269ED2002C19CC /* aastandby.jpg */,
+				308C0A7D24E067FB00C2027C /* live_inactive.png */,
+				308C0A7F24E0680300C2027C /* live_active.png */,
 			);
 			path = Images;
 			sourceTree = "<group>";
@@ -1408,6 +1423,7 @@
 				3059E6392433AB840052E46F /* new (2).png in Resources */,
 				3080B40023BBCEBB00638B22 /* sand-clock.png in Resources */,
 				3080B3E223B7FAA700638B22 /* request.png in Resources */,
+				308C0A8424E2209300C2027C /* phone.png in Resources */,
 				3059E62F2432BFF80052E46F /* cogs (1).png in Resources */,
 				3080B3E823B81B5B00638B22 /* messaging_button.png in Resources */,
 				304E17F7243000DC009BE1C0 /* lf30_editor_HxosFZ.json in Resources */,
@@ -1458,6 +1474,8 @@
 				30B20AB1248D694400558187 /* new_apple1.png in Resources */,
 				30F6FCB823CBFC000051813D /* user (1).png in Resources */,
 				308810F8244BD12700C2BEC7 /* warn.png in Resources */,
+				308C0A7E24E067FC00C2027C /* live_inactive.png in Resources */,
+				308C0A8624E2212D00C2027C /* phone-white.png in Resources */,
 				4CC1720122677EF9009A1B80 /* test_banner.png in Resources */,
 				30645082245E37E200B8B50E /* google_logo.png in Resources */,
 				30F798A2241EAD6D00740966 /* cod_test.jpg in Resources */,
@@ -1508,6 +1526,7 @@
 				3064507A245DF62800B8B50E /* new_logo2_light.png in Resources */,
 				30A84DF02381E86E007BEAA5 /* icon.png in Resources */,
 				30A60D8D2363C801004B2150 /* like.png in Resources */,
+				308C0A8024E0680400C2027C /* live_active.png in Resources */,
 				3058211D2454CA0900B76E67 /* 1273057-200_white.png in Resources */,
 				30634D5D24059B1500FEAD40 /* 498852.png in Resources */,
 				3080B40423BC07BE00638B22 /* x-mark.png in Resources */,
@@ -1657,6 +1676,7 @@
 				30A7DD2124D1E3550028B128 /* TwitchWebPlayerKeys.swift in Sources */,
 				30E0B1DD249C6658007F0B9B /* OptionCollectionCell.swift in Sources */,
 				301AEF4E23885CEC00339850 /* TeamFrag.swift in Sources */,
+				308C0A8224E06A0100C2027C /* TwitchOptionCell.swift in Sources */,
 				30B6E18723A338E000B69F00 /* TeamSearchTeamCell.swift in Sources */,
 				301AEF4C23885B2F00339850 /* MessagingManager.swift in Sources */,
 				30A84DF62381EB58007BEAA5 /* RequestCell.swift in Sources */,
