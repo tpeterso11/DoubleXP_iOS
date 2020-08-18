@@ -79,7 +79,14 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         // Do any additional setup after loading the view, typically from a nib.
        
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        availableGames = delegate.gcGames
+        var list = [GamerConnectGame]()
+        for game in delegate.gcGames {
+            if(game.available == "true"){
+                list.append(game)
+            }
+        }
+        
+        availableGames = list
         
         switches.append(psSwitch)
         switches.append(xboxSwitch)

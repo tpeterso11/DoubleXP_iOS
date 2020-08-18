@@ -60,7 +60,7 @@ class RequestObject: GenericRequestObject, NSCoding {
         }
     }
     
-    var _profile = FreeAgentObject(gamerTag: "", competitionId: "", consoles: [String](), game: "", userId: "", questions: [[String]]())
+    var _profile = FreeAgentObject(gamerTag: "", competitionId: "", consoles: [String](), game: "", userId: "", questions: [FAQuestion]())
     var profile: FreeAgentObject {
         get {
             return (_profile)

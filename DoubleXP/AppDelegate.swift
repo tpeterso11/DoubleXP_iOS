@@ -32,6 +32,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var mediaCache = MediaCache()
     var twitchChannels = [TwitchChannelObj]()
     var competitions = [CompetitionObj]()
+    var upcomingGames = [UpcomingGame]()
     var announcementManager = AnnouncementManager()
     var imageCache = NSCache<NSString, UIImage>()
     

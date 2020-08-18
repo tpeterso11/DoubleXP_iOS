@@ -204,7 +204,7 @@ class RequestsFoldingCell: FoldingCell{
     }
     
     @objc func quizClicked(_ sender: AnyObject?) {
-        callbacks.showQuizClicked(questions: (self.currentRequest as! RequestObject).profile.questions)
+        //callbacks.showQuizClicked(questions: (self.currentRequest as! RequestObject).profile.questions)
     }
     
     @objc func rejectClicked(_ sender: AnyObject?) {

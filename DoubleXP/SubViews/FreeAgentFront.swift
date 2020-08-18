@@ -29,7 +29,14 @@ class FreeAgentFront: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         super.viewDidLoad()
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        games = delegate.gcGames
+        var list = [GamerConnectGame]()
+        for game in delegate.gcGames {
+            if(game.available == "true"){
+                list.append(game)
+            }
+        }
+        
+        games = list
         
         for game in games {
             if(!game.hasQuiz){
@@ -39,10 +46,6 @@ class FreeAgentFront: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         
         gcGameList.delegate = self
         gcGameList.dataSource = self
-        
-        //behavior = MSCollectionViewPeekingBehavior()
-        //gcGameList.configureForPeekingBehavior(behavior: behavior)
-        //gcGameList.configureForPeekingDelegate()
         
         handleNextButton(activate: false)
         

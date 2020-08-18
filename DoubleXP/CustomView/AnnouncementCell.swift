@@ -13,5 +13,6 @@ class AnnouncementCell: UICollectionViewCell {
     @IBOutlet weak var announcementTitle: UILabel!
     @IBOutlet weak var announcementGame: UILabel!
     @IBOutlet weak var extraInfo: UILabel!
+    @IBOutlet weak var announcementIgnore: UIImageView!
     
 }

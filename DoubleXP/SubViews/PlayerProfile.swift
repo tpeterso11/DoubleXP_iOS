@@ -120,6 +120,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     var showQuiz = false
     
     var gamesWithStats = [String]()
+    var gamesWithQuiz = [String]()
     
      enum Const {
            static let closeCellHeight: CGFloat = 100
@@ -411,7 +412,193 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                     let gamerTag = dict["gamerTag"] as? String ?? ""
                     let competitionId = dict["competitionId"] as? String ?? ""
                     let userId = dict["userId"] as? String ?? ""
-                    let questions = dict["questions"] as? [[String]] ?? [[String]]()
+                    
+                    var questions = [FAQuestion]()
+                            let questionList = dict["questions"] as! [[String: Any]]
+                            for question in questionList {
+                                for (key, value) in question {
+                                    var questionNumber = ""
+                                    var question = ""
+                                    var option1 = ""
+                                    var option1Description = ""
+                                    var option2 = ""
+                                    var option2Description = ""
+                                    var option3 = ""
+                                    var option3Description = ""
+                                    var option4 = ""
+                                    var option4Description = ""
+                                    var option5 = ""
+                                    var option5Description = ""
+                                    var option6 = ""
+                                    var option6Description = ""
+                                    var option7 = ""
+                                    var option7Description = ""
+                                    var option8 = ""
+                                    var option8Description = ""
+                                    var option9 = ""
+                                    var option9Description = ""
+                                    var option10 = ""
+                                    var option10Description = ""
+                                    var required = ""
+                                    var questionDescription = ""
+                                    var teamNeedQuestion = "false"
+                                    var acceptMultiple = ""
+                                    var question1SetURL = ""
+                                    var question2SetURL = ""
+                                    var question3SetURL = ""
+                                    var question4SetURL = ""
+                                    var question5SetURL = ""
+                                    var optionsURL = ""
+                                    var maxOptions = ""
+                                    var answer = ""
+                                    var answerArray = [String]()
+                                    
+                                    if(key == "questionNumber"){
+                                        questionNumber = (value as? String) ?? ""
+                                    }
+                                    if(key == "question"){
+                                        question = (value as? String) ?? ""
+                                    }
+                                    if(key == "option1"){
+                                        option1 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option1Description"){
+                                        option1Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option2"){
+                                        option2 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option2Description"){
+                                        option2Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option3"){
+                                        option3 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option3Description"){
+                                        option3Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option4"){
+                                        option4 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option4Description"){
+                                        option4Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option5"){
+                                        option5 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option5Description"){
+                                        option5Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option6"){
+                                        option6 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option6Description"){
+                                        option6Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option7"){
+                                        option7 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option7Description"){
+                                        option7Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option8"){
+                                        option8 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option8Description"){
+                                        option8Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option9"){
+                                        option9 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option9Description"){
+                                        option9Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option10"){
+                                        option10 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option10Description"){
+                                        option10Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "required"){
+                                        required = (value as? String) ?? ""
+                                    }
+                                    if(key == "questionDescription"){
+                                        questionDescription = (value as? String) ?? ""
+                                    }
+                                    if(key == "acceptMultiple"){
+                                        acceptMultiple = (value as? String) ?? ""
+                                    }
+                                    if(key == "question1SetURL"){
+                                        question1SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "question2SetURL"){
+                                        question2SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "question3SetURL"){
+                                        question3SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "question4SetURL"){
+                                        question4SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "question5SetURL"){
+                                        question5SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "teamNeedQuestion"){
+                                        teamNeedQuestion = (value as? String) ?? "false"
+                                    }
+                                    if(key == "optionsUrl"){
+                                        optionsURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "maxOptions"){
+                                        maxOptions = (value as? String) ?? ""
+                                    }
+                                    if(key == "answer"){
+                                        answer = (value as? String) ?? ""
+                                    }
+                                    if(key == "answerArray"){
+                                        answerArray = (value as? [String]) ?? [String]()
+                                    }
+                                
+                                let faQuestion = FAQuestion(question: question)
+                                    faQuestion.questionNumber = questionNumber
+                                    faQuestion.question = question
+                                    faQuestion.option1 = option1
+                                    faQuestion.option1Description = option1Description
+                                    faQuestion.question1SetURL = question1SetURL
+                                    faQuestion.option2 = option2
+                                    faQuestion.option2Description = option2Description
+                                    faQuestion.question2SetURL = question2SetURL
+                                    faQuestion.option3 = option3
+                                    faQuestion.option3Description = option3Description
+                                    faQuestion.question3SetURL = question3SetURL
+                                    faQuestion.option4 = option4
+                                    faQuestion.option4Description = option4Description
+                                    faQuestion.question4SetURL = question4SetURL
+                                    faQuestion.option5 = option5
+                                    faQuestion.option5Description = option5Description
+                                    faQuestion.question5SetURL = question5SetURL
+                                    faQuestion.option6 = option6
+                                    faQuestion.option6Description = option6Description
+                                    faQuestion.option7 = option7
+                                    faQuestion.option7Description = option7Description
+                                    faQuestion.option8 = option8
+                                    faQuestion.option8Description = option8Description
+                                    faQuestion.option9 = option9
+                                    faQuestion.option9Description = option9Description
+                                    faQuestion.option10 = option10
+                                    faQuestion.option10Description = option10Description
+                                    faQuestion.required = required
+                                    faQuestion.acceptMultiple = acceptMultiple
+                                    faQuestion.questionDescription = questionDescription
+                                    faQuestion.teamNeedQuestion = teamNeedQuestion
+                                    faQuestion.optionsUrl = optionsURL
+                                    faQuestion.maxOptions = maxOptions
+                                    faQuestion.answer = answer
+                                    faQuestion.answerArray = answerArray
+                        
+                            questions.append(faQuestion)
+                        }
+                    }
                     
                     let result = FreeAgentObject(gamerTag: gamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
                     self.profilePayload.append(result)
@@ -681,7 +868,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 for profile in self.profilePayload {
                     for game in self.objects {
                         if(game.gameName == profile.game){
-                            game.hasQuiz = true
+                            self.gamesWithQuiz.append(game.gameName)
                         }
                     }
                 }
@@ -888,7 +1075,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             cell.gameName.text = ""
             cell.developer.text = ""
             
-            if(current.hasQuiz){
+            if(self.gamesWithQuiz.contains(current.gameName)){
                 cell.quizAvailableContainer.isHidden = false
             } else {
                 cell.quizAvailableContainer.isHidden = true
@@ -917,15 +1104,22 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             cell.statsAvailable.isHidden = true
             cell.statsAvailableContainer.isHidden = true
             
+            var contained = ""
             for stat in self.userForProfile!.stats{
                 if(stat.gameName == current.gameName){
-                    //self.objects[indexPath.item].stats = stat
-                    //cell.setCollectionView(stat: stat)
-                    cell.statsAvailable.isHidden = false
-                    cell.statsAvailableContainer.isHidden = false
-                    
-                    self.gamesWithStats.append(stat.gameName)
+                    contained = stat.gameName
+                    break
                 }
+            }
+            
+            if(!contained.isEmpty){
+                cell.statsAvailable.isHidden = false
+                cell.statsAvailableContainer.isHidden = false
+                
+                self.gamesWithStats.append(contained)
+            } else {
+                cell.statsAvailable.isHidden = true
+                cell.statsAvailableContainer.isHidden = true
             }
             
             cell.layoutMargins = UIEdgeInsets.zero
@@ -946,7 +1140,25 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 cell.setOptions(options: adjustedPayload, cache: self.localImageCache)
                 
                 return cell
-            } else {
+            } else if(current.count > 2){
+                let cell = tableview.dequeueReusableCell(withIdentifier: "multiOptionCell", for: indexPath) as! MultiOptionCell
+                
+                let question = current[0]
+                cell.question.text = current[0]
+                
+                
+                var newPayload = [String]()
+                for answer in current {
+                    if(answer != question){
+                        newPayload.append(answer)
+                    }
+                }
+                
+                cell.setPayload(payload: newPayload)
+                
+                return cell
+            }
+            else {
                 let cell = tableview.dequeueReusableCell(withIdentifier: "answerCell", for: indexPath) as! AnswerTableCell
                 
                 cell.question.text = current[0]
@@ -968,7 +1180,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     func tableView(_ tableview: UITableView, didSelectRowAt indexPath: IndexPath) {
         if(tableview == self.table){
             let current = self.objects[indexPath.item]
-            if(self.gamesWithStats.contains(current.gameName) || current.hasQuiz){
+            if(self.gamesWithStats.contains(current.gameName) || self.gamesWithQuiz.contains(current.gameName)){
                 self.showStatsOverlay(gameName: current.gameName, game: current)
             }
         }
@@ -1183,14 +1395,14 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         }
            
         //releasing with bug that, under unknown circumstances, the quiz table will not appear when drawer is opened.
-        if(game.hasQuiz){
+        if(self.gamesWithQuiz.contains(gameName)){
             self.quizPayload = [[String]]()
             for profile in self.profilePayload{
                 if(profile.game == game.gameName){
                     self.currentProfile = profile
                     
                     for array in currentProfile!.questions{
-                        self.quizPayload.append(array)
+                        //self.quizPayload.append(array)
                     }
                     break
                 }
@@ -1219,7 +1431,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         self.statsButtonSwitcher.addTarget(self, action: #selector(switchToStats), for: .touchUpInside)
         self.statsButtonSwitcher.isUserInteractionEnabled = true
         
-        if(game.hasQuiz && self.gamesWithStats.contains(game.gameName)){
+        if(self.gamesWithQuiz.contains(gameName) && self.gamesWithStats.contains(game.gameName)){
             self.statsSwitcher.alpha = 1
         } else {
             self.statsSwitcher.alpha = 0

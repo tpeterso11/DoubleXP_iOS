@@ -101,6 +101,16 @@ class GamerConnectGame: NSObject, NSCoding {
         }
     }
     
+    var _available:String = ""
+    var available:String {
+        get {
+            return (_available)
+        }
+        set (newVal) {
+            _available = newVal
+        }
+    }
+    
     var _statsAvailable:Bool? = nil
     var statsAvailable:Bool {
         get {
@@ -162,7 +172,7 @@ class GamerConnectGame: NSObject, NSCoding {
     }
     
     init(imageUrl: String, gameName: String, developer: String, hook: String, statsAvailable: Bool, teamNeeds: [String],
-         twitterHandle: String, twitchHandle: String)
+         twitterHandle: String, twitchHandle: String, available: String)
     {
         super.init()
         self.imageUrl = imageUrl
@@ -173,6 +183,7 @@ class GamerConnectGame: NSObject, NSCoding {
         self.teamNeeds = teamNeeds
         self.twitterHandle = twitterHandle
         self.twitchHandle = twitchHandle
+        self.available = available
     }
     
     required init(coder decoder: NSCoder)
@@ -191,6 +202,7 @@ class GamerConnectGame: NSObject, NSCoding {
         self.twitchGameId = (decoder.decodeObject(forKey: "twitchGameId") as! String)
         self.hasQuiz = (decoder.decodeObject(forKey: "hasQuiz") as! Bool)
         self.mobileGame = (decoder.decodeObject(forKey: "mobileGame") as! String)
+        self.available = (decoder.decodeObject(forKey: "available") as! String)
     }
     
     func encode(with coder: NSCoder) {
@@ -207,5 +219,6 @@ class GamerConnectGame: NSObject, NSCoding {
         coder.encode(self.twitchGameId, forKey: "twitchGameId")
         coder.encode(self.hasQuiz, forKey: "hasQuiz")
         coder.encode(self.mobileGame, forKey: "mobileGame")
+        coder.encode(self.mobileGame, forKey: "available")
     }
 }

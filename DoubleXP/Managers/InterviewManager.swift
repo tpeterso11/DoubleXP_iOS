@@ -23,12 +23,13 @@ class InterviewManager{
     
     func initialize(gameName: String, uId: String){
         let profileManager = GamerProfileManager()
-        faObject = FreeAgentObject(gamerTag: profileManager.getGamerTagForGame(gameName: gameName), competitionId: "", consoles: [String](), game: gameName, userId: uId, questions: [[String]]())
+        faObject = FreeAgentObject(gamerTag: profileManager.getGamerTagForGame(gameName: gameName), competitionId: "", consoles: [String](), game: gameName, userId: uId, questions: [FAQuestion]())
     }
     
     func setConsoles(console: String){
         faObject?.consoles.append(console)
-        showConfirmation()
+        submitProfile()
+        //showConfirmation()
     }
     
     func showConsoles(){
@@ -85,7 +86,8 @@ class InterviewManager{
     func updateQuestions(answer: String?, answerArray: [String]?, faQuestion: FAQuestion){
         for question in self.questions{
             if(question.question == faQuestion.question){
-                if(!question.optionsUrl.isEmpty){
+                let number = Int(question.maxOptions)
+                if(number ?? 0 > 1){
                     question.answerArray = answerArray!
                 } else {
                     question.answer = answer!
@@ -336,18 +338,33 @@ class InterviewManager{
                                 }
                             }
                             
-                            let imageUrl = self.convertLoLImageUrl(imageName: image)
-                            let moa = Moa()
-                            moa.onSuccess = { image in
-                              // image is loaded
-                                self.imageCache.setObject(image, forKey: imageUrl as NSString)
-                                return image
+                            if(self.faObject!.game == "League Of Legends"){
+                                let imageUrl = self.convertLoLImageUrl(imageName: image)
+                                let moa = Moa()
+                                moa.onSuccess = { image in
+                                  // image is loaded
+                                    self.imageCache.setObject(image, forKey: imageUrl as NSString)
+                                    return image
+                                }
+                                moa.url = imageUrl
+                                
+                                let optionObj = OptionObj(optionLabel: label, imageUrl: imageUrl, sortingTags: tags)
+                                                           optionObj.title = title
+                                                           options.append(optionObj)
+                            } else {
+                                let imageUrl = image
+                                let moa = Moa()
+                                moa.onSuccess = { image in
+                                  // image is loaded
+                                    self.imageCache.setObject(image, forKey: imageUrl as NSString)
+                                    return image
+                                }
+                                moa.url = imageUrl
+                                
+                                let optionObj = OptionObj(optionLabel: label, imageUrl: imageUrl, sortingTags: tags)
+                                                           optionObj.title = title
+                                                           options.append(optionObj)
                             }
-                            moa.url = imageUrl
-                            
-                            let optionObj = OptionObj(optionLabel: label, imageUrl: imageUrl, sortingTags: tags)
-                            optionObj.title = title
-                            options.append(optionObj)
                         }
                         
                         self.optionCache = options.sorted { $0.optionLabel < $1.optionLabel }
@@ -407,7 +424,7 @@ class InterviewManager{
     }
     
     func submitProfile(){
-        processQuestions()
+        faObject?.questions = self.questions
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let currentUser = delegate.currentUser
@@ -425,38 +442,213 @@ class InterviewManager{
                     let gamerTag = dict?["gamerTag"] as? String ?? ""
                     let competitionId = dict?["competitionId"] as? String ?? ""
                     let userId = dict?["userId"] as? String ?? ""
-                    let questions = dict?["questions"] as? [[String]] ?? [[String]]()
                     
-                    let result = FreeAgentObject(gamerTag: gamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
-                    profileList.append(result)
+                    var questions = [FAQuestion]()
+                    let questionList = dict?["questions"] as! [[String: Any]]
+                    for question in questionList {
+                        for (key, value) in question {
+                            var questionNumber = ""
+                            var question = ""
+                            var option1 = ""
+                            var option1Description = ""
+                            var option2 = ""
+                            var option2Description = ""
+                            var option3 = ""
+                            var option3Description = ""
+                            var option4 = ""
+                            var option4Description = ""
+                            var option5 = ""
+                            var option5Description = ""
+                            var option6 = ""
+                            var option6Description = ""
+                            var option7 = ""
+                            var option7Description = ""
+                            var option8 = ""
+                            var option8Description = ""
+                            var option9 = ""
+                            var option9Description = ""
+                            var option10 = ""
+                            var option10Description = ""
+                            var required = ""
+                            var questionDescription = ""
+                            var teamNeedQuestion = "false"
+                            var acceptMultiple = ""
+                            var question1SetURL = ""
+                            var question2SetURL = ""
+                            var question3SetURL = ""
+                            var question4SetURL = ""
+                            var question5SetURL = ""
+                            var optionsURL = ""
+                            var maxOptions = ""
+                            var answer = ""
+                                var answerArray = [String]()
+                                
+                                if(key == "questionNumber"){
+                                    questionNumber = (value as? String) ?? ""
+                                }
+                                if(key == "question"){
+                                    question = (value as? String) ?? ""
+                                }
+                                if(key == "option1"){
+                                    option1 = (value as? String) ?? ""
+                                }
+                                if(key == "option1Description"){
+                                    option1Description = (value as? String) ?? ""
+                                }
+                                if(key == "option2"){
+                                    option2 = (value as? String) ?? ""
+                                }
+                                if(key == "option2Description"){
+                                    option2Description = (value as? String) ?? ""
+                                }
+                                if(key == "option3"){
+                                    option3 = (value as? String) ?? ""
+                                }
+                                if(key == "option3Description"){
+                                    option3Description = (value as? String) ?? ""
+                                }
+                                if(key == "option4"){
+                                    option4 = (value as? String) ?? ""
+                                }
+                                if(key == "option4Description"){
+                                    option4Description = (value as? String) ?? ""
+                                }
+                                if(key == "option5"){
+                                    option5 = (value as? String) ?? ""
+                                }
+                                if(key == "option5Description"){
+                                    option5Description = (value as? String) ?? ""
+                                }
+                                if(key == "option6"){
+                                    option6 = (value as? String) ?? ""
+                                }
+                                if(key == "option6Description"){
+                                    option6Description = (value as? String) ?? ""
+                                }
+                                if(key == "option7"){
+                                    option7 = (value as? String) ?? ""
+                                }
+                                if(key == "option7Description"){
+                                    option7Description = (value as? String) ?? ""
+                                }
+                                if(key == "option8"){
+                                    option8 = (value as? String) ?? ""
+                                }
+                                if(key == "option8Description"){
+                                    option8Description = (value as? String) ?? ""
+                                }
+                                if(key == "option9"){
+                                    option9 = (value as? String) ?? ""
+                                }
+                                if(key == "option9Description"){
+                                    option9Description = (value as? String) ?? ""
+                                }
+                                if(key == "option10"){
+                                    option10 = (value as? String) ?? ""
+                                }
+                                if(key == "option10Description"){
+                                    option10Description = (value as? String) ?? ""
+                                }
+                                if(key == "required"){
+                                    required = (value as? String) ?? ""
+                                }
+                                if(key == "questionDescription"){
+                                    questionDescription = (value as? String) ?? ""
+                                }
+                                if(key == "acceptMultiple"){
+                                    acceptMultiple = (value as? String) ?? ""
+                                }
+                                if(key == "question1SetURL"){
+                                    question1SetURL = (value as? String) ?? ""
+                                }
+                                if(key == "question2SetURL"){
+                                    question2SetURL = (value as? String) ?? ""
+                                }
+                                if(key == "question3SetURL"){
+                                    question3SetURL = (value as? String) ?? ""
+                                }
+                                if(key == "question4SetURL"){
+                                    question4SetURL = (value as? String) ?? ""
+                                }
+                                if(key == "question5SetURL"){
+                                    question5SetURL = (value as? String) ?? ""
+                                }
+                                if(key == "teamNeedQuestion"){
+                                    teamNeedQuestion = (value as? String) ?? "false"
+                                }
+                                if(key == "optionsUrl"){
+                                    optionsURL = (value as? String) ?? ""
+                                }
+                                if(key == "maxOptions"){
+                                    maxOptions = (value as? String) ?? ""
+                                }
+                                if(key == "answer"){
+                                    answer = (value as? String) ?? ""
+                                }
+                                if(key == "answerArray"){
+                                    answerArray = (value as? [String]) ?? [String]()
+                                }
+                            
+                            let faQuestion = FAQuestion(question: question)
+                                faQuestion.questionNumber = questionNumber
+                                faQuestion.question = question
+                                faQuestion.option1 = option1
+                                faQuestion.option1Description = option1Description
+                                faQuestion.question1SetURL = question1SetURL
+                                faQuestion.option2 = option2
+                                faQuestion.option2Description = option2Description
+                                faQuestion.question2SetURL = question2SetURL
+                                faQuestion.option3 = option3
+                                faQuestion.option3Description = option3Description
+                                faQuestion.question3SetURL = question3SetURL
+                                faQuestion.option4 = option4
+                                faQuestion.option4Description = option4Description
+                                faQuestion.question4SetURL = question4SetURL
+                                faQuestion.option5 = option5
+                                faQuestion.option5Description = option5Description
+                                faQuestion.question5SetURL = question5SetURL
+                                faQuestion.option6 = option6
+                                faQuestion.option6Description = option6Description
+                                faQuestion.option7 = option7
+                                faQuestion.option7Description = option7Description
+                                faQuestion.option8 = option8
+                                faQuestion.option8Description = option8Description
+                                faQuestion.option9 = option9
+                                faQuestion.option9Description = option9Description
+                                faQuestion.option10 = option10
+                                faQuestion.option10Description = option10Description
+                                faQuestion.required = required
+                                faQuestion.acceptMultiple = acceptMultiple
+                                faQuestion.questionDescription = questionDescription
+                                faQuestion.teamNeedQuestion = teamNeedQuestion
+                                faQuestion.optionsUrl = optionsURL
+                                faQuestion.maxOptions = maxOptions
+                                faQuestion.answer = answer
+                                faQuestion.answerArray = answerArray
+                
+                    questions.append(faQuestion)
                 }
             }
-            
-            profileList.append(self.faObject!)
-            
-            var array = [[String: Any]]()
-            for profile in profileList{
-//                if(!(currentUser?.stats.isEmpty)!){
-//                    for statObj in currentUser!.stats{
-//                        if(statObj.gameName == self.faObject!.game){
-//                            if(statObj.gameName == "The Division 2"){
-//                                let statTree = ["gearScore": statObj.gearScore, "killsPVP": statObj.killsPVP, "playerLevelGame": statObj.playerLevelGame, "playerLevelPVP": statObj.playerLevelPVP]
-//
-//                                profile.statTree = statTree
-//                            }
-//                            else if(statObj.gameName == "Rainbow Six Siege"){
-//                                let statTree = ["currentRank": statObj.currentRank, "killsPVP": statObj.killsPVP, "totalRankedWins": statObj.totalRankedWins, "totalRankedLosses": statObj.totalRankedLosses, "totalRankedKills": statObj.totalRankedKills, "totalRankedDeaths": statObj.totalRankedDeaths, "mostUsedAttacker": statObj.mostUsedAttacker, "mostUsedDefender": statObj.mostUsedDefender]
-//                                profile.statTree = statTree
-//                            }
-//                        }
-//                    }
-//                }
+                let result = FreeAgentObject(gamerTag: gamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
+                profileList.append(result)
+            }
+        }
+        profileList.append(self.faObject!)
+        
+        var array = [[String: Any]]()
+        for profile in profileList{
+            var questions = [[String: Any]]()
+            for question in profile.questions {
+                let currentQuestion = question
+                let currentDict = ["question": currentQuestion.question, "answer": currentQuestion.answer, "questionAnswered": currentQuestion.questionAnswered, "acceptMultiple": currentQuestion.acceptMultiple, "questionDescription": currentQuestion.questionDescription, "required": currentQuestion.required, "question5SetURL": currentQuestion.question5SetURL, "option5Description": currentQuestion.option5Description,  "option5": currentQuestion.option5, "question4SetURL": currentQuestion.question4SetURL, "option4Description": currentQuestion.option4Description, "option4": currentQuestion.option4,"question3SetURL": currentQuestion.question3SetURL, "option3Description": currentQuestion.option3Description, "option3": currentQuestion.option3,"question2SetURL": currentQuestion.question2SetURL, "option2Description": currentQuestion.option2Description, "option2": currentQuestion.option1,"question1SetURL": currentQuestion.question1SetURL, "option1Description": currentQuestion.option1Description, "option1": currentQuestion.option1, "teamNeedQuestion": currentQuestion.teamNeedQuestion, "optionsUrl": currentQuestion.optionsUrl, "maxOptions": currentQuestion.maxOptions, "answerArray": currentQuestion.answerArray, "questionNumber": currentQuestion.questionNumber] as [String : Any]
                 
-                array.append(["gamerTag": profile.gamerTag, "competitionId": profile.competitionId, "consoles": profile.consoles, "game": profile.game, "userId": profile.userId, "questions": profile.questions, "statTree": profile.statTree])
+                questions.append(currentDict)
             }
             
-            ref.setValue(array)
-            self.showComplete()
+            array.append(["gamerTag": profile.gamerTag, "competitionId": profile.competitionId, "consoles": profile.consoles, "game": profile.game, "userId": profile.userId, "questions": questions, "statTree": profile.statTree])
+        }
+        ref.setValue(array)
+        self.showComplete()
             
         }) { (error) in
             print(error.localizedDescription)
@@ -467,21 +659,19 @@ class InterviewManager{
         return "http://ddragon.leagueoflegends.com/cdn/10.11.1/img/champion/"+imageName
     }
     
-    private func processQuestions(){
-        var questionsArray = [[String]]()
-        for question in self.questions{
-            var questionArray = [String]()
+    
+    //we basically need to refactor the quiz to have it so every time we answer a question, we add it to ONE central question dictionary. If it is a multi-answer, we append "array", if it's a single answer -> "answer". We will then have to make this change for Android to make sure we properly show quizzes in both apps.
+    /*private func processQuestions(){
+        var orderedDictionary = OrderedDictionary<FAQuestion, Any>()
+    
+        for question in self.questions {
             if(!question.answerArray.isEmpty){
-                questionArray.append(question.question)
-                questionArray.append(contentsOf: question.answerArray)
+                orderedDictionary[question] = question.answerArray
             } else {
-                questionArray.append(question.question)
-                questionArray.append(question.answer)
+                orderedDictionary[question] = question.answer
             }
-            
-            questionsArray.append(questionArray)
         }
         
-        faObject?.questions = questionsArray
-    }
+        faObject?.questions = orderedDictionary
+    }*/
 }

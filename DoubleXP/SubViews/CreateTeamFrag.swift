@@ -68,7 +68,14 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         switches.append(nintendoSwitch)
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        gcGames = delegate.gcGames
+        var list = [GamerConnectGame]()
+        for game in delegate.gcGames {
+            if(game.available == "true"){
+                list.append(game)
+            }
+        }
+        
+        gcGames = list
         
         psSwitch.addTarget(self, action: #selector(psSwitchChanged), for: UIControl.Event.valueChanged)
         xboxSwitch.addTarget(self, action: #selector(xboxSwitchChanged), for: UIControl.Event.valueChanged)

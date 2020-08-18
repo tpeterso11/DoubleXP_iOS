@@ -749,8 +749,11 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                 UIView.animate(withDuration: 0.5) {
                     self.articleOverlay.alpha = 1
                     self.view.bringSubviewToFront(self.articleOverlay)
+                    
+                    self.expandOverlay()
                     self.view.layoutIfNeeded()
                 }
+                
             
             }, completion: nil)
         })
@@ -1137,9 +1140,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
             let attr = (current as! String).htmlToAttributedString
                           
             cell.label.attributedText = attr?.string.set(style: groupStyle)
-            cell.label.lineBreakMode = .byWordWrapping
-            
-            cell.label.numberOfLines = 500
+            cell.label.font = UIFont(name: cell.label.font!.fontName, size: 18)
             
             return cell
         } else {
@@ -1155,13 +1156,6 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
             
             return cell
         }
-        /*if(self.isExpanded){
-            cell.label.numberOfLines = 500
-        }
-        else{
-            cell.label.numberOfLines = 4
-            cell.label.lineBreakMode = .byTruncatingTail
-        }*/
         
     }
     
@@ -1176,7 +1170,11 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 100.0;
+        if(tableView == articleTable){
+            return 1500.0;
+        } else {
+            return 100.0;
+        }
     }
     
     func webViewDidClose(_ webView: WKWebView) {

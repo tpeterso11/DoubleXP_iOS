@@ -13,14 +13,18 @@ import MSPeekCollectionViewDelegateImplementation
 import FBSDKCoreKit
 import VideoBackground
 import MSPeekCollectionViewDelegateImplementation
+import CountdownLabel
+import SwiftNotificationCenter
 
-class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout,
+UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
     @IBOutlet weak var gcGameScroll: UICollectionView!
     @IBOutlet weak var recommendedUsers: UICollectionView!
     var selectedCell = false
     
+    @IBOutlet weak var yourFeedHeader: UIView!
     @IBOutlet weak var announcementShare: UIButton!
-    @IBOutlet weak var announcementClose: UIButton!
+    @IBOutlet weak var announcementClose: UIImageView!
     @IBOutlet weak var announcementDetails: UILabel!
     @IBOutlet weak var announcementSender: UILabel!
     @IBOutlet weak var announcementTitle: UILabel!
@@ -28,9 +32,23 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
     @IBOutlet weak var announcementLayout: UIVisualEffectView!
     @IBOutlet weak var connectHeader: UILabel!
     @IBOutlet weak var currentDate: UILabel!
+    @IBOutlet weak var upcomingGameBox: UIView!
+    @IBOutlet weak var upcomingBoxGame: UILabel!
+    @IBOutlet weak var upcomingBoxDesc: UILabel!
+    @IBOutlet weak var closeUpcomingGame: UIImageView!
+    @IBOutlet weak var announcementCloseClickArea: UIView!
+    @IBOutlet weak var upcomingReleaseDate: UILabel!
+    @IBOutlet weak var trailerWV: WKWebView!
+    @IBOutlet weak var upcomingReleaseBoxBack: UIImageView!
     var gcGames = [GamerConnectGame]()
+    @IBOutlet weak var upcomingBoxTable: UITableView!
     var secondaryPayload = [Any]()
     private var currentAnnouncement: AnnouncementObj?
+    var timer: Timer!
+    var currentUpcomingGamePos = -1
+    var currentTrailers = [String: String]()
+    var trailerPayload = [String]()
+    var upcomingSet = false
     
     var behavior: MSCollectionViewPeekingBehavior!
     
@@ -50,7 +68,23 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
         currentDate.text = todayString
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        gcGames = appDelegate.gcGames
+        var list = [GamerConnectGame]()
+        for game in appDelegate.gcGames {
+            if(game.available == "true"){
+                list.append(game)
+            }
+        }
+        
+        gcGames = list
+        
+        NotificationCenter.default.addObserver(
+            forName: UIWindow.didBecomeKeyNotification,
+            object: self.view.window,
+            queue: nil
+        ) { notification in
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            delegate.currentLanding?.hideScoob()
+        }
     }
     
     override func reloadView() {
@@ -58,6 +92,15 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
         appDelegate.currentLanding!.restoreBottomNav()
         appDelegate.currentLanding!.updateNavColor(color: UIColor(named: "darker")!)
         appDelegate.currentLanding!.stackDepth = 1
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        print("gone")
+        NotificationCenter.default.removeObserver(NSNotification.Name.AVPlayerItemDidPlayToEndTime)
+    }
+    
+    func playerDidFinishPlaying(note: NSNotification) {
+        print("gone")
     }
     
     private func animateView(){
@@ -84,6 +127,8 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
                 self.gcGameScroll.reloadData()
             }, completion: { (finished: Bool) in
                 UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                    self.yourFeedHeader.transform = top
+                    self.yourFeedHeader.alpha = 1
                     self.recommendedUsers.transform = top
                     self.recommendedUsers.alpha = 1
                 }, completion: nil)
@@ -103,6 +148,13 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
             }
         }
         
+        let defaults = UserDefaults.standard
+        let ignoreArray = defaults.stringArray(forKey: "ignoredUpcomingGames") ?? [String]()
+        for game in appDelegate.upcomingGames {
+            if(!ignoreArray.contains(game.id)){
+                secondaryPayload.append(game)
+            }
+        }
         secondaryPayload.append(contentsOf: appDelegate.competitions)
         
         let userOne = RecommendedUser(gamerTag: "allthesaints011", uid: "HMv30El7nmWXPEnriV3irMsnS3V2")
@@ -162,6 +214,68 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
                 
                 cell.announcementGame.text = (current as! AnnouncementObj).announcementGames[0]
                 cell.announcementTitle.text = (current as! AnnouncementObj).announcementTitle
+                
+                cell.contentView.layer.cornerRadius = 10.0
+                cell.contentView.layer.borderWidth = 1.0
+                cell.contentView.layer.borderColor = UIColor.clear.cgColor
+                cell.contentView.layer.masksToBounds = true
+                
+                cell.tag = indexPath.item
+                
+                let ignoreTap = UITapGestureRecognizer(target: self, action: #selector(ignoreGame))
+                cell.announcementIgnore.isUserInteractionEnabled = true
+                cell.announcementIgnore.addGestureRecognizer(ignoreTap)
+                
+                cell.layer.shadowColor = UIColor.black.cgColor
+                cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+                cell.layer.shadowRadius = 2.0
+                cell.layer.shadowOpacity = 0.5
+                cell.layer.masksToBounds = false
+                cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
+                
+                return cell
+            }
+            else if(current is UpcomingGame){
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "upcoming", for: indexPath) as! UpcomingGameCell
+                let currentObj = current as! UpcomingGame
+                
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                let cache = appDelegate.imageCache
+                if(cache.object(forKey: currentObj.gameImageUrl as NSString) != nil){
+                    cell.gameBack.image = cache.object(forKey: currentObj.gameImageUrl as NSString)
+                } else {
+                    cell.gameBack.image = Utility.Image.placeholder
+                    cell.gameBack.moa.onSuccess = { image in
+                        cell.gameBack.image = image
+                        appDelegate.imageCache.setObject(image, forKey: currentObj.gameImageUrl as NSString)
+                        return image
+                    }
+                    cell.gameBack.moa.url = currentObj.gameImageUrl
+                }
+                
+                cell.gameBack.contentMode = .scaleAspectFill
+                cell.gameBack.clipsToBounds = true
+                
+                cell.closeClickArea.tag = indexPath.item
+                
+                let ignoreTap = UITapGestureRecognizer(target: self, action: #selector(ignoreGame))
+                cell.closeClickArea.isUserInteractionEnabled = true
+                cell.closeClickArea.addGestureRecognizer(ignoreTap)
+                
+                cell.gameName.text = currentObj.game
+                
+                if((current as! UpcomingGame).releaseDate != "TBD"){
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "MM/dd/yyyy"
+                    
+                    var localTimeZoneAbbreviation: String { return TimeZone.current.abbreviation() ?? "" }
+                    dateFormatter.timeZone = NSTimeZone(name: localTimeZoneAbbreviation) as TimeZone?
+                    let releaseDate = dateFormatter.date(from:currentObj.releaseDate)!
+                    
+                    timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(UpdateTime), userInfo: ["date": releaseDate as NSDate, "view": cell.gameCountdown], repeats: true)
+                } else {
+                    cell.gameCountdown.text = (current as! UpcomingGame).releaseDateProper
+                }
                 
                 cell.contentView.layer.cornerRadius = 10.0
                 cell.contentView.layer.borderWidth = 1.0
@@ -282,6 +396,10 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
                 let current = self.secondaryPayload[indexPath.item]
                 self.showAnnouncement(announcement: current as! AnnouncementObj)
             }
+            else if (cell is UpcomingGameCell){
+                let current = self.secondaryPayload[indexPath.item] as! UpcomingGame
+                self.showUpcomingGameInfo(upcomingGame: current)
+            }
             else{
                 let current = self.secondaryPayload[indexPath.item]
                 
@@ -306,6 +424,9 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
             else if(current is AnnouncementObj){
                 return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(80))
             }
+            else if(current is UpcomingGame){
+                return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(150))
+            }
             else{
                 return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(100))
             }
@@ -317,13 +438,103 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
         return CGSize(width: 260, height: CGFloat(100))
     }
     
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return self.trailerPayload.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "trailer", for: indexPath) as! UpcomingTrailerCell
+        let current = self.trailerPayload[indexPath.item]
+        
+        cell.type.text = current
+        cell.url = self.currentTrailers[current]
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let currentCell = tableView.cellForRow(at: indexPath) as! UpcomingTrailerCell
+        
+        if(currentCell.url != nil){
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            appDelegate.currentLanding?.showScoob(callback: self, cancelableWV: self.trailerWV)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.trailerWV.load(NSURLRequest(url: NSURL(string: currentCell.url!)! as URL) as URLRequest)
+            }
+        }
+    }
+    
+    @objc func ignoreGame(_ sender: UITapGestureRecognizer){
+        let defaults = UserDefaults.standard
+        var ignoreArray = defaults.stringArray(forKey: "ignoredUpcomingGames") ?? [String]()
+        
+        let view = sender.view
+        if(view != nil){
+            let current = self.secondaryPayload[view!.tag]
+            if(current is UpcomingGame){
+                if(!(current as! UpcomingGame).id.isEmpty){
+                    ignoreArray.append((current as! UpcomingGame).id)
+                    defaults.set(ignoreArray, forKey: "ignoredUpcomingGames")
+                    
+                    AppEvents.logEvent(AppEvents.Name(rawValue: "Upcoming Game ignored" + (current as! UpcomingGame).game))
+                    
+                    self.secondaryPayload.remove(at: view!.tag)
+                    self.recommendedUsers.reloadData()
+                }
+            }
+        }
+    }
+    
+    @objc func UpdateTime(_ sender: Timer) {
+        let userCalendar = Calendar.current
+        // Set Current Date
+        let date = Date()
+        let components = userCalendar.dateComponents([.hour, .minute, .month, .year, .day, .second], from: date)
+        let currentDate = userCalendar.date(from: components)!
+        
+        var eventDateComponents = DateComponents()
+        eventDateComponents = userCalendar.dateComponents([.hour, .minute, .month, .year, .day, .second], from: ((sender.userInfo as! NSDictionary)["date"]! as! Date))
+        
+        // Convert eventDateComponents to the user's calendar
+        let eventDate = userCalendar.date(from: eventDateComponents)!
+        
+        // Change the seconds to days, hours, minutes and seconds
+        let timeLeft = userCalendar.dateComponents([.day, .hour, .minute, .second], from: currentDate, to: eventDate)
+        
+        // Display Countdown
+        ((sender.userInfo as! NSDictionary)["view"] as! UILabel).text = "\(timeLeft.day!)d \(timeLeft.hour!)h \(timeLeft.minute!)m \(timeLeft.second!)s"
+        
+        // Show diffrent text when the event has passed
+        endEvent(currentdate: currentDate, eventdate: eventDate)
+    }
+    
+    func endEvent(currentdate: Date, eventdate: Date) {
+        if currentdate >= eventdate {
+            // Stop Timer
+            timer.invalidate()
+        }
+    }
+    
     private func showAnnouncement(announcement: AnnouncementObj){
         self.currentAnnouncement = announcement
         self.announcementSender.text = currentAnnouncement?.announcementSender
         self.announcementDetails.text = currentAnnouncement?.announcementDetails
         self.announcementTitle.text = currentAnnouncement?.announcementTitle
-        self.announcementClose.addTarget(self, action: #selector(self.dismissAnnouncement), for: .touchUpInside)
+        
+        let closeTap = UITapGestureRecognizer(target: self, action: #selector(dismissAnnouncement))
+        self.announcementClose.isUserInteractionEnabled = true
+        self.announcementClose.addGestureRecognizer(closeTap)
         self.announcementShare.isHidden = true
+        
+        self.announcementBox.layer.shadowColor = UIColor.black.cgColor
+        self.announcementBox.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+        self.announcementBox.layer.shadowRadius = 2.0
+        self.announcementBox.layer.shadowOpacity = 0.5
+        self.announcementBox.layer.masksToBounds = false
+        self.announcementBox.layer.shadowPath = UIBezierPath(roundedRect: self.announcementBox.bounds, cornerRadius: self.announcementBox.layer.cornerRadius).cgPath
+        
+        //let slideDown = UISwipeGestureRecognizer(target: self, action: #selector(dismissView(gesture:)))
+        //slideDown.direction = .down
+        //self.announcementBox.addGestureRecognizer(slideDown)
         
         let top = CGAffineTransform(translationX: 0, y: 40)
         UIView.animate(withDuration: 0.8, animations: {
@@ -336,11 +547,33 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
         })
     }
     
-    @objc private func dismissAnnouncement(){
+    @objc func dismissView(gesture: UISwipeGestureRecognizer) {
+        UIView.animate(withDuration: 0.4) {
+            if let theWindow = UIApplication.shared.keyWindow {
+                gesture.view?.frame = CGRect(x:theWindow.frame.width - 15 , y: theWindow.frame.height - 15, width: 10 , height: 10)
+            }
+        }
+    }
+    
+    @objc private func ignoreAnnouncement(_ sender: UITapGestureRecognizer){
         if(self.currentAnnouncement != nil){
             registerAnnouncementView(announcement: self.currentAnnouncement!)
         }
         
+        for obj in self.secondaryPayload {
+            if(obj is AnnouncementObj){
+                if((obj as! AnnouncementObj).announcementId == self.currentAnnouncement?.announcementId){
+                    
+                    let view = sender.view
+                    self.secondaryPayload.remove(at: (view as! AnnouncementCell).tag)
+                }
+            }
+        }
+        
+        self.recommendedUsers.reloadData()
+    }
+    
+    @objc private func dismissAnnouncement(){
         let top = CGAffineTransform(translationX: 0, y: 0)
         UIView.animate(withDuration: 0.5, animations: {
             self.announcementBox.transform = top
@@ -359,9 +592,10 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
             if(snapshot.exists()){
                 if(snapshot.hasChild("viewedAnnouncements")){
                     var viewed = snapshot.childSnapshot(forPath: "viewedAnnouncements").value as! [String]
-                    viewed.append(announcement.announcementId)
-                    
-                    ref.child("viewedAnnouncements").setValue(viewed)
+                    if(!viewed.contains(announcement.announcementId)){
+                        viewed.append(announcement.announcementId)
+                        ref.child("viewedAnnouncements").setValue(viewed)
+                    }
                 } else {
                     var viewed = [String]()
                     viewed.append(announcement.announcementId)
@@ -381,6 +615,111 @@ class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewData
             print(error.localizedDescription)
             
         }
+    }
+    
+    private func showUpcomingGameInfo(upcomingGame: UpcomingGame){
+        self.upcomingBoxGame.text = upcomingGame.game
+        self.upcomingBoxDesc.text = upcomingGame.gameDesc
+        self.upcomingBoxDesc.layer.cornerRadius = 15
         
+        self.upcomingBoxDesc.layer.shadowColor = UIColor.black.cgColor
+        self.upcomingBoxDesc.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+        self.upcomingBoxDesc.layer.shadowRadius = 2.0
+        self.upcomingBoxDesc.layer.shadowOpacity = 0.5
+        self.upcomingBoxDesc.layer.masksToBounds = true
+        self.upcomingBoxDesc.layer.shadowPath = UIBezierPath(roundedRect: self.upcomingBoxDesc.bounds, cornerRadius: self.upcomingBoxDesc.layer.cornerRadius).cgPath
+        
+        self.currentTrailers = upcomingGame.trailerUrls
+        self.upcomingReleaseDate.text = upcomingGame.releaseDateProper
+        
+        self.trailerPayload = [String]()
+        self.trailerPayload.append(contentsOf: upcomingGame.trailerUrls.keys)
+        
+        let closeTap = UITapGestureRecognizer(target: self, action: #selector(hideUpcoming))
+        self.closeUpcomingGame.isUserInteractionEnabled = true
+        self.closeUpcomingGame.addGestureRecognizer(closeTap)
+        
+        let clickAreaTap = UITapGestureRecognizer(target: self, action: #selector(hideUpcoming))
+        self.announcementCloseClickArea.isUserInteractionEnabled = true
+        self.announcementCloseClickArea.addGestureRecognizer(clickAreaTap)
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let cache = appDelegate.imageCache
+        if(cache.object(forKey: upcomingGame.gameImageUrl as NSString) != nil){
+            self.upcomingReleaseBoxBack.image = cache.object(forKey: upcomingGame.gameImageUrl as NSString)
+            self.upcomingReleaseBoxBack.contentMode = .scaleAspectFill
+            self.upcomingReleaseBoxBack.clipsToBounds = true
+        } else {
+            self.upcomingReleaseBoxBack.image = Utility.Image.placeholder
+            self.upcomingReleaseBoxBack.moa.onSuccess = { image in
+                self.upcomingReleaseBoxBack.image = image
+                self.upcomingReleaseBoxBack.contentMode = .scaleAspectFill
+                self.upcomingReleaseBoxBack.clipsToBounds = true
+                
+                appDelegate.imageCache.setObject(image, forKey: upcomingGame.gameImageUrl as NSString)
+                return image
+            }
+            self.upcomingReleaseBoxBack.moa.url = upcomingGame.gameImageUrl
+        }
+        
+        self.upcomingGameBox.layer.cornerRadius = 15.0
+        self.upcomingGameBox.layer.borderWidth = 1.0
+        self.upcomingGameBox.layer.borderColor = UIColor.clear.cgColor
+        self.upcomingGameBox.layer.masksToBounds = true
+        
+        self.upcomingGameBox.layer.shadowColor = UIColor.black.cgColor
+        self.upcomingGameBox.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+        self.upcomingGameBox.layer.shadowRadius = 2.0
+        self.upcomingGameBox.layer.shadowOpacity = 0.5
+        self.upcomingGameBox.layer.masksToBounds = false
+        self.upcomingGameBox.layer.shadowPath = UIBezierPath(roundedRect: self.upcomingGameBox.bounds, cornerRadius: self.upcomingGameBox.layer.cornerRadius).cgPath
+        
+        if(!upcomingSet){
+            self.upcomingBoxTable.delegate = self
+            self.upcomingBoxTable.dataSource = self
+            self.upcomingSet = true
+            
+            self.upcomingBoxTable.reloadData()
+        } else {
+            self.upcomingBoxTable.reloadData()
+        }
+        
+        let top = CGAffineTransform(translationX: 0, y: 40)
+        UIView.animate(withDuration: 0.8, animations: {
+            self.announcementLayout.alpha = 1
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                self.upcomingGameBox.alpha = 1
+                self.upcomingGameBox.transform = top
+                
+                self.upcomingGameBox.layer.shadowColor = UIColor.black.cgColor
+                self.upcomingGameBox.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+                self.upcomingGameBox.layer.shadowRadius = 2.0
+                self.upcomingGameBox.layer.shadowOpacity = 0.5
+                self.upcomingGameBox.layer.masksToBounds = false
+                self.upcomingGameBox.layer.shadowPath = UIBezierPath(roundedRect: self.upcomingGameBox.bounds, cornerRadius: self.upcomingGameBox.layer.cornerRadius).cgPath
+            }, completion: nil)
+        })
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 80.0;
+    }
+    
+    func updateNavColor(color: UIColor) {
+    }
+    
+    @objc private func hideUpcoming(){
+        self.announcementCloseClickArea.isUserInteractionEnabled = false
+        
+        let top = CGAffineTransform(translationX: 0, y: 0)
+        UIView.animate(withDuration: 0.8, animations: {
+             self.upcomingGameBox.alpha = 0
+             self.upcomingGameBox.transform = top
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                self.announcementLayout.alpha = 0
+            }, completion: nil)
+        })
     }
 }

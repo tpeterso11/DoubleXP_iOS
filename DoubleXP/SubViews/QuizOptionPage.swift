@@ -30,7 +30,7 @@ var interviewManager: InterviewManager!
         
         options = interviewManager.optionCache
         maxOptions = Int(question!.maxOptions) ?? 1
-        questionLabel.text = "which 3 champions do you play with the most?"//question?.question
+        questionLabel.text = question?.question
     
         optionTable.delegate = self
         optionTable.dataSource = self
@@ -38,8 +38,24 @@ var interviewManager: InterviewManager!
         choicesCollection.delegate = self
         choicesCollection.dataSource = self
         
+        if(Int(question!.maxOptions) ?? 0 > 1){
+            continueButton.setTitle("continue (select up to " + question!.maxOptions + ")", for: .normal)
+        } else {
+            continueButton.setTitle("continue", for: .normal)
+        }
         continueButton.addTarget(self, action: #selector(continueClicked), for: .touchUpInside)
         checkButton()
+        
+        animateEntry()
+    }
+    
+    private func animateEntry(){
+        UIView.animate(withDuration: 0.8, animations: {
+            self.optionTable.alpha = 1
+            self.questionLabel.alpha = 1
+            self.continueButton.alpha = 1
+            self.choicesCollection.alpha = 1
+        }, completion: nil)
     }
     
     @objc private func continueClicked(){
@@ -57,7 +73,7 @@ var interviewManager: InterviewManager!
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return Int(self.question!.maxOptions) ?? 0
+        return Int(self.question!.maxOptions) ?? 0 + 1
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -79,6 +95,8 @@ var interviewManager: InterviewManager!
         } else {
             cell.answerImage.image = nil
         }
+        cell.answerImage.contentMode = .scaleAspectFill
+        cell.answerImage.clipsToBounds = true
         
         cell.contentView.layer.cornerRadius = 2.0
         cell.contentView.layer.borderWidth = 1.0
@@ -144,6 +162,7 @@ var interviewManager: InterviewManager!
                 UIView.animate(withDuration: 0.3, animations: {
                     cell.selectedText.text = ""
                     cell.selectedCell.alpha = 0
+                    cell.optionBlur.alpha = 0
                 }, completion: nil)
             } else {
                 let answerWurl = selectedItem.optionLabel + "/DXP/" + selectedItem.imageUrl
@@ -152,6 +171,7 @@ var interviewManager: InterviewManager!
                 UIView.animate(withDuration: 0.3, animations: {
                     cell.selectedText.text = selectedItem.title
                     cell.selectedCell.alpha = 1
+                    cell.optionBlur.alpha = 1
                 }, completion: nil)
             }
             

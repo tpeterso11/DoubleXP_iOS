@@ -102,9 +102,9 @@ class ViewTeamsFoldingCell: FoldingCell, UICollectionViewDataSource, UICollectio
             self.isUserInteractionEnabled = true
             //if this user has a game profile for this game AND the current teams' team needs are not empty
             if(contained && (!self.currentTeam!.teamNeeds.isEmpty && !self.currentTeam!.selectedTeamNeeds.isEmpty)){
-                var answer = containedProfile?.questions[0][0]
-                if(self.currentTeam!.selectedTeamNeeds.contains((containedProfile?.questions[0][1])!)){
-                    //match team needs
+                //var answer = containedProfile?.questions[0][0]
+                //if(self.currentTeam!.selectedTeamNeeds.contains((containedProfile?.questions[0][1])!)){
+                if(true == false) {   //match team needs
                     self.sendButton.tag = indexPath.item
                     self.sendButton.addTarget(self, action: #selector(sendRequest), for: .touchUpInside)
                     

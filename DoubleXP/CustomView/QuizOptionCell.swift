@@ -14,6 +14,7 @@ class QuizOptionCell: UITableViewCell {
     @IBOutlet weak var optionBack: UIImageView!
     @IBOutlet weak var selectedCell: UIView!
     @IBOutlet weak var selectedText: UILabel!
+    @IBOutlet weak var optionBlur: UIVisualEffectView!
     
     override func awakeFromNib() {
         self.layer.cornerRadius = 10
