@@ -394,208 +394,210 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                     let status = dict?["status"] as? String ?? ""
                     let teamId = dict?["teamId"] as? String ?? ""
                     let teamName = dict?["teamName"] as? String ?? ""
-                    let captainId = dict?["teamCaptainId"] as? String ?? ""
+                    let captainId = dict?["captainId"] as? String ?? ""
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
                     let requestId = dict?["requestId"] as? String ?? ""
+                        let userUid = dict?["userUid"] as? String ?? ""
                      
                      let profile = currentObj.childSnapshot(forPath: "profile")
                      let profileDict = profile.value as? [String: Any]
                      let game = profileDict?["game"] as? String ?? ""
                      let consoles = profileDict?["consoles"] as? [String] ?? [String]()
-                     let gamerTag = profileDict?["gamerTag"] as? String ?? ""
+                     let profileGamerTag = profileDict?["gamerTag"] as? String ?? ""
                      let competitionId = profileDict?["competitionId"] as? String ?? ""
                      let userId = profileDict?["userId"] as? String ?? ""
                      
                     var questions = [FAQuestion]()
-                            let questionList = profileDict?["questions"] as! [[String: Any]]
+                    let questionList = dict?["questions"] as? [[String: Any]] ?? [[String: Any]]()
                             for question in questionList {
+                                var questionNumber = ""
+                                var questionString = ""
+                                var option1 = ""
+                                var option1Description = ""
+                                var option2 = ""
+                                var option2Description = ""
+                                var option3 = ""
+                                var option3Description = ""
+                                var option4 = ""
+                                var option4Description = ""
+                                var option5 = ""
+                                var option5Description = ""
+                                var option6 = ""
+                                var option6Description = ""
+                                var option7 = ""
+                                var option7Description = ""
+                                var option8 = ""
+                                var option8Description = ""
+                                var option9 = ""
+                                var option9Description = ""
+                                var option10 = ""
+                                var option10Description = ""
+                                var required = ""
+                                var questionDescription = ""
+                                var teamNeedQuestion = "false"
+                                var acceptMultiple = ""
+                                var question1SetURL = ""
+                                var question2SetURL = ""
+                                var question3SetURL = ""
+                                var question4SetURL = ""
+                                var question5SetURL = ""
+                                var optionsURL = ""
+                                var maxOptions = ""
+                                var answer = ""
+                                var answerArray = [String]()
+                                
                                 for (key, value) in question {
-                                    var questionNumber = ""
-                                    var question = ""
-                                    var option1 = ""
-                                    var option1Description = ""
-                                    var option2 = ""
-                                    var option2Description = ""
-                                    var option3 = ""
-                                    var option3Description = ""
-                                    var option4 = ""
-                                    var option4Description = ""
-                                    var option5 = ""
-                                    var option5Description = ""
-                                    var option6 = ""
-                                    var option6Description = ""
-                                    var option7 = ""
-                                    var option7Description = ""
-                                    var option8 = ""
-                                    var option8Description = ""
-                                    var option9 = ""
-                                    var option9Description = ""
-                                    var option10 = ""
-                                    var option10Description = ""
-                                    var required = ""
-                                    var questionDescription = ""
-                                    var teamNeedQuestion = "false"
-                                    var acceptMultiple = ""
-                                    var question1SetURL = ""
-                                    var question2SetURL = ""
-                                    var question3SetURL = ""
-                                    var question4SetURL = ""
-                                    var question5SetURL = ""
-                                    var optionsURL = ""
-                                    var maxOptions = ""
-                                    var answer = ""
-                                        var answerArray = [String]()
-                                        
-                                        if(key == "questionNumber"){
-                                            questionNumber = (value as? String) ?? ""
-                                        }
-                                        if(key == "question"){
-                                            question = (value as? String) ?? ""
-                                        }
-                                        if(key == "option1"){
-                                            option1 = (value as? String) ?? ""
-                                        }
-                                        if(key == "option1Description"){
-                                            option1Description = (value as? String) ?? ""
-                                        }
-                                        if(key == "option2"){
-                                            option2 = (value as? String) ?? ""
-                                        }
-                                        if(key == "option2Description"){
-                                            option2Description = (value as? String) ?? ""
-                                        }
-                                        if(key == "option3"){
-                                            option3 = (value as? String) ?? ""
-                                        }
-                                        if(key == "option3Description"){
-                                            option3Description = (value as? String) ?? ""
-                                        }
-                                        if(key == "option4"){
-                                            option4 = (value as? String) ?? ""
-                                        }
-                                        if(key == "option4Description"){
-                                            option4Description = (value as? String) ?? ""
-                                        }
-                                        if(key == "option5"){
-                                            option5 = (value as? String) ?? ""
-                                        }
-                                        if(key == "option5Description"){
-                                            option5Description = (value as? String) ?? ""
-                                        }
-                                        if(key == "option6"){
-                                            option6 = (value as? String) ?? ""
-                                        }
-                                        if(key == "option6Description"){
-                                            option6Description = (value as? String) ?? ""
-                                        }
-                                        if(key == "option7"){
-                                            option7 = (value as? String) ?? ""
-                                        }
-                                        if(key == "option7Description"){
-                                            option7Description = (value as? String) ?? ""
-                                        }
-                                        if(key == "option8"){
-                                            option8 = (value as? String) ?? ""
-                                        }
-                                        if(key == "option8Description"){
-                                            option8Description = (value as? String) ?? ""
-                                        }
-                                        if(key == "option9"){
-                                            option9 = (value as? String) ?? ""
-                                        }
-                                        if(key == "option9Description"){
-                                            option9Description = (value as? String) ?? ""
-                                        }
-                                        if(key == "option10"){
-                                            option10 = (value as? String) ?? ""
-                                        }
-                                        if(key == "option10Description"){
-                                            option10Description = (value as? String) ?? ""
-                                        }
-                                        if(key == "required"){
-                                            required = (value as? String) ?? ""
-                                        }
-                                        if(key == "questionDescription"){
-                                            questionDescription = (value as? String) ?? ""
-                                        }
-                                        if(key == "acceptMultiple"){
-                                            acceptMultiple = (value as? String) ?? ""
-                                        }
-                                        if(key == "question1SetURL"){
-                                            question1SetURL = (value as? String) ?? ""
-                                        }
-                                        if(key == "question2SetURL"){
-                                            question2SetURL = (value as? String) ?? ""
-                                        }
-                                        if(key == "question3SetURL"){
-                                            question3SetURL = (value as? String) ?? ""
-                                        }
-                                        if(key == "question4SetURL"){
-                                            question4SetURL = (value as? String) ?? ""
-                                        }
-                                        if(key == "question5SetURL"){
-                                            question5SetURL = (value as? String) ?? ""
-                                        }
-                                        if(key == "teamNeedQuestion"){
-                                            teamNeedQuestion = (value as? String) ?? "false"
-                                        }
-                                        if(key == "optionsUrl"){
-                                            optionsURL = (value as? String) ?? ""
-                                        }
-                                        if(key == "maxOptions"){
-                                            maxOptions = (value as? String) ?? ""
-                                        }
-                                        if(key == "answer"){
-                                            answer = (value as? String) ?? ""
-                                        }
-                                        if(key == "answerArray"){
-                                            answerArray = (value as? [String]) ?? [String]()
-                                        }
-                                    
-                                    let faQuestion = FAQuestion(question: question)
-                                        faQuestion.questionNumber = questionNumber
-                                        faQuestion.question = question
-                                        faQuestion.option1 = option1
-                                        faQuestion.option1Description = option1Description
-                                        faQuestion.question1SetURL = question1SetURL
-                                        faQuestion.option2 = option2
-                                        faQuestion.option2Description = option2Description
-                                        faQuestion.question2SetURL = question2SetURL
-                                        faQuestion.option3 = option3
-                                        faQuestion.option3Description = option3Description
-                                        faQuestion.question3SetURL = question3SetURL
-                                        faQuestion.option4 = option4
-                                        faQuestion.option4Description = option4Description
-                                        faQuestion.question4SetURL = question4SetURL
-                                        faQuestion.option5 = option5
-                                        faQuestion.option5Description = option5Description
-                                        faQuestion.question5SetURL = question5SetURL
-                                        faQuestion.option6 = option6
-                                        faQuestion.option6Description = option6Description
-                                        faQuestion.option7 = option7
-                                        faQuestion.option7Description = option7Description
-                                        faQuestion.option8 = option8
-                                        faQuestion.option8Description = option8Description
-                                        faQuestion.option9 = option9
-                                        faQuestion.option9Description = option9Description
-                                        faQuestion.option10 = option10
-                                        faQuestion.option10Description = option10Description
-                                        faQuestion.required = required
-                                        faQuestion.acceptMultiple = acceptMultiple
-                                        faQuestion.questionDescription = questionDescription
-                                        faQuestion.teamNeedQuestion = teamNeedQuestion
-                                        faQuestion.optionsUrl = optionsURL
-                                        faQuestion.maxOptions = maxOptions
-                                        faQuestion.answer = answer
-                                        faQuestion.answerArray = answerArray
-                        
-                            questions.append(faQuestion)
-                        }
+                                    if(key == "questionNumber"){
+                                        questionNumber = (value as? String) ?? ""
+                                    }
+                                    if(key == "question"){
+                                        questionString = (value as? String) ?? ""
+                                    }
+                                    if(key == "option1"){
+                                        option1 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option1Description"){
+                                        option1Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option2"){
+                                        option2 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option2Description"){
+                                        option2Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option3"){
+                                        option3 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option3Description"){
+                                        option3Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option4"){
+                                        option4 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option4Description"){
+                                        option4Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option5"){
+                                        option5 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option5Description"){
+                                        option5Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option6"){
+                                        option6 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option6Description"){
+                                        option6Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option7"){
+                                        option7 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option7Description"){
+                                        option7Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option8"){
+                                        option8 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option8Description"){
+                                        option8Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option9"){
+                                        option9 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option9Description"){
+                                        option9Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option10"){
+                                        option10 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option10Description"){
+                                        option10Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "required"){
+                                        required = (value as? String) ?? ""
+                                    }
+                                    if(key == "questionDescription"){
+                                        questionDescription = (value as? String) ?? ""
+                                    }
+                                    if(key == "acceptMultiple"){
+                                        acceptMultiple = (value as? String) ?? ""
+                                    }
+                                    if(key == "question1SetURL"){
+                                        question1SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "question2SetURL"){
+                                        question2SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "question3SetURL"){
+                                        question3SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "question4SetURL"){
+                                        question4SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "question5SetURL"){
+                                        question5SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "teamNeedQuestion"){
+                                        teamNeedQuestion = (value as? String) ?? "false"
+                                    }
+                                    if(key == "optionsUrl"){
+                                        optionsURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "maxOptions"){
+                                        maxOptions = (value as? String) ?? ""
+                                    }
+                                    if(key == "answer"){
+                                        answer = (value as? String) ?? ""
+                                    }
+                                    if(key == "answerArray"){
+                                        answerArray = (value as? [String]) ?? [String]()
+                                    }
+                            }
+                                
+                                let faQuestion = FAQuestion(question: questionString)
+                                    faQuestion.questionNumber = questionNumber
+                                    faQuestion.question = questionString
+                                    faQuestion.option1 = option1
+                                    faQuestion.option1Description = option1Description
+                                    faQuestion.question1SetURL = question1SetURL
+                                    faQuestion.option2 = option2
+                                    faQuestion.option2Description = option2Description
+                                    faQuestion.question2SetURL = question2SetURL
+                                    faQuestion.option3 = option3
+                                    faQuestion.option3Description = option3Description
+                                    faQuestion.question3SetURL = question3SetURL
+                                    faQuestion.option4 = option4
+                                    faQuestion.option4Description = option4Description
+                                    faQuestion.question4SetURL = question4SetURL
+                                    faQuestion.option5 = option5
+                                    faQuestion.option5Description = option5Description
+                                    faQuestion.question5SetURL = question5SetURL
+                                    faQuestion.option6 = option6
+                                    faQuestion.option6Description = option6Description
+                                    faQuestion.option7 = option7
+                                    faQuestion.option7Description = option7Description
+                                    faQuestion.option8 = option8
+                                    faQuestion.option8Description = option8Description
+                                    faQuestion.option9 = option9
+                                    faQuestion.option9Description = option9Description
+                                    faQuestion.option10 = option10
+                                    faQuestion.option10Description = option10Description
+                                    faQuestion.required = required
+                                    faQuestion.acceptMultiple = acceptMultiple
+                                    faQuestion.questionDescription = questionDescription
+                                    faQuestion.teamNeedQuestion = teamNeedQuestion
+                                    faQuestion.optionsUrl = optionsURL
+                                    faQuestion.maxOptions = maxOptions
+                                    faQuestion.answer = answer
+                                    faQuestion.answerArray = answerArray
+                    
+                        questions.append(faQuestion)
                     }
                      
-                     let result = FreeAgentObject(gamerTag: gamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
+                     let result = FreeAgentObject(gamerTag: profileGamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
                      
                      
-                     let newRequest = RequestObject(status: status, teamId: teamId, teamName: teamName, captainId: captainId, requestId: requestId)
+                    let newRequest = RequestObject(status: status, teamId: teamId, teamName: teamName, captainId: captainId, requestId: requestId, userUid: userUid, gamerTag: gamerTag)
                      newRequest.profile = result
                      
                      teamInviteReqs.append(newRequest)
@@ -633,112 +635,32 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                     gamerTags.append(currentGamerTagObj)
                 }
                 let messagingNotifications = value?["messagingNotifications"] as? Bool ?? false
-                var teams = [TeamObject]()
-                let teamsArray = snapshot.childSnapshot(forPath: "teams")
-                for teamObj in teamsArray.children {
-                    let currentObj = teamObj as! DataSnapshot
-                    let dict = currentObj.value as? [String: Any]
-                    let teamName = dict?["teamName"] as? String ?? ""
-                    let teamId = dict?["teamId"] as? String ?? ""
-                    let games = dict?["games"] as? [String] ?? [String]()
-                    let consoles = dict?["consoles"] as? [String] ?? [String]()
-                    let teammateTags = dict?["teammateTags"] as? [String] ?? [String]()
-                    let teammateIds = dict?["teammateIds"] as? [String] ?? [String]()
-                    
-                    var invites = [TeamInviteObject]()
-                    let teamInvites = snapshot.childSnapshot(forPath: "teamInvites")
-                    for invite in teamInvites.children{
-                        let currentObj = invite as! DataSnapshot
-                        let dict = currentObj.value as? [String: Any]
-                        let gamerTag = dict?["gamerTag"] as? String ?? ""
-                        let date = dict?["date"] as? String ?? ""
-                        let uid = dict?["uid"] as? String ?? ""
-                        let teamName = dict?["teamName"] as? String ?? ""
-                        
-                        let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid, teamName: teamName)
-                        invites.append(newInvite)
-                    }
-                    
-                    var teammateArray = [TeammateObject]()
-                    if(currentObj.hasChild("teammates")){
-                        let teammates = currentObj.childSnapshot(forPath: "teammates")
-                        for teammate in teammates.children{
-                            let currentTeammate = teammate as! DataSnapshot
-                            let dict = currentTeammate.value as? [String: Any]
-                            let gamerTag = dict?["gamerTag"] as? String ?? ""
-                            let date = dict?["date"] as? String ?? ""
-                            let uid = dict?["uid"] as? String ?? ""
-                            
-                            let teammate = TeammateObject(gamerTag: gamerTag, date: date, uid: uid)
-                            teammateArray.append(teammate)
-                        }
-                    }
-                    
-                    let teamInvitetags = dict?["teamInviteTags"] as? [String] ?? [String]()
-                    let captain = dict?["teamCaptain"] as? String ?? ""
-                    let imageUrl = dict?["imageUrl"] as? String ?? ""
-                    let teamChat = dict?["teamChat"] as? String ?? String()
-                    let teamNeeds = dict?["teamNeeds"] as? [String] ?? [String]()
-                    let selectedTeamNeeds = dict?["selectedTeamNeeds"] as? [String] ?? [String]()
-                    let captainId = dict?["teamCaptainId"] as? String ?? String()
-                    
-                    let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl, teamCaptainId: captainId)
-                    currentTeam.teammates = teammateArray
-                    teams.append(currentTeam)
-                }
                 
-                var currentTeamInvites = [TeamObject]()
-                let teamInvitesArray = snapshot.childSnapshot(forPath: "teamInvites")
-                for teamObj in teamInvitesArray.children {
-                    let currentObj = teamObj as! DataSnapshot
+               var teams = [EasyTeamObj]()
+               let teamsArray = snapshot.childSnapshot(forPath: "teams")
+               for teamObj in teamsArray.children {
+                   let currentObj = teamObj as! DataSnapshot
+                   let dict = currentObj.value as? [String: Any]
+                   let teamName = dict?["teamName"] as? String ?? ""
+                   let teamId = dict?["teamId"] as? String ?? ""
+                   let game = dict?["gameName"] as? String ?? ""
+                   let teamCaptainId = dict?["teamCaptainId"] as? String ?? ""
+                   let newTeam = dict?["newTeam"] as? String ?? ""
+                   
+                   teams.append(EasyTeamObj(teamName: teamName, teamId: teamId, gameName: game, teamCaptainId: teamCaptainId, newTeam: newTeam))
+               }
+                
+                var currentTeamInvites = [TeamInviteObject]()
+                let teamInvites = snapshot.childSnapshot(forPath: "teamInvites")
+                for invite in teamInvites.children{
+                    let currentObj = invite as! DataSnapshot
                     let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
                     let teamName = dict?["teamName"] as? String ?? ""
-                    let teamId = dict?["teamId"] as? String ?? ""
-                    let games = dict?["games"] as? [String] ?? [String]()
-                    let consoles = dict?["consoles"] as? [String] ?? [String]()
-                    let teammateTags = dict?["teammateTags"] as? [String] ?? [String]()
-                    let teammateIds = dict?["teammateIds"] as? [String] ?? [String]()
                     
-                    var invites = [TeamInviteObject]()
-                    let teamInvites = snapshot.childSnapshot(forPath: "teamInvites")
-                    for invite in teamInvites.children{
-                        let currentObj = invite as! DataSnapshot
-                        let dict = currentObj.value as? [String: Any]
-                        let gamerTag = dict?["gamerTag"] as? String ?? ""
-                        let date = dict?["date"] as? String ?? ""
-                        let uid = dict?["uid"] as? String ?? ""
-                        let teamName = dict?["teamName"] as? String ?? ""
-                        
-                        let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid, teamName: teamName)
-                        invites.append(newInvite)
-                    }
-                    
-                    var teammateArray = [TeammateObject]()
-                    if(currentObj.hasChild("teammates")){
-                        let teammates = currentObj.childSnapshot(forPath: "teammates")
-                        for teammate in teammates.children{
-                            let currentTeammate = teammate as! DataSnapshot
-                            let dict = currentTeammate.value as? [String: Any]
-                            let gamerTag = dict?["gamerTag"] as? String ?? ""
-                            let date = dict?["date"] as? String ?? ""
-                            let uid = dict?["uid"] as? String ?? ""
-                            
-                            let teammate = TeammateObject(gamerTag: gamerTag, date: date, uid: uid)
-                            teammateArray.append(teammate)
-                        }
-                    }
-                    
-                    let teamInvitetags = dict?["teamInviteTags"] as? [String] ?? [String]()
-                    let captain = dict?["teamCaptain"] as? String ?? ""
-                    let imageUrl = dict?["imageUrl"] as? String ?? ""
-                    let teamChat = dict?["teamChat"] as? String ?? String()
-                    let teamNeeds = dict?["teamNeeds"] as? [String] ?? [String]()
-                    let selectedTeamNeeds = dict?["selectedTeamNeeds"] as? [String] ?? [String]()
-                    let captainId = dict?["teamCaptainId"] as? String ?? String()
-                    
-                    let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl, teamCaptainId: captainId)
-                    currentTeam.teammates = teammateArray
-                    currentTeamInvites.append(currentTeam)
+                    let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid, teamName: teamName)
+                    currentTeamInvites.append(newInvite)
                 }
                 
                 var currentStats = [StatObject]()

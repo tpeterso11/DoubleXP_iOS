@@ -60,6 +60,26 @@ class RequestObject: GenericRequestObject, NSCoding {
         }
     }
     
+    var _gamerTag = ""
+    var gamerTag: String {
+        get {
+            return (_gamerTag)
+        }
+        set (newVal) {
+            _gamerTag = newVal
+        }
+    }
+    
+    var _userUid = ""
+    var userUid: String {
+        get {
+            return (_userUid)
+        }
+        set (newVal) {
+            _userUid = newVal
+        }
+    }
+    
     var _profile = FreeAgentObject(gamerTag: "", competitionId: "", consoles: [String](), game: "", userId: "", questions: [FAQuestion]())
     var profile: FreeAgentObject {
         get {
@@ -70,7 +90,7 @@ class RequestObject: GenericRequestObject, NSCoding {
         }
     }
     
-    init(status: String, teamId: String, teamName: String, captainId: String, requestId: String)
+    init(status: String, teamId: String, teamName: String, captainId: String, requestId: String, userUid: String, gamerTag: String)
     {
         super.init()
         self.status = status
@@ -78,6 +98,8 @@ class RequestObject: GenericRequestObject, NSCoding {
         self.captainId = captainId
         self.teamName = teamName
         self.requestId = requestId
+        self.userUid = userUid
+        self.gamerTag = gamerTag
     }
 
     required init(coder decoder: NSCoder)
@@ -88,6 +110,8 @@ class RequestObject: GenericRequestObject, NSCoding {
         self.teamName = (decoder.decodeObject(forKey: "teamName") as! String)
         self.captainId = (decoder.decodeObject(forKey: "teamCaptainId") as! String)
         self.requestId = (decoder.decodeObject(forKey: "requestId") as! String)
+         self.userUid = (decoder.decodeObject(forKey: "userUid") as! String)
+         self.gamerTag = (decoder.decodeObject(forKey: "gamerTag") as! String)
     }
 
     func encode(with coder: NSCoder) {
@@ -96,6 +120,8 @@ class RequestObject: GenericRequestObject, NSCoding {
         coder.encode(self.captainId, forKey: "teamCaptainId")
         coder.encode(self.teamName, forKey: "teamName")
         coder.encode(self.requestId, forKey: "requestId")
+        coder.encode(self.userUid, forKey: "userUid")
+        coder.encode(self.gamerTag, forKey: "gamerTag")
     }
 }
 

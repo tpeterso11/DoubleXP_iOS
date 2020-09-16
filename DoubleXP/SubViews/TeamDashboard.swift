@@ -13,7 +13,7 @@ import MSPeekCollectionViewDelegateImplementation
 import SwiftTwitch
 import WebKit
 
-class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, SocialMediaManagerCallback {
+class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, SocialMediaManagerCallback, LandingUICallbacks {
     
     var team: TeamObject? = nil
     var tweets = [Any]()
@@ -37,7 +37,7 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
     @IBOutlet weak var tweetCollection: UICollectionView!
     @IBOutlet weak var tweetStreamSegment: UISegmentedControl!
     @IBOutlet weak var webview: WKWebView!
-    @IBOutlet weak var twitchPlayer: TestPlayer!
+    @IBOutlet weak var TwitchPlayer: WKWebView!
     var gcGame: GamerConnectGame!
     var dataSet = "twitter"
     @IBOutlet weak var spinner: UIActivityIndicatorView!
@@ -90,7 +90,7 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + 0.3) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             let delegate = UIApplication.shared.delegate as! AppDelegate
             self.manager = delegate.socialMediaManager
             self.loadSocial()
@@ -126,6 +126,14 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
         
         loadingStatus.text = "loading..."
         
+        NotificationCenter.default.addObserver(
+            forName: UIWindow.didBecomeKeyNotification,
+            object: self.view.window,
+            queue: nil
+        ) { notification in
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            delegate.currentLanding?.hideScoob()
+        }
         
         UIView.animate(withDuration: 0.8, animations: {
             self.spinner.alpha = 1
@@ -138,7 +146,20 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
                 self.gcGame = game
             }
         }
+        
+        if(!team!.isOnTeam(uid: currentUser!.uId)){
+            self.buildButton.alpha = 0.3
+            self.buildButton.isUserInteractionEnabled = false
+            
+            self.teamChat.alpha = 0.3
+            self.teamChat.isUserInteractionEnabled = false
+        }
     }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+           print("gone")
+           NotificationCenter.default.removeObserver(NSNotification.Name.AVPlayerItemDidPlayToEndTime)
+       }
     
     private func getTwitch(){
         manager.loadTwitchStreams2DotOhTeam(team: self.team!, gcGame: self.gcGame, callbacks: self)
@@ -353,30 +374,14 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if(collectionView == tweetCollection && dataSet == "twitch"){
-            let cell = self.tweetCollection.cellForItem(at: indexPath) as! TwitchStreamCell
             let current = streams[indexPath.item]
-        
-            NotificationCenter.default.addObserver(
-                forName: UIWindow.didBecomeKeyNotification,
-                object: self.view.window,
-                queue: nil
-            ) { notification in
-                print("Video stopped")
-                self.twitchPlayer.isHidden = true
-                self.twitchPlayer.setChannel(to: "")
-                
-                UIView.animate(withDuration: 0.8) {
-                    self.twitchView.alpha = 0
-                }
-            }
             
-            twitchPlayer.configuration.allowsInlineMediaPlayback = true
-            twitchPlayer.configuration.mediaTypesRequiringUserActionForPlayback = []
-            twitchPlayer.setChannel(to: (current as! TwitchStreamObject).handle)
-            //twitchPlayer.togglePlaybackState()
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            appDelegate.currentLanding?.showScoob(callback: self, cancelableWV: self.TwitchPlayer)
             
-            UIView.animate(withDuration: 0.8) {
-                self.twitchView.alpha = 1.0
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                let test = "https://doublexpstorage.tech/stream.php?channel=" + (current as! TwitchStreamObject).handle
+                self.TwitchPlayer.load(NSURLRequest(url: NSURL(string: test)! as URL) as URLRequest)
             }
         }
         else if(collectionView == teamRoster){
@@ -405,5 +410,8 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
     //K2yk5yy8AHmyC4mMFHecB1WBoowFnf4uMs4ET7zEjFe06hWmCm (consumer API secret)
     
     func onChannelsLoaded(channels: [TwitchChannelObj]) {
+    }
+    
+    func updateNavColor(color: UIColor) {
     }
 }

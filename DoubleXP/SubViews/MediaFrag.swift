@@ -383,11 +383,11 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                 case "Kwatakye Raven":
                     //cell..text = "DoubleXP"
                     cell.authorLabel.text = (current as! NewsObject).author
-                    cell.sourceImage.image = #imageLiteral(resourceName: "team_thumbs_up.png")
+                    cell.sourceImage.image = #imageLiteral(resourceName: "dxp_disc_dark_boom.png")
                     break
                 case "Aaron Hodges":
                     cell.authorLabel.text = (current as! NewsObject).author
-                    cell.sourceImage.image = #imageLiteral(resourceName: "team_thumbs_up.png")
+                    cell.sourceImage.image = #imageLiteral(resourceName: "dxp_disc_dark_boom.png")
                     break
                 default:
                     cell.authorLabel.text = (current as! NewsObject).author
@@ -419,44 +419,50 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                 return cell
             }
             else {
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "channelCell", for: indexPath) as! TwitchChannelCell
-                cell.gameName.text = (current as! TwitchChannelObj).gameName
-                
-                let delegate = UIApplication.shared.delegate as! AppDelegate
-                let str = (current as! TwitchChannelObj).imageUrlIOS
-                let replaced = str.replacingOccurrences(of: "{width}x{height}", with: "800x500")
-                
-                let cache = delegate.imageCache
-                if(cache.object(forKey: replaced as NSString) != nil){
-                    cell.image.image = cache.object(forKey: replaced as NSString)
-                } else {
-                    cell.image.image = Utility.Image.placeholder
-                    cell.image.moa.onSuccess = { image in
-                        cell.image.image = image
-                        delegate.imageCache.setObject(image, forKey: replaced as NSString)
-                        return image
+                let current = self.articles[indexPath.item]
+                if(current is TwitchChannelObj){
+                    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "channelCell", for: indexPath) as! TwitchChannelCell
+                    cell.gameName.text = (current as! TwitchChannelObj).gameName
+                    
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    let str = (current as! TwitchChannelObj).imageUrlIOS
+                    let replaced = str.replacingOccurrences(of: "{width}x{height}", with: "800x500")
+                    
+                    let cache = delegate.imageCache
+                    if(cache.object(forKey: replaced as NSString) != nil){
+                        cell.image.image = cache.object(forKey: replaced as NSString)
+                    } else {
+                        cell.image.image = Utility.Image.placeholder
+                        cell.image.moa.onSuccess = { image in
+                            cell.image.image = image
+                            delegate.imageCache.setObject(image, forKey: replaced as NSString)
+                            return image
+                        }
+                        cell.image.moa.url = replaced
                     }
-                    cell.image.moa.url = replaced
+                    cell.image.contentMode = .scaleAspectFill
+                    cell.image.clipsToBounds = true
+                    
+                    cell.contentView.layer.cornerRadius = 10.0
+                    cell.contentView.layer.borderWidth = 1.0
+                    cell.contentView.layer.borderColor = UIColor.clear.cgColor
+                    cell.contentView.layer.masksToBounds = true
+                    
+                    cell.layer.shadowColor = UIColor.black.cgColor
+                    cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+                    cell.layer.shadowRadius = 2.0
+                    cell.layer.shadowOpacity = 0.5
+                    cell.layer.masksToBounds = false
+                    cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius:
+                        cell.contentView.layer.cornerRadius).cgPath
+                    //cell.devLogo.contentMode = .scaleAspectFill
+                    //cell.devLogo.clipsToBounds = true
+                    
+                    return cell
+                } else {
+                    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "empty", for: indexPath) as! EmptyCollectionViewCell
+                    return cell
                 }
-                cell.image.contentMode = .scaleAspectFill
-                cell.image.clipsToBounds = true
-                
-                cell.contentView.layer.cornerRadius = 10.0
-                cell.contentView.layer.borderWidth = 1.0
-                cell.contentView.layer.borderColor = UIColor.clear.cgColor
-                cell.contentView.layer.masksToBounds = true
-                
-                cell.layer.shadowColor = UIColor.black.cgColor
-                cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
-                cell.layer.shadowRadius = 2.0
-                cell.layer.shadowOpacity = 0.5
-                cell.layer.masksToBounds = false
-                cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius:
-                    cell.contentView.layer.cornerRadius).cgPath
-                //cell.devLogo.contentMode = .scaleAspectFill
-                //cell.devLogo.clipsToBounds = true
-                
-                return cell
             }
         }
     }
@@ -599,27 +605,29 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         else if(collectionView == channelCollection){
             let current = streams[indexPath.item]
             
-            NotificationCenter.default.addObserver(
-                forName: UIWindow.didBecomeKeyNotification,
-                object: self.view.window,
-                queue: nil
-            ) { notification in
-                print("Video stopped")
-                //self.twitchPlayer.isHidden = true
-                //self.twitchPlayer.setChannel(to: "")
-                
-                UIView.animate(withDuration: 0.8) {
-                    self.twitchPlayerOverlay.alpha = 0
+            if(current is TwitchStreamObject){
+                NotificationCenter.default.addObserver(
+                    forName: UIWindow.didBecomeKeyNotification,
+                    object: self.view.window,
+                    queue: nil
+                ) { notification in
+                    print("Video stopped")
+                    //self.twitchPlayer.isHidden = true
+                    //self.twitchPlayer.setChannel(to: "")
+                    
+                    UIView.animate(withDuration: 0.8) {
+                        self.twitchPlayerOverlay.alpha = 0
+                    }
                 }
-            }
-            
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-            delegate.currentLanding?.showScoob(callback: self, cancelableWV: self.twitchWV)
-            //loading twitch streams
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                let test = "https://doublexpstorage.tech/stream.php?channel=" + current.handle
-                self.twitchWV.load(NSURLRequest(url: NSURL(string: test)! as URL) as URLRequest)
+                
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                delegate.currentLanding?.showScoob(callback: self, cancelableWV: self.twitchWV)
+                //loading twitch streams
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                    let test = "https://doublexpstorage.tech/stream.php?channel=" + current.handle
+                    self.twitchWV.load(NSURLRequest(url: NSURL(string: test)! as URL) as URLRequest)
+                }
             }
         }
         else {
@@ -1100,9 +1108,9 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         else {
             let current = self.articles[indexPath.item]
             if(current is Int){
-                if((current as! Int) == 0){
+                if((current as? Int) == 0){
                     //empty cell
-                    return CGSize(width: (collectionView.bounds.width), height: CGFloat(30))
+                    return CGSize(width: (collectionView.bounds.width), height: CGFloat(80))
                 }
                 else{
                     return CGSize(width: (collectionView.bounds.width - 20), height: CGFloat(200))
@@ -1187,6 +1195,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     func onChannelsLoaded(channels: [TwitchChannelObj]) {
         DispatchQueue.main.async {
             self.articles.append(contentsOf: channels)
+            self.articles.append(0)
             
             let layout = UICollectionViewFlowLayout()
             layout.scrollDirection = .vertical

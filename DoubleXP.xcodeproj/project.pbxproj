@@ -112,6 +112,12 @@
 		30634D732407219C00FEAD40 /* unknown_badge.png in Resources */ = {isa = PBXBuildFile; fileRef = 30634D722407219C00FEAD40 /* unknown_badge.png */; };
 		30634D752407394E00FEAD40 /* EmptyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30634D742407394E00FEAD40 /* EmptyCell.swift */; };
 		30634D7724074B9B00FEAD40 /* multimedia.png in Resources */ = {isa = PBXBuildFile; fileRef = 30634D7624074B9A00FEAD40 /* multimedia.png */; };
+		3063C6C625047CBC00DBB22C /* EasyTeamObj.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3063C6C525047CBC00DBB22C /* EasyTeamObj.swift */; };
+		3063C6C82508369000DBB22C /* EpisodeObj.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3063C6C72508369000DBB22C /* EpisodeObj.swift */; };
+		3063C6CA25083B1B00DBB22C /* EpisodeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3063C6C925083B1B00DBB22C /* EpisodeCell.swift */; };
+		3063C6CC25083FDF00DBB22C /* LoginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3063C6CB25083FDF00DBB22C /* LoginManager.swift */; };
+		3063C6CE2508658000DBB22C /* dxp_disc_dark_boom.png in Resources */ = {isa = PBXBuildFile; fileRef = 3063C6CD2508658000DBB22C /* dxp_disc_dark_boom.png */; };
+		3063C6D02508666D00DBB22C /* dxp_disc_light_boom.png in Resources */ = {isa = PBXBuildFile; fileRef = 3063C6CF2508666D00DBB22C /* dxp_disc_light_boom.png */; };
 		306450722457ACE400B8B50E /* friendship.png in Resources */ = {isa = PBXBuildFile; fileRef = 306450712457ACE300B8B50E /* friendship.png */; };
 		306450742457ACF400B8B50E /* friendship (1).png in Resources */ = {isa = PBXBuildFile; fileRef = 306450732457ACF400B8B50E /* friendship (1).png */; };
 		3064507A245DF62800B8B50E /* new_logo2_light.png in Resources */ = {isa = PBXBuildFile; fileRef = 30645079245DF62800B8B50E /* new_logo2_light.png */; };
@@ -507,6 +513,12 @@
 		30634D722407219C00FEAD40 /* unknown_badge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = unknown_badge.png; sourceTree = "<group>"; };
 		30634D742407394E00FEAD40 /* EmptyCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyCell.swift; sourceTree = "<group>"; };
 		30634D7624074B9A00FEAD40 /* multimedia.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = multimedia.png; sourceTree = "<group>"; };
+		3063C6C525047CBC00DBB22C /* EasyTeamObj.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EasyTeamObj.swift; sourceTree = "<group>"; };
+		3063C6C72508369000DBB22C /* EpisodeObj.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeObj.swift; sourceTree = "<group>"; };
+		3063C6C925083B1B00DBB22C /* EpisodeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeCell.swift; sourceTree = "<group>"; };
+		3063C6CB25083FDF00DBB22C /* LoginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginManager.swift; sourceTree = "<group>"; };
+		3063C6CD2508658000DBB22C /* dxp_disc_dark_boom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dxp_disc_dark_boom.png; sourceTree = "<group>"; };
+		3063C6CF2508666D00DBB22C /* dxp_disc_light_boom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dxp_disc_light_boom.png; sourceTree = "<group>"; };
 		306450712457ACE300B8B50E /* friendship.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = friendship.png; sourceTree = "<group>"; };
 		306450732457ACF400B8B50E /* friendship (1).png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "friendship (1).png"; sourceTree = "<group>"; };
 		30645079245DF62800B8B50E /* new_logo2_light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = new_logo2_light.png; sourceTree = "<group>"; };
@@ -881,6 +893,7 @@
 				30634D642405FE5700FEAD40 /* MediaCache.swift */,
 				305B51FE240DF2610064B605 /* ProfileManager.swift */,
 				308C0A7B24DF4D3D00C2027C /* AnnouncementManager.swift */,
+				3063C6CB25083FDF00DBB22C /* LoginManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -988,6 +1001,7 @@
 				308C0A8724E3724300C2027C /* MultiOptionCell.swift */,
 				3091E39224E7885C00468557 /* UpcomingGameCell.swift */,
 				3091E39624E8588700468557 /* UpcomingTrailerCell.swift */,
+				3063C6C925083B1B00DBB22C /* EpisodeCell.swift */,
 			);
 			path = CustomView;
 			sourceTree = "<group>";
@@ -1069,6 +1083,8 @@
 		4CB84C432205F74800183D28 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				3063C6CF2508666D00DBB22C /* dxp_disc_light_boom.png */,
+				3063C6CD2508658000DBB22C /* dxp_disc_dark_boom.png */,
 				308C0A8524E2212D00C2027C /* phone-white.png */,
 				308C0A8324E2209200C2027C /* phone.png */,
 				308C0A7524DF16AB00C2027C /* shout.png */,
@@ -1262,6 +1278,8 @@
 				308C0A7924DF38F600C2027C /* AnnouncementObj.swift */,
 				3091E38E24E6FFB000468557 /* OrderedDictionary.swift */,
 				3091E39024E77C4800468557 /* UpcomingGame.swift */,
+				3063C6C525047CBC00DBB22C /* EasyTeamObj.swift */,
+				3063C6C72508369000DBB22C /* EpisodeObj.swift */,
 			);
 			path = Object;
 			sourceTree = "<group>";
@@ -1404,6 +1422,7 @@
 				306793D5244B373B005158B2 /* game-controller.png in Resources */,
 				305B520D2415D76F0064B605 /* expand_black.png in Resources */,
 				30781C972428261D00C5D886 /* email (1).png in Resources */,
+				3063C6D02508666D00DBB22C /* dxp_disc_light_boom.png in Resources */,
 				30C4EDB32267C1890046B615 /* doublexp_white.png in Resources */,
 				30634D732407219C00FEAD40 /* unknown_badge.png in Resources */,
 				30F6FCBC23CC02AD0051813D /* cross.png in Resources */,
@@ -1542,6 +1561,7 @@
 				30A84DF02381E86E007BEAA5 /* icon.png in Resources */,
 				30A60D8D2363C801004B2150 /* like.png in Resources */,
 				308C0A8024E0680400C2027C /* live_active.png in Resources */,
+				3063C6CE2508658000DBB22C /* dxp_disc_dark_boom.png in Resources */,
 				3058211D2454CA0900B76E67 /* 1273057-200_white.png in Resources */,
 				30634D5D24059B1500FEAD40 /* 498852.png in Resources */,
 				3080B40423BC07BE00638B22 /* x-mark.png in Resources */,
@@ -1690,6 +1710,7 @@
 				30A84DDA237649C3007BEAA5 /* NotificationProtocols.swift in Sources */,
 				30A7DD2124D1E3550028B128 /* TwitchWebPlayerKeys.swift in Sources */,
 				30E0B1DD249C6658007F0B9B /* OptionCollectionCell.swift in Sources */,
+				3063C6CC25083FDF00DBB22C /* LoginManager.swift in Sources */,
 				301AEF4E23885CEC00339850 /* TeamFrag.swift in Sources */,
 				308C0A8224E06A0100C2027C /* TwitchOptionCell.swift in Sources */,
 				30B6E18723A338E000B69F00 /* TeamSearchTeamCell.swift in Sources */,
@@ -1789,6 +1810,7 @@
 				308759B8242512BD002C19CC /* FADashFoldingCell.swift in Sources */,
 				30B583DE2350168B00736733 /* TeamObject.swift in Sources */,
 				308BD030238ED1370034822B /* DashFriendInviteCell.swift in Sources */,
+				3063C6CA25083B1B00DBB22C /* EpisodeCell.swift in Sources */,
 				307CE35323EC452600DCB12A /* TestCell.swift in Sources */,
 				307CE34B23EA0BDE00DCB12A /* ExpandedTVCell.swift in Sources */,
 				308C0A7A24DF38F600C2027C /* AnnouncementObj.swift in Sources */,
@@ -1808,6 +1830,7 @@
 				308810F6244B9A8600C2BEC7 /* PrizeCell.swift in Sources */,
 				3030E020242297F2008B775E /* InsetLabelSmall.swift in Sources */,
 				30634D752407394E00FEAD40 /* EmptyCell.swift in Sources */,
+				3063C6C625047CBC00DBB22C /* EasyTeamObj.swift in Sources */,
 				30E8CC8524891B1400B1BE98 /* StatsCollectionCell.swift in Sources */,
 				30634D712407112800FEAD40 /* ArticleTextCell.swift in Sources */,
 				3091E39324E7885C00468557 /* UpcomingGameCell.swift in Sources */,
@@ -1862,6 +1885,7 @@
 				308BD01D238AED570034822B /* CreateTeamFrag.swift in Sources */,
 				30B6E18B23A472A300B69F00 /* FreeAgentFront.swift in Sources */,
 				30B583CF2348290700736733 /* GamerConnectGame.swift in Sources */,
+				3063C6C82508369000DBB22C /* EpisodeObj.swift in Sources */,
 				308BD023238B521B0034822B /* TeamNeedsSelection.swift in Sources */,
 				30EBC3FA23D608DB009CFAB2 /* TeamTweetCell.swift in Sources */,
 				308810F4244B729A00C2BEC7 /* CompetitionFrag.swift in Sources */,
@@ -2050,7 +2074,7 @@
 				CODE_SIGN_ENTITLEMENTS = DoubleXP/DoubleXP.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 38;
+				CURRENT_PROJECT_VERSION = 42;
 				DEVELOPMENT_TEAM = GU6KL76XP4;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = DoubleXP/Info.plist;
@@ -2058,7 +2082,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.0;
+				MARKETING_VERSION = 1.3.5;
 				PRODUCT_BUNDLE_IDENTIFIER = Encrypted.DoubleXP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = DXP2;
@@ -2077,7 +2101,7 @@
 				CODE_SIGN_ENTITLEMENTS = DoubleXP/DoubleXP.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 38;
+				CURRENT_PROJECT_VERSION = 42;
 				DEVELOPMENT_TEAM = GU6KL76XP4;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = DoubleXP/Info.plist;
@@ -2085,7 +2109,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.0;
+				MARKETING_VERSION = 1.3.5;
 				PRODUCT_BUNDLE_IDENTIFIER = Encrypted.DoubleXP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = DXP2;

@@ -221,7 +221,7 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
                 cell.setUI(friendRequest: nil, team: nil, request: nil, rival: (current as! RivalObj), indexPath: indexPath, currentTableView: self.requestList, callbacks: self)
             }
             else{
-                cell.setUI(friendRequest: nil, team: (current as! TeamObject), request: nil, rival: nil, indexPath: indexPath, currentTableView: self.requestList, callbacks: self)
+                cell.setUI(friendRequest: nil, team: (current as! TeamInviteObject), request: nil, rival: nil, indexPath: indexPath, currentTableView: self.requestList, callbacks: self)
             }
             
             cell.layoutMargins = UIEdgeInsets.zero
@@ -275,13 +275,15 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
     //later, add "accepted" and "invited" array to user. This way. when they are invited or accepted, we can observe this in the DB and open a nice little overlay that says "you've been accepted, chat or check out the team". We cannot do this just by observing teams because if they create a team themselves, we do not want this overlay showing.
     
     func updateCell(indexPath: IndexPath) {
-        self.userRequests.remove(at: indexPath.item)
-        self.requestList.deleteRows(at: [indexPath], with: .automatic)
-        
-        if(self.userRequests.isEmpty){
-            UIView.animate(withDuration: 0.8, animations: {
-                self.emptyLayout.alpha = 1
-            }, completion: nil)
+        if indexPath.item >= 0 && indexPath.item < self.userRequests.count {
+            self.userRequests.remove(at: indexPath.item)
+            self.requestList.deleteRows(at: [indexPath], with: .automatic)
+            
+            if(self.userRequests.isEmpty){
+                UIView.animate(withDuration: 0.8, animations: {
+                    self.emptyLayout.alpha = 1
+                }, completion: nil)
+            }
         }
     }
     

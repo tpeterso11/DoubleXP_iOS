@@ -13,12 +13,12 @@ class RequestsFoldingCell: FoldingCell{
     
     @IBOutlet weak var drawer: UIView!
     
+    @IBOutlet weak var requestType: UILabel!
     @IBOutlet weak var profile: UIButton!
     @IBOutlet weak var reject: UIButton!
     @IBOutlet weak var accept: UIButton!
     @IBOutlet weak var gamerTagMan: UILabel!
     @IBOutlet weak var gamerTagSub: UILabel!
-    @IBOutlet weak var requestType: UILabel!
     @IBOutlet weak var requestSince: UILabel!
     @IBOutlet weak var quizButton: UIButton!
     @IBOutlet weak var workOverlay: UIView!
@@ -28,6 +28,7 @@ class RequestsFoldingCell: FoldingCell{
     private var callbacks: RequestsUpdate!
     private var requested = false
     private var currentTableView: UITableView!
+    @IBOutlet weak var requestTypeLabel: UILabel!
     
     override func awakeFromNib() {
         foregroundView.layer.cornerRadius = 10
@@ -42,18 +43,22 @@ class RequestsFoldingCell: FoldingCell{
         super.awakeFromNib()
     }
     
-    func setUI(friendRequest: FriendRequestObject?, team: TeamObject?, request: RequestObject?, rival: RivalObj?, indexPath: IndexPath, currentTableView: UITableView, callbacks: RequestsUpdate){
+    func setUI(friendRequest: FriendRequestObject?, team: TeamInviteObject?, request: RequestObject?, rival: RivalObj?, indexPath: IndexPath, currentTableView: UITableView, callbacks: RequestsUpdate){
         self.indexPath = indexPath
         self.callbacks = callbacks
         self.currentTableView = currentTableView
         
+        requestTypeLabel.text = ""
+        //requestType.text = ""
+        
         if(friendRequest != nil){
             currentRequest = friendRequest
             gamerTagMan.text = friendRequest?.gamerTag
-            gamerTagSub.text = friendRequest?.gamerTag
+            //gamerTagSub.text = friendRequest?.gamerTag
             quizButton.isHidden = true
             
-            requestType.text = "Friend Request"
+            requestType.text = "someone wants to be your friend."
+            requestTypeLabel.text = "friend request"
             
             if(friendRequest != nil){
                 if(!friendRequest!.date.isEmpty){
@@ -76,16 +81,19 @@ class RequestsFoldingCell: FoldingCell{
         }
         else if(request != nil){
             currentRequest = request
-            gamerTagMan.text = request?.teamName
-            gamerTagSub.text = request?.profile.gamerTag
+            gamerTagMan.text = request?.gamerTag
             quizButton.isHidden = false
             
+            if((request?.profile.questions.isEmpty) == nil || request!.profile.questions.isEmpty){
+                quizButton.isUserInteractionEnabled = false
+                quizButton.alpha = 0.3
+            } else {
+                quizButton.isUserInteractionEnabled = true
+                quizButton.addTarget(self, action: #selector(quizClicked), for: .touchUpInside)
+            }
             
-            quizButton.isUserInteractionEnabled = true
-            quizButton.addTarget(self, action: #selector(quizClicked), for: .touchUpInside)
-            
-            
-            requestType.text = "Invite Request"
+            requestType.text = "someone wants to join your team."
+            requestTypeLabel.text = "invite request"
         }
         else if(rival != nil){
             currentRequest = rival
@@ -93,28 +101,26 @@ class RequestsFoldingCell: FoldingCell{
             gamerTagSub.text = "wants to play " + rival!.game
             quizButton.isHidden = true
             
-            
-            requestType.text = "Play Request"
+            requestType.text = "someone wants to get online and play."
+            requestTypeLabel.text = "play request"
         }
         else{
             currentRequest = team
             gamerTagMan.text = team?.teamName
-            gamerTagSub.text = team?.teamName
             quizButton.isHidden = true
             
-            requestType.text = "Team Invite"
+            requestType.text = "someone wants you to join their team."
+            requestTypeLabel.text = "team request"
             
             requestSince.isHidden = true
+            
+            self.profile.setTitle("view", for: .normal)
         }
         
     
         profile.addTarget(self, action: #selector(profileClicked), for: .touchUpInside)
         reject.addTarget(self, action: #selector(rejectClicked), for: .touchUpInside)
         accept.addTarget(self, action: #selector(acceptClicked), for: .touchUpInside)
-        
-        if(currentRequest is TeamObject){
-            profile.titleLabel?.text = "View"
-        }
     }
     
     func differenceInDays(date: String) -> Int{
@@ -145,13 +151,13 @@ class RequestsFoldingCell: FoldingCell{
            landing?.navigateToProfile(uid: (currentRequest as! FriendRequestObject).uid)
         }
         else if(self.currentRequest is RequestObject){
-            landing?.navigateToProfile(uid: (currentRequest as! RequestObject).profile.userId)
+            landing?.navigateToProfile(uid: (currentRequest as! RequestObject).userUid)
         }
         else if(self.currentRequest is RivalObj){
             landing?.navigateToProfile(uid: (currentRequest as! RivalObj).uid)
         }
         else{
-            landing?.navigateToTeamDashboard(team: (currentRequest as! TeamObject), newTeam: false)
+            landing?.startDashNavigation(teamName: "", teamInvite: (currentRequest as! TeamInviteObject), newTeam: false)
         }
     }
     
@@ -166,7 +172,7 @@ class RequestsFoldingCell: FoldingCell{
                 manager.acceptFriendFromRequests(position: self.indexPath, otherUserRequest: (self.currentRequest as! FriendRequestObject), currentUserUid: delegate.currentUser!.uId, callbacks: self.callbacks)
             }
             else if(self.currentRequest is RequestObject){
-                var currentTeam: TeamObject? = nil
+                var currentTeam: EasyTeamObj? = nil
                 
                 let delegate = UIApplication.shared.delegate as! AppDelegate
                 for team in delegate.currentUser!.teams{
@@ -178,7 +184,9 @@ class RequestsFoldingCell: FoldingCell{
                 
                 if(currentTeam != nil){
                     let teamManager = TeamManager()
-                    teamManager.acceptRequest(requestObject: self.currentRequest as! RequestObject, acceptedTeam: currentTeam!, callbacks: self.callbacks, indexPath: self.indexPath)
+                    let request = self.currentRequest as! RequestObject
+                    
+                    teamManager.acceptRequest(requestObject: request, acceptedTeam: currentTeam!, callbacks: self.callbacks, indexPath: self.indexPath)
                 }
             }
             else if(self.currentRequest is RivalObj){
@@ -186,7 +194,7 @@ class RequestsFoldingCell: FoldingCell{
             }
             else{
                 let teamManager = TeamManager()
-                teamManager.acceptTeamRequest(team: (self.currentRequest as! TeamObject), callbacks: self.callbacks, indexPath: self.indexPath)
+                teamManager.acceptTeamInvite(teamInvite: (self.currentRequest as! TeamInviteObject), callbacks: self.callbacks, indexPath: self.indexPath)
             }
         }
     }
@@ -220,7 +228,7 @@ class RequestsFoldingCell: FoldingCell{
                 let manager = TeamManager()
                 let delegate = UIApplication.shared.delegate as! AppDelegate
                 
-                var currentTeam: TeamObject?
+                var currentTeam: EasyTeamObj?
                 for team in delegate.currentUser!.teams{
                     if(team.teamName == (self.currentRequest as! RequestObject).teamName){
                         currentTeam = team
@@ -237,7 +245,7 @@ class RequestsFoldingCell: FoldingCell{
             }
             else{
                 let teamManager = TeamManager()
-                teamManager.acceptTeamRequest(team: (self.currentRequest as! TeamObject), callbacks: self.callbacks, indexPath: self.indexPath)
+                teamManager.recjectTeamInvite(teamInvite: (self.currentRequest as! TeamInviteObject), callbacks: self.callbacks, indexPath: self.indexPath)
             }
         }
     }

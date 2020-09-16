@@ -24,6 +24,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var currentLanding: LandingActivity?
     var currentMediaFrag: MediaFrag?
     var currentProfileFrag: PlayerProfile?
+    var currentConnectFrag: GamerConnectFrag?
+    var currentTeamFrag: TeamFrag?
     var currentFrag: String = ""
     var interviewManager = InterviewManager()
     var mediaManager = MediaManager()
@@ -33,6 +35,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var twitchChannels = [TwitchChannelObj]()
     var competitions = [CompetitionObj]()
     var upcomingGames = [UpcomingGame]()
+    var episodes = [EpisodeObj]()
     var announcementManager = AnnouncementManager()
     var imageCache = NSCache<NSString, UIImage>()
     

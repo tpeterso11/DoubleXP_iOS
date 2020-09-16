@@ -130,7 +130,7 @@ class UpcomingGame: NSObject, NSCoding {
     }
     
     func encode(with coder: NSCoder) {
-        coder.encode(self.game, forKey: "id")
+        coder.encode(self.id, forKey: "id")
         coder.encode(self.game, forKey: "game")
         coder.encode(self.blurb, forKey: "blurb")
         coder.encode(self.releaseDateMillis, forKey: "releaseDateMillis")

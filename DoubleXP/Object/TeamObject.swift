@@ -120,6 +120,16 @@ class TeamObject: NSObject, NSCoding {
         }
     }
     
+    var _isRequest: String = "true"
+    var isRequest: String {
+        get {
+            return (_isRequest)
+        }
+        set (newVal) {
+            _isRequest = newVal
+        }
+    }
+    
     var _teamChat:String? = nil
     var teamChat:String {
         get {
@@ -170,8 +180,12 @@ class TeamObject: NSObject, NSCoding {
         }
     }
     
+    func isOnTeam(uid: String) -> Bool {
+        return teammateIds.contains(uid)
+    }
+    
     init(teamName: String, teamId: String, games: [String], consoles: [String], teammateTags: [String], teammateIds: [String],
-         teamCaptain: String, teamInvites: [TeamInviteObject], teamChat: String, teamInviteTags: [String], teamNeeds: [String], selectedTeamNeeds: [String], imageUrl: String, teamCaptainId: String)
+         teamCaptain: String, teamInvites: [TeamInviteObject], teamChat: String, teamInviteTags: [String], teamNeeds: [String], selectedTeamNeeds: [String], imageUrl: String, teamCaptainId: String, isRequest: String)
     {
         super.init()
         self.teamName = teamName
@@ -188,6 +202,7 @@ class TeamObject: NSObject, NSCoding {
         self.selectedTeamNeeds = selectedTeamNeeds
         self.imageUrl = imageUrl
         self.teamCaptainId = teamCaptainId
+        self.isRequest = isRequest
     }
     
     required init(coder decoder: NSCoder)
@@ -209,6 +224,7 @@ class TeamObject: NSObject, NSCoding {
         self.teammates = (decoder.decodeObject(forKey: "teammates") as! [TeammateObject])
         self.requests = (decoder.decodeObject(forKey: "requests") as! [RequestObject])
         self.teamCaptainId = (decoder.decodeObject(forKey: "teamCaptainId") as! String)
+        self.isRequest = (decoder.decodeObject(forKey: "isRequest") as! String)
     }
     
     func encode(with coder: NSCoder) {
@@ -228,6 +244,7 @@ class TeamObject: NSObject, NSCoding {
         coder.encode(self.teammates, forKey: "teammates")
         coder.encode(self.requests, forKey: "requests")
         coder.encode(self.teamCaptainId, forKey: "teamCaptainId")
+        coder.encode(self.isRequest, forKey: "isRequest")
     }
     
 }

@@ -47,23 +47,14 @@ class TeamNeedsSelection: ParentVC, UICollectionViewDataSource, UICollectionView
         
         if(selectedNeeds.isEmpty){
             currentLanding?.stackDepth -= 1
-            currentLanding?.navigateToTeamDashboard(team: team!, newTeam: true)
+            currentLanding?.startDashNavigation(teamName: team!.teamName, teamInvite: nil, newTeam: true)
         }
         else{
             let ref = Database.database().reference().child("Teams").child(team!.teamName)
             ref.child("selectedTeamNeeds").setValue(selectedNeeds)
             
-            let userRef = Database.database().reference().child("Users").child(delegate.currentUser!.uId).child("teams").child(team!.teamName)
-            userRef.child("selectedTeamNeeds").setValue(selectedNeeds)
-            
-            for team in delegate.currentUser!.teams{
-                if(team.teamName == self.team!.teamName){
-                    team.selectedTeamNeeds.append(contentsOf: self.selectedNeeds)
-                }
-            }
-            
             currentLanding?.stackDepth -= 1
-            currentLanding?.navigateToTeamDashboard(team: team!, newTeam: true)
+            currentLanding?.startDashNavigation(teamName: team!.teamName, teamInvite: nil, newTeam: true)
         }
     }
     

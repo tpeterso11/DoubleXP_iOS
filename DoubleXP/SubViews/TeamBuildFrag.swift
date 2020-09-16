@@ -214,7 +214,7 @@ class TeamBuildFrag: ParentVC, UITableViewDataSource, UITableViewDelegate, TeamC
     }
     
     func updateCell(indexPath: IndexPath) {
-        currentUser!.teamInvites.append(team!)
+        //currentUser!.teamInvites.append()
         team!.teamInviteTags.append(self.invitableFriends[indexPath.item].gamerTag)
         
         self.invitableFriends.remove(at: indexPath.item)

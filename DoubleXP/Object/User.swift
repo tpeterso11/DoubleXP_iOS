@@ -231,8 +231,8 @@ class User: NSObject, NSCoding {
         }
     }
     
-    var _teams = [TeamObject]()
-    var teams: [TeamObject] {
+    var _teams = [EasyTeamObj]()
+    var teams: [EasyTeamObj] {
         get {
             return (_teams)
         }
@@ -241,8 +241,8 @@ class User: NSObject, NSCoding {
         }
     }
     
-    var _teamInvites = [TeamObject]()
-    var teamInvites: [TeamObject] {
+    var _teamInvites = [TeamInviteObject]()
+    var teamInvites: [TeamInviteObject] {
         get {
             return (_teamInvites)
         }
@@ -360,6 +360,26 @@ class User: NSObject, NSCoding {
         return array
     }
     
+    func userCanSendInvites() -> Bool {
+        var canSend = false
+        if(!self.gamerTags.isEmpty){
+            for profile in self.gamerTags{
+                if(!profile.gamerTag.isEmpty){
+                    canSend = true
+                    break
+                }
+            }
+        }
+        
+        if(!canSend){
+            if(!self.gamerTag.isEmpty){
+                canSend = true
+            }
+        }
+        
+        return canSend
+    }
+    
     init(uId: String)
     {
         super.init()
@@ -377,8 +397,8 @@ class User: NSObject, NSCoding {
         self.messagingNotifications = (decoder.decodeObject(forKey: "messagingNotifications") as! Bool)
         self.sentRequests = (decoder.decodeObject(forKey: "sentRequests") as! [FriendRequestObject])
         self.pendingRequests = (decoder.decodeObject(forKey: "pendingRequests") as! [FriendRequestObject])
-        self.teams = (decoder.decodeObject(forKey: "teams") as! [TeamObject])
-        self.teamInvites = (decoder.decodeObject(forKey: "teamInvites") as! [TeamObject])
+        self.teams = (decoder.decodeObject(forKey: "teams") as! [EasyTeamObj])
+        self.teamInvites = (decoder.decodeObject(forKey: "teamInvites") as! [TeamInviteObject])
         self.stats = (decoder.decodeObject(forKey: "stats") as! [StatObject])
         self.chatObjects = (decoder.decodeObject(forKey: "chatObjects") as! [ChatObject])
         self.sendBirdId = (decoder.decodeObject(forKey: "sendBirdId") as! String)

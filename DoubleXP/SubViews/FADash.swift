@@ -33,6 +33,7 @@ class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource 
     
     private var quizOverlayShowing = false
     private var profilesLoaded = false
+    var localImageCache = NSCache<NSString, UIImage>()
     
     enum Const {
            static let closeCellHeight: CGFloat = 90
@@ -71,10 +72,10 @@ class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource 
                     let userId = dict["userId"] as? String ?? ""
                     
                     var questions = [FAQuestion]()
-                            let questionList = dict["questions"] as! [[String: Any]]
+                    let questionList = dict["questions"] as? [[String: Any]] ?? [[String: Any]]()
                             for question in questionList {
                                 var questionNumber = ""
-                                var questionLabel = ""
+                                var questionString = ""
                                 var option1 = ""
                                 var option1Description = ""
                                 var option2 = ""
@@ -114,7 +115,7 @@ class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource 
                                         questionNumber = (value as? String) ?? ""
                                     }
                                     if(key == "question"){
-                                        questionLabel = (value as? String) ?? ""
+                                        questionString = (value as? String) ?? ""
                                     }
                                     if(key == "option1"){
                                         option1 = (value as? String) ?? ""
@@ -215,46 +216,46 @@ class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource 
                                     if(key == "answerArray"){
                                         answerArray = (value as? [String]) ?? [String]()
                                     }
-                                }
-                            let faQuestion = FAQuestion(question: questionLabel)
-                                faQuestion.questionNumber = questionNumber
-                                faQuestion.question = questionLabel
-                                faQuestion.option1 = option1
-                                faQuestion.option1Description = option1Description
-                                faQuestion.question1SetURL = question1SetURL
-                                faQuestion.option2 = option2
-                                faQuestion.option2Description = option2Description
-                                faQuestion.question2SetURL = question2SetURL
-                                faQuestion.option3 = option3
-                                faQuestion.option3Description = option3Description
-                                faQuestion.question3SetURL = question3SetURL
-                                faQuestion.option4 = option4
-                                faQuestion.option4Description = option4Description
-                                faQuestion.question4SetURL = question4SetURL
-                                faQuestion.option5 = option5
-                                faQuestion.option5Description = option5Description
-                                faQuestion.question5SetURL = question5SetURL
-                                faQuestion.option6 = option6
-                                faQuestion.option6Description = option6Description
-                                faQuestion.option7 = option7
-                                faQuestion.option7Description = option7Description
-                                faQuestion.option8 = option8
-                                faQuestion.option8Description = option8Description
-                                faQuestion.option9 = option9
-                                faQuestion.option9Description = option9Description
-                                faQuestion.option10 = option10
-                                faQuestion.option10Description = option10Description
-                                faQuestion.required = required
-                                faQuestion.acceptMultiple = acceptMultiple
-                                faQuestion.questionDescription = questionDescription
-                                faQuestion.teamNeedQuestion = teamNeedQuestion
-                                faQuestion.optionsUrl = optionsURL
-                                faQuestion.maxOptions = maxOptions
-                                faQuestion.answer = answer
-                                faQuestion.answerArray = answerArray
+                            }
+                                
+                                let faQuestion = FAQuestion(question: questionString)
+                                    faQuestion.questionNumber = questionNumber
+                                    faQuestion.question = questionString
+                                    faQuestion.option1 = option1
+                                    faQuestion.option1Description = option1Description
+                                    faQuestion.question1SetURL = question1SetURL
+                                    faQuestion.option2 = option2
+                                    faQuestion.option2Description = option2Description
+                                    faQuestion.question2SetURL = question2SetURL
+                                    faQuestion.option3 = option3
+                                    faQuestion.option3Description = option3Description
+                                    faQuestion.question3SetURL = question3SetURL
+                                    faQuestion.option4 = option4
+                                    faQuestion.option4Description = option4Description
+                                    faQuestion.question4SetURL = question4SetURL
+                                    faQuestion.option5 = option5
+                                    faQuestion.option5Description = option5Description
+                                    faQuestion.question5SetURL = question5SetURL
+                                    faQuestion.option6 = option6
+                                    faQuestion.option6Description = option6Description
+                                    faQuestion.option7 = option7
+                                    faQuestion.option7Description = option7Description
+                                    faQuestion.option8 = option8
+                                    faQuestion.option8Description = option8Description
+                                    faQuestion.option9 = option9
+                                    faQuestion.option9Description = option9Description
+                                    faQuestion.option10 = option10
+                                    faQuestion.option10Description = option10Description
+                                    faQuestion.required = required
+                                    faQuestion.acceptMultiple = acceptMultiple
+                                    faQuestion.questionDescription = questionDescription
+                                    faQuestion.teamNeedQuestion = teamNeedQuestion
+                                    faQuestion.optionsUrl = optionsURL
+                                    faQuestion.maxOptions = maxOptions
+                                    faQuestion.answer = answer
+                                    faQuestion.answerArray = answerArray
                     
                         questions.append(faQuestion)
-                        
                     }
                     
                     let result = FreeAgentObject(gamerTag: gamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
@@ -349,12 +350,50 @@ class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource 
         else{
             let current = quizPayload[indexPath.item]
             
-            let cell = tableView.dequeueReusableCell(withIdentifier: "answerCell", for: indexPath) as! AnswerTableCell
-            
-            cell.question.text = current.question
-            //cell.answer.text = current[1]
-
-            return cell
+            if(!current.answer.isEmpty){
+                if(current.answer.contains("/DXP/")){
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "optionCell", for: indexPath) as! OptionAnswerCell
+                    var adjustedPayload = [current.answer]
+                    cell.question.text = current.question
+                    
+                    cell.setOptions(options: adjustedPayload, cache: self.localImageCache)
+                    
+                    return cell
+                } else {
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "answerCell", for: indexPath) as! AnswerTableCell
+                    
+                    cell.question.text = current.question
+                    cell.answer.text = current.answer
+                    
+                    return cell
+                }
+            } else {
+                let currentArray = current.answerArray
+                
+                if(currentArray[0].contains("/DXP/")){
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "optionCell", for: indexPath) as! OptionAnswerCell
+                    
+                    cell.question.text = current.question
+                    cell.setOptions(options: current.answerArray, cache: self.localImageCache)
+                    
+                    return cell
+                } else if(currentArray.count > 1){
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "multiOptionCell", for: indexPath) as! MultiOptionCell
+                    
+                    cell.question.text = current.question
+                    
+                    cell.setPayload(payload: currentArray)
+                    
+                    return cell
+                } else {
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "answerCell", for: indexPath) as! AnswerTableCell
+                    
+                    cell.question.text = current.question
+                    cell.answer.text = currentArray[0]
+                    
+                    return cell
+                }
+            }
         }
     }
     
@@ -379,7 +418,14 @@ class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource 
             return cellHeights[indexPath.row]
         }
         else{
-            return CGFloat(100)
+            let cell = tableView.cellForRow(at: indexPath)
+            if(cell is AnswerTableCell){
+                return CGFloat(50)
+            } else if (cell is MultiOptionCell){
+                 return CGFloat(140)
+            } else {
+                return CGFloat(180)
+            }
         }
     }
     

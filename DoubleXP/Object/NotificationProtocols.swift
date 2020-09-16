@@ -23,7 +23,7 @@ protocol NavigateToProfile: class {
     
     func navigateToCreateFrag()
     
-    func navigateToTeamDashboard(team: TeamObject?, newTeam: Bool)
+    func navigateToTeamDashboard(team: TeamObject?, teamInvite: TeamInviteObject?, newTeam: Bool)
     
     func navigateToTeamNeeds(team: TeamObject)
     
@@ -62,6 +62,8 @@ protocol NavigateToProfile: class {
     func navigateToCompetition(competition: CompetitionObj)
     
     func navigateToSponsor()
+    
+    func startDashNavigation(teamName: String?, teamInvite: TeamInviteObject?, newTeam: Bool)
 }
 
 protocol RequestsUpdate: class{

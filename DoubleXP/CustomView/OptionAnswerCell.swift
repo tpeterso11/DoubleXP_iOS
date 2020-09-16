@@ -39,7 +39,10 @@ class OptionAnswerCell: UITableViewCell, UICollectionViewDelegate, UICollectionV
             let url = current.suffix(from: startIndex!)
             let answer = current.prefix(upTo: answerIndex!)
             
-            cell.optionText.text = String(answer) as String
+            if(self.options.count < 3){
+                cell.optionText.text = String(answer) as String
+            }
+            
             if(self.imageCache.object(forKey: url as NSString) != nil){
                 cell.optionImage.image = imageCache.object(forKey: url as NSString)
             } else {
@@ -60,7 +63,7 @@ class OptionAnswerCell: UITableViewCell, UICollectionViewDelegate, UICollectionV
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        return CGSize(width: collectionView.bounds.width / 3, height: CGFloat(120))
+        return CGSize(width: collectionView.bounds.width / CGFloat(options.count), height: CGFloat(120))
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {

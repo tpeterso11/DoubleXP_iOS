@@ -12,7 +12,6 @@ import SwiftNotificationCenter
 
 class NavigationPageController: EMPageViewController, EMPageViewControllerDataSource, NavigateToProfile {
     
-    
     func em_pageViewController(_ pageViewController: EMPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
         return nil
     }
@@ -221,7 +220,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         selectViewController(currentViewController, direction: .reverse, animated: true, completion: nil)
     }
     
-    func navigateToTeamDashboard(team: TeamObject?, newTeam: Bool){
+    func navigateToTeamDashboard(team: TeamObject?, teamInvite: TeamInviteObject?, newTeam: Bool){
         //change this to go to team needs selection later.
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "teamDashboard") as! TeamDashboard
         currentViewController.team = team
@@ -504,6 +503,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
     func updateNavigation(currentFrag: ParentVC) {
     }
     
-    
+    func startDashNavigation(teamName: String?, teamInvite: TeamInviteObject?, newTeam: Bool) {
+    }
     
 }

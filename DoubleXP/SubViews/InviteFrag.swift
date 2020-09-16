@@ -39,7 +39,7 @@ class InviteFrag: ParentVC, MFMessageComposeViewControllerDelegate, MFMailCompos
     @objc func smsButtonClicked(_ sender: AnyObject?) {
         if (MFMessageComposeViewController.canSendText()) {
             let controller = MFMessageComposeViewController()
-            controller.body = "Download DoubleXP!"
+            controller.body = "Download DoubleXP! https://apps.apple.com/us/app/id1472888221"
             controller.messageComposeDelegate = self
             self.present(controller, animated: true, completion: nil)
         }
@@ -51,7 +51,7 @@ class InviteFrag: ParentVC, MFMessageComposeViewControllerDelegate, MFMailCompos
             composeVC.mailComposeDelegate = self
             // Configure the fields of the interface.
             composeVC.setSubject("News Team...ASSEM-BULL!")
-            composeVC.setMessageBody("I created a team on DoubleXP. Download, join and join my squad!", isHTML: false)
+            composeVC.setMessageBody("I created a team on DoubleXP. Download, join and join my squad! https://apps.apple.com/us/app/id1472888221", isHTML: false)
             // Present the view controller modally.
             self.present(composeVC, animated: true, completion: nil)
         }

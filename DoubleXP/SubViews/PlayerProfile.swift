@@ -58,7 +58,6 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     @IBOutlet weak var userStatusText: UILabel!
     @IBOutlet weak var mainLayout: UIView!
     @IBOutlet weak var actionButton: UIView!
-    @IBOutlet weak var actionButtonIcon: UIImageView!
     @IBOutlet weak var actionButtonText: UILabel!
     @IBOutlet weak var actionOverlay: UIVisualEffectView!
     @IBOutlet weak var actionDrawer: UIView!
@@ -97,6 +96,11 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     @IBOutlet weak var statOverlayTable: UITableView!
     @IBOutlet weak var statsOverlayCollection: UICollectionView!
     @IBOutlet weak var profileTable: UITableView!
+    @IBOutlet weak var gtRegisterBlur: UIVisualEffectView!
+    @IBOutlet weak var gtRegisterBox: UIView!
+    @IBOutlet weak var gtEntryField: UnderLineTextField!
+    @IBOutlet weak var sendGt: UIButton!
+    @IBOutlet weak var dismissGtRegisterButton: UIButton!
     
     var localImageCache = NSCache<NSString, UIImage>()
     
@@ -107,13 +111,14 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     
     var rivalSelectedGame = ""
     var rivalSelectedType = ""
+    var newGT = ""
     var currentStatsGame: GamerConnectGame?
     var statsSet = false
     var quizSet = false
     var currentKey = ""
     var drawerOpen = false
     
-    private var quizPayload = [[String]]()
+    private var quizPayload = [FAQuestion]()
     private var currentProfile: FreeAgentObject? = nil
     
     var showStats = false
@@ -242,59 +247,20 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 gamerTags.append(currentGamerTagObj)
             }
             
-            var teams = [TeamObject]()
+            var teams = [EasyTeamObj]()
             let teamsArray = snapshot.childSnapshot(forPath: "teams")
             for teamObj in teamsArray.children {
                 let currentObj = teamObj as! DataSnapshot
-                let dict = currentObj.value as! [String: Any]
-                let teamName = dict["teamName"] as? String ?? ""
-                let teamId = dict["teamId"] as? String ?? ""
-                let games = dict["games"] as? [String] ?? [String]()
-                let consoles = dict["consoles"] as? [String] ?? [String]()
-                let teammateTags = dict["teammateTags"] as? [String] ?? [String]()
-                let teammateIds = dict["teammateIds"] as? [String] ?? [String]()
+                let dict = currentObj.value as? [String: Any]
+                let teamName = dict?["teamName"] as? String ?? ""
+                let teamId = dict?["teamId"] as? String ?? ""
+                let game = dict?["gameName"] as? String ?? ""
+                let teamCaptainId = dict?["teamCaptainId"] as? String ?? ""
+                let newTeam = dict?["newTeam"] as? String ?? ""
                 
-                var invites = [TeamInviteObject]()
-                let teamInvites = snapshot.childSnapshot(forPath: "teamInvites")
-                for invite in teamInvites.children{
-                    let currentObj = invite as! DataSnapshot
-                    let dict = currentObj.value as? [String: Any]
-                    let gamerTag = dict?["gamerTag"] as? String ?? ""
-                    let date = dict?["date"] as? String ?? ""
-                    let uid = dict?["uid"] as? String ?? ""
-                    let teamName = dict?["teamName"] as? String ?? ""
-                    
-                    let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid, teamName: teamName)
-                    invites.append(newInvite)
-                }
-                
-                var teammateArray = [TeammateObject]()
-                if(currentObj.hasChild("teammates")){
-                    let teammates = snapshot.childSnapshot(forPath: "teammates")
-                    for invite in teammates.children{
-                        let currentObj = invite as! DataSnapshot
-                        let dict = currentObj.value as! [String: Any]
-                        let gamerTag = dict["gamerTag"] as? String ?? ""
-                        let date = dict["date"] as? String ?? ""
-                        let uid = dict["uid"] as? String ?? ""
-                        
-                        let teammate = TeammateObject(gamerTag: gamerTag, date: date, uid: uid)
-                        teammateArray.append(teammate)
-                    }
-                }
-                
-                let teamInvitetags = dict["teamInviteTags"] as? [String] ?? [String]()
-                let captain = dict["teamCaptain"] as? String ?? ""
-                let imageUrl = dict["imageUrl"] as? String ?? ""
-                let teamChat = dict["teamChat"] as? String ?? String()
-                let teamNeeds = dict["teamNeeds"] as? [String] ?? [String]()
-                let selectedTeamNeeds = dict["selectedTeamNeeds"] as? [String] ?? [String]()
-                let captainId = dict["teamCaptainId"] as? String ?? String()
-                
-                let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl, teamCaptainId: captainId)
-                currentTeam.teammates = teammateArray
-                teams.append(currentTeam)
+                teams.append(EasyTeamObj(teamName: teamName, teamId: teamId, gameName: game, teamCaptainId: teamCaptainId, newTeam: newTeam))
             }
+
             
             var currentStats = [StatObject]()
             let statsArray = snapshot.childSnapshot(forPath: "stats")
@@ -414,50 +380,50 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                     let userId = dict["userId"] as? String ?? ""
                     
                     var questions = [FAQuestion]()
-                            let questionList = dict["questions"] as! [[String: Any]]
+                    let questionList = dict["questions"] as? [[String: Any]] ?? [[String: Any]]()
                             for question in questionList {
+                                var questionNumber = ""
+                                var questionString = ""
+                                var option1 = ""
+                                var option1Description = ""
+                                var option2 = ""
+                                var option2Description = ""
+                                var option3 = ""
+                                var option3Description = ""
+                                var option4 = ""
+                                var option4Description = ""
+                                var option5 = ""
+                                var option5Description = ""
+                                var option6 = ""
+                                var option6Description = ""
+                                var option7 = ""
+                                var option7Description = ""
+                                var option8 = ""
+                                var option8Description = ""
+                                var option9 = ""
+                                var option9Description = ""
+                                var option10 = ""
+                                var option10Description = ""
+                                var required = ""
+                                var questionDescription = ""
+                                var teamNeedQuestion = "false"
+                                var acceptMultiple = ""
+                                var question1SetURL = ""
+                                var question2SetURL = ""
+                                var question3SetURL = ""
+                                var question4SetURL = ""
+                                var question5SetURL = ""
+                                var optionsURL = ""
+                                var maxOptions = ""
+                                var answer = ""
+                                var answerArray = [String]()
+                                
                                 for (key, value) in question {
-                                    var questionNumber = ""
-                                    var question = ""
-                                    var option1 = ""
-                                    var option1Description = ""
-                                    var option2 = ""
-                                    var option2Description = ""
-                                    var option3 = ""
-                                    var option3Description = ""
-                                    var option4 = ""
-                                    var option4Description = ""
-                                    var option5 = ""
-                                    var option5Description = ""
-                                    var option6 = ""
-                                    var option6Description = ""
-                                    var option7 = ""
-                                    var option7Description = ""
-                                    var option8 = ""
-                                    var option8Description = ""
-                                    var option9 = ""
-                                    var option9Description = ""
-                                    var option10 = ""
-                                    var option10Description = ""
-                                    var required = ""
-                                    var questionDescription = ""
-                                    var teamNeedQuestion = "false"
-                                    var acceptMultiple = ""
-                                    var question1SetURL = ""
-                                    var question2SetURL = ""
-                                    var question3SetURL = ""
-                                    var question4SetURL = ""
-                                    var question5SetURL = ""
-                                    var optionsURL = ""
-                                    var maxOptions = ""
-                                    var answer = ""
-                                    var answerArray = [String]()
-                                    
                                     if(key == "questionNumber"){
                                         questionNumber = (value as? String) ?? ""
                                     }
                                     if(key == "question"){
-                                        question = (value as? String) ?? ""
+                                        questionString = (value as? String) ?? ""
                                     }
                                     if(key == "option1"){
                                         option1 = (value as? String) ?? ""
@@ -558,10 +524,11 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                                     if(key == "answerArray"){
                                         answerArray = (value as? [String]) ?? [String]()
                                     }
+                            }
                                 
-                                let faQuestion = FAQuestion(question: question)
+                                let faQuestion = FAQuestion(question: questionString)
                                     faQuestion.questionNumber = questionNumber
-                                    faQuestion.question = question
+                                    faQuestion.question = questionString
                                     faQuestion.option1 = option1
                                     faQuestion.option1Description = option1Description
                                     faQuestion.question1SetURL = question1SetURL
@@ -595,9 +562,8 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                                     faQuestion.maxOptions = maxOptions
                                     faQuestion.answer = answer
                                     faQuestion.answerArray = answerArray
-                        
-                            questions.append(faQuestion)
-                        }
+                    
+                        questions.append(faQuestion)
                     }
                     
                     let result = FreeAgentObject(gamerTag: gamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
@@ -714,7 +680,6 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             for request in currentUser!.pendingRequests{
                 if(request.uid == user.uId){
                     actionButton.applyGradient(colours:  [#colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1), #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1)], orientation: .horizontal)
-                    actionButtonIcon.image = #imageLiteral(resourceName: "new.png")
                     actionButtonText.text = "Received Request!"
                     
                     let singleTap = UITapGestureRecognizer(target: self, action: #selector(receivedButtonClicked))
@@ -758,8 +723,20 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     }
     
     @objc func textFieldDidChange(_ textField: UITextField) {
-        if(textField.text != nil){
-            self.checkTwitchButton()
+        if(textField == self.twitchUserNameEntry){
+            if(textField.text != nil){
+                self.checkTwitchButton()
+            }
+        } else {
+            if(self.gtEntryField.text!.count > 4){
+                self.sendGt.alpha = 1
+                self.sendGt.isUserInteractionEnabled = true
+                self.newGT = self.gtEntryField.text!
+                self.sendGt.addTarget(self, action: #selector(dismissEntry), for: .touchUpInside)
+            } else {
+                self.sendGt.alpha = 0.3
+                self.sendGt.isUserInteractionEnabled = false
+            }
         }
     }
     
@@ -970,7 +947,6 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     
     private func updateToChatButton(){
         actionButton.applyGradient(colours:  [#colorLiteral(red: 0, green: 0.4987006783, blue: 0, alpha: 1), #colorLiteral(red: 0.5843137503, green: 0.8235294223, blue: 0.4196078479, alpha: 1)], orientation: .horizontal)
-        actionButtonIcon.image = #imageLiteral(resourceName: "comment-black-oval-bubble-shape.png")
         actionButtonText.text = "Chat with this user"
         
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(messagingButtonClicked))
@@ -980,35 +956,88 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     
     private func updateToRequestButton(){
         let manager = GamerProfileManager()
-        if(manager.currentUserHasGamertagAvailable() && !manager.gamertagBelongsToUser(gamerTag: manager.getGamerTag(user: self.userForProfile!))){
+        if(!manager.gamertagBelongsToUser(gamerTag: manager.getGamerTag(user: self.userForProfile!))){
             let singleTap = UITapGestureRecognizer(target: self, action: #selector(connectButtonClicked))
-           actionButton.applyGradient(colours:  [UIColor(named: "darker")!, .lightGray], orientation: .horizontal)
-           actionButtonIcon.image = #imageLiteral(resourceName: "follow.png")
+           actionButton.applyGradient(colours:  [#colorLiteral(red: 0, green: 0.4987006783, blue: 0, alpha: 1), #colorLiteral(red: 0.5843137503, green: 0.8235294223, blue: 0.4196078479, alpha: 1)], orientation: .horizontal)
            actionButtonText.text = "send friend request"
 
            actionButton.isUserInteractionEnabled = true
-            actionButton.isHidden = false
-           actionButton.addGestureRecognizer(singleTap)
+           actionButton.isHidden = false
+            actionButton.addGestureRecognizer(singleTap)
         } else {
-            bottomBlur.isHidden = true
-            actionButton.isHidden = true
+            self.bottomBlur.isHidden = true
+            self.actionButton.isHidden = true
         }
+    }
+    
+    private func setupGTView(){
+        self.gtRegisterBox.layer.borderColor = UIColor.clear.cgColor
+        self.gtRegisterBox.layer.masksToBounds = true
+        
+        self.gtRegisterBox.layer.shadowColor = UIColor.black.cgColor
+        self.gtRegisterBox.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+        self.gtRegisterBox.layer.shadowRadius = 2.0
+        self.gtRegisterBox.layer.shadowOpacity = 0.5
+        self.gtRegisterBox.layer.shadowPath = UIBezierPath(roundedRect: self.gtRegisterBox.bounds, cornerRadius: self.gtRegisterBox.layer.cornerRadius).cgPath
+    }
+    
+    private func showGamerTagRequest(){
+        self.gtEntryField.delegate = self
+        self.gtEntryField.text = ""
+        self.gtEntryField.addTarget(self, action: #selector(self.textFieldDidChange(_:)), for: UIControl.Event.editingChanged)
+        self.sendGt.alpha = 0.3
+        self.dismissGtRegisterButton.addTarget(self, action: #selector(dismissEntry), for: .touchUpInside)
+        self.sendGt.addTarget(self, action: #selector(dismissEntry), for: .touchUpInside)
+        let top = CGAffineTransform(translationX: 0, y: -40)
+        UIView.animate(withDuration: 0.6, animations: {
+            self.gtRegisterBlur.alpha = 1
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                self.gtRegisterBox.transform = top
+                self.gtRegisterBox.alpha = 1
+            }, completion: nil)
+        })
+    }
+    
+    @objc func dismissEntry(_ sender: AnyObject?) {
+        if(!self.newGT.isEmpty){
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            delegate.currentUser!.gamerTag = self.newGT
+            
+            let ref = Database.database().reference().child("Users").child(delegate.currentUser!.uId)
+            ref.child("gamerTag").setValue(self.newGT)
+            
+            let friendsManager = FriendsManager()
+            friendsManager.sendRequestFromProfile(currentUser: delegate.currentUser!, otherUser: userForProfile!, callbacks: self)
+        }
+        let top = CGAffineTransform(translationX: 0, y: 0)
+        UIView.animate(withDuration: 0.4, animations: {
+            self.gtRegisterBox.transform = top
+            self.gtRegisterBox.alpha = 0
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                self.gtRegisterBlur.alpha = 0
+            }, completion: nil)
+        })
     }
     
     private func updateToPending(){
         actionButton.applyGradient(colours:  [#colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1), #colorLiteral(red: 0.501960814, green: 0.501960814, blue: 0.501960814, alpha: 1)], orientation: .horizontal)
-        actionButtonIcon.image = #imageLiteral(resourceName: "sand-clock.png")
         actionButtonText.text = "pending request"
     }
     
     @objc func connectButtonClicked(_ sender: AnyObject?) {
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Friend Profile - Friend Request Sent"))
-        let friendsManager = FriendsManager()
-        
-        if(self.userForProfile != nil){
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-            let currentUser = delegate.currentUser
-            friendsManager.sendRequestFromProfile(currentUser: currentUser!, otherUser: userForProfile!, callbacks: self)
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        if(delegate.currentUser!.userCanSendInvites()){
+            AppEvents.logEvent(AppEvents.Name(rawValue: "Friend Profile - Friend Request Sent"))
+            let friendsManager = FriendsManager()
+            
+            if(self.userForProfile != nil){
+                let currentUser = delegate.currentUser
+                friendsManager.sendRequestFromProfile(currentUser: currentUser!, otherUser: userForProfile!, callbacks: self)
+            }
+        } else {
+            showGamerTagRequest()
         }
     }
     
@@ -1130,42 +1159,51 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         else {
             let current = quizPayload[indexPath.item]
             
-            if(current[1].contains("/DXP/")){
-                let cell = tableview.dequeueReusableCell(withIdentifier: "optionCell", for: indexPath) as! OptionAnswerCell
-                
-                var adjustedPayload = current
-                cell.question.text = adjustedPayload[0]
-                adjustedPayload.remove(at: 0)
-                
-                cell.setOptions(options: adjustedPayload, cache: self.localImageCache)
-                
-                return cell
-            } else if(current.count > 2){
-                let cell = tableview.dequeueReusableCell(withIdentifier: "multiOptionCell", for: indexPath) as! MultiOptionCell
-                
-                let question = current[0]
-                cell.question.text = current[0]
-                
-                
-                var newPayload = [String]()
-                for answer in current {
-                    if(answer != question){
-                        newPayload.append(answer)
-                    }
+            if(!current.answer.isEmpty){
+                if(current.answer.contains("/DXP/")){
+                    let cell = tableview.dequeueReusableCell(withIdentifier: "optionCell", for: indexPath) as! OptionAnswerCell
+                    let adjustedPayload = [current.answer]
+                    cell.question.text = current.question
+                    
+                    cell.setOptions(options: adjustedPayload, cache: self.localImageCache)
+                    
+                    return cell
+                } else {
+                    let cell = tableview.dequeueReusableCell(withIdentifier: "answerCell", for: indexPath) as! AnswerTableCell
+                    
+                    cell.question.text = current.question
+                    cell.answer.text = current.answer
+                    
+                    return cell
                 }
+            } else {
+                let currentArray = current.answerArray
                 
-                cell.setPayload(payload: newPayload)
-                
-                return cell
+                if(currentArray[0].contains("/DXP/")){
+                    let cell = tableview.dequeueReusableCell(withIdentifier: "optionCell", for: indexPath) as! OptionAnswerCell
+                    
+                    cell.question.text = current.question
+                    cell.setOptions(options: current.answerArray, cache: self.localImageCache)
+                    
+                    return cell
+                } else if(currentArray.count > 1){
+                    let cell = tableview.dequeueReusableCell(withIdentifier: "multiOptionCell", for: indexPath) as! MultiOptionCell
+                    
+                    cell.question.text = current.question
+                    
+                    cell.setPayload(payload: currentArray)
+                    
+                    return cell
+                } else {
+                    let cell = tableview.dequeueReusableCell(withIdentifier: "answerCell", for: indexPath) as! AnswerTableCell
+                    
+                    cell.question.text = current.question
+                    cell.answer.text = currentArray[0]
+                    
+                    return cell
+                }
             }
-            else {
-                let cell = tableview.dequeueReusableCell(withIdentifier: "answerCell", for: indexPath) as! AnswerTableCell
-                
-                cell.question.text = current[0]
-                cell.answer.text = current[1]
-                
-                return cell
-            }
+            
         }
     }
 
@@ -1173,7 +1211,14 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         if(tableview == self.table){
             return cellHeights[indexPath.row]
         } else {
-            return CGFloat(150)
+            let cell = tableview.cellForRow(at: indexPath)
+            if(cell is AnswerTableCell){
+                return CGFloat(50)
+            } else if (cell is MultiOptionCell){
+                 return CGFloat(140)
+            } else {
+                return CGFloat(180)
+            }
         }
     }
 
@@ -1260,7 +1305,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         if(collectionView == rivalGameCollection){
-            return CGSize(width: self.rivalGameCollection.bounds.width - 10, height: CGFloat(80))
+            return CGSize(width: self.rivalGameCollection.bounds.width, height: CGFloat(80))
         } else {
             let current = self.statsPayload[indexPath.item]
             if(current.contains("HEADER")){
@@ -1395,15 +1440,13 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         }
            
         //releasing with bug that, under unknown circumstances, the quiz table will not appear when drawer is opened.
+        self.quizPayload = [FAQuestion]()
         if(self.gamesWithQuiz.contains(gameName)){
-            self.quizPayload = [[String]]()
             for profile in self.profilePayload{
                 if(profile.game == game.gameName){
                     self.currentProfile = profile
                     
-                    for array in currentProfile!.questions{
-                        //self.quizPayload.append(array)
-                    }
+                    self.quizPayload.append(contentsOf: currentProfile!.questions)
                     break
                 }
             }
@@ -1539,66 +1582,6 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         )
     }
     
-    private func convertTeammates(list: [String], userUid: String, teamName: String, game: String) -> [TeammateObject]{
-        var newArray = [TeammateObject]()
-        let manager = GamerProfileManager()
-        let tempTeammates = list
-        if(!tempTeammates.isEmpty){
-            for teammate in tempTeammates{
-                let ref = Database.database().reference().child("Users").child(teammate)
-                    ref.observeSingleEvent(of: .value, with: { (snapshot) in
-                        // Get user value
-                        let _ = snapshot.value as? NSDictionary
-                        let uId = snapshot.key
-                        var gamerTags = [GamerProfile]()
-                        let gamerTagsArray = snapshot.childSnapshot(forPath: "gamerTags")
-                        for gamerTagObj in gamerTagsArray.children {
-                            let currentObj = gamerTagObj as! DataSnapshot
-                            let dict = currentObj.value as! [String: Any]
-                            let currentTag = dict["gamerTag"] as? String ?? ""
-                            let currentGame = dict["game"] as? String ?? ""
-                            let console = dict["console"] as? String ?? ""
-                            
-                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
-                            gamerTags.append(currentGamerTagObj)
-                        }
-            
-                        let newTeammate = TeammateObject(gamerTag: manager.getGamerTagForGame(gameName: game), date: "", uid: uId)
-                        newArray.append(newTeammate)
-                })
-                { (error) in
-                    print(error.localizedDescription)
-                }
-            }
-                        
-            var teammates = [Dictionary<String, String>]()
-            for user in newArray{
-                let current = ["gamerTag": user.gamerTag, "date": user.date, "uid": user.uid]
-                teammates.append(current)
-            }
-            
-            if(!teammates.isEmpty){
-                let ref = Database.database().reference().child("Users").child(userUid).child("teams")
-                ref.observeSingleEvent(of: .value, with: { (snapshot) in
-                    for userTeam in snapshot.children{
-                        let currentObj = userTeam as! DataSnapshot
-                        let dict = currentObj.value as! [String: Any]
-                        let teamName = dict["teamName"] as? String ?? ""
-                        
-                        if(teamName == teamName){
-                            ref.child(userUid).child("teams").child(currentObj.key).child("teammates").setValue(teammates)
-                            break
-                        }
-                    }
-                })
-                
-                let teamRef = Database.database().reference().child("Teams")
-                teamRef.child(teamName).child("teammates").setValue(teammates)
-            }
-        }
-        return newArray
-    }
-    
     @objc private func rivalClicked(){
         let closeTap = UITapGestureRecognizer(target: self, action: #selector(self.closeOverlay))
         self.rivalClose.isUserInteractionEnabled = true
@@ -1663,7 +1646,9 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             self.rivalOverlaySpinner.startAnimating()
             self.rivalSelectedType = "co-op"
             
-            self.sendPayload()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                self.sendPayload()
+            }
         }, completion: nil)
     }
     
@@ -1675,7 +1660,9 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             self.rivalOverlaySpinner.startAnimating()
             self.rivalSelectedType = "rival"
             
-            self.sendPayload()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                self.sendPayload()
+            }
         }, completion: nil)
     }
     
@@ -2011,7 +1998,6 @@ extension UIView {
         gradient.frame = self.bounds
         gradient.colors = colours.map { $0.cgColor }
         gradient.locations = locations
-        gradient.cornerRadius = 20
         self.layer.insertSublayer(gradient, at: 0)
         return gradient
     }
@@ -2022,7 +2008,6 @@ extension UIView {
         gradient.colors = colours.map { $0.cgColor }
         gradient.startPoint = orientation.startPoint
         gradient.endPoint = orientation.endPoint
-        gradient.cornerRadius = 20
         self.layer.insertSublayer(gradient, at: 0)
     }
 }

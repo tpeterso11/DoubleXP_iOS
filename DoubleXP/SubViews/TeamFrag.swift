@@ -21,13 +21,17 @@ class TeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate {
     @IBOutlet weak var faDashButton: UIView!
     @IBOutlet weak var teamSearchButton: UIView!
     @IBOutlet weak var headerView: UIView!
-    private var emptyTeamList = [TeamObject]()
+    private var emptyTeamList = [EasyTeamObj]()
     
     @IBOutlet weak var buttonLayout: UIView!
     private var user: User?
+    private var loaded = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.currentTeamFrag = self
         
         let createTap = UITapGestureRecognizer(target: self, action: #selector(createButtonClicked))
         createButton.isUserInteractionEnabled = true
@@ -70,11 +74,11 @@ class TeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate {
     
     private func populateList(){
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        user = delegate.currentUser
+        user = delegate.currentUser!
         
         var captain = false
-        for team in user?.teams ?? [TeamObject](){
-            if(team.teamCaptain == user?.uId){
+        for team in user!.teams {
+            if(team.teamCaptainId == user?.uId){
                 captain = true
                 break
             }
@@ -91,12 +95,21 @@ class TeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate {
         }
         
         if((user?.teams.isEmpty)!){
-            let emptyTeam = TeamObject(teamName: "No Teams", teamId: "", games: ["Tap to build your first."], consoles: [""], teammateTags: [""], teammateIds: [""], teamCaptain: "", teamInvites: [TeamInviteObject](), teamChat: "", teamInviteTags: [""], teamNeeds: [""], selectedTeamNeeds: [""], imageUrl: "", teamCaptainId: "")
+            let easyTeam = EasyTeamObj(teamName: "No Teams", teamId: "", gameName:  "Tap to build your first.", teamCaptainId: "", newTeam: "false")
             
-            self.emptyTeamList.append(emptyTeam)
+            self.emptyTeamList.append(easyTeam)
         }
         
-        self.animateView()
+        if(!loaded){
+            self.loaded = true
+            self.animateView()
+        } else {
+            self.teamList.reloadData()
+        }
+    }
+    
+    func reloadTeams(){
+        populateList()
     }
     
     override func reloadView(){
@@ -138,23 +151,23 @@ class TeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "teamCell", for: indexPath) as! TeamCellTeamFrag
         
-        var current: TeamObject
+        var current: EasyTeamObj
         
         if((user?.teams.isEmpty)!){
             current = self.emptyTeamList[indexPath.item]
         }
         else{
-            current = (user?.teams[indexPath.item]) ?? TeamObject(teamName: "", teamId: "", games: [""], consoles: [""], teammateTags: [""], teammateIds: [""], teamCaptain: "", teamInvites: [TeamInviteObject](), teamChat: "", teamInviteTags: [""], teamNeeds: [""], selectedTeamNeeds: [""], imageUrl: "", teamCaptainId: "")
+            current = (user?.teams[indexPath.item]) ?? EasyTeamObj(teamName: "", teamId: "", gameName: "", teamCaptainId: "", newTeam: "false")
         }
         cell.teamName.text = current.teamName
         
         
-        if(current.teamCaptain == self.user?.uId ?? ""){
+        if(current.teamCaptainId == self.user?.uId ?? ""){
             cell.captainStar.isHidden = false
         }
         
-        if(!current.games.isEmpty){
-            cell.gameName.text = current.games[0]
+        if(!current.gameName.isEmpty){
+            cell.gameName.text = current.gameName
         }
         
         cell.contentView.applyGradient(colours:  [#colorLiteral(red: 0.9491214156, green: 0.9434790015, blue: 0.953458488, alpha: 1), #colorLiteral(red: 0.945284307, green: 0.9604713321, blue: 0.9703486562, alpha: 1)], orientation: .horizontal)
@@ -178,7 +191,7 @@ class TeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate {
             let team = user?.teams[indexPath.item]
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             let currentLanding = appDelegate.currentLanding
-            currentLanding!.navigateToTeamDashboard(team: team!, newTeam: false)
+            currentLanding!.startDashNavigation(teamName: team!.teamName, teamInvite: nil, newTeam: false)
         }
         else{
             self.createButtonClicked(self)

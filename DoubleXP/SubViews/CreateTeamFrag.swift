@@ -34,6 +34,7 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
     @IBOutlet weak var teamName: UnderLineTextField!
     @IBOutlet weak var loadingView: UIView!
     private var tempPayload = [String: Any]()
+    private var tempUserPayload = [String: String]()
     private var setupTeamObj: TeamObject?
     private var selectedCells = [String]()
     var gcHeight: CGFloat?
@@ -329,7 +330,7 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         let captain = TeammateObject(gamerTag: self.enteredTag, date: dateString, uid: user!.uId)
         teammates.append(captain)
         
-        let newTeam = TeamObject(teamName: teamName.text!, teamId: randomAlphaNumericString(length: 12), games: selected, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: self.enteredTag, teamInvites: [TeamInviteObject](), teamChat: "", teamInviteTags: [String](), teamNeeds: currentGame?.teamNeeds ?? [String](), selectedTeamNeeds: [String](), imageUrl: currentGame?.imageUrl ?? "", teamCaptainId: delegate.currentUser!.uId)
+        let newTeam = TeamObject(teamName: teamName.text!, teamId: randomAlphaNumericString(length: 12), games: selected, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: self.enteredTag, teamInvites: [TeamInviteObject](), teamChat: "", teamInviteTags: [String](), teamNeeds: currentGame?.teamNeeds ?? [String](), selectedTeamNeeds: [String](), imageUrl: currentGame?.imageUrl ?? "", teamCaptainId: delegate.currentUser!.uId, isRequest: "false")
         newTeam.teammates = teammates
         
         createTeam(team: newTeam)
@@ -366,7 +367,7 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         teammates.append(captain)
         
         if(!self.chosenGame.isEmpty){
-            let newTeam = TeamObject(teamName: teamName.text!, teamId: randomAlphaNumericString(length: 12), games: selected, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: manager.getGamerTagForGame(gameName: chosenGame), teamInvites: [TeamInviteObject](), teamChat: "", teamInviteTags: [String](), teamNeeds: currentGame?.teamNeeds ?? [String](), selectedTeamNeeds: [String](), imageUrl: currentGame?.imageUrl ?? "", teamCaptainId: delegate.currentUser!.uId)
+            let newTeam = TeamObject(teamName: teamName.text!, teamId: randomAlphaNumericString(length: 12), games: selected, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: manager.getGamerTagForGame(gameName: chosenGame), teamInvites: [TeamInviteObject](), teamChat: "", teamInviteTags: [String](), teamNeeds: currentGame?.teamNeeds ?? [String](), selectedTeamNeeds: [String](), imageUrl: currentGame?.imageUrl ?? "", teamCaptainId: delegate.currentUser!.uId, isRequest: "false")
             newTeam.teammates = teammates
             
             createTeam(team: newTeam)
@@ -594,20 +595,64 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         
         tempPayload = ["teamName": team.teamName, "teamId": team.teamId, "games": team.games, "consoles": team.consoles, "teammateTags": team.teammateTags, "teammateIds": team.teammateIds, "teamCaptain": team.teamCaptain, "teamInvites": team.teamInvites, "teamChat": groupChannel.channelUrl, "teamInviteTags": team.teamInviteTags, "teamNeeds": team.teamNeeds, "selectedTeamNeeds": team.selectedTeamNeeds, "imageUrl": team.imageUrl, "teammates": teammates, "teamCaptainId": delegate.currentUser!.uId] as [String : Any]
         
+        tempUserPayload = ["teamName": team.teamName, "teamId": team.teamId, "gameName": team.games[0], "teamCaptainId": team.teamCaptainId, "newTeam": "false"]
+    
+        let easyTeam = EasyTeamObj(teamName: team.teamName, teamId: team.teamId, gameName: team.games[0], teamCaptainId: team.teamCaptainId, newTeam: "false")
+        
         team.teamChat = groupChannel.channelUrl
-        user?.teams.append(team)
+        user?.teams.append(easyTeam)
+        
+        //send to teams
         ref.child(team.teamName).setValue(tempPayload)
-        userRef.child("teams").child(team.teamName).setValue(tempPayload)
-        
-        let currentLanding = delegate.currentLanding
-        if (!self.setupTeamObj!.teamNeeds.isEmpty){
-            currentLanding?.navigateToTeamNeeds(team: self.setupTeamObj!)
+        updateUser(userRef: userRef)
+    }
+    
+    private func updateUser(userRef: DatabaseReference){
+        userRef.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                let teams = [EasyTeamObj]()
+                if(snapshot.hasChild("teams")){
+                    var teams = [EasyTeamObj]()
+                    let teamsArray = snapshot.childSnapshot(forPath: "teams")
+                    for teamObj in teamsArray.children {
+                        let currentObj = teamObj as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let teamName = dict?["teamName"] as? String ?? ""
+                        let teamId = dict?["teamId"] as? String ?? ""
+                        let game = dict?["gameName"] as? String ?? ""
+                        let teamCaptainId = dict?["teamCaptainId"] as? String ?? ""
+                        let newTeam = dict?["newTeam"] as? String ?? ""
+                        
+                        teams.append(EasyTeamObj(teamName: teamName, teamId: teamId, gameName: game, teamCaptainId: teamCaptainId, newTeam: newTeam))
+                    }
+                }
+                
+                
+                var sendUpArray = [[String: Any]]()
+                
+                for team in teams {
+                    let current = ["teamName": team.teamName, "teamId": team.teamId, "gameName": team.gameName, "newTeam": team.newTeam] as [String : String]
+                    
+                    sendUpArray.append(current)
+                }
+                sendUpArray.append(self.tempUserPayload)
+                userRef.child("teams").setValue(sendUpArray)
+                
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                let currentLanding = delegate.currentLanding
+                if (!self.setupTeamObj!.teamNeeds.isEmpty){
+                    currentLanding?.navigateToTeamNeeds(team: self.setupTeamObj!)
+                }
+                else{
+                    currentLanding?.startDashNavigation(teamName: self.setupTeamObj!.teamName, teamInvite: nil, newTeam: true)
+                }
+                
+                AppEvents.logEvent(AppEvents.Name(rawValue: "Create Frag - Team Created With Chat"))
+            }
+            
+        }) { (error) in
+            print(error.localizedDescription)
         }
-        else{
-            currentLanding?.navigateToTeamDashboard(team: self.setupTeamObj!, newTeam: true)
-        }
-        
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Create Frag - Team Created With Chat"))
     }
     
     func createTeamChannelFail() {
@@ -625,21 +670,14 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         
         tempPayload = ["teamName": team.teamName, "teamId": team.teamId, "games": team.games, "consoles": team.consoles, "teammateTags": team.teammateTags, "teammateIds": team.teammateIds, "teamCaptain": team.teamCaptain, "teamInvites": team.teamInvites, "teamChat": "", "teamInviteTags": team.teamInviteTags, "teamNeeds": team.teamNeeds, "selectedTeamNeeds": team.selectedTeamNeeds, "imageUrl": team.imageUrl, "teammates": teammates] as [String : Any]
         
-        user?.teams.append(team)
+        tempUserPayload = ["teamName": team.teamName, "teamId": team.teamId, "gameName": team.games[0], "newTeam": "false"]
+        
+        let easyTeam = EasyTeamObj(teamName: team.teamName, teamId: team.teamId, gameName: team.games[0], teamCaptainId: team.teamCaptainId, newTeam: "false")
+        user?.teams.append(easyTeam)
+        
+        //send to teams
         ref.child(team.teamName).setValue(tempPayload)
-        userRef.child("teams").child(team.teamName).setValue(tempPayload)
-        
-        let currentLanding = delegate.currentLanding
-        if (!self.setupTeamObj!.teamNeeds.isEmpty){
-            currentLanding?.stackDepth -= 1
-            currentLanding?.navigateToTeamNeeds(team: self.setupTeamObj!)
-        }
-        else{
-            currentLanding?.stackDepth -= 1
-            currentLanding?.navigateToTeamDashboard(team: self.setupTeamObj!, newTeam: true)
-        }
-        
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Create Frag - Team Created With Chat"))
+        updateUser(userRef: userRef)
     }
     
     

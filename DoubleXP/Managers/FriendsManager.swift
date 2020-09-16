@@ -496,13 +496,8 @@ class FriendsManager{
             }
         }
         
-        var otherUserTags = [String]()
-        for tag in user.gamerTags{
-            otherUserTags.append(tag.gamerTag)
-        }
-        
         for friend in currentUser.friends{
-            if(otherUserTags.contains(friend.gamerTag)){
+            if(friend.uid == user.uId){
                 contained = true
                 break
             }

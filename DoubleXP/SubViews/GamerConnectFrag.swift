@@ -22,6 +22,7 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
     @IBOutlet weak var recommendedUsers: UICollectionView!
     var selectedCell = false
     
+    @IBOutlet weak var fadeLogo: UIImageView!
     @IBOutlet weak var yourFeedHeader: UIView!
     @IBOutlet weak var announcementShare: UIButton!
     @IBOutlet weak var announcementClose: UIImageView!
@@ -44,6 +45,7 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
     @IBOutlet weak var upcomingBoxTable: UITableView!
     var secondaryPayload = [Any]()
     private var currentAnnouncement: AnnouncementObj?
+    private var currentEpisode: EpisodeObj?
     var timer: Timer!
     var currentUpcomingGamePos = -1
     var currentTrailers = [String: String]()
@@ -68,6 +70,8 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
         currentDate.text = todayString
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.currentConnectFrag = self
+        
         var list = [GamerConnectGame]()
         for game in appDelegate.gcGames {
             if(game.available == "true"){
@@ -103,6 +107,14 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
         print("gone")
     }
     
+    func reloadFeed(){
+        buildSecondaryPayload()
+        self.recommendedUsers.performBatchUpdates({
+            let indexSet = IndexSet(integer: 0)
+            self.recommendedUsers.reloadSections(indexSet)
+        }, completion: nil)
+    }
+    
     private func animateView(){
         buildSecondaryPayload()
         
@@ -122,6 +134,7 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
             
             let top = CGAffineTransform(translationX: 0, y: 40)
             UIView.animate(withDuration: 0.8, animations: {
+                self.fadeLogo.alpha = 0
                 self.gcGameScroll.alpha = 1
                 self.gcGameScroll.transform = top
                 self.gcGameScroll.reloadData()
@@ -141,6 +154,7 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let manager = appDelegate.announcementManager
+        let defaults = UserDefaults.standard
         
         for announcement in manager.announcments{
             if(manager.shouldSeeAnnouncement(user: appDelegate.currentUser!, announcement: announcement)){
@@ -148,13 +162,22 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
             }
         }
         
-        let defaults = UserDefaults.standard
+        //episodes
+        let ignoredEpisodes = defaults.stringArray(forKey: "ignoredEpisodes") ?? [String]()
+        for episode in appDelegate.episodes {
+            if(!ignoredEpisodes.contains(episode.mediaId)){
+                secondaryPayload.append(episode)
+            }
+        }
+        
+        //upcoming games
         let ignoreArray = defaults.stringArray(forKey: "ignoredUpcomingGames") ?? [String]()
         for game in appDelegate.upcomingGames {
             if(!ignoreArray.contains(game.id)){
                 secondaryPayload.append(game)
             }
         }
+
         secondaryPayload.append(contentsOf: appDelegate.competitions)
         
         let userOne = RecommendedUser(gamerTag: "allthesaints011", uid: "HMv30El7nmWXPEnriV3irMsnS3V2")
@@ -290,8 +313,50 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
                 cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
                 
                 return cell
-            }
-            else{
+            } else if(current is EpisodeObj){
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "episode", for: indexPath) as! EpisodeCell
+                let currentObj = current as! EpisodeObj
+                
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                let cache = appDelegate.imageCache
+                if(cache.object(forKey: currentObj.imageUrl as NSString) != nil){
+                    cell.background.image = cache.object(forKey: currentObj.imageUrl as NSString)
+                } else {
+                    cell.background.image = Utility.Image.placeholder
+                    cell.background.moa.onSuccess = { image in
+                        cell.background.image = image
+                        appDelegate.imageCache.setObject(image, forKey: currentObj.imageUrl as NSString)
+                        return image
+                    }
+                    cell.background.moa.url = currentObj.imageUrl
+                }
+                
+                cell.background.contentMode = .scaleAspectFill
+                cell.background.clipsToBounds = true
+                
+                cell.clickArea.tag = indexPath.item
+                
+                let ignoreTap = UITapGestureRecognizer(target: self, action: #selector(ignoreEpisode))
+                cell.clickArea.isUserInteractionEnabled = true
+                cell.clickArea.addGestureRecognizer(ignoreTap)
+                
+                cell.title.text = currentObj.name
+                cell.sub.text = currentObj.sub
+                
+                cell.contentView.layer.cornerRadius = 10.0
+                cell.contentView.layer.borderWidth = 1.0
+                cell.contentView.layer.borderColor = UIColor.clear.cgColor
+                cell.contentView.layer.masksToBounds = true
+                
+                cell.layer.shadowColor = UIColor.black.cgColor
+                cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+                cell.layer.shadowRadius = 2.0
+                cell.layer.shadowOpacity = 0.5
+                cell.layer.masksToBounds = false
+                cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
+                
+                return cell
+            } else{
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "competitionCell", for: indexPath) as! CompetitionCell
                 
                 cell.competitionName.text = (current as! CompetitionObj).competitionName
@@ -399,8 +464,10 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
             else if (cell is UpcomingGameCell){
                 let current = self.secondaryPayload[indexPath.item] as! UpcomingGame
                 self.showUpcomingGameInfo(upcomingGame: current)
-            }
-            else{
+            } else if (cell is EpisodeCell){
+                let current = self.secondaryPayload[indexPath.item] as! EpisodeObj
+                self.playEpisode(url: current.url)
+            }   else{
                 let current = self.secondaryPayload[indexPath.item]
                 
                 let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -426,6 +493,9 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
             }
             else if(current is UpcomingGame){
                 return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(150))
+            }
+            else if(current is EpisodeObj){
+                return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(170))
             }
             else{
                 return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(100))
@@ -481,6 +551,14 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
                     self.recommendedUsers.reloadData()
                 }
             }
+        }
+    }
+    
+    private func playEpisode(url: String){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.currentLanding?.showScoob(callback: self, cancelableWV: self.trailerWV)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.trailerWV.load(NSURLRequest(url: NSURL(string: url)! as URL) as URLRequest)
         }
     }
     
@@ -571,6 +649,27 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
         }
         
         self.recommendedUsers.reloadData()
+    }
+    
+    @objc private func ignoreEpisode(_ sender: UITapGestureRecognizer){
+        let defaults = UserDefaults.standard
+        var ignoreArray = defaults.stringArray(forKey: "ignoredEpisodes") ?? [String]()
+        
+        let view = sender.view
+        if(view != nil){
+            let current = self.secondaryPayload[view!.tag]
+            if(current is EpisodeObj){
+                if(!(current as! EpisodeObj).mediaId.isEmpty){
+                    ignoreArray.append((current as! EpisodeObj).mediaId)
+                    defaults.set(ignoreArray, forKey: "ignoredEpisodes")
+                    
+                    AppEvents.logEvent(AppEvents.Name(rawValue: "Episode ignored" + (current as! EpisodeObj).mediaId))
+                    
+                    self.secondaryPayload.remove(at: view!.tag)
+                    self.recommendedUsers.reloadData()
+                }
+            }
+        }
     }
     
     @objc private func dismissAnnouncement(){

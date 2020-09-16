@@ -28,6 +28,7 @@ class ViewTeamsFoldingCell: FoldingCell, UICollectionViewDataSource, UICollectio
     private var currentTeam: TeamObject?
     private var currentCollection: UITableView?
     private var set = false
+    private var teamNeedsQuestion: FAQuestion?
     
     override func awakeFromNib() {
         foregroundView.layer.cornerRadius = 10
@@ -55,6 +56,7 @@ class ViewTeamsFoldingCell: FoldingCell, UICollectionViewDataSource, UICollectio
         self.teamName.text = team.teamName
         self.currentCollection = collectionView
         self.selectedNeeds = [String]()
+        self.teamNeedsQuestion = nil
         
         self.profiles.append(contentsOf: profiles)
         
@@ -86,7 +88,7 @@ class ViewTeamsFoldingCell: FoldingCell, UICollectionViewDataSource, UICollectio
         var contained = false
         var containedProfile: FreeAgentObject?
         
-        for profile in self.profiles{
+        for profile in self.profiles {
             if(profile.game == self.gameName){
                 contained = true
                 containedProfile = profile
@@ -103,10 +105,29 @@ class ViewTeamsFoldingCell: FoldingCell, UICollectionViewDataSource, UICollectio
             //if this user has a game profile for this game AND the current teams' team needs are not empty
             if(contained && (!self.currentTeam!.teamNeeds.isEmpty && !self.currentTeam!.selectedTeamNeeds.isEmpty)){
                 //var answer = containedProfile?.questions[0][0]
-                //if(self.currentTeam!.selectedTeamNeeds.contains((containedProfile?.questions[0][1])!)){
-                if(true == false) {   //match team needs
+                if(containedProfile != nil){
+                    for question in containedProfile!.questions {
+                        if(question.teamNeedQuestion == "true"){
+                            self.teamNeedsQuestion = question
+                            break
+                        }
+                    }
+                }
+                
+                var answer = ""
+                if(self.teamNeedsQuestion != nil){
+                    if(!self.teamNeedsQuestion!.answer.isEmpty){
+                        answer = self.teamNeedsQuestion!.answer
+                    } else {
+                        answer = self.teamNeedsQuestion!.answerArray[0]
+                    }
+                }
+                
+                if(self.currentTeam!.selectedTeamNeeds.contains(answer)){
+                //if(true == false) {   //match team needs
                     self.sendButton.tag = indexPath.item
                     self.sendButton.addTarget(self, action: #selector(sendRequest), for: .touchUpInside)
+                    self.sendButton.backgroundColor = #colorLiteral(red: 0.1667544842, green: 0.6060172915, blue: 0.279296875, alpha: 1)
                     
                     self.statusText.text = " send a request to join this team."
                     self.createButton.isHidden = true
@@ -117,6 +138,7 @@ class ViewTeamsFoldingCell: FoldingCell, UICollectionViewDataSource, UICollectio
                     self.createButton.isHidden = false
                     self.sendButton.alpha = 0.4
                     self.sendButton.isUserInteractionEnabled = false
+                    self.sendButton.backgroundColor = #colorLiteral(red: 0.3333333433, green: 0.3333333433, blue: 0.3333333433, alpha: 1)
                     
                     self.createButton.addTarget(self, action: #selector(createProfile), for: .touchUpInside)
                 }
@@ -129,6 +151,7 @@ class ViewTeamsFoldingCell: FoldingCell, UICollectionViewDataSource, UICollectio
                 
                 self.createButton.isHidden = true
                 self.statusText.text = " send a request to join this team."
+                self.sendButton.backgroundColor = #colorLiteral(red: 0.1667544842, green: 0.6060172915, blue: 0.279296875, alpha: 1)
             }
             else{
                 //if this gamer does not have a game profile for this game AND there are team needs.
@@ -137,17 +160,21 @@ class ViewTeamsFoldingCell: FoldingCell, UICollectionViewDataSource, UICollectio
                     self.createButton.isHidden = false
                     self.sendButton.alpha = 0.4
                     self.sendButton.isUserInteractionEnabled = false
+                    self.sendButton.backgroundColor = #colorLiteral(red: 0.3333333433, green: 0.3333333433, blue: 0.3333333433, alpha: 1)
                     
                     self.createButton.addTarget(self, action: #selector(createProfile), for: .touchUpInside)
                 }
                 else{
+                    self.sendButton.tag = indexPath.item
+                    self.sendButton.addTarget(self, action: #selector(sendRequest), for: .touchUpInside)
+                    
+                    self.createButton.isHidden = true
+                    self.statusText.text = " membership for this team is OPEN"
+                    self.sendButton.backgroundColor = #colorLiteral(red: 0.1667544842, green: 0.6060172915, blue: 0.279296875, alpha: 1)
+                    
                     //if not contained and no team needs, they still need a profile to request
                     self.createButton.isHidden = false
-                    self.sendButton.alpha = 0.4
-                    self.sendButton.isUserInteractionEnabled = false
-                    
                     self.createButton.addTarget(self, action: #selector(createProfile), for: .touchUpInside)
-                    self.statusText.text = " need a profile to request to join this team."
                 }
             }
         }
@@ -213,7 +240,13 @@ class ViewTeamsFoldingCell: FoldingCell, UICollectionViewDataSource, UICollectio
         let indexPath = IndexPath(item: (sender?.tag)!, section: 0)
         
         let manager = TeamManager()
-        manager.sendRequestToJoin(freeAgent: profiles[indexPath.item], team: self.currentTeam!, callbacks: self, indexPath: indexPath)
+        var faProfile: FreeAgentObject? = nil
+        for profile in profiles {
+            if(profile.game == self.currentTeam?.games[0]){
+                faProfile = profile
+            }
+        }
+        manager.sendRequestToJoin(freeAgent: faProfile, team: self.currentTeam!, callbacks: self, indexPath: indexPath)
     }
     
     @objc func createProfile(_ sender: AnyObject?) {

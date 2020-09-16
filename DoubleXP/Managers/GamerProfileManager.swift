@@ -11,7 +11,7 @@ import UIKit
 
 class GamerProfileManager{
     
-    func getGamerTagForGame(gameName: String) -> String{
+    func getGamerTagForGame(gameName: String) -> String {
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let user = delegate.currentUser
         
