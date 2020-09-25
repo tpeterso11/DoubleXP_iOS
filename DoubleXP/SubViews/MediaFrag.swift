@@ -997,7 +997,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         }, completion: { (finished: Bool) in
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             let manager = appDelegate.socialMediaManager
-            manager.getChannelTopVideos(currentChannel: self.selectedChannel, callbacks: self)
+            //manager.getChannelTopVideos(currentChannel: self.selectedChannel, callbacks: self)
         })
     }
     

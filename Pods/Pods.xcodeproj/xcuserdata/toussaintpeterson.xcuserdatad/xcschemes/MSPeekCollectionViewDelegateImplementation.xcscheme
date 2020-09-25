@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "CC4DE41EB4BC5DDE87BBBE62DE643BD8"
-               BuildableName = "MSPeekCollectionViewDelegateImplementation.framework"
+               BuildableName = "MSPeekCollectionViewDelegateImplementation"
                BlueprintName = "MSPeekCollectionViewDelegateImplementation"
                ReferencedContainer = "container:Pods.xcodeproj">
             </BuildableReference>

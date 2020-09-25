@@ -9,8 +9,6 @@
 import UIKit
 import SwiftHTTP
 import Firebase
-import SwiftTwitch
-import Marshal
 import SwiftDate
 
 class PreSplashActivity: UIViewController {

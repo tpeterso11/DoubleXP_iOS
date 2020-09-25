@@ -13,6 +13,8 @@ import FBSDKCoreKit
 import moa
 import Firebase
 import Lottie
+//import GiphyUISDK
+//import GiphyCoreSDK
 
 typealias Runnable = () -> ()
 
@@ -122,7 +124,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     var bottomNavHeight = CGFloat()
     
     private var giphyKey = "KCFi8XVyX2VzniYepciJJnEPUc8H4Hpk"
-    //let giphy = GiphyViewController()
+    let giphy = GiphyViewController()
 
     
     override func viewDidLoad() {
@@ -142,12 +144,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         
         stackDepth = appDelegate.navStack.count
         
-        gifButton.alpha = 0
-        
-        //import GiphyUISDK
-        //import GiphyCoreSDK
-        /*Giphy.configure(apiKey: giphyKey)
-        giphy.layout = .waterfall
+        Giphy.configure(apiKey: giphyKey)
         giphy.mediaTypeConfig = [.gifs, .emoji]
         giphy.rating = .ratedPG13
         giphy.renditionType = .fixedWidth
@@ -155,14 +152,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         giphy.showConfirmationScreen = true
         GiphyViewController.trayHeightMultiplier = 0.7
         
-        if (self.traitCollection.userInterfaceStyle == .dark) {
-            giphy.theme = .dark
-        }
-        else{
-            giphy.theme = .light
-        }
-        
-        giphy.delegate = self*/
+        giphy.delegate = self
         
         self.constraint = NSLayoutConstraint(item: self.secondaryNv, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0.0, constant: 0)
         self.constraint?.isActive = true
@@ -208,6 +198,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         //let gifTap = UITapGestureRecognizer(target: self, action: #selector(gifClicked))
         //gifButton.isUserInteractionEnabled = true
         //gifButton.addGestureRecognizer(gifTap)
+        gifButton.alpha = 0
         
         //self.view.bringSubviewToFront(self.giphy)
         Broadcaster.register(LandingMenuCallbacks.self, observer: self)
@@ -1290,9 +1281,9 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         }
     }
     
-    /*@objc func gifClicked(_ sender: AnyObject?) {
-        present(giphy, animated: true, completion: nil)
-    }*/
+    @objc func gifClicked(_ sender: AnyObject?) {
+        //present(giphy, animated: true, completion: nil)
+    }
     
     @objc func sendMessage(_ sender: AnyObject?) {
         AppEvents.logEvent(AppEvents.Name(rawValue: "Messaging - Send Message"))

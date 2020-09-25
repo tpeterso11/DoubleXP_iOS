@@ -45,9 +45,9 @@ class TeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate {
         teamSearchButton.isUserInteractionEnabled = true
         teamSearchButton.addGestureRecognizer(teamSearchTap)
         
-        createButton.applyGradient(colours:  [#colorLiteral(red: 0.177384913, green: 0.172250092, blue: 0.1810538173, alpha: 1), #colorLiteral(red: 0.4791436791, green: 0.4813652635, blue: 0.4867808223, alpha: 1)], orientation: .horizontal)
-        faDashButton.applyGradient(colours:  [#colorLiteral(red: 0.5893185735, green: 0.04998416454, blue: 0.09506303817, alpha: 1), #colorLiteral(red: 0.715370357, green: 0.04661592096, blue: 0.1113757268, alpha: 1)], orientation: .horizontal)
-        teamSearchButton.applyGradient(colours:  [#colorLiteral(red: 0.177384913, green: 0.172250092, blue: 0.1810538173, alpha: 1), #colorLiteral(red: 0.4791436791, green: 0.4813652635, blue: 0.4867808223, alpha: 1)], orientation: .horizontal)
+        createButton.applyGradient(colours:  [#colorLiteral(red: 0.177384913, green: 0.172250092, blue: 0.1810538173, alpha: 1), #colorLiteral(red: 0.2549019754, green: 0.2745098174, blue: 0.3019607961, alpha: 1), #colorLiteral(red: 0.1774329543, green: 0.1721752286, blue: 0.185343653, alpha: 1)], orientation: .horizontal)
+        faDashButton.applyGradient(colours:  [#colorLiteral(red: 0.177384913, green: 0.172250092, blue: 0.1810538173, alpha: 1), #colorLiteral(red: 0.2549019754, green: 0.2745098174, blue: 0.3019607961, alpha: 1), #colorLiteral(red: 0.177384913, green: 0.172250092, blue: 0.1810538173, alpha: 1)], orientation: .horizontal)
+        teamSearchButton.applyGradient(colours:  [#colorLiteral(red: 0.177384913, green: 0.172250092, blue: 0.1810538173, alpha: 1), #colorLiteral(red: 0.2549019754, green: 0.2745098174, blue: 0.3019607961, alpha: 1), #colorLiteral(red: 0.177384913, green: 0.172250092, blue: 0.1810538173, alpha: 1)], orientation: .horizontal)
         
         //headerView.roundCorners(corners: [.topLeft, .topRight], radius: 25)
         
@@ -171,10 +171,10 @@ class TeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate {
         }
         
         cell.contentView.applyGradient(colours:  [#colorLiteral(red: 0.9491214156, green: 0.9434790015, blue: 0.953458488, alpha: 1), #colorLiteral(red: 0.945284307, green: 0.9604713321, blue: 0.9703486562, alpha: 1)], orientation: .horizontal)
-            /*cell.contentView.layer.cornerRadius = 20.0
+        cell.contentView.layer.cornerRadius = 20.0
         cell.contentView.layer.borderWidth = 1.0
         cell.contentView.layer.borderColor = UIColor.clear.cgColor
-        cell.contentView.layer.masksToBounds = true*/
+        cell.contentView.layer.masksToBounds = true
         
         cell.layer.shadowColor = UIColor.black.cgColor
         cell.layer.shadowOffset = CGSize(width: cell.bounds.width + 20, height: cell.bounds.height + 20)

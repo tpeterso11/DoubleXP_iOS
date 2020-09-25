@@ -8,8 +8,9 @@
 
 import Foundation
 import UIKit
+import CollectionViewSlantedLayout
 
-class EpisodeCell: UICollectionViewCell {
+class EpisodeCell: CollectionViewSlantedCell {
     @IBOutlet weak var background: UIImageView!
     @IBOutlet weak var forgetEpisode: UIImageView!
     @IBOutlet weak var sub: UILabel!

@@ -250,7 +250,8 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
     }
     
     @objc func registerClicked(_ sender: AnyObject?) {
-        self.performSegue(withIdentifier: "register", sender: nil)
+        //self.performSegue(withIdentifier: "register", sender: nil)newReg
+        self.performSegue(withIdentifier: "newReg", sender: nil)
     }
     
     private func display(alertController: UIAlertController){

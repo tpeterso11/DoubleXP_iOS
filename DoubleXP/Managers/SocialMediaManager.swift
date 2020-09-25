@@ -8,7 +8,6 @@
 
 import Foundation
 import UIKit
-import SwiftTwitch
 import SwiftHTTP
 import Firebase
 import FBSDKLoginKit
@@ -566,7 +565,7 @@ class SocialMediaManager{
         }
     }*/
     
-    func getChannelTopVideos(currentChannel: TwitchChannelObj, callbacks: SocialMediaManagerCallback){
+    /*func getChannelTopVideos(currentChannel: TwitchChannelObj, callbacks: SocialMediaManagerCallback){
         if(!token.isEmpty){
             var streams = [TwitchStreamObject]()
             TwitchTokenManager.shared.accessToken = token
@@ -593,7 +592,7 @@ class SocialMediaManager{
                 }
             })
         }
-    }
+    }*/
 }
 
 

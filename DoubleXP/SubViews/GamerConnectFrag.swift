@@ -13,8 +13,8 @@ import MSPeekCollectionViewDelegateImplementation
 import FBSDKCoreKit
 import VideoBackground
 import MSPeekCollectionViewDelegateImplementation
-import CountdownLabel
 import SwiftNotificationCenter
+import CollectionViewSlantedLayout
 
 class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout,
 UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
@@ -80,6 +80,8 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
         }
         
         gcGames = list
+        
+        self.recommendedUsers.collectionViewLayout = CollectionViewSlantedLayout()
         
         NotificationCenter.default.addObserver(
             forName: UIWindow.didBecomeKeyNotification,
@@ -180,13 +182,13 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
 
         secondaryPayload.append(contentsOf: appDelegate.competitions)
         
-        let userOne = RecommendedUser(gamerTag: "allthesaints011", uid: "HMv30El7nmWXPEnriV3irMsnS3V2")
+        //let userOne = RecommendedUser(gamerTag: "allthesaints011", uid: "HMv30El7nmWXPEnriV3irMsnS3V2")
         //let userTwo = RecommendedUser(gamerTag: "fitboy_", uid: "oFdx8UequuOs77s8daWFifODVhJ3")
-        let userThree = RecommendedUser(gamerTag: "Kwatakye Raven", uid: "N1k1BqmvEvdOXrbmi2p91kTNLOo1")
+        //let userThree = RecommendedUser(gamerTag: "Kwatakye Raven", uid: "N1k1BqmvEvdOXrbmi2p91kTNLOo1")
         
-        secondaryPayload.append(userOne)
+        //secondaryPayload.append(userOne)
         //secondaryPayload.append(userTwo)
-        secondaryPayload.append(userThree)
+        //secondaryPayload.append(userThree)
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -238,10 +240,12 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
                 cell.announcementGame.text = (current as! AnnouncementObj).announcementGames[0]
                 cell.announcementTitle.text = (current as! AnnouncementObj).announcementTitle
                 
-                cell.contentView.layer.cornerRadius = 10.0
+                cell.announcementTitle.rotate(degrees: CGFloat(-12))
+                cell.announcementGame.rotate(degrees: CGFloat(-12))
+                /*cell.contentView.layer.cornerRadius = 10.0
                 cell.contentView.layer.borderWidth = 1.0
                 cell.contentView.layer.borderColor = UIColor.clear.cgColor
-                cell.contentView.layer.masksToBounds = true
+                cell.contentView.layer.masksToBounds = true*/
                 
                 cell.tag = indexPath.item
                 
@@ -287,23 +291,13 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
                 
                 cell.gameName.text = currentObj.game
                 
-                if((current as! UpcomingGame).releaseDate != "TBD"){
-                    let dateFormatter = DateFormatter()
-                    dateFormatter.dateFormat = "MM/dd/yyyy"
-                    
-                    var localTimeZoneAbbreviation: String { return TimeZone.current.abbreviation() ?? "" }
-                    dateFormatter.timeZone = NSTimeZone(name: localTimeZoneAbbreviation) as TimeZone?
-                    let releaseDate = dateFormatter.date(from:currentObj.releaseDate)!
-                    
-                    timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(UpdateTime), userInfo: ["date": releaseDate as NSDate, "view": cell.gameCountdown], repeats: true)
-                } else {
-                    cell.gameCountdown.text = (current as! UpcomingGame).releaseDateProper
-                }
+                cell.gameName.rotate(degrees: CGFloat(-12))
+                cell.cellHeader.rotate(degrees: CGFloat(-12))
                 
-                cell.contentView.layer.cornerRadius = 10.0
+                /*cell.contentView.layer.cornerRadius = 10.0
                 cell.contentView.layer.borderWidth = 1.0
                 cell.contentView.layer.borderColor = UIColor.clear.cgColor
-                cell.contentView.layer.masksToBounds = true
+                cell.contentView.layer.masksToBounds = true*/
                 
                 cell.layer.shadowColor = UIColor.black.cgColor
                 cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
@@ -342,11 +336,13 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
                 
                 cell.title.text = currentObj.name
                 cell.sub.text = currentObj.sub
+                cell.title.rotate(degrees: CGFloat(-12))
+                cell.sub.rotate(degrees: CGFloat(-12))
                 
-                cell.contentView.layer.cornerRadius = 10.0
+                /*cell.contentView.layer.cornerRadius = 10.0
                 cell.contentView.layer.borderWidth = 1.0
                 cell.contentView.layer.borderColor = UIColor.clear.cgColor
-                cell.contentView.layer.masksToBounds = true
+                cell.contentView.layer.masksToBounds = true*/
                 
                 cell.layer.shadowColor = UIColor.black.cgColor
                 cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
@@ -384,10 +380,10 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
                     (current as! CompetitionObj).videoPlayed = true
                 }
                 
-                cell.contentView.layer.cornerRadius = 10.0
+                /*cell.contentView.layer.cornerRadius = 10.0
                 cell.contentView.layer.borderWidth = 1.0
                 cell.contentView.layer.borderColor = UIColor.clear.cgColor
-                cell.contentView.layer.masksToBounds = true
+                cell.contentView.layer.masksToBounds = true*/
                 
                 cell.layer.shadowColor = UIColor.black.cgColor
                 cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
@@ -820,5 +816,15 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
                 self.announcementLayout.alpha = 0
             }, completion: nil)
         })
+    }
+}
+
+extension UIView {
+    func rotate(degrees: CGFloat) {
+        rotate(radians: CGFloat.pi * degrees / 180.0)
+    }
+
+    func rotate(radians: CGFloat) {
+        self.transform = CGAffineTransform(rotationAngle: radians)
     }
 }

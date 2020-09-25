@@ -10,6 +10,7 @@
 #endif
 #endif
 
+#import "UnderLineTextField 2.h"
 #import "UnderLineTextField.h"
 
 FOUNDATION_EXPORT double UnderLineTextFieldVersionNumber;

@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		10631A03541DDFBBBF45B91E /* Pods_DoubleXPTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7FBD397045996E190590EAE /* Pods_DoubleXPTests.framework */; };
 		2DE540DC246495930053C57A /* TwitterHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE540DB246495930053C57A /* TwitterHelper.swift */; };
 		3008EE782267F89800E0D9ED /* NewsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3008EE772267F89800E0D9ED /* NewsCell.swift */; };
 		301AEF4C23885B2F00339850 /* MessagingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301AEF4B23885B2F00339850 /* MessagingManager.swift */; };
@@ -94,6 +93,7 @@
 		305D8F0E23DFD03D007D0991 /* TestPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 305D8F0D23DFD03D007D0991 /* TestPlayer.swift */; };
 		305D8F1023DFE605007D0991 /* live.png in Resources */ = {isa = PBXBuildFile; fileRef = 305D8F0F23DFE605007D0991 /* live.png */; };
 		305DA86F2400BE94002ED813 /* stop.png in Resources */ = {isa = PBXBuildFile; fileRef = 305DA86E2400BE94002ED813 /* stop.png */; };
+		305FD948251AE0CC00D6B565 /* SpinnerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 305FD947251AE0CC00D6B565 /* SpinnerCell.swift */; };
 		30634D5424055E6900FEAD40 /* tower_white.png in Resources */ = {isa = PBXBuildFile; fileRef = 30634D5224055E6900FEAD40 /* tower_white.png */; };
 		30634D5524055E6900FEAD40 /* tower_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 30634D5324055E6900FEAD40 /* tower_dark.png */; };
 		30634D57240563EB00FEAD40 /* MediaFrag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30634D56240563EB00FEAD40 /* MediaFrag.swift */; };
@@ -118,6 +118,8 @@
 		3063C6CC25083FDF00DBB22C /* LoginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3063C6CB25083FDF00DBB22C /* LoginManager.swift */; };
 		3063C6CE2508658000DBB22C /* dxp_disc_dark_boom.png in Resources */ = {isa = PBXBuildFile; fileRef = 3063C6CD2508658000DBB22C /* dxp_disc_dark_boom.png */; };
 		3063C6D02508666D00DBB22C /* dxp_disc_light_boom.png in Resources */ = {isa = PBXBuildFile; fileRef = 3063C6CF2508666D00DBB22C /* dxp_disc_light_boom.png */; };
+		3064299125169CBC0023F38D /* 13642-confetti.json in Resources */ = {isa = PBXBuildFile; fileRef = 3064299025169CBC0023F38D /* 13642-confetti.json */; };
+		306429932516D19E0023F38D /* boom.json in Resources */ = {isa = PBXBuildFile; fileRef = 306429922516D19D0023F38D /* boom.json */; };
 		306450722457ACE400B8B50E /* friendship.png in Resources */ = {isa = PBXBuildFile; fileRef = 306450712457ACE300B8B50E /* friendship.png */; };
 		306450742457ACF400B8B50E /* friendship (1).png in Resources */ = {isa = PBXBuildFile; fileRef = 306450732457ACF400B8B50E /* friendship (1).png */; };
 		3064507A245DF62800B8B50E /* new_logo2_light.png in Resources */ = {isa = PBXBuildFile; fileRef = 30645079245DF62800B8B50E /* new_logo2_light.png */; };
@@ -230,6 +232,8 @@
 		3091E39124E77C4800468557 /* UpcomingGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3091E39024E77C4800468557 /* UpcomingGame.swift */; };
 		3091E39324E7885C00468557 /* UpcomingGameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3091E39224E7885C00468557 /* UpcomingGameCell.swift */; };
 		3091E39724E8588700468557 /* UpcomingTrailerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3091E39624E8588700468557 /* UpcomingTrailerCell.swift */; };
+		3092E67B2516969D00E8FE08 /* GCRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3092E67A2516969D00E8FE08 /* GCRegistration.swift */; };
+		3092E67D2516985200E8FE08 /* 18353-confetti-celebration.json in Resources */ = {isa = PBXBuildFile; fileRef = 3092E67C2516985200E8FE08 /* 18353-confetti-celebration.json */; };
 		3095CBCD2455F2BC001C19E7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3095CBCC2455F2BC001C19E7 /* GoogleService-Info.plist */; };
 		309A38B5244EA15000B4FF35 /* division_new_logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 309A38B4244EA15000B4FF35 /* division_new_logo.png */; };
 		309A38B7244EA3CD00B4FF35 /* division_new_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 309A38B6244EA3CD00B4FF35 /* division_new_dark.png */; };
@@ -320,11 +324,20 @@
 		30C4EDB32267C1890046B615 /* doublexp_white.png in Resources */ = {isa = PBXBuildFile; fileRef = 30C4EDAF2267C1890046B615 /* doublexp_white.png */; };
 		30C4EDB42267C1890046B615 /* team_thumbs_up.png in Resources */ = {isa = PBXBuildFile; fileRef = 30C4EDB02267C1890046B615 /* team_thumbs_up.png */; };
 		30C4EDB52267C1890046B615 /* vintage_tv.png in Resources */ = {isa = PBXBuildFile; fileRef = 30C4EDB12267C1890046B615 /* vintage_tv.png */; };
+		30D60CE1251C07E500C914EF /* GCGameController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30D60CE0251C07E500C914EF /* GCGameController.swift */; };
 		30E0B1D5249588CE007F0B9B /* QuizOptionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E0B1D4249588CE007F0B9B /* QuizOptionCell.swift */; };
 		30E0B1D724958FF3007F0B9B /* QuizOptionPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E0B1D624958FF3007F0B9B /* QuizOptionPage.swift */; };
 		30E0B1D92495AC04007F0B9B /* AnswerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E0B1D82495AC04007F0B9B /* AnswerCell.swift */; };
 		30E0B1DB249C60E1007F0B9B /* OptionAnswerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E0B1DA249C60E0007F0B9B /* OptionAnswerCell.swift */; };
 		30E0B1DD249C6658007F0B9B /* OptionCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E0B1DC249C6658007F0B9B /* OptionCollectionCell.swift */; };
+		30E4BE8825179D9000754921 /* nintendo-switch.png in Resources */ = {isa = PBXBuildFile; fileRef = 30E4BE8725179D8F00754921 /* nintendo-switch.png */; };
+		30E4BE8A25179FAF00754921 /* buttons.png in Resources */ = {isa = PBXBuildFile; fileRef = 30E4BE8925179FAE00754921 /* buttons.png */; };
+		30E4BE8C2517A1AC00754921 /* click.png in Resources */ = {isa = PBXBuildFile; fileRef = 30E4BE8B2517A1AB00754921 /* click.png */; };
+		30E4BE8E2517A1B600754921 /* smartphone.png in Resources */ = {isa = PBXBuildFile; fileRef = 30E4BE8D2517A1B500754921 /* smartphone.png */; };
+		30E4BE902517A1BF00754921 /* xbox-buttons-set.png in Resources */ = {isa = PBXBuildFile; fileRef = 30E4BE8F2517A1BE00754921 /* xbox-buttons-set.png */; };
+		30E4BE9225182A3300754921 /* 11887-ios-tick-burst.json in Resources */ = {isa = PBXBuildFile; fileRef = 30E4BE9125182A3200754921 /* 11887-ios-tick-burst.json */; };
+		30E4BE9425182B0C00754921 /* NewRegGameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E4BE9325182B0C00754921 /* NewRegGameCell.swift */; };
+		30E4BE962518382F00754921 /* 13816-confirmation-animation.json in Resources */ = {isa = PBXBuildFile; fileRef = 30E4BE952518382F00754921 /* 13816-confirmation-animation.json */; };
 		30E8CC7F248532F500B1BE98 /* apple (2).png in Resources */ = {isa = PBXBuildFile; fileRef = 30E8CC7E248532F500B1BE98 /* apple (2).png */; };
 		30E8CC812485551F00B1BE98 /* dxp_circle.png in Resources */ = {isa = PBXBuildFile; fileRef = 30E8CC802485551F00B1BE98 /* dxp_circle.png */; };
 		30E8CC832487315800B1BE98 /* ProfileStatHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E8CC822487315800B1BE98 /* ProfileStatHeader.swift */; };
@@ -354,6 +367,7 @@
 		30FC34C123E7DAE8007F0080 /* settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 30FC34C023E7DAE8007F0080 /* settings.png */; };
 		30FC34C323E914CA007F0080 /* MenuHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FC34C223E914CA007F0080 /* MenuHeaderCell.swift */; };
 		30FC34C723E927BE007F0080 /* MenuSettingsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FC34C623E927BE007F0080 /* MenuSettingsCell.swift */; };
+		398E99D7454D231296D6F804 /* Pods_DoubleXPTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 609C098C47EE24F3E230CA55 /* Pods_DoubleXPTests.framework */; };
 		48343FFE2465CE580034CF12 /* envelope.png in Resources */ = {isa = PBXBuildFile; fileRef = 48343FF92465CE570034CF12 /* envelope.png */; };
 		48343FFF2465CE580034CF12 /* star.png in Resources */ = {isa = PBXBuildFile; fileRef = 48343FFA2465CE570034CF12 /* star.png */; };
 		483440002465CE580034CF12 /* restaurant-membership-card-tool.png in Resources */ = {isa = PBXBuildFile; fileRef = 48343FFB2465CE570034CF12 /* restaurant-membership-card-tool.png */; };
@@ -372,8 +386,8 @@
 		4CC1720122677EF9009A1B80 /* test_banner.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CC1720022677EF8009A1B80 /* test_banner.png */; };
 		4CC1720322677FA5009A1B80 /* LandingActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC1720222677FA5009A1B80 /* LandingActivity.swift */; };
 		4CC17206226781DF009A1B80 /* NewsObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC17205226781DF009A1B80 /* NewsObject.swift */; };
-		CE992EE2BE093A8E429F315A /* Pods_DoubleXP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B12E95FE068027907E12E643 /* Pods_DoubleXP.framework */; };
-		E441A94D04DE68F871A0C327 /* Pods_DoubleXPUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C7CFB9288BBA886025B93A8 /* Pods_DoubleXPUITests.framework */; };
+		6D7B0B638FBC317FE5CDBC9E /* Pods_DoubleXP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 09E7E0F729FB0D9061A49A71 /* Pods_DoubleXP.framework */; };
+		FA32F546083E642F57388D0E /* Pods_DoubleXPUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9FAAECDE0CE784E9DC1D892A /* Pods_DoubleXPUITests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -407,7 +421,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0C5F4B174A53C96A2BCFB001 /* Pods-DoubleXPUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXPUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-DoubleXPUITests/Pods-DoubleXPUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		09E7E0F729FB0D9061A49A71 /* Pods_DoubleXP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DoubleXP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE540DB246495930053C57A /* TwitterHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwitterHelper.swift; sourceTree = "<group>"; };
 		3008EE772267F89800E0D9ED /* NewsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsCell.swift; sourceTree = "<group>"; };
 		301AEF4B23885B2F00339850 /* MessagingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagingManager.swift; sourceTree = "<group>"; };
@@ -495,6 +509,7 @@
 		305D8F0D23DFD03D007D0991 /* TestPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestPlayer.swift; sourceTree = "<group>"; };
 		305D8F0F23DFE605007D0991 /* live.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = live.png; sourceTree = "<group>"; };
 		305DA86E2400BE94002ED813 /* stop.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stop.png; sourceTree = "<group>"; };
+		305FD947251AE0CC00D6B565 /* SpinnerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerCell.swift; sourceTree = "<group>"; };
 		30634D5224055E6900FEAD40 /* tower_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tower_white.png; sourceTree = "<group>"; };
 		30634D5324055E6900FEAD40 /* tower_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tower_dark.png; sourceTree = "<group>"; };
 		30634D56240563EB00FEAD40 /* MediaFrag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaFrag.swift; sourceTree = "<group>"; };
@@ -519,6 +534,8 @@
 		3063C6CB25083FDF00DBB22C /* LoginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginManager.swift; sourceTree = "<group>"; };
 		3063C6CD2508658000DBB22C /* dxp_disc_dark_boom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dxp_disc_dark_boom.png; sourceTree = "<group>"; };
 		3063C6CF2508666D00DBB22C /* dxp_disc_light_boom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dxp_disc_light_boom.png; sourceTree = "<group>"; };
+		3064299025169CBC0023F38D /* 13642-confetti.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "13642-confetti.json"; sourceTree = "<group>"; };
+		306429922516D19D0023F38D /* boom.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = boom.json; sourceTree = "<group>"; };
 		306450712457ACE300B8B50E /* friendship.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = friendship.png; sourceTree = "<group>"; };
 		306450732457ACF400B8B50E /* friendship (1).png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "friendship (1).png"; sourceTree = "<group>"; };
 		30645079245DF62800B8B50E /* new_logo2_light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = new_logo2_light.png; sourceTree = "<group>"; };
@@ -631,6 +648,8 @@
 		3091E39024E77C4800468557 /* UpcomingGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpcomingGame.swift; sourceTree = "<group>"; };
 		3091E39224E7885C00468557 /* UpcomingGameCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpcomingGameCell.swift; sourceTree = "<group>"; };
 		3091E39624E8588700468557 /* UpcomingTrailerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpcomingTrailerCell.swift; sourceTree = "<group>"; };
+		3092E67A2516969D00E8FE08 /* GCRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCRegistration.swift; sourceTree = "<group>"; };
+		3092E67C2516985200E8FE08 /* 18353-confetti-celebration.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "18353-confetti-celebration.json"; sourceTree = "<group>"; };
 		3095CBCC2455F2BC001C19E7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		309A38B4244EA15000B4FF35 /* division_new_logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = division_new_logo.png; sourceTree = "<group>"; };
 		309A38B6244EA3CD00B4FF35 /* division_new_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = division_new_dark.png; sourceTree = "<group>"; };
@@ -721,11 +740,20 @@
 		30C4EDAF2267C1890046B615 /* doublexp_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = doublexp_white.png; sourceTree = "<group>"; };
 		30C4EDB02267C1890046B615 /* team_thumbs_up.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = team_thumbs_up.png; sourceTree = "<group>"; };
 		30C4EDB12267C1890046B615 /* vintage_tv.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = vintage_tv.png; sourceTree = "<group>"; };
+		30D60CE0251C07E500C914EF /* GCGameController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCGameController.swift; sourceTree = "<group>"; };
 		30E0B1D4249588CE007F0B9B /* QuizOptionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizOptionCell.swift; sourceTree = "<group>"; };
 		30E0B1D624958FF3007F0B9B /* QuizOptionPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizOptionPage.swift; sourceTree = "<group>"; };
 		30E0B1D82495AC04007F0B9B /* AnswerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerCell.swift; sourceTree = "<group>"; };
 		30E0B1DA249C60E0007F0B9B /* OptionAnswerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionAnswerCell.swift; sourceTree = "<group>"; };
 		30E0B1DC249C6658007F0B9B /* OptionCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionCollectionCell.swift; sourceTree = "<group>"; };
+		30E4BE8725179D8F00754921 /* nintendo-switch.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "nintendo-switch.png"; sourceTree = "<group>"; };
+		30E4BE8925179FAE00754921 /* buttons.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = buttons.png; sourceTree = "<group>"; };
+		30E4BE8B2517A1AB00754921 /* click.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = click.png; sourceTree = "<group>"; };
+		30E4BE8D2517A1B500754921 /* smartphone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = smartphone.png; sourceTree = "<group>"; };
+		30E4BE8F2517A1BE00754921 /* xbox-buttons-set.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "xbox-buttons-set.png"; sourceTree = "<group>"; };
+		30E4BE9125182A3200754921 /* 11887-ios-tick-burst.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "11887-ios-tick-burst.json"; sourceTree = "<group>"; };
+		30E4BE9325182B0C00754921 /* NewRegGameCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewRegGameCell.swift; sourceTree = "<group>"; };
+		30E4BE952518382F00754921 /* 13816-confirmation-animation.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "13816-confirmation-animation.json"; sourceTree = "<group>"; };
 		30E8CC7E248532F500B1BE98 /* apple (2).png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "apple (2).png"; sourceTree = "<group>"; };
 		30E8CC802485551F00B1BE98 /* dxp_circle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dxp_circle.png; sourceTree = "<group>"; };
 		30E8CC822487315800B1BE98 /* ProfileStatHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStatHeader.swift; sourceTree = "<group>"; };
@@ -779,14 +807,14 @@
 		4CC1720022677EF8009A1B80 /* test_banner.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = test_banner.png; sourceTree = "<group>"; };
 		4CC1720222677FA5009A1B80 /* LandingActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingActivity.swift; sourceTree = "<group>"; };
 		4CC17205226781DF009A1B80 /* NewsObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsObject.swift; sourceTree = "<group>"; };
-		9C7CFB9288BBA886025B93A8 /* Pods_DoubleXPUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DoubleXPUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		B12E95FE068027907E12E643 /* Pods_DoubleXP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DoubleXP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		B9ADA8C4012D66B1172D0841 /* Pods-DoubleXPUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXPUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-DoubleXPUITests/Pods-DoubleXPUITests.release.xcconfig"; sourceTree = "<group>"; };
-		C7FBD397045996E190590EAE /* Pods_DoubleXPTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DoubleXPTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D9D38A77BAFC04AF72FFB04A /* Pods-DoubleXPTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXPTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-DoubleXPTests/Pods-DoubleXPTests.release.xcconfig"; sourceTree = "<group>"; };
-		E3B486C87263366FEEE070C1 /* Pods-DoubleXP.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXP.debug.xcconfig"; path = "Pods/Target Support Files/Pods-DoubleXP/Pods-DoubleXP.debug.xcconfig"; sourceTree = "<group>"; };
-		F4C44CD59F7DCAC7A7E5BF4B /* Pods-DoubleXP.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXP.release.xcconfig"; path = "Pods/Target Support Files/Pods-DoubleXP/Pods-DoubleXP.release.xcconfig"; sourceTree = "<group>"; };
-		FD166A6221BC503E0FEE9C4C /* Pods-DoubleXPTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXPTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-DoubleXPTests/Pods-DoubleXPTests.debug.xcconfig"; sourceTree = "<group>"; };
+		598D7D36F87EC06EBE670B2A /* Pods-DoubleXPTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXPTests.debug.xcconfig"; path = "Target Support Files/Pods-DoubleXPTests/Pods-DoubleXPTests.debug.xcconfig"; sourceTree = "<group>"; };
+		609C098C47EE24F3E230CA55 /* Pods_DoubleXPTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DoubleXPTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		67827A7F41E3C1749D933912 /* Pods-DoubleXP.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXP.release.xcconfig"; path = "Target Support Files/Pods-DoubleXP/Pods-DoubleXP.release.xcconfig"; sourceTree = "<group>"; };
+		6E03CA40D159A0E28E87C94F /* Pods-DoubleXP.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXP.debug.xcconfig"; path = "Target Support Files/Pods-DoubleXP/Pods-DoubleXP.debug.xcconfig"; sourceTree = "<group>"; };
+		984DCF812FDC534816B6F633 /* Pods-DoubleXPTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXPTests.release.xcconfig"; path = "Target Support Files/Pods-DoubleXPTests/Pods-DoubleXPTests.release.xcconfig"; sourceTree = "<group>"; };
+		9FAAECDE0CE784E9DC1D892A /* Pods_DoubleXPUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DoubleXPUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1DC7160C788F41DE7E12E07 /* Pods-DoubleXPUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXPUITests.debug.xcconfig"; path = "Target Support Files/Pods-DoubleXPUITests/Pods-DoubleXPUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		CCE6FC77ED2DA6FB67642F78 /* Pods-DoubleXPUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXPUITests.release.xcconfig"; path = "Target Support Files/Pods-DoubleXPUITests/Pods-DoubleXPUITests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -794,7 +822,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CE992EE2BE093A8E429F315A /* Pods_DoubleXP.framework in Frameworks */,
+				6D7B0B638FBC317FE5CDBC9E /* Pods_DoubleXP.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -802,7 +830,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				10631A03541DDFBBBF45B91E /* Pods_DoubleXPTests.framework in Frameworks */,
+				398E99D7454D231296D6F804 /* Pods_DoubleXPTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -810,13 +838,23 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E441A94D04DE68F871A0C327 /* Pods_DoubleXPUITests.framework in Frameworks */,
+				FA32F546083E642F57388D0E /* Pods_DoubleXPUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		07350CACB98919027D381245 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				09E7E0F729FB0D9061A49A71 /* Pods_DoubleXP.framework */,
+				609C098C47EE24F3E230CA55 /* Pods_DoubleXPTests.framework */,
+				9FAAECDE0CE784E9DC1D892A /* Pods_DoubleXPUITests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		304E17F1242FF250009BE1C0 /* Json */ = {
 			isa = PBXGroup;
 			children = (
@@ -824,10 +862,15 @@
 				304E17F4242FFCE3009BE1C0 /* lf30_editor_JRIPtN.json */,
 				304E17F6243000DB009BE1C0 /* lf30_editor_HxosFZ.json */,
 				304E17F824300B30009BE1C0 /* data.json */,
+				306429922516D19D0023F38D /* boom.json */,
 				304E17F2242FFA3A009BE1C0 /* lf20_XsNu5S.json */,
 				304E17FE2430F098009BE1C0 /* lf30_editor_ISR839.json */,
 				306793D0244810A9005158B2 /* live_video.json */,
+				3064299025169CBC0023F38D /* 13642-confetti.json */,
+				3092E67C2516985200E8FE08 /* 18353-confetti-celebration.json */,
+				30E4BE9125182A3200754921 /* 11887-ios-tick-burst.json */,
 				3067A40624D63216006945E6 /* scoob.json */,
+				30E4BE952518382F00754921 /* 13816-confirmation-animation.json */,
 				30591EB3243EA3FD004E54F4 /* lf20_OkHuIu.json */,
 			);
 			path = Json;
@@ -1002,6 +1045,9 @@
 				3091E39224E7885C00468557 /* UpcomingGameCell.swift */,
 				3091E39624E8588700468557 /* UpcomingTrailerCell.swift */,
 				3063C6C925083B1B00DBB22C /* EpisodeCell.swift */,
+				30E4BE9325182B0C00754921 /* NewRegGameCell.swift */,
+				305FD947251AE0CC00D6B565 /* SpinnerCell.swift */,
+				30D60CE0251C07E500C914EF /* GCGameController.swift */,
 			);
 			path = CustomView;
 			sourceTree = "<group>";
@@ -1013,8 +1059,8 @@
 				4C4D883A2205F33200AD7090 /* DoubleXPTests */,
 				4C4D88452205F33300AD7090 /* DoubleXPUITests */,
 				4C4D88212205F32900AD7090 /* Products */,
-				A14168B0B16CCE5F642C1081 /* Pods */,
-				D099DAD2231C0465397013A6 /* Frameworks */,
+				EA0A069EB519AB84D180FC9F /* Pods */,
+				07350CACB98919027D381245 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1058,6 +1104,7 @@
 				303F2D3F2372883E004B68E1 /* NavigationPageController.swift */,
 				30B6E19623AC13BE00B69F00 /* QuizNavigationController.swift */,
 				309F3A0C23B3EFBF00FD0C48 /* Utility.swift */,
+				3092E67A2516969D00E8FE08 /* GCRegistration.swift */,
 			);
 			path = DoubleXP;
 			sourceTree = "<group>";
@@ -1083,6 +1130,11 @@
 		4CB84C432205F74800183D28 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				30E4BE8725179D8F00754921 /* nintendo-switch.png */,
+				30E4BE8F2517A1BE00754921 /* xbox-buttons-set.png */,
+				30E4BE8925179FAE00754921 /* buttons.png */,
+				30E4BE8B2517A1AB00754921 /* click.png */,
+				30E4BE8D2517A1B500754921 /* smartphone.png */,
 				3063C6CF2508666D00DBB22C /* dxp_disc_light_boom.png */,
 				3063C6CD2508658000DBB22C /* dxp_disc_dark_boom.png */,
 				308C0A8524E2212D00C2027C /* phone-white.png */,
@@ -1284,27 +1336,18 @@
 			path = Object;
 			sourceTree = "<group>";
 		};
-		A14168B0B16CCE5F642C1081 /* Pods */ = {
+		EA0A069EB519AB84D180FC9F /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				E3B486C87263366FEEE070C1 /* Pods-DoubleXP.debug.xcconfig */,
-				F4C44CD59F7DCAC7A7E5BF4B /* Pods-DoubleXP.release.xcconfig */,
-				FD166A6221BC503E0FEE9C4C /* Pods-DoubleXPTests.debug.xcconfig */,
-				D9D38A77BAFC04AF72FFB04A /* Pods-DoubleXPTests.release.xcconfig */,
-				0C5F4B174A53C96A2BCFB001 /* Pods-DoubleXPUITests.debug.xcconfig */,
-				B9ADA8C4012D66B1172D0841 /* Pods-DoubleXPUITests.release.xcconfig */,
+				6E03CA40D159A0E28E87C94F /* Pods-DoubleXP.debug.xcconfig */,
+				67827A7F41E3C1749D933912 /* Pods-DoubleXP.release.xcconfig */,
+				598D7D36F87EC06EBE670B2A /* Pods-DoubleXPTests.debug.xcconfig */,
+				984DCF812FDC534816B6F633 /* Pods-DoubleXPTests.release.xcconfig */,
+				A1DC7160C788F41DE7E12E07 /* Pods-DoubleXPUITests.debug.xcconfig */,
+				CCE6FC77ED2DA6FB67642F78 /* Pods-DoubleXPUITests.release.xcconfig */,
 			);
 			name = Pods;
-			sourceTree = "<group>";
-		};
-		D099DAD2231C0465397013A6 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				B12E95FE068027907E12E643 /* Pods_DoubleXP.framework */,
-				C7FBD397045996E190590EAE /* Pods_DoubleXPTests.framework */,
-				9C7CFB9288BBA886025B93A8 /* Pods_DoubleXPUITests.framework */,
-			);
-			name = Frameworks;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1314,13 +1357,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4C4D884B2205F33300AD7090 /* Build configuration list for PBXNativeTarget "DoubleXP" */;
 			buildPhases = (
-				AF9325A7AA564901A37B30F0 /* [CP] Check Pods Manifest.lock */,
+				5066E1702B0465B7DA7014DA /* [CP] Check Pods Manifest.lock */,
 				4C4D881C2205F32900AD7090 /* Sources */,
 				4C4D881D2205F32900AD7090 /* Frameworks */,
 				4C4D881E2205F32900AD7090 /* Resources */,
-				76084E605E46D4237B0B5091 /* [CP] Embed Pods Frameworks */,
-				0CEA5B16247F8ECA417CBD97 /* [CP] Copy Pods Resources */,
 				2D10C867246331FC00AFB350 /* Embed Frameworks */,
+				20526186DDDD5E9F22DD5A73 /* [CP] Embed Pods Frameworks */,
+				87E9CA7AFBDE9ECB29BE2B18 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1335,7 +1378,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4C4D884E2205F33300AD7090 /* Build configuration list for PBXNativeTarget "DoubleXPTests" */;
 			buildPhases = (
-				C53321FC86C03B8BBAA9663A /* [CP] Check Pods Manifest.lock */,
+				0B5636DDA4F998748C0E8424 /* [CP] Check Pods Manifest.lock */,
 				4C4D88332205F33200AD7090 /* Sources */,
 				4C4D88342205F33200AD7090 /* Frameworks */,
 				4C4D88352205F33200AD7090 /* Resources */,
@@ -1354,7 +1397,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4C4D88512205F33300AD7090 /* Build configuration list for PBXNativeTarget "DoubleXPUITests" */;
 			buildPhases = (
-				CE65845BB9E527955A97B36C /* [CP] Check Pods Manifest.lock */,
+				24632683EFCB17192A55A74C /* [CP] Check Pods Manifest.lock */,
 				4C4D883E2205F33300AD7090 /* Sources */,
 				4C4D883F2205F33300AD7090 /* Frameworks */,
 				4C4D88402205F33300AD7090 /* Resources */,
@@ -1420,16 +1463,20 @@
 			files = (
 				30B6E1A123ADBD8C00B69F00 /* game_over_PNG15.png in Resources */,
 				306793D5244B373B005158B2 /* game-controller.png in Resources */,
+				306429932516D19E0023F38D /* boom.json in Resources */,
 				305B520D2415D76F0064B605 /* expand_black.png in Resources */,
 				30781C972428261D00C5D886 /* email (1).png in Resources */,
 				3063C6D02508666D00DBB22C /* dxp_disc_light_boom.png in Resources */,
 				30C4EDB32267C1890046B615 /* doublexp_white.png in Resources */,
 				30634D732407219C00FEAD40 /* unknown_badge.png in Resources */,
 				30F6FCBC23CC02AD0051813D /* cross.png in Resources */,
+				30E4BE902517A1BF00754921 /* xbox-buttons-set.png in Resources */,
 				3080B40623BC089E00638B22 /* check.png in Resources */,
+				30E4BE962518382F00754921 /* 13816-confirmation-animation.json in Resources */,
 				48343FFF2465CE580034CF12 /* star.png in Resources */,
 				30F6FCC023CD7F9D0051813D /* open-menu.png in Resources */,
 				30E8CC812485551F00B1BE98 /* dxp_circle.png in Resources */,
+				30E4BE8A25179FAF00754921 /* buttons.png in Resources */,
 				305B520124144EAB0064B605 /* close.png in Resources */,
 				305821192454BB6000B76E67 /* basketball-jersey.png in Resources */,
 				305B52072415C2AF0064B605 /* expand_white.png in Resources */,
@@ -1447,6 +1494,7 @@
 				305B51FD240C9B760064B605 /* edit_white.png in Resources */,
 				30E8CC7F248532F500B1BE98 /* apple (2).png in Resources */,
 				3058211524525C8C00B76E67 /* 18th-map.png in Resources */,
+				30E4BE8825179D9000754921 /* nintendo-switch.png in Resources */,
 				30A84DF22381E877007BEAA5 /* plus-symbol-in-a-rounded-black-square.png in Resources */,
 				30A519912409700000DCFC77 /* white_pixelated_heart.png in Resources */,
 				309A38B924500FAB00B4FF35 /* google-logo-png-open-2000.png in Resources */,
@@ -1460,6 +1508,7 @@
 				308C0A8424E2209300C2027C /* phone.png in Resources */,
 				3059E62F2432BFF80052E46F /* cogs (1).png in Resources */,
 				3080B3E823B81B5B00638B22 /* messaging_button.png in Resources */,
+				30E4BE8C2517A1AC00754921 /* click.png in Resources */,
 				304E17F7243000DC009BE1C0 /* lf30_editor_HxosFZ.json in Resources */,
 				306793D3244B3733005158B2 /* game-controller (1).png in Resources */,
 				309A38B5244EA15000B4FF35 /* division_new_logo.png in Resources */,
@@ -1472,6 +1521,7 @@
 				3080B3E623B80BE400638B22 /* request_highlight.png in Resources */,
 				30634D672406067C00FEAD40 /* hodges_badge.png in Resources */,
 				3058198223D27152008684A7 /* observation.png in Resources */,
+				30E4BE9225182A3300754921 /* 11887-ios-tick-burst.json in Resources */,
 				305B52092415D72E0064B605 /* collapse_white.png in Resources */,
 				3058198023D26F72008684A7 /* pen.png in Resources */,
 				30C4EDB42267C1890046B615 /* team_thumbs_up.png in Resources */,
@@ -1517,10 +1567,12 @@
 				305B520F2415D78A0064B605 /* expand_white2.png in Resources */,
 				3059F026241B1F9C0090380B /* twitch-logo-0.png in Resources */,
 				3059F028241D83300090380B /* twitch_white.png in Resources */,
+				3064299125169CBC0023F38D /* 13642-confetti.json in Resources */,
 				308669A924570ED80032C46E /* person-killing-other-with-an-arm_flipped.png in Resources */,
 				305B51FB240C99B00064B605 /* edit.png in Resources */,
 				308C0A7624DF16AC00C2027C /* shout.png in Resources */,
 				304E17F0242FE6CC009BE1C0 /* Thumb.json in Resources */,
+				30E4BE8E2517A1B600754921 /* smartphone.png in Resources */,
 				304E17EC242EF4C7009BE1C0 /* thumbs_down_white.png in Resources */,
 				3059E6312432BFFF0052E46F /* cogs.png in Resources */,
 				306793CF2447F88E005158B2 /* joystick.png in Resources */,
@@ -1531,6 +1583,7 @@
 				30634D6B24061B7E00FEAD40 /* mike_badge.png in Resources */,
 				308759BA24269ED2002C19CC /* aastandby.jpg in Resources */,
 				304E17FD2430E1D0009BE1C0 /* two.png in Resources */,
+				3092E67D2516985200E8FE08 /* 18353-confetti-celebration.json in Resources */,
 				30634D5924056B7300FEAD40 /* new_logo.png in Resources */,
 				3080B3EA23B81BC100638B22 /* pending_button.png in Resources */,
 				30FC34C123E7DAE8007F0080 /* settings.png in Resources */,
@@ -1609,24 +1662,29 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0CEA5B16247F8ECA417CBD97 /* [CP] Copy Pods Resources */ = {
+		0B5636DDA4F998748C0E8424 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			name = "[CP] Copy Pods Resources";
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-DoubleXPTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-resources.sh\"\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		76084E605E46D4237B0B5091 /* [CP] Embed Pods Frameworks */ = {
+		20526186DDDD5E9F22DD5A73 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1643,16 +1701,42 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		AF9325A7AA564901A37B30F0 /* [CP] Check Pods Manifest.lock */ = {
+		24632683EFCB17192A55A74C /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			inputFileListPaths = (
 			);
 			inputPaths = (
 				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
 				"${PODS_ROOT}/Manifest.lock",
 			);
 			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-DoubleXPUITests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		5066E1702B0465B7DA7014DA /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
 			outputPaths = (
 				"$(DERIVED_FILE_DIR)/Pods-DoubleXP-checkManifestLockResult.txt",
 			);
@@ -1661,40 +1745,21 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C53321FC86C03B8BBAA9663A /* [CP] Check Pods Manifest.lock */ = {
+		87E9CA7AFBDE9ECB29BE2B18 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-DoubleXPTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		CE65845BB9E527955A97B36C /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-DoubleXPUITests-checkManifestLockResult.txt",
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -1793,6 +1858,7 @@
 				30B6E18D23A583E400B69F00 /* RequestObject.swift in Sources */,
 				3058240A239C349A00FDEA7D /* ChatMessage.swift in Sources */,
 				30A60D9823691646004B2150 /* VerticalAlignLabel.swift in Sources */,
+				305FD948251AE0CC00D6B565 /* SpinnerCell.swift in Sources */,
 				30A5199F240A007300DCFC77 /* AGVideoPlayerView.swift in Sources */,
 				30B6E18923A33A6300B69F00 /* TeamSearchGameCell.swift in Sources */,
 				305B51F9240C78600064B605 /* ProfileGameSelectionCell.swift in Sources */,
@@ -1861,11 +1927,13 @@
 				308BD026238D7CB40034822B /* TeamNeedsCell.swift in Sources */,
 				30EBC3FE23D949A0009CFAB2 /* FoldingRosterCell.swift in Sources */,
 				30FC34BF23E7ADB1007F0080 /* MenuFriendsCell.swift in Sources */,
+				30E4BE9425182B0C00754921 /* NewRegGameCell.swift in Sources */,
 				306E6B5D23DE4E4D0069F426 /* TwitchStreamCell.swift in Sources */,
 				30E0B1D92495AC04007F0B9B /* AnswerCell.swift in Sources */,
 				308810F0244B48A300C2BEC7 /* RecommendedUser.swift in Sources */,
 				307CE34923E9F74B00DCB12A /* MenuFriendsListCell.swift in Sources */,
 				30B6E18123A089BD00B69F00 /* FADashCell.swift in Sources */,
+				30D60CE1251C07E500C914EF /* GCGameController.swift in Sources */,
 				308C0A7824DF26C700C2027C /* AnnouncementCell.swift in Sources */,
 				30A60D9123666716004B2150 /* UserCell.swift in Sources */,
 				307CE35523EC508600DCB12A /* InsetLabel.swift in Sources */,
@@ -1884,6 +1952,7 @@
 				30FC34C723E927BE007F0080 /* MenuSettingsCell.swift in Sources */,
 				308BD01D238AED570034822B /* CreateTeamFrag.swift in Sources */,
 				30B6E18B23A472A300B69F00 /* FreeAgentFront.swift in Sources */,
+				3092E67B2516969D00E8FE08 /* GCRegistration.swift in Sources */,
 				30B583CF2348290700736733 /* GamerConnectGame.swift in Sources */,
 				3063C6C82508369000DBB22C /* EpisodeObj.swift in Sources */,
 				308BD023238B521B0034822B /* TeamNeedsSelection.swift in Sources */,
@@ -2067,14 +2136,14 @@
 		};
 		4C4D884C2205F33300AD7090 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E3B486C87263366FEEE070C1 /* Pods-DoubleXP.debug.xcconfig */;
+			baseConfigurationReference = 6E03CA40D159A0E28E87C94F /* Pods-DoubleXP.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = DoubleXP/DoubleXP.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 42;
+				CURRENT_PROJECT_VERSION = 43;
 				DEVELOPMENT_TEAM = GU6KL76XP4;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = DoubleXP/Info.plist;
@@ -2082,7 +2151,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.5;
+				MARKETING_VERSION = 1.3.6;
 				PRODUCT_BUNDLE_IDENTIFIER = Encrypted.DoubleXP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = DXP2;
@@ -2094,14 +2163,14 @@
 		};
 		4C4D884D2205F33300AD7090 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F4C44CD59F7DCAC7A7E5BF4B /* Pods-DoubleXP.release.xcconfig */;
+			baseConfigurationReference = 67827A7F41E3C1749D933912 /* Pods-DoubleXP.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = DoubleXP/DoubleXP.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 42;
+				CURRENT_PROJECT_VERSION = 43;
 				DEVELOPMENT_TEAM = GU6KL76XP4;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = DoubleXP/Info.plist;
@@ -2109,7 +2178,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.5;
+				MARKETING_VERSION = 1.3.6;
 				PRODUCT_BUNDLE_IDENTIFIER = Encrypted.DoubleXP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = DXP2;
@@ -2120,7 +2189,7 @@
 		};
 		4C4D884F2205F33300AD7090 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FD166A6221BC503E0FEE9C4C /* Pods-DoubleXPTests.debug.xcconfig */;
+			baseConfigurationReference = 598D7D36F87EC06EBE670B2A /* Pods-DoubleXPTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -2144,7 +2213,7 @@
 		};
 		4C4D88502205F33300AD7090 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D9D38A77BAFC04AF72FFB04A /* Pods-DoubleXPTests.release.xcconfig */;
+			baseConfigurationReference = 984DCF812FDC534816B6F633 /* Pods-DoubleXPTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -2168,7 +2237,7 @@
 		};
 		4C4D88522205F33300AD7090 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0C5F4B174A53C96A2BCFB001 /* Pods-DoubleXPUITests.debug.xcconfig */;
+			baseConfigurationReference = A1DC7160C788F41DE7E12E07 /* Pods-DoubleXPUITests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -2193,7 +2262,7 @@
 		};
 		4C4D88532205F33300AD7090 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B9ADA8C4012D66B1172D0841 /* Pods-DoubleXPUITests.release.xcconfig */;
+			baseConfigurationReference = CCE6FC77ED2DA6FB67642F78 /* Pods-DoubleXPUITests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";

@@ -10,11 +10,17 @@
 #endif
 #endif
 
+#import "PINCache 3.h"
 #import "PINCache.h"
+#import "PINCacheMacros 3.h"
 #import "PINCacheMacros.h"
+#import "PINCacheObjectSubscripting 3.h"
 #import "PINCacheObjectSubscripting.h"
+#import "PINCaching 3.h"
 #import "PINCaching.h"
+#import "PINDiskCache 3.h"
 #import "PINDiskCache.h"
+#import "PINMemoryCache 3.h"
 #import "PINMemoryCache.h"
 
 FOUNDATION_EXPORT double PINCacheVersionNumber;

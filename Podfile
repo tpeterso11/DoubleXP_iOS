@@ -16,7 +16,6 @@ target 'DoubleXP' do
   pod 'SendBirdSDK'
   pod 'FoldingCell'
   pod 'lottie-ios'
-  pod 'SwiftTwitch'
   pod 'ExpyTableView'
   pod 'PINRemoteImage'
   pod 'AIFlatSwitch'
@@ -33,7 +32,7 @@ target 'DoubleXP' do
   pod 'Swifter', :git => 'https://github.com/mattdonnelly/Swifter.git'
   pod 'OrderedDictionary'
   pod 'AnimatedCollectionViewLayout'
-  pod 'CountdownLabel'
+  pod 'CollectionViewSlantedLayout', '~> 3.1'
   
   # Pods for DoubleXP
 

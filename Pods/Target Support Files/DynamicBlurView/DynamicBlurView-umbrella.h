@@ -10,6 +10,7 @@
 #endif
 #endif
 
+#import "DynamicBlurView 2.h"
 #import "DynamicBlurView.h"
 
 FOUNDATION_EXPORT double DynamicBlurViewVersionNumber;

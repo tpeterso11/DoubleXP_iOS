@@ -10,7 +10,6 @@ import UIKit
 import Firebase
 import moa
 import MSPeekCollectionViewDelegateImplementation
-import SwiftTwitch
 import WebKit
 
 class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, SocialMediaManagerCallback, LandingUICallbacks {

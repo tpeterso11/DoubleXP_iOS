@@ -437,7 +437,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         }
         
         currentViewController.pageName = "Messaging"
-        currentViewController.navDictionary = ["state": "messaging", "searchHint": "Message this user.", "sendButton": "Send"]
+        currentViewController.navDictionary = ["state": "messaging", "searchHint": "Message this user.", "searchButton": "Send"]
         
         delegate.addToNavStack(vc: currentViewController)
         delegate.currentLanding?.stackDepth = delegate.navStack.count

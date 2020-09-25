@@ -9,11 +9,12 @@
 import Foundation
 import UIKit
 import CountdownLabel
+import CollectionViewSlantedLayout
 
-class UpcomingGameCell: UICollectionViewCell {
+class UpcomingGameCell: CollectionViewSlantedCell {
     @IBOutlet weak var gameName: UILabel!
     @IBOutlet weak var gameBack: UIImageView!
-    @IBOutlet weak var gameCountdown: UILabel!
     @IBOutlet weak var closeClickArea: UIView!
+    @IBOutlet weak var cellHeader: UILabel!
     var releaseDate: NSDate?
 }
