@@ -31,11 +31,6 @@
 @property (strong, nonatomic, readonly, nullable) NSMutableArray<SBDUser *> *operators;
 
 /**
- *  DO NOT USE this initializer. You can only get an instance type of `SBDOpenChannel` from SDK.
- */
-- (nullable instancetype)initWithDictionary:(NSDictionary * _Nonnull)dict;
-
-/**
  *  Creates a query instance for open channel list.
  *
  *  @return The query instance for open channel list.
@@ -45,7 +40,7 @@
 /**
  *  Creates an open channel.
  *
- *  @param completionHandler The handler block to execute. `channel` is the open channel instance which is created. The name and cover URL of the channel are generated in SendBird server.
+ *  @param completionHandler The handler block to execute. `channel` is the open channel instance which is created. The name and cover URL of the channel are generated in Sendbird server.
  */
 + (void)createChannelWithCompletionHandler:(nonnull void (^)(SBDOpenChannel * _Nullable channel, SBDError * _Nullable error))completionHandler;
 
@@ -400,6 +395,14 @@ DEPRECATED_ATTRIBUTE;
               progressHandler:(nullable void (^)(int64_t bytesSent, int64_t totalBytesSent, int64_t totalBytesExpectedToSend))progressHandler
             completionHandler:(nonnull void (^)(SBDOpenChannel * _Nullable channel, SBDError * _Nullable error))completionHandler
 DEPRECATED_ATTRIBUTE;
+
+/**
+ *  Deletes open channel
+ *
+ *  @param completionHandler The handler block to execute. `channel` is the open channel instance which is deleted.
+ *  @since 3.0.180
+ */
+- (void)deleteChannelWithCompletionHandler:(nullable void (^)(SBDError * _Nullable error))completionHandler;
 
 /**
  *  Gets an open channel instance from channel URL.

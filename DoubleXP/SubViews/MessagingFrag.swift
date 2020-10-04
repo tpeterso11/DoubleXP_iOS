@@ -241,7 +241,7 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
                 let appDelegate = UIApplication.shared.delegate as! AppDelegate
                 let currentUser = appDelegate.currentUser
                 
-                let chatMessage = ChatMessage(message: message.message!, timeStamp: result)
+                let chatMessage = ChatMessage(message: message.message, timeStamp: result)
                 chatMessage.data = message.data ?? ""
                 chatMessage.senderString = chatMessage.data
                 chatMessage.timeStampMillis = message.createdAt
@@ -453,7 +453,7 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
                    formatter.dateFormat = "MMMM.dd.yyyy"
                    let result = formatter.string(from: date as Date)
         
-        let chatMessage = ChatMessage(message: message.message!, timeStamp: result)
+        let chatMessage = ChatMessage(message: message.message, timeStamp: result)
         //let currentUser = appDelegate.currentUser
         //let chatMessage1 = MockMessage(text: message.message!, user: currentUser!, messageId: "", date: Date.init())
         //chatMessage.data = message.data ?? ""

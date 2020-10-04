@@ -43,6 +43,13 @@ typedef NS_ENUM(NSUInteger, FBSDKInternalUtilityVersionShift)
 
 @implementation FBSDKInternalUtility
 
+static BOOL ShouldOverrideHostWithGamingDomain(NSString *hostPrefix) {
+  return
+  [[FBSDKAccessToken currentAccessToken] respondsToSelector:@selector(graphDomain)] &&
+  [[FBSDKAccessToken currentAccessToken].graphDomain isEqualToString:@"gaming"] &&
+  ([hostPrefix isEqualToString:@"graph."] || [hostPrefix isEqualToString:@"graph-video."]);
+}
+
 #pragma mark - Class Methods
 
 + (NSString *)appURLScheme
@@ -144,8 +151,7 @@ typedef NS_ENUM(NSUInteger, FBSDKInternalUtilityVersionShift)
   }
 
   NSString *host =
-  [hostPrefix isEqualToString:@"graph."] &&
-  [[FBSDKAccessToken currentAccessToken].graphDomain isEqualToString:@"gaming"]
+  ShouldOverrideHostWithGamingDomain(hostPrefix)
   ? @"fb.gg"
   : @"facebook.com";
 
@@ -270,13 +276,13 @@ typedef NS_ENUM(NSUInteger, FBSDKInternalUtilityVersionShift)
       switch (components.count) {
         default:
         case 3:
-          operatingSystemVersion.patchVersion = [components[2] integerValue];
+          operatingSystemVersion.patchVersion = [[FBSDKTypeUtility array:components objectAtIndex:2] integerValue];
           // fall through
         case 2:
-          operatingSystemVersion.minorVersion = [components[1] integerValue];
+          operatingSystemVersion.minorVersion = [[FBSDKTypeUtility array:components objectAtIndex:1] integerValue];
           // fall through
         case 1:
-          operatingSystemVersion.majorVersion = [components[0] integerValue];
+          operatingSystemVersion.majorVersion = [[FBSDKTypeUtility array:components objectAtIndex:0] integerValue];
           break;
         case 0:
           operatingSystemVersion.majorVersion = ([self isUIKitLinkTimeVersionAtLeast:FBSDKUIKitVersion_7_0] ? 7 : 6);
@@ -491,7 +497,10 @@ static NSMapTable *_transientObjects;
 
 + (UIWindow *)findWindow
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
   UIWindow *topWindow = [UIApplication sharedApplication].keyWindow;
+#pragma clang diagnostic pop
   if (topWindow == nil || topWindow.windowLevel < UIWindowLevelNormal) {
     for (UIWindow *window in [UIApplication sharedApplication].windows) {
       if (window.windowLevel >= topWindow.windowLevel && !window.isHidden) {
@@ -549,6 +558,21 @@ static NSMapTable *_transientObjects;
   }
   return topController;
 }
+
+#if !TARGET_OS_TV
++ (UIInterfaceOrientation)statusBarOrientation
+{
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
+  if (@available(iOS 13.0, *)) {
+    return [self findWindow].windowScene.interfaceOrientation;
+  } else {
+    return UIInterfaceOrientationUnknown;
+  }
+#else
+  return UIApplication.sharedApplication.statusBarOrientation;
+#endif
+}
+#endif
 
 + (NSString *)hexadecimalStringFromData:(NSData *)data
 {

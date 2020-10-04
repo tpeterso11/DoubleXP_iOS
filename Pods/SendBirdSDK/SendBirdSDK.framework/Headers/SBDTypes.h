@@ -118,7 +118,33 @@ typedef NS_ENUM(NSInteger, SBDErrorCode) {
     SBDErrorTimerWasAlreadyDone = 800302,
     
     // WS Error
-    SBDErrorMessagesRateLimitExceeded = 900200,
+    SBDErrorSocketLoginRequired = 900010,
+    SBDErrorSocketUserNotMember = 900020,
+    SBDErrorSocketUserDeactivated = 900021,
+    SBDErrorSocketUserNotOwnerOfMessage = 900022,
+    SBDErrorSocketUserSendMessageNotAllowed = 900023,
+    SBDErrorSocketInvalidMentionForMessage = 900025,
+    SBDErrorSocketInvalidPushOptionForMessage = 900026,
+    SBDErrorSocketTooManyMetaKeyForMessage = 900027,
+    SBDErrorSocketTooManyMetaValueForMessage = 900028,
+    SBDErrorSocketTooManyMetaArrayForMessage = 900029,
+    SBDErrorSocketGuestNotAllowed = 900030,
+    SBDErrorSocketMutedUserInApplicationSendMessageNotAllowed = 900040,
+    SBDErrorSocketMutedUserInChannelSendMessageNotAllowed = 900041,
+    SBDErrorSocketChannelFrozen = 900050,
+    SBDErrorSocketProfanityMessageBlocked = 900060,
+    SBDErrorSocketBannedUrlsBlocked = 900061,
+    SBDErrorSocketRestrictedDomainBlocked = 900065,
+    SBDErrorSocketModeratedFileBlocked = 900066,
+    SBDErrorSocketEnterDeletedChannel = 900070,
+    SBDErrorSocketBlockedUserReceiveMessageNotAllowed = 900080,
+    SBDErrorSocketDeactivatedUserReceiveMessageNotAllowed = 900081,
+    SBDErrorSocketWrongChannelType = 900090,
+    SBDErrorSocketBannedUserSendMessageNotAllowed = 900100,
+    SBDErrorSocketTooManyMessages = 900200,
+    SBDErrorSocketMessageNotFound = 900300,
+    SBDErrorSocketTooManyParticipants = 900400,
+    SBDErrorSocketChannelNotFound = 900500
 };
 
 /**
@@ -577,7 +603,7 @@ typedef NS_ENUM(NSUInteger, SBDPushTokenType) {
  Constants of type to describe message's request state
  
  - SBDMessageRequestStateNone: MUST NOT BE. If you got a message instance from SDK, the message can't have this value.
- - SBDMessageRequestStatePending: Indicates the state of the message returned when trying to send a message. The message with the pending state means that is not dispatched completely to the SendBird server. The pending message should be replaced with a message (failed or succeeded) from the callback.
+ - SBDMessageRequestStatePending: Indicates the state of the message returned when trying to send a message. The message with the pending state means that is not dispatched completely to the Sendbird server. The pending message should be replaced with a message (failed or succeeded) from the callback.
  - SBDMessageRequestStateFailed: Indicates the state of the message that failed to send the message.
  - SBDMessageRequestStateSucceeded: Indicates the state of the message that success to send the message.
  
@@ -595,7 +621,7 @@ typedef NS_ENUM(NSUInteger, SBDMessageRequestState) {
  Constants of type to describe message's sending status.
  
  - SBDMessageSendingStatusNone: MUST NOT BE. If you got a message instance from SDK, the message can't have this value.
- - SBDMessageSendingStatusPending: Indicates the status of the message returned when trying to send a message. The message with the pending status means that is not dispatched completely to the SendBird server. The pending message should be replaced with a message (failed or succeeded) from the callback.
+ - SBDMessageSendingStatusPending: Indicates the status of the message returned when trying to send a message. The message with the pending status means that is not dispatched completely to the Sendbird server. The pending message should be replaced with a message (failed or succeeded) from the callback.
  - SBDMessageSendingStatusFailed: Indicates the status of the message that failed to send the message.
  - SBDMessageSendingStatusSucceeded: Indicates the status of the message that success to send the message.
  - SBDMessageSendingStatusCanceled: Indicates the status of the message that is canceled.
@@ -621,7 +647,6 @@ typedef NS_OPTIONS(NSUInteger, SBDGroupChannelListQuerySearchField) {
     /* filter type to query for member nickname */
     SBDGroupChannelListQuerySearchFieldChannelName      = (1 << 1),
 };
-
 
 /**
  Categories of reporting reasons
@@ -662,6 +687,16 @@ typedef NS_ENUM(NSUInteger, SBDMessageSearchQueryOrder) {
 typedef NS_ENUM(NSUInteger, SBDReactionEventAction) {
     SBDReactionEventActionAdd = 0,
     SBDReactionEventActionDelete = 1,
+};
+
+/**
+ The order type for member list query.
+
+ @since 3.0.198
+*/
+typedef NS_ENUM(NSUInteger, SBDMemberListOrder) {
+    SBDMemberListOrderNicknameAlphabetical = 0,
+    SBDMemberListOrderOperatorThenMemberNicknameAlphabetical = 1,
 };
 
 #endif /* SBDTypes_h */
