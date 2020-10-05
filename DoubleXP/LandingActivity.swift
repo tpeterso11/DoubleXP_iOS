@@ -13,8 +13,8 @@ import FBSDKCoreKit
 import moa
 import Firebase
 import Lottie
-//import GiphyUISDK
-//import GiphyCoreSDK
+import GiphyUISDK
+import GiphyCoreSDK
 
 typealias Runnable = () -> ()
 
@@ -2370,7 +2370,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
 }
 
-/*extension LandingActivity: GiphyDelegate {
+extension LandingActivity: GiphyDelegate {
    func didSelectMedia(giphyViewController: GiphyViewController, media: GPHMedia)   {
    
         // your user tapped a GIF!
@@ -2384,7 +2384,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
    func didDismiss(controller: GiphyViewController?) {
         // your user dismissed the controller without selecting a GIF.
    }
-}*/
+}
 
 extension Array {
     func getElement(at index: Int) -> Element? {

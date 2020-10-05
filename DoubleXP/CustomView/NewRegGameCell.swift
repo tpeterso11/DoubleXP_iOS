@@ -12,7 +12,7 @@ import Lottie
 import UnderLineTextField
 import CollectionPickerView
 
-class NewRegGameCell: UITableViewCell, UICollectionViewDataSource, UICollectionViewDelegate {
+class NewRegGameCell: UITableViewCell/*, UICollectionViewDataSource, UICollectionViewDelegate*/ {
     @IBOutlet weak var gameBack: UIImageView!
     @IBOutlet weak var gameName: UILabel!
     @IBOutlet weak var cover: UIView!
@@ -95,8 +95,8 @@ class NewRegGameCell: UITableViewCell, UICollectionViewDataSource, UICollectionV
     private func showConsole(){
         self.backConsole.isHidden = true
         self.consoleBack.isHidden = false
-        
-        self.consolePicker.dataSource = self
+//_todo
+//        self.consolePicker.dataSource = self
     }
     
     private func animateAdded(){

@@ -368,6 +368,7 @@
 		30FC34C323E914CA007F0080 /* MenuHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FC34C223E914CA007F0080 /* MenuHeaderCell.swift */; };
 		30FC34C723E927BE007F0080 /* MenuSettingsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FC34C623E927BE007F0080 /* MenuSettingsCell.swift */; };
 		398E99D7454D231296D6F804 /* Pods_DoubleXPTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 609C098C47EE24F3E230CA55 /* Pods_DoubleXPTests.framework */; };
+		4675893BBCBADB61687F5863 /* Pods_DoubleXPUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B7BF829B5B8265BC48CDA6D /* Pods_DoubleXPUITests.framework */; };
 		48343FFE2465CE580034CF12 /* envelope.png in Resources */ = {isa = PBXBuildFile; fileRef = 48343FF92465CE570034CF12 /* envelope.png */; };
 		48343FFF2465CE580034CF12 /* star.png in Resources */ = {isa = PBXBuildFile; fileRef = 48343FFA2465CE570034CF12 /* star.png */; };
 		483440002465CE580034CF12 /* restaurant-membership-card-tool.png in Resources */ = {isa = PBXBuildFile; fileRef = 48343FFB2465CE570034CF12 /* restaurant-membership-card-tool.png */; };
@@ -387,7 +388,6 @@
 		4CC1720322677FA5009A1B80 /* LandingActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC1720222677FA5009A1B80 /* LandingActivity.swift */; };
 		4CC17206226781DF009A1B80 /* NewsObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC17205226781DF009A1B80 /* NewsObject.swift */; };
 		6D7B0B638FBC317FE5CDBC9E /* Pods_DoubleXP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 09E7E0F729FB0D9061A49A71 /* Pods_DoubleXP.framework */; };
-		FA32F546083E642F57388D0E /* Pods_DoubleXPUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9FAAECDE0CE784E9DC1D892A /* Pods_DoubleXPUITests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -421,7 +421,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		05853CEF740DA8C9EB9D8081 /* Pods-DoubleXP-DoubleXPUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXP-DoubleXPUITests.debug.xcconfig"; path = "Target Support Files/Pods-DoubleXP-DoubleXPUITests/Pods-DoubleXP-DoubleXPUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		09E7E0F729FB0D9061A49A71 /* Pods_DoubleXP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DoubleXP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		1B7BF829B5B8265BC48CDA6D /* Pods_DoubleXPUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DoubleXPUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE540DB246495930053C57A /* TwitterHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwitterHelper.swift; sourceTree = "<group>"; };
 		3008EE772267F89800E0D9ED /* NewsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsCell.swift; sourceTree = "<group>"; };
 		301AEF4B23885B2F00339850 /* MessagingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagingManager.swift; sourceTree = "<group>"; };
@@ -810,9 +812,9 @@
 		598D7D36F87EC06EBE670B2A /* Pods-DoubleXPTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXPTests.debug.xcconfig"; path = "Target Support Files/Pods-DoubleXPTests/Pods-DoubleXPTests.debug.xcconfig"; sourceTree = "<group>"; };
 		609C098C47EE24F3E230CA55 /* Pods_DoubleXPTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DoubleXPTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		67827A7F41E3C1749D933912 /* Pods-DoubleXP.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXP.release.xcconfig"; path = "Target Support Files/Pods-DoubleXP/Pods-DoubleXP.release.xcconfig"; sourceTree = "<group>"; };
+		6DA7CACC50C7A3F948E16DB2 /* Pods-DoubleXP-DoubleXPUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXP-DoubleXPUITests.release.xcconfig"; path = "Target Support Files/Pods-DoubleXP-DoubleXPUITests/Pods-DoubleXP-DoubleXPUITests.release.xcconfig"; sourceTree = "<group>"; };
 		6E03CA40D159A0E28E87C94F /* Pods-DoubleXP.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXP.debug.xcconfig"; path = "Target Support Files/Pods-DoubleXP/Pods-DoubleXP.debug.xcconfig"; sourceTree = "<group>"; };
 		984DCF812FDC534816B6F633 /* Pods-DoubleXPTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXPTests.release.xcconfig"; path = "Target Support Files/Pods-DoubleXPTests/Pods-DoubleXPTests.release.xcconfig"; sourceTree = "<group>"; };
-		9FAAECDE0CE784E9DC1D892A /* Pods_DoubleXPUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DoubleXPUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1DC7160C788F41DE7E12E07 /* Pods-DoubleXPUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXPUITests.debug.xcconfig"; path = "Target Support Files/Pods-DoubleXPUITests/Pods-DoubleXPUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		CCE6FC77ED2DA6FB67642F78 /* Pods-DoubleXPUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXPUITests.release.xcconfig"; path = "Target Support Files/Pods-DoubleXPUITests/Pods-DoubleXPUITests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -838,7 +840,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FA32F546083E642F57388D0E /* Pods_DoubleXPUITests.framework in Frameworks */,
+				4675893BBCBADB61687F5863 /* Pods_DoubleXPUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -850,7 +852,7 @@
 			children = (
 				09E7E0F729FB0D9061A49A71 /* Pods_DoubleXP.framework */,
 				609C098C47EE24F3E230CA55 /* Pods_DoubleXPTests.framework */,
-				9FAAECDE0CE784E9DC1D892A /* Pods_DoubleXPUITests.framework */,
+				1B7BF829B5B8265BC48CDA6D /* Pods_DoubleXPUITests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1345,6 +1347,8 @@
 				984DCF812FDC534816B6F633 /* Pods-DoubleXPTests.release.xcconfig */,
 				A1DC7160C788F41DE7E12E07 /* Pods-DoubleXPUITests.debug.xcconfig */,
 				CCE6FC77ED2DA6FB67642F78 /* Pods-DoubleXPUITests.release.xcconfig */,
+				05853CEF740DA8C9EB9D8081 /* Pods-DoubleXP-DoubleXPUITests.debug.xcconfig */,
+				6DA7CACC50C7A3F948E16DB2 /* Pods-DoubleXP-DoubleXPUITests.release.xcconfig */,
 			);
 			name = Pods;
 			path = Pods;
@@ -1362,8 +1366,8 @@
 				4C4D881D2205F32900AD7090 /* Frameworks */,
 				4C4D881E2205F32900AD7090 /* Resources */,
 				2D10C867246331FC00AFB350 /* Embed Frameworks */,
-				20526186DDDD5E9F22DD5A73 /* [CP] Embed Pods Frameworks */,
-				87E9CA7AFBDE9ECB29BE2B18 /* [CP] Copy Pods Resources */,
+				C6079FACD8838ECC0486654F /* [CP] Embed Pods Frameworks */,
+				91CAD62F3B1C3754B1DFFAFE /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1684,23 +1688,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		20526186DDDD5E9F22DD5A73 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		24632683EFCB17192A55A74C /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1745,7 +1732,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		87E9CA7AFBDE9ECB29BE2B18 /* [CP] Copy Pods Resources */ = {
+		91CAD62F3B1C3754B1DFFAFE /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1760,6 +1747,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C6079FACD8838ECC0486654F /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
