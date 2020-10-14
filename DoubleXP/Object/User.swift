@@ -41,6 +41,36 @@ class User: NSObject, NSCoding {
         }
     }
     
+    var _selectedAge = ""
+    var selectedAge: String {
+        get {
+            return (_selectedAge)
+        }
+        set (newVal) {
+            _selectedAge = newVal
+        }
+    }
+    
+    var _primaryLanguage = ""
+    var primaryLanguage: String {
+        get {
+            return (_primaryLanguage)
+        }
+        set (newVal) {
+            _primaryLanguage = newVal
+        }
+    }
+    
+    var _secondaryLanguage = ""
+    var secondaryLanguage: String {
+        get {
+            return (_secondaryLanguage)
+        }
+        set (newVal) {
+            _secondaryLanguage = newVal
+        }
+    }
+    
     var _senderId = ""
        var senderId: String {
            get {
@@ -208,6 +238,26 @@ class User: NSObject, NSCoding {
         }
         set (newVal) {
             _notifications = newVal
+        }
+    }
+    
+    var _userLat = 0.0
+    var userLat: Double {
+        get {
+            return (_userLat)
+        }
+        set (newVal) {
+            _userLat = newVal
+        }
+    }
+    
+    var _userLong = 0.0
+    var userLong: Double {
+        get {
+            return (_userLong)
+        }
+        set (newVal) {
+            _userLong = newVal
         }
     }
     
@@ -412,6 +462,9 @@ class User: NSObject, NSCoding {
         self.tempRivals = (decoder.decodeObject(forKey: "tempRivals") as! [RivalObj])
         self.twitchConnect = (decoder.decodeObject(forKey: "twitchConnect") as! String)
         self.viewedAnnouncements = (decoder.decodeObject(forKey: "viewedAnnouncements") as! [String])
+        self.selectedAge = (decoder.decodeObject(forKey: "selectedAge") as! String)
+        self.primaryLanguage = (decoder.decodeObject(forKey: "primaryLanguage") as! String)
+        self.secondaryLanguage = (decoder.decodeObject(forKey: "secondaryLanguage") as! String)
     }
     
     func encode(with coder: NSCoder) {
@@ -438,6 +491,9 @@ class User: NSObject, NSCoding {
         coder.encode(self.tempRivals, forKey: "tempRivals")
         coder.encode(self.twitchConnect, forKey: "twitchConnect")
         coder.encode(self.viewedAnnouncements, forKey: "viewedAnnouncements")
+        coder.encode(self.selectedAge, forKey: "selectedAge")
+        coder.encode(self.primaryLanguage, forKey: "primaryLanguage")
+        coder.encode(self.secondaryLanguage, forKey: "secondaryLanguage")
     }
 }
 

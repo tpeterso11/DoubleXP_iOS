@@ -11,6 +11,7 @@ import CoreData
 import Firebase
 import FBSDKCoreKit
 import GoogleSignIn
+import FirebaseMessaging
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
@@ -38,6 +39,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var episodes = [EpisodeObj]()
     var announcementManager = AnnouncementManager()
     var imageCache = NSCache<NSString, UIImage>()
+    var registerUserCache = [User]()
+    var cachedUserType = ""
     
     private var apnsToken: String = ""
     private var fcmToken: String = ""

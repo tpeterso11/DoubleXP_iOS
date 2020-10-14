@@ -83,11 +83,14 @@ PODS:
     - GoogleUtilities/Reachability (~> 6.7)
     - GoogleUtilities/UserDefaults (~> 6.7)
     - Protobuf (>= 3.9.2, ~> 3.9)
+  - FLAnimatedImage (1.0.12)
   - FoldingCell (5.0.2)
-  - Giphy (2.0.2):
+  - GeoFire (4.0.1):
+    - Firebase/Database (~> 6.0)
+  - Giphy (2.0.3):
     - DeepDiff
     - libwebp
-    - PINCache
+    - PINCache (~> 2.0.0)
   - GoogleAppMeasurement (6.8.3):
     - GoogleUtilities/AppDelegateSwizzler (~> 6.7)
     - GoogleUtilities/MethodSwizzler (~> 6.7)
@@ -147,21 +150,10 @@ PODS:
   - nanopb/decode (1.30906.0)
   - nanopb/encode (1.30906.0)
   - OrderedDictionary (1.4)
-  - PINCache (3.0.1):
-    - PINCache/Arc-exception-safe (= 3.0.1)
-    - PINCache/Core (= 3.0.1)
-  - PINCache/Arc-exception-safe (3.0.1):
-    - PINCache/Core
-  - PINCache/Core (3.0.1):
-    - PINOperation (~> 1.2.0)
-  - PINOperation (1.2)
-  - PINRemoteImage (3.0.1):
-    - PINRemoteImage/PINCache (= 3.0.1)
-  - PINRemoteImage/Core (3.0.1):
-    - PINOperation
-  - PINRemoteImage/PINCache (3.0.1):
-    - PINCache (~> 3.0.1)
-    - PINRemoteImage/Core
+  - PINCache (2.0)
+  - PINRemoteImage (1.1.2):
+    - FLAnimatedImage (>= 1.0)
+    - PINCache (>= 2.0)
   - PopupDialog (1.1.1):
     - DynamicBlurView (~> 4.0)
   - PromisesObjC (1.2.10)
@@ -197,6 +189,7 @@ DEPENDENCIES:
   - Firebase/Database
   - Firebase/Messaging
   - FoldingCell
+  - GeoFire (~> 4.0)
   - Giphy
   - GoogleSignIn
   - lottie-ios
@@ -242,7 +235,9 @@ SPEC REPOS:
     - FirebaseInstallations
     - FirebaseInstanceID
     - FirebaseMessaging
+    - FLAnimatedImage
     - FoldingCell
+    - GeoFire
     - Giphy
     - GoogleAppMeasurement
     - GoogleDataTransport
@@ -259,7 +254,6 @@ SPEC REPOS:
     - nanopb
     - OrderedDictionary
     - PINCache
-    - PINOperation
     - PINRemoteImage
     - PopupDialog
     - PromisesObjC
@@ -309,8 +303,10 @@ SPEC CHECKSUMS:
   FirebaseInstallations: 466c7b4d1f58fe16707693091da253726a731ed2
   FirebaseInstanceID: ac5a82fcd21f804dbfc8f318eff9e1d7a9916e49
   FirebaseMessaging: fc1f98b4592f8f2ea538169b1c317c6e76f81300
+  FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
   FoldingCell: f92eb5fb9842319e7cd08c71533c98408b785099
-  Giphy: 3892d437a64b730ff9c3dc054b8333f1d6204418
+  GeoFire: 67b5276c561434b4e4c7ea567c2c4d64e711339c
+  Giphy: 8af55f511fdef64fb405df018c2869eee26a526c
   GoogleAppMeasurement: 966e88df9d19c15715137bb2ddaf52373f111436
   GoogleDataTransport: b7f406340a291370045a270c599e53c6fa6ec20f
   GoogleSignIn: 7137d297ddc022a7e0aa4619c86d72c909fa7213
@@ -325,9 +321,8 @@ SPEC CHECKSUMS:
   MSPeekCollectionViewDelegateImplementation: f86fd6a6ce284723343e8697a013f5294c05e745
   nanopb: 59317e09cf1f1a0af72f12af412d54edf52603fc
   OrderedDictionary: 138c8d2e358d3a0c9adda15c6c7db24e8e3b09e6
-  PINCache: ee3c4abadd09970a61cdda0cfc345e69a3d75b26
-  PINOperation: 3a967a927e7867e61976c6cc23e5770416449fbc
-  PINRemoteImage: 3b7cedb118c2d357f87e9eabc7c81ba0202cb236
+  PINCache: ca953ba93ce1edde056fdd99121ee65b295a08c9
+  PINRemoteImage: 0696e5f679deabf2e2ddfb57085fb978ca51bfc3
   PopupDialog: 720c92befd8bc23c13442254945213db5612f149
   PromisesObjC: b14b1c6b68e306650688599de8a45e49fae81151
   Protobuf: 3dac39b34a08151c6d949560efe3f86134a3f748
@@ -346,6 +341,6 @@ SPEC CHECKSUMS:
   ValidationToolkit: ce8e9c1a5d49eddc3266a009d46df5ea22042dbc
   VideoBackground: b4a2f39d3b16254b2bec9488cb2968a06dff69c5
 
-PODFILE CHECKSUM: 0f6ea7c6f06c04aed768e0c642eb96a84a1f2132
+PODFILE CHECKSUM: 033f7c22f3312a04082ace831b6ad5b823d964cf
 
-COCOAPODS: 1.10.0.rc.1
+COCOAPODS: 1.9.1

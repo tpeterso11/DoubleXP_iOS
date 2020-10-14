@@ -38,6 +38,7 @@ target 'DoubleXP' do
   pod 'CollectionPickerView'
   pod 'SPStorkController'
   pod 'Giphy'
+  pod 'GeoFire', '~> 4.0'
   
   # Pods for DoubleXP
 

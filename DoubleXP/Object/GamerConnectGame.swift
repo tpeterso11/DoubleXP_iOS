@@ -131,6 +131,16 @@ class GamerConnectGame: NSObject, NSCoding {
         }
     }
     
+    var _availablebConsoles:[String]? = nil
+    var availablebConsoles:[String] {
+        get {
+            return (_availablebConsoles)!
+        }
+        set (newVal) {
+            _availablebConsoles = newVal
+        }
+    }
+    
     var _gameModes:[String]? = nil
     var gameModes:[String] {
         get {
@@ -203,6 +213,7 @@ class GamerConnectGame: NSObject, NSCoding {
         self.hasQuiz = (decoder.decodeObject(forKey: "hasQuiz") as! Bool)
         self.mobileGame = (decoder.decodeObject(forKey: "mobileGame") as! String)
         self.available = (decoder.decodeObject(forKey: "available") as! String)
+        self.availablebConsoles = (decoder.decodeObject(forKey: "availableConsoles") as! [String])
     }
     
     func encode(with coder: NSCoder) {
@@ -219,6 +230,7 @@ class GamerConnectGame: NSObject, NSCoding {
         coder.encode(self.twitchGameId, forKey: "twitchGameId")
         coder.encode(self.hasQuiz, forKey: "hasQuiz")
         coder.encode(self.mobileGame, forKey: "mobileGame")
-        coder.encode(self.mobileGame, forKey: "available")
+        coder.encode(self.available, forKey: "available")
+        coder.encode(self.availablebConsoles, forKey: "avaliableConsoles")
     }
 }

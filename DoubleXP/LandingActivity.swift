@@ -88,6 +88,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     var mainNavShowing = false
     var bannerShowing = false
     var met = false
+    var resultsUserUid: String? = nil
     //@IBOutlet weak var newNav: UIView!
     
     @IBOutlet weak var alertSubjectStatus: UILabel!
