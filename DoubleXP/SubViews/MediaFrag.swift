@@ -16,6 +16,7 @@ import WebKit
 import SwiftRichString
 import FBSDKCoreKit
 import AnimatedCollectionViewLayout
+import Lottie
 
 class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITableViewDelegate, UITableViewDataSource, MediaCallbacks, SocialMediaManagerCallback, LandingUICallbacks, SearchCallbacks {
     
@@ -46,8 +47,9 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     @IBOutlet weak var articleAuthorBadge: UIImageView!
     @IBOutlet weak var articleSourceImage: UIImageView!
     @IBOutlet weak var articleName: UILabel!
-    @IBOutlet weak var articleSub: UILabel!
+    @IBOutlet weak var scoob: AnimationView!
     @IBOutlet weak var authorLabel: UILabel!
+    @IBOutlet weak var scoobDismiss: UIButton!
     @IBOutlet weak var articleImage: UIImageView!
     @IBOutlet weak var articleWV: WKWebView!
     @IBOutlet weak var videoAvailLabel: UILabel!
@@ -57,6 +59,10 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     @IBOutlet weak var twitchOptionTable: UITableView!
     @IBOutlet weak var twitchOptionClose: UIImageView!
     @IBOutlet weak var clickableSpace: UIView!
+    @IBOutlet weak var scoobLoading: UIVisualEffectView!
+    @IBOutlet weak var dismissHead: UILabel!
+    @IBOutlet weak var dismissBody: UILabel!
+    @IBOutlet weak var scoobSub: UIView!
     var options = [String]()
     var selectedCategory = ""
     var newsSet = false
@@ -77,6 +83,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     var streams = [TwitchStreamObject]()
     var currentCategory = "news"
     var isSearch = false
+    var channelsSet = false
     var currentStream: TwitchStreamObject?
     
     
@@ -159,8 +166,9 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         self.news.refreshControl?.addTarget(self, action: #selector(pullToRefresh), for: .valueChanged)
         self.channelCollection.refreshControl?.addTarget(self, action: #selector(downloadStreams), for: .valueChanged)
         
-        optionsCollection.dataSource = self
-        optionsCollection.delegate = self
+        //optionsCollection.dataSource = self
+        //optionsCollection.delegate = self
+        setupScoob()
         
         self.constraint = NSLayoutConstraint(item: self.articleOverlay, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0.0, constant: 0)
         
@@ -181,8 +189,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
             object: self.view.window,
             queue: nil
         ) { notification in
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-            delegate.currentLanding?.hideScoob()
+            self.hideScoob()
         }
 
         animateView()
@@ -259,15 +266,25 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     }
     
     private func animateView(){
-        let top = CGAffineTransform(translationX: 0, y: 50)
-        UIView.animate(withDuration: 0.5, animations: {
-            self.optionsCollection.alpha = 1
-            self.optionsCollection.transform = top
-        }, completion: nil)
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            self.getMedia()
-        }
+        self.twitchShowing = true
+        self.loadingViewSpinner.startAnimating()
+        self.currentCategory = "twitch"
+        self.articlesLoaded = false
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Media - Twitch Selected"))
+        //let delegate = UIApplication.shared.delegate as! AppDelegate
+        //delegate.currentLanding?.updateNavColor(color: UIColor(named: "twitchPurpleDark")!)
+        //delegate.currentLanding?.removeBottomNav(showNewNav: true, hideSearch: false, searchHint:"search for stream", searchButtonText: "search", isMessaging: false)
+        UIView.animate(withDuration: 0.3, animations: {
+            self.loadingView.alpha = 1
+        }, completion: { (finished: Bool) in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self.articles = [Any]()
+                
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                let manager = appDelegate.socialMediaManager
+                manager.getTwitchGames(callbacks: self)
+            }
+        })
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -620,8 +637,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                     }
                 }
                 
-                let delegate = UIApplication.shared.delegate as! AppDelegate
-                delegate.currentLanding?.showScoob(callback: self, cancelableWV: self.twitchWV)
+                self.showScoob(callback: self, cancelableWV: self.twitchWV)
                 //loading twitch streams
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
@@ -771,7 +787,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     
     @objc func videoClicked(_ sender: AnyObject?) {
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        delegate.currentLanding?.showScoob(callback: self, cancelableWV: self.articleWV)
+        self.showScoob(callback: self, cancelableWV: self.articleWV)
         
         if(self.selectedArticle.source == "gs"){
             AppEvents.logEvent(AppEvents.Name(rawValue: "Media - GS Video Selected"))
@@ -833,7 +849,8 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         channelOverlayClose.isUserInteractionEnabled = true
         channelOverlayClose.addGestureRecognizer(close)
         
-        streamsButton.addTarget(self, action: #selector(downloadStreams), for: .touchUpInside)
+        self.downloadStreams()
+        //streamsButton.addTarget(self, action: #selector(downloadStreams), for: .touchUpInside)
         videosButton.addTarget(self, action: #selector(downloadVideos), for: .touchUpInside)
         connectButton.addTarget(self, action: #selector(navigateToConnect), for: .touchUpInside)
         
@@ -1194,19 +1211,48 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     
     func onChannelsLoaded(channels: [TwitchChannelObj]) {
         DispatchQueue.main.async {
+            self.articles = [Any]()
             self.articles.append(contentsOf: channels)
             self.articles.append(0)
+            if(!self.channelsSet){
+                if(self.refreshControl.isRefreshing){
+                    self.refreshControl.endRefreshing()
+            }
             
-            let layout = UICollectionViewFlowLayout()
-            layout.scrollDirection = .vertical
-            self.news?.collectionViewLayout = layout
-            self.news.reloadData()
-            self.news.setContentOffset(CGPoint(x:0,y:0), animated: true)
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            delegate.currentMediaFrag = self
             
-            UIView.animate(withDuration: 0.8, delay: 1, options: [], animations: {
+            let top = CGAffineTransform(translationX: 0, y: 10)
+            UIView.animate(withDuration: 0.3, animations: {
                 self.loadingView.alpha = 0
-                self.articlesLoaded = true
-            }, completion: nil)
+                self.loadingViewSpinner.stopAnimating()
+            }, completion: { (finished: Bool) in
+                UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                    let layout = UICollectionViewFlowLayout()
+                    layout.scrollDirection = .vertical
+                    self.news?.collectionViewLayout = layout
+                    self.news.transform = top
+                    self.news.delegate = self
+                    self.news.dataSource = self
+                    self.news.alpha = 1
+                    self.channelsSet = true
+                }, completion: nil)
+            })
+        } else {
+                self.articles.append(contentsOf: channels)
+                self.articles.append(0)
+                
+                let layout = UICollectionViewFlowLayout()
+                layout.scrollDirection = .vertical
+                self.news?.collectionViewLayout = layout
+                self.news.reloadData()
+                self.news.setContentOffset(CGPoint(x:0,y:0), animated: true)
+                
+                UIView.animate(withDuration: 0.8, delay: 1, options: [], animations: {
+                    self.loadingView.alpha = 0
+                    self.articlesLoaded = true
+                }, completion: nil)
+            }
         }
     }
     
@@ -1219,8 +1265,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                 
                 AppEvents.logEvent(AppEvents.Name(rawValue: "Twitch Search"))
                 if(streams.count == 1){
-                    let delegate = UIApplication.shared.delegate as! AppDelegate
-                    delegate.currentLanding?.showScoob(callback: self, cancelableWV: self.twitchWV)
+                    self.showScoob(callback: self, cancelableWV: self.twitchWV)
                     //loading twitch streams
                     
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -1300,8 +1345,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     
     @objc private func dismissTwitchDrawer(){
         if(self.currentStream != nil){
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-            delegate.currentLanding?.showScoob(callback: self, cancelableWV: self.twitchWV)
+            self.showScoob(callback: self, cancelableWV: self.twitchWV)
             //loading twitch streams
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -1315,9 +1359,6 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                     }, completion: { (finished: Bool) in
                         self.clickableSpace.isUserInteractionEnabled = false
                         self.articleBlur.alpha = 0
-                        
-                        delegate.currentLanding?.updateNavColor(color: UIColor(named: "twitchPurpleDark")!)
-                        delegate.currentLanding?.removeBottomNav(showNewNav: true, hideSearch: false, searchHint:"search for stream", searchButtonText: "search", isMessaging: false)
                     })
                 }
             }
@@ -1354,6 +1395,101 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     }
     
     func messageTextSubmitted(string: String, list: [String]?) {
+    }
+    
+    func showScoob(callback: LandingUICallbacks, cancelableWV: WKWebView?){
+        resetDismissScoob()
+        setupScoobCancel(cancelableWV: cancelableWV)
+        
+        let top = CGAffineTransform(translationX: 0, y: 40)
+        UIView.animate(withDuration: 0.5, animations: {
+            self.scoobLoading.alpha = 1
+            self.scoobSub.transform = top
+            self.scoobSub.alpha = 1
+        
+            DispatchQueue.main.asyncAfter(deadline: .now() + 20.0) {
+                self.showDismissScoob()
+            }
+        }, completion: nil)
+        
+        scoob.loopMode = .loop
+        scoob.play()
+    }
+    
+    func setupScoobCancel(cancelableWV: WKWebView?) {
+        if(cancelableWV != nil){
+            cancelableWV?.stopLoading()
+            cancelableWV?.loadHTMLString("", baseURL: nil)
+        } else {
+            hideScoob()
+        }
+    }
+    
+    func showDismissScoob(){
+        let top3 = CGAffineTransform(translationX: 0, y: -40)
+        UIView.animate(withDuration: 0.5, animations: {
+            self.scoobDismiss.transform = top3
+            self.dismissHead.transform = top3
+            self.dismissBody.transform = top3
+            self.scoobDismiss.alpha = 1
+            self.dismissHead.alpha = 1
+            self.dismissBody.alpha = 1
+        }, completion: nil)
+    }
+    
+    func resetDismissScoob(){
+        let top3 = CGAffineTransform(translationX: 0, y: 0)
+        UIView.animate(withDuration: 0.01, animations: {
+            self.scoobDismiss.transform = top3
+            self.dismissHead.transform = top3
+            self.dismissBody.transform = top3
+            self.scoobDismiss.alpha = 0
+            self.dismissHead.alpha = 0
+            self.dismissBody.alpha = 0
+        }, completion: nil)
+    }
+    
+    func setupScoob(){
+        scoobSub.layer.cornerRadius = 10.0
+        scoobSub.layer.borderWidth = 1.0
+        scoobSub.layer.borderColor = UIColor.clear.cgColor
+        scoobSub.layer.masksToBounds = true
+        
+        scoobSub.layer.shadowColor = UIColor.black.cgColor
+        scoobSub.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+        scoobSub.layer.shadowRadius = 2.0
+        scoobSub.layer.shadowOpacity = 0.5
+        scoobSub.layer.masksToBounds = false
+        scoobSub.layer.shadowPath = UIBezierPath(roundedRect: scoobSub.layer.bounds, cornerRadius: scoobSub.layer.cornerRadius).cgPath
+        
+        scoobDismiss.layer.shadowColor = UIColor.black.cgColor
+        scoobDismiss.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+        scoobDismiss.layer.shadowRadius = 2.0
+        scoobDismiss.layer.shadowOpacity = 0.5
+        scoobDismiss.layer.masksToBounds = false
+        scoobDismiss.layer.shadowPath = UIBezierPath(roundedRect: scoobDismiss.bounds, cornerRadius: scoobDismiss.layer.cornerRadius).cgPath
+        //add more scoob layouts
+        // -- like one that is like  (ACTUAL CONTROLLER SYMBOLS ->) " triangle triangle back forward" and then below have "Sub Zero's ice move" somethin like that. We can create a small library of these to pop up throughout the app whenever the loading screen shows.
+   
+        scoobDismiss.addTarget(self, action: #selector(hideScoob), for: .touchUpInside)
+    }
+    
+    
+    @objc func hideScoob(){
+        if(self.scoobLoading.alpha == 1){
+            let top = CGAffineTransform(translationX: 0, y: 0)
+            UIView.animate(withDuration: 0.5, animations: {
+                self.scoobLoading.alpha = 0
+            }, completion: { (finished: Bool) in
+                UIView.animate(withDuration: 0.5, delay: 0.8, options: [], animations: {
+                    self.scoobSub.transform = top
+                    self.scoobSub.alpha = 0
+                    self.resetDismissScoob()
+                    
+                    self.scoob.stop()
+                }, completion: nil)
+            })
+        }
     }
     
 }

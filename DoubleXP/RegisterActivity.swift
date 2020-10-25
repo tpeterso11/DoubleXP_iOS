@@ -23,10 +23,6 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
     @IBOutlet weak var emailField: UITextField!
     @IBOutlet weak var passwordField: UITextField!
     @IBOutlet weak var closeX: UIImageView!
-    @IBOutlet weak var psSwitch: UISwitch!
-    @IBOutlet weak var xboxSwitch: UISwitch!
-    @IBOutlet weak var nintendoSwitch: UISwitch!
-    @IBOutlet weak var pcSwitch: UISwitch!
     @IBOutlet weak var nextButton: UIButton!
     @IBOutlet weak var facebook: UIImageView!
     @IBOutlet weak var googleSignIn: UIView!
@@ -86,19 +82,9 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
             if let tokenString = result?.token?.tokenString {
                 self.facebookTokenString = tokenString
                 self.facebookLoginAccepted = true
+                self.registrationType = "facebook"
                 
-                self.emailLoginCover.image = #imageLiteral(resourceName: "facebook_logo.png")
-                
-                let top = CGAffineTransform(translationX: 0, y: 70)
-                UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5,
-                               initialSpringVelocity: 0.5, options: [], animations: {
-                                self.emailLoginCover.transform = top
-                                self.emailLoginCover.alpha = 1
-                                self.emailField.alpha = 0.1
-                                self.emailField.isUserInteractionEnabled = false
-                                self.passwordField.alpha = 0.1
-                                self.passwordField.isUserInteractionEnabled = false
-                }, completion: nil)
+                registerUser(email: nil, pass: nil, facebook: true, google: false, apple: false)
             } else {
                 AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Fail - " + "\(error?.localizedDescription ?? "")"))
                 
@@ -181,52 +167,9 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
            appleRegister.isUserInteractionEnabled = false
        }
         
-        switches.append(psSwitch)
-        switches.append(xboxSwitch)
-        switches.append(pcSwitch)
-        switches.append(nintendoSwitch)
-        
-        psSwitch.addTarget(self, action: #selector(psSwitchChanged), for: UIControl.Event.valueChanged)
-        xboxSwitch.addTarget(self, action: #selector(xboxSwitchChanged), for: UIControl.Event.valueChanged)
-        nintendoSwitch.addTarget(self, action: #selector(nintendoSwitchChanged), for: UIControl.Event.valueChanged)
-        pcSwitch.addTarget(self, action: #selector(pcSwitchChanged), for: UIControl.Event.valueChanged)
-        
         GIDSignIn.sharedInstance().delegate = self
         
         checkNextButton()
-        
-        if(!socialRegistered.isEmpty && !socialRegisteredUid.isEmpty){
-            if(socialRegistered == "google"){
-                self.emailLoginCover.image = #imageLiteral(resourceName: "google_logo.png")
-            }
-            else if(socialRegistered == "apple"){
-                self.emailLoginCover.image = #imageLiteral(resourceName: "apple (2).png")
-            }
-            else{
-                self.emailLoginCover.image = #imageLiteral(resourceName: "facebook_logo.png")
-            }
-            
-            let top = CGAffineTransform(translationX: 0, y: 70)
-            UIView.animate(withDuration: 0.8, delay: 0.5, usingSpringWithDamping: 0.5,
-                           initialSpringVelocity: 0.5, options: [], animations: {
-                            self.emailLoginCover.transform = top
-                            self.emailLoginCover.alpha = 1
-                            self.emailField.alpha = 0.1
-                            self.emailField.isUserInteractionEnabled = false
-                            self.passwordField.alpha = 0.1
-                            self.passwordField.isUserInteractionEnabled = false
-            }, completion: nil)
-            
-            if(self.socialRegistered == "google"){
-                self.googleLoginAccepted = true
-            }
-            else if(self.socialRegistered == "apple"){
-                self.appleLoginAccepted = true
-            }
-            else if(self.socialRegistered == "facebook"){
-                self.facebookLoginAccepted = true
-            }
-        }
         
         AppEvents.logEvent(AppEvents.Name(rawValue: "Register"))
     }
@@ -241,22 +184,6 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
     @objc func appleClicked(){
         AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Apple Login"))
         startSignInWithAppleFlow()
-    }
-    
-    @objc func psSwitchChanged(stationSwitch: UISwitch) {
-        checkNextButton()
-    }
-    
-    @objc func xboxSwitchChanged(stationSwitch: UISwitch) {
-        checkNextButton()
-    }
-    
-    @objc func pcSwitchChanged(stationSwitch: UISwitch) {
-        checkNextButton()
-    }
-    
-    @objc func nintendoSwitchChanged(stationSwitch: UISwitch) {
-        checkNextButton()
     }
     
     @available(iOS 13.0, *)
@@ -276,18 +203,8 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
             
           self.appleTokenString = idTokenString
             self.appleLoginAccepted = true
-            self.emailLoginCover.image = #imageLiteral(resourceName: "apple (2).png")
-        
-            let top = CGAffineTransform(translationX: 0, y: 70)
-            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5,
-                       initialSpringVelocity: 0.5, options: [], animations: {
-                        self.emailLoginCover.transform = top
-                        self.emailLoginCover.alpha = 1
-                        self.emailField.alpha = 0.1
-                        self.emailField.isUserInteractionEnabled = false
-                        self.passwordField.alpha = 0.1
-                        self.passwordField.isUserInteractionEnabled = false
-            }, completion: nil)
+            self.registrationType = "apple"
+            registerUser(email: nil, pass: nil, facebook: false, google: false, apple: true)
         }
     }
     
@@ -397,57 +314,16 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                     else{
                         let uId = authResult?.user.uid ?? ""
                             let user = User(uId: uId)
-                                
-                            if(self.psSwitch.isOn){
-                                user.ps = true
-                            }
-                            
-                            if(self.pcSwitch.isOn){
-                                user.pc = true
-                            }
-                            
-                            if(self.xboxSwitch.isOn){
-                                user.xbox = true
-                            }
-                            
-                            if(self.nintendoSwitch.isOn){
-                                user.nintendo = true
-                            }
-                            checkRef.child("consoles").child("xbox").setValue(self.xboxSwitch.isOn)
-                            checkRef.child("consoles").child("ps").setValue(self.psSwitch.isOn)
-                            checkRef.child("consoles").child("nintendo").setValue(self.nintendoSwitch.isOn)
-                            checkRef.child("consoles").child("pc").setValue(self.pcSwitch.isOn)
                             checkRef.child("platform").setValue("ios")
                             checkRef.child("search").setValue("true")
                             checkRef.child("registrationType").setValue("facebook")
                             checkRef.child("model").setValue(UIDevice.modelName)
                             checkRef.child("notifications").setValue("true")
                                 
-                            DispatchQueue.main.async {
-                                let delegate = UIApplication.shared.delegate as! AppDelegate
-                                delegate.currentUser = user
-                                    
-                                if(!user.pc && !user.xbox && !user.ps && !user.nintendo){
-                                    AppEvents.logEvent(AppEvents.Name(rawValue: "Register - No GC"))
-                                    self.performSegue(withIdentifier: "registerNoGC", sender: nil)
-                                }
-                                else{
-                                    if(user.pc){
-                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PC User"))
-                                    }
-                                    if(user.xbox){
-                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - xBox User"))
-                                    }
-                                    if(user.ps){
-                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PS User"))
-                                    }
-                                    if(user.nintendo){
-                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Nintendo User"))
-                                    }
-                                    
-                                    AppEvents.logEvent(AppEvents.Name(rawValue: "Register - GC"))
-                                    self.performSegue(withIdentifier: "registerGC", sender: nil)
-                                }
+                                DispatchQueue.main.async {
+                                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                                    delegate.currentUser = user
+                                    self.performSegue(withIdentifier: "newReg", sender: nil)
                                 }
                             }
                         }) { (error) in
@@ -490,57 +366,15 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                             else{
                                 let uId = authResult?.user.uid ?? ""
                                     let user = User(uId: uId)
-                                        
-                                    if(self.psSwitch.isOn){
-                                        user.ps = true
-                                    }
-                                    
-                                    if(self.pcSwitch.isOn){
-                                        user.pc = true
-                                    }
-                                    
-                                    if(self.xboxSwitch.isOn){
-                                        user.xbox = true
-                                    }
-                                    
-                                    if(self.nintendoSwitch.isOn){
-                                        user.nintendo = true
-                                    }
-                                    checkRef.child("consoles").child("xbox").setValue(self.xboxSwitch.isOn)
-                                    checkRef.child("consoles").child("ps").setValue(self.psSwitch.isOn)
-                                    checkRef.child("consoles").child("nintendo").setValue(self.nintendoSwitch.isOn)
-                                    checkRef.child("consoles").child("pc").setValue(self.pcSwitch.isOn)
                                     checkRef.child("platform").setValue("ios")
                                     checkRef.child("search").setValue("true")
                                     checkRef.child("registrationType").setValue("google")
                                     checkRef.child("model").setValue(UIDevice.modelName)
                                     checkRef.child("notifications").setValue("true")
-                                        
-                                    DispatchQueue.main.async {
-                                        let delegate = UIApplication.shared.delegate as! AppDelegate
-                                        delegate.currentUser = user
-                                            
-                                        if(!user.pc && !user.xbox && !user.ps && !user.nintendo){
-                                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - No GC"))
-                                            self.performSegue(withIdentifier: "registerNoGC", sender: nil)
-                                        }
-                                        else{
-                                            if(user.pc){
-                                                AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PC User"))
-                                            }
-                                            if(user.xbox){
-                                                AppEvents.logEvent(AppEvents.Name(rawValue: "Register - xBox User"))
-                                            }
-                                            if(user.ps){
-                                                AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PS User"))
-                                            }
-                                            if(user.nintendo){
-                                                AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Nintendo User"))
-                                            }
-                                            
-                                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - GC"))
-                                            self.performSegue(withIdentifier: "registerGC", sender: nil)
-                                        }
+                                        DispatchQueue.main.async {
+                                            let delegate = UIApplication.shared.delegate as! AppDelegate
+                                            delegate.currentUser = user
+                                            self.performSegue(withIdentifier: "newReg", sender: nil)
                                         }
                                     }
                                 }) { (error) in
@@ -586,58 +420,16 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                               else{
                                   let uId = authResult?.user.uid ?? ""
                                       let user = User(uId: uId)
-                                          
-                                      if(self.psSwitch.isOn){
-                                          user.ps = true
-                                      }
-                                      
-                                      if(self.pcSwitch.isOn){
-                                          user.pc = true
-                                      }
-                                      
-                                      if(self.xboxSwitch.isOn){
-                                          user.xbox = true
-                                      }
-                                      
-                                      if(self.nintendoSwitch.isOn){
-                                          user.nintendo = true
-                                      }
-                                      checkRef.child("consoles").child("xbox").setValue(self.xboxSwitch.isOn)
-                                      checkRef.child("consoles").child("ps").setValue(self.psSwitch.isOn)
-                                      checkRef.child("consoles").child("nintendo").setValue(self.nintendoSwitch.isOn)
-                                      checkRef.child("consoles").child("pc").setValue(self.pcSwitch.isOn)
                                       checkRef.child("platform").setValue("ios")
                                       checkRef.child("search").setValue("true")
                                       checkRef.child("registrationType").setValue("apple")
                                       checkRef.child("model").setValue(UIDevice.modelName)
                                       checkRef.child("notifications").setValue("true")
-                                          
-                                      DispatchQueue.main.async {
-                                          let delegate = UIApplication.shared.delegate as! AppDelegate
-                                          delegate.currentUser = user
-                                              
-                                          if(!user.pc && !user.xbox && !user.ps && !user.nintendo){
-                                              AppEvents.logEvent(AppEvents.Name(rawValue: "Register - No GC"))
-                                              self.performSegue(withIdentifier: "registerNoGC", sender: nil)
-                                          }
-                                          else{
-                                              if(user.pc){
-                                                  AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PC User"))
-                                              }
-                                              if(user.xbox){
-                                                  AppEvents.logEvent(AppEvents.Name(rawValue: "Register - xBox User"))
-                                              }
-                                              if(user.ps){
-                                                  AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PS User"))
-                                              }
-                                              if(user.nintendo){
-                                                  AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Nintendo User"))
-                                              }
-                                              
-                                              AppEvents.logEvent(AppEvents.Name(rawValue: "Register - GC"))
-                                              self.performSegue(withIdentifier: "registerGC", sender: nil)
-                                          }
-                                          }
+                                        DispatchQueue.main.async {
+                                            let delegate = UIApplication.shared.delegate as! AppDelegate
+                                            delegate.currentUser = user
+                                            self.performSegue(withIdentifier: "newReg", sender: nil)
+                                        }
                                       }
                                   }) { (error) in
                                       print(error.localizedDescription)
@@ -673,27 +465,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                             let uId = authResult?.user.uid ?? ""
                             let user = User(uId: uId)
                             
-                            if(self.psSwitch.isOn){
-                                user.ps = true
-                            }
-                            
-                            if(self.pcSwitch.isOn){
-                                user.pc = true
-                            }
-                            
-                            if(self.xboxSwitch.isOn){
-                                user.xbox = true
-                            }
-                            
-                            if(self.nintendoSwitch.isOn){
-                                user.nintendo = true
-                            }
-                            
                             let ref = Database.database().reference().child("Users").child((authResult?.user.uid)!)
-                            ref.child("consoles").child("xbox").setValue(self.xboxSwitch.isOn)
-                            ref.child("consoles").child("ps").setValue(self.psSwitch.isOn)
-                            ref.child("consoles").child("nintendo").setValue(self.nintendoSwitch.isOn)
-                            ref.child("consoles").child("pc").setValue(self.pcSwitch.isOn)
                             ref.child("platform").setValue("ios")
                             ref.child("search").setValue("true")
                             ref.child("registrationType").setValue("email")
@@ -703,28 +475,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                             DispatchQueue.main.async {
                                 let delegate = UIApplication.shared.delegate as! AppDelegate
                                 delegate.currentUser = user
-                                
-                                if(!user.pc && !user.xbox && !user.ps && !user.nintendo){
-                                    AppEvents.logEvent(AppEvents.Name(rawValue: "Register - No GC"))
-                                    self.performSegue(withIdentifier: "registerNoGC", sender: nil)
-                                }
-                                else{
-                                    if(user.pc){
-                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PC User"))
-                                    }
-                                    if(user.xbox){
-                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - xBox User"))
-                                    }
-                                    if(user.ps){
-                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PS User"))
-                                    }
-                                    if(user.nintendo){
-                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Nintendo User"))
-                                    }
-                                    
-                                    AppEvents.logEvent(AppEvents.Name(rawValue: "Register - GC"))
-                                    self.performSegue(withIdentifier: "registerGC", sender: nil)
-                                }
+                                self.performSegue(withIdentifier: "newReg", sender: nil)
                             }
                         }
                     }
@@ -735,27 +486,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
             if(!self.socialRegistered.isEmpty && !socialRegisteredUid.isEmpty){
                 let user = User(uId: self.socialRegisteredUid)
                 
-                if(self.psSwitch.isOn){
-                    user.ps = true
-                }
-                
-                if(self.pcSwitch.isOn){
-                    user.pc = true
-                }
-                
-                if(self.xboxSwitch.isOn){
-                    user.xbox = true
-                }
-                
-                if(self.nintendoSwitch.isOn){
-                    user.nintendo = true
-                }
-                
                 let ref = Database.database().reference().child("Users").child(self.socialRegisteredUid)
-                ref.child("consoles").child("xbox").setValue(self.xboxSwitch.isOn)
-                ref.child("consoles").child("ps").setValue(self.psSwitch.isOn)
-                ref.child("consoles").child("nintendo").setValue(self.nintendoSwitch.isOn)
-                ref.child("consoles").child("pc").setValue(self.pcSwitch.isOn)
                 ref.child("platform").setValue("ios")
                 ref.child("search").setValue("true")
                 ref.child("registrationType").setValue(self.socialRegistered)
@@ -765,28 +496,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                 DispatchQueue.main.async {
                     let delegate = UIApplication.shared.delegate as! AppDelegate
                     delegate.currentUser = user
-                    
-                    if(!user.pc && !user.xbox && !user.ps && !user.nintendo){
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - No GC"))
-                        self.performSegue(withIdentifier: "registerNoGC", sender: nil)
-                    }
-                    else{
-                        if(user.pc){
-                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PC User"))
-                        }
-                        if(user.xbox){
-                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - xBox User"))
-                        }
-                        if(user.ps){
-                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PS User"))
-                        }
-                        if(user.nintendo){
-                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Nintendo User"))
-                        }
-                        
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - GC"))
-                        self.performSegue(withIdentifier: "registerGC", sender: nil)
-                    }
+                    self.performSegue(withIdentifier: "newReg", sender: nil)
                 }
             }
             else{
@@ -1103,8 +813,9 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                     let currentTag = dict?["gamerTag"] as? String ?? ""
                     let currentGame = dict?["game"] as? String ?? ""
                     let console = dict?["console"] as? String ?? ""
+                    let quizTaken = dict?["quizTaken"] as? String ?? ""
                     
-                    let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
+                    let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
                     gamerTags.append(currentGamerTagObj)
                 }
                 
@@ -1237,7 +948,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
     }
 
     func checkNextButton(){
-        if((self.emailEntered && passwordEntered && checkSwitches()) || (self.emailLoginCover.alpha == 1 && self.facebookLoginAccepted && checkSwitches()) || (self.googleLoginAccepted && checkSwitches()) || (self.appleLoginAccepted && checkSwitches())){
+        if(self.emailEntered && passwordEntered){
             self.nextButton.alpha = 1
         }
         else{
@@ -1264,18 +975,6 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
         }
     }
     
-    private func checkSwitches() -> Bool{
-        var switchOn = false
-        for uiSwitch in self.switches{
-            if(uiSwitch.isOn){
-                switchOn = true
-                break
-            }
-        }
-        
-        return switchOn
-    }
-    
     private func modelIdentifier() -> String {
         if let simulatorModelIdentifier = ProcessInfo().environment["SIMULATOR_MODEL_IDENTIFIER"] { return simulatorModelIdentifier }
         var sysinfo = utsname()
@@ -1291,19 +990,8 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
         
         //registerUser(email: email, pass: pass)
         if(!email.isEmpty && !pass.isEmpty && rule.evaluate(with: email)){
+            self.registrationType = "email"
             registerUser(email: email, pass: pass, facebook: false, google: false, apple: false)
-        }
-        else if(self.facebookLoginAccepted && !self.facebookTokenString.isEmpty){
-            registerUser(email: nil, pass: nil, facebook: true, google: false, apple: false)
-        }
-        else if(self.googleLoginAccepted && !self.googleTokenString.isEmpty && !self.googleToken.isEmpty){
-            registerUser(email: nil, pass: nil, facebook: false, google: true, apple: false)
-        }
-        else if(self.appleLoginAccepted && !self.appleTokenString.isEmpty){
-            registerUser(email: nil, pass: nil, facebook: false, google: false, apple: true)
-        }
-        else if(!self.socialRegistered.isEmpty && !self.socialRegisteredUid.isEmpty){
-            registerUser(email: nil, pass: nil, facebook: socialRegistered == "facebook", google: socialRegistered == "google", apple: socialRegistered == "apple")
         }
         else{
             if(!rule.evaluate(with: email)){
@@ -1372,20 +1060,9 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
         self.googleTokenString = authentication.accessToken
         self.googleToken = authentication.idToken
         self.googleLoginAccepted = true
+        self.registrationType = "google"
         
-        self.emailLoginCover.image = #imageLiteral(resourceName: "google_logo.png")
-        
-        let top = CGAffineTransform(translationX: 0, y: 70)
-        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5,
-                       initialSpringVelocity: 0.5, options: [], animations: {
-                        self.emailLoginCover.transform = top
-                        self.emailLoginCover.alpha = 1
-                        self.emailField.alpha = 0.1
-                        self.emailField.isUserInteractionEnabled = false
-                        self.passwordField.alpha = 0.1
-                        self.passwordField.isUserInteractionEnabled = false
-        }, completion: nil)
-        
+        registerUser(email: nil, pass: nil, facebook: false, google: true, apple: false)
     }
 
     func sign(_ signIn: GIDSignIn!, didDisconnectWith user: GIDGoogleUser!, withError error: Error!) {

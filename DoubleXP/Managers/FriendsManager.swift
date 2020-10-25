@@ -364,7 +364,6 @@ class FriendsManager{
             if(snapshot.exists()){
                 let delegate = UIApplication.shared.delegate as! AppDelegate
                 let currentUser = delegate.currentUser
-                let manager = GamerProfileManager()
                 
                 var tempArray = [FriendRequestObject]()
                 let requestsArray = snapshot.childSnapshot(forPath: "sent_requests")
@@ -429,7 +428,10 @@ class FriendsManager{
                         }
                         
                         sendingRef.setValue(sentArray)
-                        user.sentRequests = sentArray
+                        
+                        let delegate = UIApplication.shared.delegate as! AppDelegate
+                        let currentUser = delegate.currentUser
+                        currentUser!.sentRequests = sentArray
                     }
                 }
                 else{
@@ -447,7 +449,9 @@ class FriendsManager{
                         sentRequests.append(newFriend)
                     }
                     
-                    user.sentRequests = sentRequests
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    let currentUser = delegate.currentUser
+                    currentUser!.sentRequests = sentRequests
                 }
             }
             

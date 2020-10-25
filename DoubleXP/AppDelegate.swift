@@ -20,7 +20,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var appProperties: NSDictionary = [:]
     var gcGames: [GamerConnectGame]!
     var freeAgentProfiles: [FreeAgentObject]!
+    var searchManager = SearchManager()
     var selectedGCGame: GamerConnectGame?
+    var currentGCSearchFrag: GamerConnectSearch?
     var currentUser: User?
     var currentLanding: LandingActivity?
     var currentMediaFrag: MediaFrag?
@@ -41,6 +43,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var imageCache = NSCache<NSString, UIImage>()
     var registerUserCache = [User]()
     var cachedUserType = ""
+    var cachedTest = ""
+    var currentUpgradeController: Upgrade?
     
     private var apnsToken: String = ""
     private var fcmToken: String = ""

@@ -136,13 +136,18 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        guard !uid.isEmpty else {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let test = appDelegate.cachedTest
+        if(!uid.isEmpty){
+            //do nothing
+        } else if(!test.isEmpty){
+            self.uid = test
+        } else {
             return
         }
-    
+        
         loadUserInfo(uid: uid)
         
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.currentProfileFrag = self
         if(appDelegate.currentUser!.uId == self.uid){
             bottomBlur.isHidden = true
@@ -242,8 +247,9 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 let currentTag = dict["gamerTag"] as? String ?? ""
                 let currentGame = dict["game"] as? String ?? ""
                 let console = dict["console"] as? String ?? ""
+                let quizTaken = dict["quizTaken"] as? String ?? ""
                 
-                let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
+                let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
                 gamerTags.append(currentGamerTagObj)
             }
             

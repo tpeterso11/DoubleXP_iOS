@@ -81,7 +81,7 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
         
         gcGames = list
         
-        self.recommendedUsers.collectionViewLayout = CollectionViewSlantedLayout()
+        //self.recommendedUsers.collectionViewLayout = CollectionViewSlantedLayout()
         
         NotificationCenter.default.addObserver(
             forName: UIWindow.didBecomeKeyNotification,
@@ -240,8 +240,6 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
                 cell.announcementGame.text = (current as! AnnouncementObj).announcementGames[0]
                 cell.announcementTitle.text = (current as! AnnouncementObj).announcementTitle
                 
-                cell.announcementTitle.rotate(degrees: CGFloat(-12))
-                cell.announcementGame.rotate(degrees: CGFloat(-12))
                 /*cell.contentView.layer.cornerRadius = 10.0
                 cell.contentView.layer.borderWidth = 1.0
                 cell.contentView.layer.borderColor = UIColor.clear.cgColor
@@ -291,9 +289,6 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
                 
                 cell.gameName.text = currentObj.game
                 
-                cell.gameName.rotate(degrees: CGFloat(-12))
-                cell.cellHeader.rotate(degrees: CGFloat(-12))
-                
                 /*cell.contentView.layer.cornerRadius = 10.0
                 cell.contentView.layer.borderWidth = 1.0
                 cell.contentView.layer.borderColor = UIColor.clear.cgColor
@@ -336,8 +331,6 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
                 
                 cell.title.text = currentObj.name
                 cell.sub.text = currentObj.sub
-                cell.title.rotate(degrees: CGFloat(-12))
-                cell.sub.rotate(degrees: CGFloat(-12))
                 
                 /*cell.contentView.layer.cornerRadius = 10.0
                 cell.contentView.layer.borderWidth = 1.0

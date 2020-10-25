@@ -46,16 +46,11 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
         
         getQuestions()
         
-        gameName.text = gcGame?.gameName
-        
         startButton.alpha = 0.4
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
         interviewManager = delegate.interviewManager
-        
-        //let doneTap = UITapGestureRecognizer(target: self, action: #selector(doneButtonClicked))
-        //gameOverButton.isUserInteractionEnabled = true
-        //gameOverButton.addGestureRecognizer(doneTap)
+        gameName.text = interviewManager?.currentGCGame?.gameName
         
         startButton.addTarget(self, action: #selector(doneButtonClicked), for: .touchUpInside)
         
@@ -99,14 +94,19 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
     }
     
     private func setImage(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        interviewManager = delegate.interviewManager
         gameImage.image = Utility.Image.placeholder
-        gameImage.moa.url = gcGame?.imageUrl
+        gameImage.moa.url = interviewManager?.currentGCGame?.imageUrl
         gameImage.contentMode = .scaleAspectFill
         gameImage.clipsToBounds = true
     }
     
     func getQuestions(){
-        let ref = Database.database().reference().child("Games").child(gcGame!.gameName)
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        interviewManager = delegate.interviewManager
+        
+        let ref = Database.database().reference().child("Games").child(interviewManager!.currentGCGame.gameName)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             if(snapshot.exists()){
                 let value = snapshot.value as? NSDictionary

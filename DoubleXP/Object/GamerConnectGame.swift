@@ -181,6 +181,16 @@ class GamerConnectGame: NSObject, NSCoding {
         }
     }
     
+    var _filterQuestions = [[String: Any]]()
+    var filterQuestions: [[String: Any]] {
+        get {
+            return (_filterQuestions)
+        }
+        set (newVal) {
+            _filterQuestions = newVal
+        }
+    }
+    
     init(imageUrl: String, gameName: String, developer: String, hook: String, statsAvailable: Bool, teamNeeds: [String],
          twitterHandle: String, twitchHandle: String, available: String)
     {

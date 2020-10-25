@@ -211,6 +211,16 @@ class User: NSObject, NSCoding {
         }
     }
     
+    var _mobile = false
+    var mobile: Bool {
+        get {
+            return (_mobile)
+        }
+        set (newVal) {
+            _mobile = newVal
+        }
+    }
+    
     var _nintendo = false
     var nintendo: Bool {
         get {
@@ -494,6 +504,15 @@ class User: NSObject, NSCoding {
         coder.encode(self.selectedAge, forKey: "selectedAge")
         coder.encode(self.primaryLanguage, forKey: "primaryLanguage")
         coder.encode(self.secondaryLanguage, forKey: "secondaryLanguage")
+    }
+    
+    struct Post: Hashable, Equatable {
+        let gamertag: String
+        var hashValue: Int { get { return gamertag.hashValue } }
+    }
+
+    static func ==(left:User, right:User) -> Bool {
+        return left.gamerTag == right.gamerTag
     }
 }
 

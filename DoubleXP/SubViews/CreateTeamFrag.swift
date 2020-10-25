@@ -278,8 +278,9 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
                     let currentTag = dict?["gamerTag"] as? String ?? ""
                     let currentGame = dict?["game"] as? String ?? ""
                     let console = dict?["console"] as? String ?? ""
+                    let quizTaken = dict?["quizTaken"] as? String ?? ""
                     
-                    let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
+                    let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
                     gamerTags.append(currentGamerTagObj)
                 }
                 

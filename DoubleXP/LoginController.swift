@@ -70,12 +70,26 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                         AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Fail Firebase - " + authError.localizedDescription))
                     }
                     else{
-                        if(authResult != nil){
-                            let uId = authResult?.user.uid ?? ""
-                            self.downloadDBRef(uid: uId)
-                        }
-                        else{
-                            self.performSegue(withIdentifier: "register", sender: nil)
+                        let uId = authResult?.user.uid ?? ""
+                        if(!uId.isEmpty){
+                            if(authResult != nil){
+                                self.downloadDBRef(uid: uId, registrationType: "facebook")
+                            }
+                            else{
+                                let checkRef = Database.database().reference().child("Users").child(uId)
+                                let user = User(uId: uId)
+                                checkRef.child("platform").setValue("ios")
+                                checkRef.child("search").setValue("true")
+                                checkRef.child("registrationType").setValue("facebook")
+                                checkRef.child("model").setValue(UIDevice.modelName)
+                                checkRef.child("notifications").setValue("true")
+                                    
+                                DispatchQueue.main.async {
+                                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                                    delegate.currentUser = user
+                                    self.performSegue(withIdentifier: "newReg", sender: nil)
+                                }
+                            }
                         }
                     }
                 }
@@ -190,7 +204,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                 var code = ""
                 if (success) {
                     let userID = Auth.auth().currentUser!.uid
-                    self.downloadDBRef(uid: userID)
+                    self.downloadDBRef(uid: userID, registrationType: "email")
                     
                     UserDefaults.standard.set(userID, forKey: "userId")
                     //self.performSegue(withIdentifier: "loginSuccessful", sender: nil)
@@ -250,8 +264,8 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
     }
     
     @objc func registerClicked(_ sender: AnyObject?) {
-        //self.performSegue(withIdentifier: "register", sender: nil)newReg
-        self.performSegue(withIdentifier: "newReg", sender: nil)
+        self.performSegue(withIdentifier: "register", sender: nil)
+        //self.performSegue(withIdentifier: "test", sender: nil)
     }
     
     private func display(alertController: UIAlertController){
@@ -305,17 +319,38 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
             else{
                 if(authResult != nil){
                     let uId = authResult?.user.uid ?? ""
-                    self.downloadDBRef(uid: uId)
+                    self.downloadDBRef(uid: uId, registrationType: "apple")
                 }
                 else{
-                    self.performSegue(withIdentifier: "register", sender: nil)
+                    //need to redo this. AuthResult is null, so then uId will be empty.
+                    let uId = authResult?.user.uid ?? ""
+                    if(!uId.isEmpty){
+                        if(authResult != nil){
+                            self.downloadDBRef(uid: uId, registrationType: "apple")
+                        }
+                        else{
+                            let checkRef = Database.database().reference().child("Users").child(uId)
+                            let user = User(uId: uId)
+                            checkRef.child("platform").setValue("ios")
+                            checkRef.child("search").setValue("true")
+                            checkRef.child("registrationType").setValue("apple")
+                            checkRef.child("model").setValue(UIDevice.modelName)
+                            checkRef.child("notifications").setValue("true")
+                                
+                            DispatchQueue.main.async {
+                                let delegate = UIApplication.shared.delegate as! AppDelegate
+                                delegate.currentUser = user
+                                self.performSegue(withIdentifier: "newReg", sender: nil)
+                            }
+                        }
+                    }
                 }
             }
         }
       }
     }
     
-    private func downloadDBRef(uid: String){
+    private func downloadDBRef(uid: String, registrationType: String){
         let ref = Database.database().reference().child("Users").child(uid)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
                 // Get user value
@@ -631,8 +666,9 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                     let currentTag = dict?["gamerTag"] as? String ?? ""
                     let currentGame = dict?["game"] as? String ?? ""
                     let console = dict?["console"] as? String ?? ""
+                    let quizTaken = dict?["quizTaken"] as? String ?? ""
                     
-                    let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
+                    let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
                     gamerTags.append(currentGamerTagObj)
                 }
                 let messagingNotifications = value?["messagingNotifications"] as? Bool ?? false
@@ -892,8 +928,19 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                 }
             }
             else{
-                self.socialRegisteredUid = uid
-                self.performSegue(withIdentifier: "registerSocial", sender: nil)
+                let checkRef = Database.database().reference().child("Users").child(uid)
+                let user = User(uId: uid)
+                checkRef.child("platform").setValue("ios")
+                checkRef.child("search").setValue("true")
+                checkRef.child("registrationType").setValue(registrationType)
+                checkRef.child("model").setValue(UIDevice.modelName)
+                checkRef.child("notifications").setValue("true")
+                    
+                DispatchQueue.main.async {
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    delegate.currentUser = user
+                    self.performSegue(withIdentifier: "newReg", sender: nil)
+                }
             }
             
             }) { (error) in
@@ -931,8 +978,9 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                             let currentTag = dict?["gamerTag"] as? String ?? ""
                             let currentGame = dict?["game"] as? String ?? ""
                             let console = dict?["console"] as? String ?? ""
+                            let quizTaken = dict?["quizTaken"] as? String ?? ""
                             
-                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
+                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
                             gamerTags.append(currentGamerTagObj)
                         }
                         
@@ -1048,8 +1096,9 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                             let currentTag = dict?["gamerTag"] as? String ?? ""
                             let currentGame = dict?["game"] as? String ?? ""
                             let console = dict?["console"] as? String ?? ""
+                            let quizTaken = dict?["quizTaken"] as? String ?? ""
                             
-                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
+                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
                             gamerTags.append(currentGamerTagObj)
                         }
                         
@@ -1129,10 +1178,30 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                else{
                    if(authResult != nil){
                        let uId = authResult?.user.uid ?? ""
-                       self.downloadDBRef(uid: uId)
+                    self.downloadDBRef(uid: uId, registrationType: "google")
                 }
                else{
-                   self.performSegue(withIdentifier: "register", sender: nil)
+                let uId = authResult?.user.uid ?? ""
+                if(!uId.isEmpty){
+                    if(authResult != nil){
+                        self.downloadDBRef(uid: uId, registrationType: "google")
+                    }
+                    else{
+                        let checkRef = Database.database().reference().child("Users").child(uId)
+                        let user = User(uId: uId)
+                        checkRef.child("platform").setValue("ios")
+                        checkRef.child("search").setValue("true")
+                        checkRef.child("registrationType").setValue("google")
+                        checkRef.child("model").setValue(UIDevice.modelName)
+                        checkRef.child("notifications").setValue("true")
+                            
+                        DispatchQueue.main.async {
+                            let delegate = UIApplication.shared.delegate as! AppDelegate
+                            delegate.currentUser = user
+                            self.performSegue(withIdentifier: "newReg", sender: nil)
+                        }
+                    }
+                }
                }
             }
         }

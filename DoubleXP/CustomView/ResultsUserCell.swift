@@ -16,7 +16,6 @@ class ResultsUserCell: UITableViewCell, UITableViewDelegate, UITableViewDataSour
     @IBOutlet weak var basedOn: UILabel!
     @IBOutlet weak var userList: UITableView!
     
-    
     func setUserList(list: [User], type: String, resultsConroller: Results){
         self.payload = list
         self.type = type
@@ -30,7 +29,7 @@ class ResultsUserCell: UITableViewCell, UITableViewDelegate, UITableViewDataSour
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "header", for: indexPath) as! ResultsUserInteractionCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: "user", for: indexPath) as! ResultsUserInteractionCell
         let current = payload[indexPath.item]
         cell.gamertag.text = current.gamerTag
         if(type == "location"){

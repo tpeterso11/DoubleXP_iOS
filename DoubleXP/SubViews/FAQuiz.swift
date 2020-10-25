@@ -32,7 +32,7 @@ class FAQuiz: ParentVC, EMPageViewControllerDelegate, FreeAgentQuizNav {
         let interviewManager = delegate.interviewManager
         let currentUser = delegate.currentUser
         
-        interviewManager.initialize(gameName: gcGame!.gameName, uId: currentUser!.uId)
+        interviewManager.initialize(gameName: gcGame!.gameName, uId: currentUser!.uId, gamerConnectGame: gcGame!)
     }
     
     func addQuestion(question: FAQuestion, interviewManager: InterviewManager) {

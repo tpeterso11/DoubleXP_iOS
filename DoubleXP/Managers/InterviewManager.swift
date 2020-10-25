@@ -20,8 +20,10 @@ class InterviewManager{
     var faObject: FreeAgentObject?
     var multiStepQuiz = false
     var optionCache = [OptionObj]()
+    var currentGCGame: GamerConnectGame!
     
-    func initialize(gameName: String, uId: String){
+    func initialize(gameName: String, uId: String, gamerConnectGame: GamerConnectGame){
+        self.currentGCGame = gamerConnectGame
         let profileManager = GamerProfileManager()
         faObject = FreeAgentObject(gamerTag: profileManager.getGamerTagForGame(gameName: gameName), competitionId: "", consoles: [String](), game: gameName, userId: uId, questions: [FAQuestion]())
     }
@@ -426,6 +428,8 @@ class InterviewManager{
     func submitProfile(){
         faObject?.questions = self.questions
         
+        sendFilterQuestions()
+        
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let currentUser = delegate.currentUser
         
@@ -658,6 +662,39 @@ class InterviewManager{
     
     private func convertLoLImageUrl(imageName: String) -> String{
         return "http://ddragon.leagueoflegends.com/cdn/10.11.1/img/champion/"+imageName
+    }
+    
+    private func sendFilterQuestions(){
+        var filterQuestions = [FAQuestion]()
+        for question in self.questions {
+            if(question.teamNeedQuestion == "true"){
+                filterQuestions.append(question)
+            }
+        }
+        
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser
+        let ref = Database.database().reference().child("Users").child(currentUser!.uId)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.hasChild("gamerTags")){
+                let gamerTagsArray = snapshot.childSnapshot(forPath: "gamerTags")
+                for gamerTagObj in gamerTagsArray.children {
+                    let currentObj = gamerTagObj as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let currentGame = dict?["game"] as? String ?? ""
+                    
+                    if(currentGame == self.currentGCGame.gameName){
+                        for filterQuestion in filterQuestions {
+                            if(!filterQuestion.answer.isEmpty){
+                                ref.child("gamerTags").child(currentObj.key).child("filterQuestions").child(filterQuestion.question).setValue([filterQuestion.answer])
+                            } else {
+                                ref.child("gamerTags").child(currentObj.key).child("filterQuestions").child(filterQuestion.question).setValue(filterQuestion.answerArray)
+                            }
+                        }
+                    }
+                }
+            }
+        })
     }
     
     

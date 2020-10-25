@@ -12,18 +12,21 @@ import moa
 import SwiftNotificationCenter
 import MSPeekCollectionViewDelegateImplementation
 import FBSDKCoreKit
+import SPStorkController
 
-class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,  UICollectionViewDelegateFlowLayout, SearchCallbacks {
+class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,  UICollectionViewDelegateFlowLayout, SearchCallbacks, SPStorkControllerDelegate, SearchManagerCallbacks {
     
     var game: GamerConnectGame? = nil
     
     var returnedUsers = [User]()
-    var searchPS = true
-    var searchXbox = true
-    var searchNintendo = true
-    var searchPC = true
+    var searchPS = false
+    var searchXbox = false
+    var searchNintendo = false
+    var searchPC = false
+    var searchMobile = false
     var set = false
     
+    @IBOutlet weak var filterButton: UIImageView!
     @IBOutlet weak var searchingText: UILabel!
     @IBOutlet weak var gameHeaderImage: UIImageView!
     @IBOutlet weak var gamerConnectResults: UICollectionView!
@@ -68,23 +71,35 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
             
             let delegate = UIApplication.shared.delegate as! AppDelegate
             currentUser = delegate.currentUser
+            let manager = delegate.searchManager
+            manager.currentUser = currentUser
+            manager.currentGameSearch = game?.gameName ?? ""
             
             if(currentUser != nil){
                 if(currentUser!.ps){
                     psSwitch.isOn = true
                     searchPS = true
+                    manager.currentSelectedConsoles.append("ps")
                 }
                 if(currentUser!.xbox){
                     xboxSwitch.isOn = true
                     searchXbox = true
+                    manager.currentSelectedConsoles.append("xbox")
                 }
                 if(currentUser!.nintendo){
                     nintendoSwitch.isOn = true
                     searchNintendo = true
+                    manager.currentSelectedConsoles.append("nintendo")
                 }
                 if(currentUser!.pc){
                     pcSwitch.isOn = true
                     searchPC = true
+                    manager.currentSelectedConsoles.append("pc")
+                }
+                if(currentUser!.mobile){
+                    pcSwitch.isOn = true
+                    searchMobile = true
+                    manager.currentSelectedConsoles.append("mobile")
                 }
             }
             
@@ -95,8 +110,23 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
             
             Broadcaster.register(SearchCallbacks.self, observer: self)
             
+            let singleTap = UITapGestureRecognizer(target: self, action: #selector(showFilters))
+            filterButton.isUserInteractionEnabled = true
+            filterButton.addGestureRecognizer(singleTap)
+            
             checkRivals()
+            
         }
+    }
+    
+    func dismissModal(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.searchManager.searchWithFilters(callbacks: self)
+    }
+    
+    @objc func didDismissStorkBySwipe(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.searchManager.searchWithFilters(callbacks: self)
     }
     
     private func checkRivals(){
@@ -124,6 +154,25 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
             self.searchUsers(userName: nil)
         }
         
+    }
+    
+    @objc private func showFilters(){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "filters") as! GCSearchFilters
+        if(self.game != nil){
+            currentViewController.gcGame = game
+            appDelegate.currentFrag = "Filters"
+            
+            let transitionDelegate = SPStorkTransitioningDelegate()
+            currentViewController.transitioningDelegate = transitionDelegate
+            currentViewController.modalPresentationStyle = .custom
+            currentViewController.modalPresentationCapturesStatusBarAppearance = true
+            transitionDelegate.showIndicator = true
+            transitionDelegate.swipeToDismissEnabled = true
+            transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+            transitionDelegate.storkDelegate = self
+            self.present(currentViewController, animated: true, completion: nil)
+        }
     }
     
     func stringToDate(_ str: String)->Date{
@@ -344,8 +393,9 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
                             let currentTag = dict?["gamerTag"] as? String ?? ""
                             let currentGame = dict?["game"] as? String ?? ""
                             let console = dict?["console"] as? String ?? ""
+                            let quizTaken = dict?["quizTaken"] as? String ?? ""                            
                             
-                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
+                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
                             gamerTags.append(currentGamerTagObj)
                         }
                         
@@ -409,8 +459,9 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
                             let currentTag = dict?["gamerTag"] as? String ?? ""
                             let currentGame = dict?["game"] as? String ?? ""
                             let console = dict?["console"] as? String ?? ""
+                            let quizTaken = dict?["quizTaken"] as? String ?? ""
                             
-                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
+                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
                             gamerTags.append(currentGamerTagObj)
                         }
                         
@@ -462,8 +513,9 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
                                     let currentTag = dict?["gamerTag"] as? String ?? ""
                                     let currentGame = dict?["game"] as? String ?? ""
                                     let console = dict?["console"] as? String ?? ""
+                                    let quizTaken = dict?["quizTaken"] as? String ?? ""
                                     
-                                    let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
+                                    let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
                                     gamerTags.append(currentGamerTagObj)
                                 }
                                 
@@ -598,6 +650,21 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
     }
     
     func showQuizClicked(questions: [[String]]) {
+    }
+    
+    func onSuccess(returnedUsers: [User]) {
+        if(!set){
+            self.returnedUsers = returnedUsers
+            self.gamerConnectResults.delegate = self
+            self.gamerConnectResults.dataSource = self
+        } else {
+            self.returnedUsers = returnedUsers
+            self.gamerConnectResults.reloadData()
+        }
+    }
+    
+    func onFailure() {
+        self.searchEmpty.alpha = 1
     }
 }
 

@@ -168,3 +168,12 @@ protocol CurrentProfileCallbacks: class{
     func gameRemoved(gameName: String, indexPath: IndexPath)
 }
 
+protocol StatsManagerCallbacks: class{
+    func onSuccess(gameName: String)
+    func onFailure(gameName: String)
+}
+
+protocol SearchManagerCallbacks: class{
+    func onSuccess(returnedUsers: [User])
+    func onFailure()
+}

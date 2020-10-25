@@ -567,7 +567,7 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         
         var profiles = [GamerProfile]()
         for profile in self.currentProfilePayload{
-            let newProfile = GamerProfile(gamerTag: profile["gamerTag"]!, game: profile["game"]!, console: profile["console"]!)
+            let newProfile = GamerProfile(gamerTag: profile["gamerTag"]!, game: profile["game"]!, console: profile["console"]!, quizTaken: "false")
             profiles.append(newProfile)
         }
         currentUser!.gamerTags = profiles

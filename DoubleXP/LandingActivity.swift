@@ -15,6 +15,7 @@ import Firebase
 import Lottie
 import GiphyUISDK
 import GiphyCoreSDK
+import SPStorkController
 
 typealias Runnable = () -> ()
 
@@ -54,17 +55,14 @@ protocol Profile {
     func goToProfile()
 }
 
-class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile, SearchCallbacks, LandingMenuCallbacks, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, LandingUICallbacks {
+class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile, SearchCallbacks, LandingMenuCallbacks, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, LandingUICallbacks, SPStorkControllerDelegate {
     
     @IBOutlet weak var moreClickArea: UIView!
-    @IBOutlet weak var teamsClickArea: UIView!
     @IBOutlet weak var connectClickArea: UIView!
     @IBOutlet weak var requestsClickArea: UIView!
-    @IBOutlet weak var mediaClickArea: UIView!
     @IBOutlet weak var gifButton: UIImageView!
     @IBOutlet weak var navigationView: UIView!
     @IBOutlet weak var navContainer: UIView!
-    @IBOutlet weak var teamButton: UIImageView!
     @IBOutlet weak var homeButton: UIImageView!
     @IBOutlet weak var requestButton: UIImageView!
     @IBOutlet weak var bottomNav: UIView!
@@ -73,7 +71,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     @IBOutlet weak var blur: UIVisualEffectView!
     @IBOutlet weak var requests: UIImageView!
     @IBOutlet weak var connect: UIImageView!
-    @IBOutlet weak var team: UIImageView!
     @IBOutlet weak var bottomNavBack: UIImageView!
     @IBOutlet weak var bottomNavSearch: UITextField!
     @IBOutlet weak var primaryBack: UIImageView!
@@ -91,6 +88,8 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     var resultsUserUid: String? = nil
     //@IBOutlet weak var newNav: UIView!
     
+    @IBOutlet weak var myProfileClickArea: UIView!
+    @IBOutlet weak var twitchClickArea: UIView!
     @IBOutlet weak var alertSubjectStatus: UILabel!
     @IBOutlet weak var alertSubject: UILabel!
     @IBOutlet weak var alertBarFriendLayout: UIView!
@@ -98,7 +97,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     @IBOutlet weak var alertBar: UIView!
     @IBOutlet weak var notificationLabel: UILabel!
     @IBOutlet weak var clickArea: UIView!
-    @IBOutlet weak var mediaButton: UIImageView!
     @IBOutlet weak var logOut: UIButton!
     @IBOutlet weak var menuCollection: UICollectionView!
     @IBOutlet weak var friendsLabel: UILabel!
@@ -1447,7 +1445,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     @objc func navigateToCurrentUserProfile() {
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Current User Profile"))
         
-        let top = CGAffineTransform(translationX: -249, y: 0)
+        let top = CGAffineTransform(translationX: -320, y: 0)
         UIView.animate(withDuration: 0.4, delay: 0.0, options:[], animations: {
             self.menuVie.transform = top
         }, completion: { (finished: Bool) in
@@ -1666,7 +1664,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing Menu - Messaging User"))
         menuVie.viewShowing = false
         
-        let top = CGAffineTransform(translationX: -249, y: 0)
+        let top = CGAffineTransform(translationX: -320, y: 0)
         UIView.animate(withDuration: 0.4, delay: 0.0, options:[], animations: {
             self.menuVie.transform = top
         }, completion: { (finished: Bool) in
@@ -1685,7 +1683,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         menuVie.viewShowing = false
         self.restoreBottomNav()
         
-        let top = CGAffineTransform(translationX: -249, y: 0)
+        let top = CGAffineTransform(translationX: -320, y: 0)
         UIView.animate(withDuration: 0.4, delay: 0.3, options:[], animations: {
             self.menuVie.transform = top
         }, completion: { (finished: Bool) in
@@ -2020,9 +2018,9 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     
     private func enableButtons(){
-        let singleTapTeam = UITapGestureRecognizer(target: self, action: #selector(teamButtonClicked))
-        self.teamsClickArea.isUserInteractionEnabled = true
-        self.teamsClickArea.addGestureRecognizer(singleTapTeam)
+        let singleTapTwitch = UITapGestureRecognizer(target: self, action: #selector(twitchClicked))
+        self.twitchClickArea.isUserInteractionEnabled = true
+        self.twitchClickArea.addGestureRecognizer(singleTapTwitch)
         
         let singleTapHome = UITapGestureRecognizer(target: self, action: #selector(homeButtonClicked))
         self.connectClickArea.isUserInteractionEnabled = true
@@ -2036,12 +2034,43 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         self.moreClickArea.isUserInteractionEnabled = true
         self.moreClickArea.addGestureRecognizer(singleTapMenu)
         
-        let singleTapMedia = UITapGestureRecognizer(target: self, action: #selector(mediaButtonClicked))
-        self.mediaClickArea.isUserInteractionEnabled = true
-        self.mediaClickArea.addGestureRecognizer(singleTapMedia)
+        let singleTapProfile = UITapGestureRecognizer(target: self, action: #selector(profileButtonClicked))
+        self.myProfileClickArea.isUserInteractionEnabled = true
+        self.myProfileClickArea.addGestureRecognizer(singleTapProfile)
         
         bottomNav.isHidden = false
         bottomNav.isUserInteractionEnabled = true
+    }
+    
+    @objc private func twitchClicked(){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "mediaFrag") as! MediaFrag
+        currentViewController.pageName = "Media"
+        currentViewController.navDictionary = ["state": "backOnly"]
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.currentFrag = currentViewController.pageName ?? "Media"
+        
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+        //self.presentAsStork(controller)
+        //self.performSegue(withIdentifier: "twitch", sender: nil)
+    }
+    
+    @objc func didDismissStorkBySwipe(){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    }
+    
+    @objc private func profileButtonClicked(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.cachedTest = delegate.currentUser!.uId
+        self.performSegue(withIdentifier: "profile", sender: nil)
     }
     
     @objc func homeButtonClicked(_ sender: AnyObject?) {
@@ -2087,7 +2116,8 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     }
     
     @objc func requestButtonClicked(_ sender: AnyObject?) {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        self.performSegue(withIdentifier: "requests", sender: nil)
+        /*let appDelegate = UIApplication.shared.delegate as! AppDelegate
         if(appDelegate.currentFrag != "Requests"){
             navigateToRequests()
             requestsAdded = true
@@ -2097,7 +2127,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             mediaAdded = false
         }
         
-        updateNavColor(color: UIColor(named: "darker")!)
+        updateNavColor(color: UIColor(named: "darker")!)*/
     }
     
     @objc func menuButtonClicked(_ sender: AnyObject?) {
@@ -2109,7 +2139,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             self.menuCollection.dataSource = self
             self.menuCollection.delegate = self
             
-            let top = CGAffineTransform(translationX: 249, y: 0)
+            let top = CGAffineTransform(translationX: 320, y: 0)
             UIView.animate(withDuration: 0.3, delay: 0.0, options:[], animations: {
                 self.blur.alpha = 1.0
             }, completion: { (finished: Bool) in
@@ -2132,7 +2162,8 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         let currentUser = appDelegate.currentUser
         
         self.menuItems.append(0)
-        self.menuItems.append(1)
+        //self.menuItems.append(1)
+        self.menuItems.append(3)
         self.menuItems.append("Friends")
         self.menuItems.append(2)
         
@@ -2292,6 +2323,10 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                     cell.loadContent()
                     return cell
                 }
+                else if(current as? Int == 3){
+                    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "upgrade", for: indexPath) as! MenuUpgradeCell
+                    return cell
+                }
                 else{
                     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "dxpFriends", for: indexPath) as! MenuFriendsCell
                     return cell
@@ -2323,6 +2358,9 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                 else if(current as? Int == 2){
                     return CGSize(width: collectionView.bounds.size.width, height: CGFloat(400))
                 }
+                else if(current as? Int == 3){
+                    return CGSize(width: collectionView.bounds.size.width, height: CGFloat(150))
+                }
                 
                 else{
                     return CGSize(width: collectionView.bounds.size.width, height: CGFloat(100))
@@ -2340,7 +2378,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             if((current as! Int) ==  1){
                 menuVie.viewShowing = false
                 
-                let top = CGAffineTransform(translationX: -249, y: 0)
+                let top = CGAffineTransform(translationX: 0, y: 0)
                 UIView.animate(withDuration: 0.4, delay: 0.0, options:[], animations: {
                     self.menuVie.transform = top
                 }, completion: { (finished: Bool) in
@@ -2351,6 +2389,21 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                     
                         let delegate = UIApplication.shared.delegate as! AppDelegate
                         self.navigateToProfile(uid: delegate.currentUser!.uId)
+                    })
+                })
+            } else if((current as! Int) == 3){
+                menuVie.viewShowing = false
+                
+                let top = CGAffineTransform(translationX: 0, y: 0)
+                UIView.animate(withDuration: 0.4, delay: 0.0, options:[], animations: {
+                    self.menuVie.transform = top
+                }, completion: { (finished: Bool) in
+                    UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
+                        self.blur.alpha = 0.0
+                    }, completion: { (finished: Bool) in
+                        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing Menu - Upgrade"))
+                    
+                        self.performSegue(withIdentifier: "upgrade", sender: nil)
                     })
                 })
             }

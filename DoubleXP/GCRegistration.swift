@@ -28,6 +28,17 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     @IBOutlet weak var overBox: UIView!
     @IBOutlet weak var overCover: UIView!
     
+    @IBOutlet weak var genderSkipCover: UIView!
+    @IBOutlet weak var otherGenderCover: UIView!
+    @IBOutlet weak var transgenderCover: UIView!
+    @IBOutlet weak var femaleCover: UIView!
+    @IBOutlet weak var maleCover: UIView!
+    @IBOutlet weak var genderSkip: UIView!
+    @IBOutlet weak var otherGenderBox: UIView!
+    @IBOutlet weak var transgenderBox: UIView!
+    @IBOutlet weak var femaleBox: UIView!
+    @IBOutlet weak var maleBox: UIView!
+    @IBOutlet weak var genderLayout: UIView!
     @IBOutlet weak var locationAnimation: AnimationView!
     @IBOutlet weak var refuseLocation: UIButton!
     @IBOutlet weak var allowLocation: UIButton!
@@ -41,15 +52,18 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     @IBOutlet weak var startProfileButton: UIButton!
     @IBOutlet weak var celebrateAnimation: AnimationView!
     @IBOutlet weak var gcContinueButton: UIButton!
+    @IBOutlet weak var skipCover: UIView!
     var consoles = [String]()
     var constraint : NSLayoutConstraint?
     var selectedAge = ""
     var selectedPrimaryLanguage = ""
-    var selectedSecondaryLanguage = ""
+    var selectedSecondaryLanguage = "none"
+    var currendSelectedGender = ""
     private var selectedGameNames = [String]()
     private var availableGames = [GamerConnectGame]()
     private var selectedGames = [GamerConnectGame]()
     @IBOutlet weak var primaryPicker: UIPickerView!
+    @IBOutlet weak var ageSkip: UIView!
     var languages = ["none", "english", "chinese", "spanish", "hindi", "arabic", "bengali", "portuguese", "russian", "japanese", "lahnda"]
     var secondLanguage = [String]()
     var locationLat = 0.0
@@ -98,21 +112,206 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         overTap.age = "32+"
         overBox.isUserInteractionEnabled = true
         overBox.addGestureRecognizer(overTap)
+        ageSkip.tag = 4
+        let skipTap = AgeTapGesture(target: self, action: #selector(ageButtonClicked))
+        skipTap.age = "unidentified"
+        ageSkip.isUserInteractionEnabled = true
+        ageSkip.addGestureRecognizer(skipTap)
         
+        let maleTap = GenderTapGesture(target: self, action: #selector(genderClicked))
+        maleTap.gender = "male"
+        maleBox.isUserInteractionEnabled = true
+        maleBox.addGestureRecognizer(maleTap)
+        
+        let femaleTap = GenderTapGesture(target: self, action: #selector(genderClicked))
+        femaleTap.gender = "female"
+        femaleBox.isUserInteractionEnabled = true
+        femaleBox.addGestureRecognizer(femaleTap)
+        
+        let transgenderTap = GenderTapGesture(target: self, action: #selector(genderClicked))
+        transgenderTap.gender = "transgender"
+        transgenderBox.isUserInteractionEnabled = true
+        transgenderBox.addGestureRecognizer(transgenderTap)
+        
+        let otherTap = GenderTapGesture(target: self, action: #selector(genderClicked))
+        otherTap.gender = "other"
+        otherGenderBox.isUserInteractionEnabled = true
+        otherGenderBox.addGestureRecognizer(otherTap)
+        
+        let skipGenderTap = GenderTapGesture(target: self, action: #selector(genderClicked))
+        skipGenderTap.gender = "unidentified"
+        genderSkip.isUserInteractionEnabled = true
+        genderSkip.addGestureRecognizer(skipGenderTap)
     
         availableGames = list
     }
     
+    @objc private func genderClicked(sender: GenderTapGesture){
+        if(sender.gender == "male"){
+            if(currendSelectedGender != "male"){
+                currendSelectedGender = "male"
+                self.updateGCContinueGender()
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.maleCover.alpha = 1
+                    self.femaleCover.alpha = 0
+                    self.transgenderCover.alpha = 0
+                    self.otherGenderCover.alpha = 0
+                    self.genderSkipCover.alpha = 0
+                }, completion: nil)
+            } else {
+                self.currendSelectedGender = ""
+                self.updateGCContinueGender()
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.maleCover.alpha = 0
+                    self.femaleCover.alpha = 0
+                    self.transgenderCover.alpha = 0
+                    self.otherGenderCover.alpha = 0
+                    self.genderSkipCover.alpha = 0
+                }, completion: nil)
+            }
+        }
+        if(sender.gender == "female"){
+            if(currendSelectedGender != "female"){
+                currendSelectedGender = "female"
+                self.updateGCContinueGender()
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.maleCover.alpha = 0
+                    self.femaleCover.alpha = 1
+                    self.transgenderCover.alpha = 0
+                    self.otherGenderCover.alpha = 0
+                    self.genderSkipCover.alpha = 0
+                }, completion: nil)
+            } else {
+                self.currendSelectedGender = ""
+                self.updateGCContinueGender()
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.maleCover.alpha = 0
+                    self.femaleCover.alpha = 0
+                    self.transgenderCover.alpha = 0
+                    self.otherGenderCover.alpha = 0
+                    self.genderSkipCover.alpha = 0
+                }, completion: nil)
+            }
+        }
+        if(sender.gender == "transgender"){
+            if(currendSelectedGender != "transgender"){
+                currendSelectedGender = "transgender"
+                self.updateGCContinueGender()
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.maleCover.alpha = 0
+                    self.femaleCover.alpha = 0
+                    self.transgenderCover.alpha = 1
+                    self.otherGenderCover.alpha = 0
+                    self.genderSkipCover.alpha = 0
+                }, completion: nil)
+            } else {
+                self.currendSelectedGender = ""
+                self.updateGCContinueGender()
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.maleCover.alpha = 0
+                    self.femaleCover.alpha = 0
+                    self.transgenderCover.alpha = 0
+                    self.otherGenderCover.alpha = 0
+                    self.genderSkipCover.alpha = 0
+                }, completion: nil)
+            }
+        }
+        if(sender.gender == "other"){
+            if(currendSelectedGender != "other"){
+                currendSelectedGender = "other"
+                self.updateGCContinueGender()
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.maleCover.alpha = 0
+                    self.femaleCover.alpha = 0
+                    self.transgenderCover.alpha = 0
+                    self.otherGenderCover.alpha = 1
+                    self.genderSkipCover.alpha = 0
+                }, completion: nil)
+            } else {
+                self.currendSelectedGender = ""
+                self.updateGCContinueGender()
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.maleCover.alpha = 0
+                    self.femaleCover.alpha = 0
+                    self.transgenderCover.alpha = 0
+                    self.otherGenderCover.alpha = 0
+                    self.genderSkipCover.alpha = 0
+                }, completion: nil)
+            }
+        }
+        if(sender.gender == "unidentified"){
+            if(currendSelectedGender != "unidentified"){
+                currendSelectedGender = "unidentified"
+                self.updateGCContinueGender()
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.maleCover.alpha = 0
+                    self.femaleCover.alpha = 0
+                    self.transgenderCover.alpha = 0
+                    self.otherGenderCover.alpha = 0
+                    self.genderSkipCover.alpha = 1
+                }, completion: nil)
+            } else {
+                self.currendSelectedGender = ""
+                self.updateGCContinueGender()
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.maleCover.alpha = 0
+                    self.femaleCover.alpha = 0
+                    self.transgenderCover.alpha = 0
+                    self.otherGenderCover.alpha = 0
+                    self.genderSkipCover.alpha = 0
+                }, completion: nil)
+            }
+        }
+    }
+    
+    @objc private func updateGCContinueGender(){
+        if(!self.currendSelectedGender.isEmpty && self.gcContinueButton.alpha != 1.0){
+            UIView.animate(withDuration: 0.4, animations: {
+                self.gcContinueButton.alpha = 1
+                self.gcContinueButton.isUserInteractionEnabled = true
+                self.gcContinueButton.addTarget(self, action: #selector(self.transitionToAge), for: .touchUpInside)
+            }, completion: nil)
+        } else if(self.currendSelectedGender.isEmpty && self.gcContinueButton.alpha == 1.0){
+            self.gcContinueButton.alpha = 0.4
+            self.gcContinueButton.isUserInteractionEnabled = false
+        }
+    }
+    
+    @objc private func transitionToAge(){
+        self.gcContinueButton.removeTarget(self, action: #selector(self.transitionToAge), for: .touchUpInside)
+        self.updateGCContinueAge()
+        let layoutAnim = CGAffineTransform(translationX: -50, y: 0)
+        let layoutAnim2 = CGAffineTransform(translationX: -50, y: 0)
+        UIView.animate(withDuration: 0.5, animations: {
+            self.genderLayout.alpha = 0
+            self.genderLayout.transform = layoutAnim
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                   self.ageLayout.alpha = 1
+                   self.ageLayout.transform = layoutAnim2
+                    self.genderLayout.isUserInteractionEnabled = false
+                    self.ageLayout.isUserInteractionEnabled = true
+                    UIView.animate(withDuration: 0.5, delay: 0.5, options: [], animations: {
+                        let cntSlide = CGAffineTransform(translationX: 0, y: -100)
+                        self.gcContinueButton.alpha = 0.4
+                        self.gcContinueButton.transform = cntSlide
+                    }, completion: nil)
+                }, completion: nil)
+            }
+        }, completion: nil)
+    }
+    
     @objc private func ageButtonClicked(sender: AgeTapGesture){
         if(sender.age == "12 - 16"){
-            if(selectedAge != "12 - 16"){
-                selectedAge = "12 - 16"
+            if(selectedAge != "12_16"){
+                selectedAge = "12_16"
                 self.updateGCContinueAge()
                 UIView.animate(withDuration: 0.5, animations: {
                     self.youngCover.alpha = 1
                     self.oldCover.alpha = 0
                     self.midCover.alpha = 0
                     self.overCover.alpha = 0
+                    self.skipCover.alpha = 0
                 }, completion: nil)
             } else {
                 self.selectedAge = ""
@@ -122,18 +321,20 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
                     self.oldCover.alpha = 0
                     self.midCover.alpha = 0
                     self.overCover.alpha = 0
+                    self.skipCover.alpha = 0
                 }, completion: nil)
             }
         }
         if(sender.age == "17 - 24"){
-            if(selectedAge != "17 - 24"){
-                selectedAge = "17 - 24"
+            if(selectedAge != "17_24"){
+                selectedAge = "17_24"
                 self.updateGCContinueAge()
                 UIView.animate(withDuration: 0.5, animations: {
                     self.youngCover.alpha = 0
                     self.oldCover.alpha = 0
                     self.midCover.alpha = 1
                     self.overCover.alpha = 0
+                    self.skipCover.alpha = 0
                 }, completion: nil)
             } else {
                 self.selectedAge = ""
@@ -143,18 +344,20 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
                     self.oldCover.alpha = 0
                     self.midCover.alpha = 0
                     self.overCover.alpha = 0
+                    self.skipCover.alpha = 0
                 }, completion: nil)
             }
         }
         if(sender.age == "25 - 31"){
-            if(selectedAge != "25 - 31"){
-                selectedAge = "25 - 31"
+            if(selectedAge != "25_31"){
+                selectedAge = "25_31"
                 self.updateGCContinueAge()
                 UIView.animate(withDuration: 0.5, animations: {
                     self.youngCover.alpha = 0
                     self.oldCover.alpha = 1
                     self.midCover.alpha = 0
                     self.overCover.alpha = 0
+                    self.skipCover.alpha = 0
                 }, completion: nil)
             } else {
                 self.selectedAge = ""
@@ -164,18 +367,20 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
                     self.oldCover.alpha = 0
                     self.midCover.alpha = 0
                     self.overCover.alpha = 0
+                    self.skipCover.alpha = 0
                 }, completion: nil)
             }
         }
         if(sender.age == "32+"){
-            if(selectedAge != "32+"){
-                selectedAge = "32+"
+            if(selectedAge != "32_over"){
+                selectedAge = "32_over"
                 self.updateGCContinueAge()
                 UIView.animate(withDuration: 0.5, animations: {
                     self.youngCover.alpha = 0
                     self.oldCover.alpha = 0
                     self.midCover.alpha = 0
                     self.overCover.alpha = 1
+                    self.skipCover.alpha = 0
                 }, completion: nil)
             } else {
                 self.selectedAge = ""
@@ -185,6 +390,30 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
                     self.oldCover.alpha = 0
                     self.midCover.alpha = 0
                     self.overCover.alpha = 0
+                    self.skipCover.alpha = 0
+                }, completion: nil)
+            }
+        }
+        if(sender.age == "unidentified"){
+            if(selectedAge != "unidentified"){
+                selectedAge = "unidentified"
+                self.updateGCContinueAge()
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.youngCover.alpha = 0
+                    self.oldCover.alpha = 0
+                    self.midCover.alpha = 0
+                    self.overCover.alpha = 0
+                    self.skipCover.alpha = 1
+                }, completion: nil)
+            } else {
+                self.selectedAge = ""
+                self.updateGCContinueAge()
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.youngCover.alpha = 0
+                    self.oldCover.alpha = 0
+                    self.midCover.alpha = 0
+                    self.overCover.alpha = 0
+                    self.skipCover.alpha = 0
                 }, completion: nil)
             }
         }
@@ -200,20 +429,18 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         } else if(self.selectedAge.isEmpty && self.gcContinueButton.alpha == 1.0){
             self.gcContinueButton.alpha = 0.4
             self.gcContinueButton.isUserInteractionEnabled = false
+            self.gcContinueButton.addTarget(self, action: #selector(self.advanceToLanguage), for: .touchUpInside)
         }
     }
     
     @objc private func advanceToLanguage(){
         updateContinueGCPrimaryLang()
-        let layoutAnim = CGAffineTransform(translationX: 0, y: -10)
-        let layoutAnim2 = CGAffineTransform(translationX: 0, y: -10)
-        UIView.animate(withDuration: 0.8, animations: {
+        UIView.animate(withDuration: 0.5, animations: {
             self.ageLayout.alpha = 0
-            self.ageLayout.transform = layoutAnim
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                self.ageLayout.alpha = 0
                 UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
                     self.languageLayout.alpha = 1
-                    self.languageLayout.transform = layoutAnim2
                     self.ageLayout.isUserInteractionEnabled = false
                     self.languageLayout.isUserInteractionEnabled = true
                 }, completion: nil)
@@ -222,19 +449,15 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     }
     
     @objc private func startButtonClicked(){
-        let layoutAnim = CGAffineTransform(translationX: -50, y: 0)
-        let layoutAnim2 = CGAffineTransform(translationX: -50, y: 0)
-        UIView.animate(withDuration: 0.8, animations: {
+        UIView.animate(withDuration: 0.5, animations: {
             self.startLayout.alpha = 0
-            self.startLayout.transform = layoutAnim
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                   self.ageLayout.alpha = 1
-                   self.ageLayout.transform = layoutAnim2
+                   self.genderLayout.alpha = 1
                     self.startLayout.isUserInteractionEnabled = false
-                    self.ageLayout.isUserInteractionEnabled = true
+                    self.genderLayout.isUserInteractionEnabled = true
                     UIView.animate(withDuration: 0.5, delay: 0.5, options: [], animations: {
-                        let cntSlide = CGAffineTransform(translationX: 0, y: -70)
+                        let cntSlide = CGAffineTransform(translationX: 0, y: -100)
                         self.gcContinueButton.alpha = 0.4
                         self.gcContinueButton.transform = cntSlide
                     }, completion: nil)
@@ -295,12 +518,16 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         return NSAttributedString(string: languages[row], attributes: [NSAttributedString.Key.foregroundColor: UIColor.white])
     }
     
+    func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
+        return 50
+    }
+    
     private func updateContinueGCPrimaryLang(){
         if(self.selectedPrimaryLanguage == "none" || self.selectedPrimaryLanguage.isEmpty){
             self.gcContinueButton.alpha = 0.4
             self.gcContinueButton.isUserInteractionEnabled = false
         } else {
-            UIView.animate(withDuration: 0.4, animations: {
+            UIView.animate(withDuration: 0.2, animations: {
                 self.gcContinueButton.alpha = 1
                 self.gcContinueButton.isUserInteractionEnabled = true
                 self.gcContinueButton.addTarget(self, action: #selector(self.advanceToSecondary), for: .touchUpInside)
@@ -319,11 +546,12 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         if(secondLanguage.contains(self.selectedPrimaryLanguage)){
             self.secondLanguage.remove(at: secondLanguage.index(of: self.selectedPrimaryLanguage)!)
         }
+        updateContinueGCSecondaryLang()
         self.secondaryPicker.delegate = self
         self.secondaryPicker.dataSource = self
         
         let layoutAnim2 = CGAffineTransform(translationX: -50, y: 0)
-        UIView.animate(withDuration: 0.8, animations: {
+        UIView.animate(withDuration: 0.5, animations: {
             self.primaryLanguage.alpha = 0
             self.primaryLanguage.transform = layoutAnim2
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
@@ -343,21 +571,23 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     
     @objc private func advanceToLocation(){
         let layoutOut = CGAffineTransform(translationX: -50, y: 0)
-        UIView.animate(withDuration: 0.8, animations: {
+        let cntSlide = CGAffineTransform(translationX: 0, y: -100)
+        UIView.animate(withDuration: 0.5, animations: {
             self.languageLayout.alpha = 0
             self.languageLayout.transform = layoutOut
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                   self.locationLayout.alpha = 1
-                   self.locationLayout.transform = layoutOut
-                    self.languageLayout.isUserInteractionEnabled = false
-                    self.locationLayout.isUserInteractionEnabled = true
-                    self.locationAnimation.play()
-                    
-                    self.allowLocation.addTarget(self, action: #selector(self.requestLocation), for: .touchUpInside)
-                    self.refuseLocation.addTarget(self, action: #selector(self.advanceToGames), for: .touchUpInside)
-                }, completion: nil)
-            }
+            self.gcContinueButton.alpha = 0
+            self.gcContinueButton.isUserInteractionEnabled = false
+            self.gcContinueButton.transform = cntSlide
+            UIView.animate(withDuration: 0.5, animations: {
+               self.locationLayout.alpha = 1
+               self.locationLayout.transform = layoutOut
+                self.languageLayout.isUserInteractionEnabled = false
+                self.locationLayout.isUserInteractionEnabled = true
+                self.locationAnimation.play()
+                
+                self.allowLocation.addTarget(self, action: #selector(self.requestLocation), for: .touchUpInside)
+                self.refuseLocation.addTarget(self, action: #selector(self.advanceToGames), for: .touchUpInside)
+            }, completion: nil)
         }, completion: nil)
     }
     
@@ -368,6 +598,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         ref.child("primaryLanguage").setValue(self.selectedPrimaryLanguage)
         ref.child("secondaryLanguage").setValue(self.selectedSecondaryLanguage)
         ref.child("selectedAge").setValue(self.selectedAge)
+        ref.child("gender").setValue(self.currendSelectedGender)
         
         if(self.locationLat != 0.0){
             currentUser!.userLat = self.locationLat
@@ -379,19 +610,33 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         
         self.performSegue(withIdentifier: "games", sender: nil)
     }
-    
+    //speed up animations between sets
+    //location transition broken
+    //test all UX, then test data.
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == .authorizedWhenInUse {
-            self.locationLat = (manager.location?.coordinate.latitude)!
-            self.locationLong = (manager.location?.coordinate.longitude)!
+            manager.startUpdatingLocation()
             
-            advanceToGames()
         } else {
             advanceToGames()
         }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let coordinate = manager.location?.coordinate
+        if(coordinate != nil){
+            self.locationLat = (manager.location?.coordinate.latitude)!
+            self.locationLong = (manager.location?.coordinate.longitude)!
+        }
+        manager.stopUpdatingLocation()
+        advanceToGames()
     }
 }
 
 class AgeTapGesture: UITapGestureRecognizer {
     var age = String()
+}
+
+class GenderTapGesture: UITapGestureRecognizer {
+    var gender = String()
 }
