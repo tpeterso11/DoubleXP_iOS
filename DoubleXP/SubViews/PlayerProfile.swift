@@ -14,9 +14,11 @@ import FoldingCell
 import FBSDKCoreKit
 import OrderedDictionary
 import UnderLineTextField
+import Lottie
 import NotificationCenter
+import SPStorkController
 
-class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, ProfileCallbacks, UICollectionViewDataSource, UICollectionViewDelegate, RequestsUpdate, UICollectionViewDelegateFlowLayout, SocialMediaManagerCallback, UITextFieldDelegate {
+class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, ProfileCallbacks, UICollectionViewDataSource, UICollectionViewDelegate, RequestsUpdate, UICollectionViewDelegateFlowLayout, SocialMediaManagerCallback, UITextFieldDelegate, SPStorkControllerDelegate {
     
     var uid: String = ""
     var userForProfile: User? = nil
@@ -26,51 +28,18 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     var cellHeights: [CGFloat] = []
     var statsPayload = [String]()
     var currentStream = ""
-    
-    @IBOutlet weak var updateLabel: UILabel!
-    @IBOutlet weak var twitchConnectLayoutWorkSpinner: UIActivityIndicatorView!
-    @IBOutlet weak var twitchConnectLayoutWork: UIView!
-    @IBOutlet weak var twitchWorkLabel: UILabel!
-    @IBOutlet weak var twitchWorkSpinner: UIActivityIndicatorView!
-    @IBOutlet weak var twitchConnectWork: UIView!
-    @IBOutlet weak var twitchConnectNevermind: UIButton!
-    @IBOutlet weak var twitchConnectButton: UIButton!
-    @IBOutlet weak var twitchUserNameEntry: UnderLineTextField!
     @IBOutlet weak var twitchConnectDrawer: UIView!
-    @IBOutlet weak var twitchConnectOverlay: UIVisualEffectView!
-    @IBOutlet weak var profileTwitchPlayer: TestPlayer!
-    @IBOutlet weak var twitchConnectNot: UIView!
-    @IBOutlet weak var twitchConnectOffline: UIView!
-    @IBOutlet weak var twitchConnect: UIView!
-    @IBOutlet weak var twitchConnectOnline: UIView!
-    @IBOutlet weak var twitchConnectLayout: UIView!
-    @IBOutlet weak var gamerTag: UILabel!
-    @IBOutlet weak var profileLine2: UILabel!
-    @IBOutlet weak var profileLine3: UILabel!
-    @IBOutlet weak var bio: VerticalAlignLabel!
-    @IBOutlet weak var statsCollection: UICollectionView!
-    @IBOutlet weak var consoleOne: UILabel!
-    @IBOutlet weak var consoleTwo: UILabel!
-    @IBOutlet weak var headerView: UIView!
     //@IBOutlet weak var connectButton: UIImageView!
-    @IBOutlet weak var statEmpty: UIView!
-    @IBOutlet weak var table: UITableView!
-    @IBOutlet weak var userStatusText: UILabel!
-    @IBOutlet weak var mainLayout: UIView!
-    @IBOutlet weak var actionButton: UIView!
-    @IBOutlet weak var actionButtonText: UILabel!
+    @IBOutlet weak var twitchWorkSpinner: AnimationView!
+    @IBOutlet weak var twitchDrawerWork: UIView!
     @IBOutlet weak var actionOverlay: UIVisualEffectView!
     @IBOutlet weak var actionDrawer: UIView!
-    @IBOutlet weak var bottomBlur: UIVisualEffectView!
-    @IBOutlet weak var userStatsLabel: UILabel!
-    @IBOutlet weak var tapInstructions: UILabel!
     @IBOutlet weak var sentOverlay: UIView!
     @IBOutlet weak var sentText: UILabel!
-    @IBOutlet weak var declineButton: UIButton!
-    @IBOutlet weak var acceptButton: UIButton!
     @IBOutlet weak var clickArea: UIView!
-    @IBOutlet weak var rivalButton: UIButton!
+    //@IBOutlet weak var rivalButton: UIButton!
     
+    @IBOutlet weak var blockBlur: UIVisualEffectView!
     @IBOutlet weak var quizButtonSwitcher: UIButton!
     @IBOutlet weak var statsButtonSwitcher: UIButton!
     @IBOutlet weak var statsSwitcher: UIView!
@@ -93,7 +62,6 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     @IBOutlet weak var statCardBack: UIImageView!
     @IBOutlet weak var statCardTitle: UILabel!
     @IBOutlet weak var statCardClose: UIImageView!
-    @IBOutlet weak var statOverlayTable: UITableView!
     @IBOutlet weak var statsOverlayCollection: UICollectionView!
     @IBOutlet weak var profileTable: UITableView!
     @IBOutlet weak var gtRegisterBlur: UIVisualEffectView!
@@ -101,7 +69,17 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     @IBOutlet weak var gtEntryField: UnderLineTextField!
     @IBOutlet weak var sendGt: UIButton!
     @IBOutlet weak var dismissGtRegisterButton: UIButton!
+    @IBOutlet weak var fullProfileTable: UITableView!
     
+    @IBOutlet weak var twitchConnectOverlay: UIVisualEffectView!
+    @IBOutlet weak var successOverlay: UIView!
+    @IBOutlet weak var workBlur: UIVisualEffectView!
+    @IBOutlet weak var workSpinner: AnimationView!
+    @IBOutlet weak var twitchUserNameEntry: UnderLineTextField!
+    @IBOutlet weak var twitchConnectNevermind: UIButton!
+    @IBOutlet weak var twitchConnectButton: UIButton!
+    @IBOutlet weak var twitchWorkLabel: UILabel!
+    @IBOutlet weak var quizTable: UITableView!
     var localImageCache = NSCache<NSString, UIImage>()
     
     var rivalOverlayPayload = [GamerConnectGame]()
@@ -116,16 +94,22 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     var statsSet = false
     var quizSet = false
     var currentKey = ""
+    var twitchOnlineStatus = ""
     var drawerOpen = false
-    
+    var dataSet = false
+    var twitchLoading = false
+    var userBlocked = false
+    var rivalStatus = "unavailable"
     private var quizPayload = [FAQuestion]()
     private var currentProfile: FreeAgentObject? = nil
+    private var fullProfilePayload = [Any]()
     
     var showStats = false
     var showQuiz = false
     
     var gamesWithStats = [String]()
     var gamesWithQuiz = [String]()
+    var bioExpanded = false
     
      enum Const {
            static let closeCellHeight: CGFloat = 100
@@ -146,18 +130,21 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             return
         }
         
-        loadUserInfo(uid: uid)
+        UIView.animate(withDuration: 0.8, animations: {
+            self.workBlur.alpha = 1
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                self.workSpinner.alpha = 1
+                self.workSpinner.loopMode = .loop
+                self.workSpinner.play()
+            }, completion: { (finished: Bool) in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    self.loadUserInfo(uid: self.uid)
+                }
+            })
+        })
         
         appDelegate.currentProfileFrag = self
-        if(appDelegate.currentUser!.uId == self.uid){
-            bottomBlur.isHidden = true
-            actionButton.isHidden = true
-        }
-        
-        headerView.clipsToBounds = true
-        
-        self.twitchConnectLayoutWork.alpha = 1
-        self.twitchConnectLayoutWorkSpinner.startAnimating()
         
         self.actionOverlay.effect = nil
         actionOverlay.isHidden = false
@@ -167,8 +154,36 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             object: self.view.window,
             queue: nil
         ) { notification in
-            self.hideTwitchConnectWork()
+            //self.hideTwitchConnectWork()
         }
+    }
+    
+    func friendRemoved() {
+    }
+    
+    func friendRemoveFail() {
+    }
+    
+    private func showWork(){
+        UIView.animate(withDuration: 0.5, animations: {
+            self.workBlur.alpha = 1
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.3, animations: {
+                self.workSpinner.loopMode = .loop
+                self.workSpinner.play()
+            }, completion: nil)
+        })
+    }
+    
+    private func hideWork(){
+        UIView.animate(withDuration: 0.5, animations: {
+            self.workSpinner.pause()
+            self.workSpinner.alpha = 0
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.3, animations: {
+                self.workBlur.alpha = 0
+            }, completion: nil)
+        })
     }
     
     @objc func messagingButtonClicked(_ sender: AnyObject?) {
@@ -196,7 +211,10 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             
             for invite in currentUser!.pendingRequests{
                 if(self.userForProfile!.uId == invite.uid){
-                    manager.acceptFriendFromProfile(otherUserRequest: invite, currentUserUid: currentUser!.uId, callbacks: self)
+                    self.showWork()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        manager.acceptFriendFromProfile(otherUserRequest: invite, currentUserUid: currentUser!.uId, callbacks: self)
+                    }
                     break
                 }
             }
@@ -204,7 +222,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     }
     
     @objc func declineClicked(_ sender: AnyObject?) {
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Friend Profile - Friend Request Declined"))
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Friend Profile - Friend Request Accepted"))
         let manager = FriendsManager()
         if(self.userForProfile != nil){
             let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -212,7 +230,10 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             
             for invite in currentUser!.pendingRequests{
                 if(self.userForProfile!.uId == invite.uid){
-                    manager.declineRequestFromProfile(otherUserRequest: invite, currentUserUid: currentUser!.uId, callbacks: self)
+                    self.showWork()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        manager.declineRequestFromProfile(otherUserRequest: invite, currentUserUid: currentUser!.uId, callbacks: self)
+                    }
                     break
                 }
             }
@@ -220,13 +241,12 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     }
     
     func onFriendAdded() {
-        updateToChatButton()
-        dismissDrawerAndOverlay()
+        self.rebuildPayload()
     }
     
     func onFriendDeclined() {
-        updateToRequestButton()
-        dismissDrawerAndOverlay()
+        //updateToRequestButton()
+        self.rebuildPayload()
     }
     
     func loadUserInfo(uid: String){
@@ -239,6 +259,11 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             let gamerTag = value?["gamerTag"] as? String ?? ""
             let games = value?["games"] as? [String] ?? [String]()
             let twitchConnect = value?["twitchConnect"] as? String ?? ""
+            let userAge = value?["selectedAge"] as? String ?? ""
+            let primary = value?["primaryLanguage"] as? String ?? ""
+            let secondary = value?["secondaryLanguage"] as? String ?? ""
+            let blockList = value?["blockList"] as? [String: String] ?? [String: String]()
+            let restrictList = value?["restrictList"] as? [String: String] ?? [String: String]()
             var gamerTags = [GamerProfile]()
             let gamerTagsArray = snapshot.childSnapshot(forPath: "gamerTags")
             for gamerTagObj in gamerTagsArray.children {
@@ -362,6 +387,11 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             user.nintendo = nintendo
             user.bio = bio
             user.twitchConnect = twitchConnect
+            user.selectedAge = userAge
+            user.primaryLanguage = primary
+            user.secondaryLanguage = secondary
+            user.blockList = Array(blockList.keys)
+            user.restrictList = Array(restrictList.keys)
             
             self.loadProfiles(user: user)
             
@@ -588,126 +618,48 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         self.userForProfile = user
         let manager = GamerProfileManager()
         
-        let friendsManager = FriendsManager()
         let delegate = UIApplication.shared.delegate as! AppDelegate
+        if(delegate.currentUser!.blockList.contains(self.userForProfile!.uId) || self.userForProfile!.blockList.contains(delegate.currentUser!.uId)){
+            self.blockBlur.alpha = 1
+        }
+        
+        let friendsManager = FriendsManager()
         let currentUser = delegate.currentUser
+        self.fullProfilePayload = [Any]()
         
-        if(friendsManager.isInFriendList(user: userForProfile!, currentUser: currentUser!)){
-            checkRivals()
-        }
-        else{
-            self.rivalButton.alpha = 0
-            self.rivalButton.isUserInteractionEnabled = false
-        }
-        
-        self.gamerTag.text = manager.getGamerTag(user: user)
-        
-        let consoles = user.getConsoleArray()
-        if(!consoles.isEmpty){
-            consoleOne.text = consoles[0]
-            consoleOne.layer.masksToBounds = true
-            consoleOne.layer.cornerRadius = 15
-            
-            if(consoles.indices.contains(1)){
-                consoleTwo.text = consoles[1]
-                consoleTwo.layer.masksToBounds = true
-                consoleTwo.layer.cornerRadius = 15
-                consoleTwo.isHidden = false
-            }
+        self.fullProfilePayload.append([manager.getGamerTag(user: user): user.getConsoleArray()]) //header
+        var currentBio = "this user has not created a bio, yet."
+        if(!user.bio.isEmpty){
+            currentBio = user.bio
         }
         
-        if(userForProfile!.uId == currentUser!.uId){
-            if(!userForProfile!.twitchConnect.isEmpty){
-                let appDelegate = UIApplication.shared.delegate as! AppDelegate
-                let manager = appDelegate.socialMediaManager
-                manager.checkTwitchStream(twitchId: userForProfile!.twitchConnect, callbacks: self)
-            } else {
-                UIView.transition(with: self.twitchConnectLayout, duration: 0.3, options: .curveEaseInOut, animations: {
-                    self.twitchConnectLayoutWork.alpha = 0
-                    self.twitchConnectLayoutWorkSpinner.stopAnimating()
-                    self.twitchConnectLayout.backgroundColor = UIColor(named: "twitch_purple")
-                }, completion: nil)
-                
-                let connectTwitch = UITapGestureRecognizer(target: self, action: #selector(showTwitchConnectOverlay))
-                self.twitchConnectLayout.isUserInteractionEnabled = true
-                self.twitchConnectLayout.addGestureRecognizer(connectTwitch)
-                
-                twitchConnectOffline.alpha = 0
-                twitchConnectNot.alpha = 0
-                twitchConnectOnline.alpha = 0
-                twitchConnect.alpha = 1
-            }
+        self.fullProfilePayload.append(currentBio) //bio
+        
+        if(!user.selectedAge.isEmpty && !user.primaryLanguage.isEmpty && !user.secondaryLanguage.isEmpty){
+            var userInfo = [String]()
+            userInfo.append(user.selectedAge)
+            userInfo.append(user.primaryLanguage)
+            userInfo.append(user.secondaryLanguage)
+            self.fullProfilePayload.append(userInfo)
+        } //extras if needed
+        
+        self.fullProfilePayload.append("twitch")
+        self.fullProfilePayload.append(friendsManager.isInFriendList(user: userForProfile!, currentUser: currentUser!)) // interaction buttons
+        self.fullProfilePayload.append(0) //game list
+        
+        checkRivals()
+    }
+    
+    private func mapAgeFromDB(value: String) -> String {
+        if(value == "12_16"){
+            return "12 -16"
+        } else if(value == "17_24"){
+            return "17-24"
+        } else if(value == "25_31"){
+            return "25_31"
         } else {
-            if(!userForProfile!.twitchConnect.isEmpty){
-                let appDelegate = UIApplication.shared.delegate as! AppDelegate
-                let manager = appDelegate.socialMediaManager
-                manager.checkTwitchStream(twitchId: userForProfile!.twitchConnect, callbacks: self)
-            } else {
-                UIView.transition(with: self.twitchConnectLayout, duration: 0.3, options: .curveEaseInOut, animations: {
-                    self.twitchConnectLayout.backgroundColor = UIColor(named: "whiteBackToDarkGrey")
-                    self.twitchConnectLayoutWork.alpha = 0
-                    self.twitchConnectLayoutWorkSpinner.stopAnimating()
-                }, completion: nil)
-                
-                twitchConnectOffline.alpha = 0
-                twitchConnectNot.alpha = 1
-                twitchConnectOnline.alpha = 0
-                twitchConnect.alpha = 0
-            }
+            return "32 +"
         }
-        
-        var profileGames = [String]()
-        for profile in self.profilePayload{
-            profileGames.append(profile.game)
-        }
-        
-        for game in delegate.gcGames{
-            if(profileGames.contains(game.gameName) && !user.games.contains(game.gameName)){
-                user.games.append(game.gameName)
-            }
-        }
-        
-        self.setup(gamesEmpty: user.games.isEmpty)
-        
-        if(friendsManager.checkListsForUser(user: userForProfile!, currentUser: currentUser!)){
-            
-            if(friendsManager.isInFriendList(user: userForProfile!, currentUser: currentUser!)){
-                updateToChatButton()
-                
-            }
-            
-            for request in currentUser!.sentRequests{
-                if(request.uid == user.uId){
-                    updateToPending()
-                    break
-                }
-            }
-            
-            for request in currentUser!.pendingRequests{
-                if(request.uid == user.uId){
-                    actionButton.applyGradient(colours:  [#colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1), #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1)], orientation: .horizontal)
-                    actionButtonText.text = "Received Request!"
-                    
-                    let singleTap = UITapGestureRecognizer(target: self, action: #selector(receivedButtonClicked))
-                    actionButton.isUserInteractionEnabled = true
-                    actionButton.addGestureRecognizer(singleTap)
-                    
-                    acceptButton.addTarget(self, action: #selector(acceptClicked), for: .touchUpInside)
-                    declineButton.addTarget(self, action: #selector(declineClicked), for: .touchUpInside)
-                    break
-                }
-            }
-        }
-        else{
-            updateToRequestButton()
-        }
-        
-        guard !user.bio.isEmpty else{
-            self.bio.text = "This user has not yet created a bio."
-            //self.bio.text = "\"" + "I roll with the muh-fuckin rough ridin, ride or dyin, killing ERRRRRYBODY CLAN Xoxx:snfdgXXX" + "\""
-            return
-        }
-        self.bio.text = "\"" + user.bio + "\""
     }
     
     @objc private func showTwitchConnectOverlay(){
@@ -759,29 +711,25 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         AppEvents.logEvent(AppEvents.Name(rawValue: "User Profile - Registered with Twitch Connect"))
         
         UIView.animate(withDuration: 0.5, animations: {
-            self.twitchConnectWork.alpha = 1
-            self.twitchWorkSpinner.startAnimating()
-        }, completion: { (finished: Bool) in
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-            let ref = Database.database().reference().child("Users").child(delegate.currentUser!.uId)
-            ref.child("twitchConnect").setValue(self.twitchUserNameEntry.text!)
-            
-            self.dismissTwitchConnectOverlay(register: true)
-            
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            let manager = appDelegate.socialMediaManager
-            manager.checkTwitchStream(twitchId: self.twitchUserNameEntry.text!, callbacks: self)
-        })
-    }
-    
-    private func hideTwitchConnectWork(){
-        UIView.animate(withDuration: 0.5, animations: {
-            self.twitchConnectLayoutWork.alpha = 0
+            self.twitchDrawerWork.alpha = 1
         }, completion: { (finished: Bool) in
             UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                self.twitchConnectOnline.alpha = 1
-                self.twitchConnectLayoutWorkSpinner.stopAnimating()
-            }, completion: nil)
+                self.twitchWorkSpinner.alpha = 1
+                self.twitchWorkSpinner.loopMode = .loop
+                self.twitchWorkSpinner.play()
+            }, completion: { (finished: Bool) in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    let ref = Database.database().reference().child("Users").child(delegate.currentUser!.uId)
+                    ref.child("twitchConnect").setValue(self.twitchUserNameEntry.text!)
+                    
+                    self.dismissTwitchConnectOverlay(register: true)
+                    
+                    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                    let manager = appDelegate.socialMediaManager
+                    manager.checkTwitchStream(twitchId: self.twitchUserNameEntry.text!, callbacks: self)
+                }
+            })
         })
     }
     
@@ -819,58 +767,13 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     }
     
     private func setup(gamesEmpty: Bool) {
-        if(gamesEmpty){
-            self.bottomBlur.isHidden = true
-            
-            let top = CGAffineTransform(translationX: 0, y: -10)
-            UIView.animate(withDuration: 0.8, animations: {
-                self.statEmpty.alpha = 1
-                self.statEmpty.transform = top
-            }, completion: nil)
-        }
-        else{
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-            for game in self.userForProfile!.games{
-                for gcGame in delegate.gcGames{
-                    if(game == gcGame.gameName){
-                        self.objects.append(gcGame)
-                    }
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        for game in self.userForProfile!.games{
+            for gcGame in delegate.gcGames{
+                if(game == gcGame.gameName){
+                    self.objects.append(gcGame)
                 }
             }
-            
-            cellHeights = Array(repeating: Const.closeCellHeight, count: self.objects.count)
-            table.estimatedRowHeight = Const.closeCellHeight
-            table.rowHeight = UITableView.automaticDimension
-            
-            if #available(iOS 10.0, *) {
-                table.refreshControl = UIRefreshControl()
-                table.refreshControl?.addTarget(self, action: #selector(refreshHandler), for: .valueChanged)
-            }
-            
-            if(!self.profilePayload.isEmpty){
-                for profile in self.profilePayload {
-                    for game in self.objects {
-                        if(game.gameName == profile.game){
-                            self.gamesWithQuiz.append(game.gameName)
-                        }
-                    }
-                }
-            }
-            
-            self.table.dataSource = self
-            self.table.delegate = self
-            self.table.contentInset = UIEdgeInsets(top: 0,left: 0,bottom: 50,right: 0)
-            
-            let top = CGAffineTransform(translationX: 0, y: -10)
-            UIView.animate(withDuration: 0.8, animations: {
-                self.table.alpha = 1
-                self.table.transform = top
-                self.userStatsLabel.alpha = 1
-                self.userStatsLabel.transform = top
-                
-                self.tapInstructions.alpha = 1
-                self.tapInstructions.transform = top
-            }, completion: nil)
         }
     }
     
@@ -878,42 +781,18 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     }
     
     func onStreamsLoaded(streams: [TwitchStreamObject]) {
+        self.twitchLoading = false
+        
         if(streams.isEmpty){
-            UIView.transition(with: self.twitchConnectLayout, duration: 0.3, options: .curveEaseInOut, animations: {
-                self.twitchConnectLayout.backgroundColor = UIColor(named: "whiteBackToDarkGrey")
-                self.twitchConnectLayoutWork.alpha = 0
-                self.twitchConnectLayoutWorkSpinner.stopAnimating()
-            }, completion: nil)
-            
-            twitchConnectOffline.alpha = 1
-            twitchConnectNot.alpha = 0
-            twitchConnectOnline.alpha = 0
-            twitchConnect.alpha = 0
-            
-            let changeTwitch = UITapGestureRecognizer(target: self, action: #selector(self.showTwitchConnectOverlay))
-            self.twitchConnectLayout.isUserInteractionEnabled = true
-            self.twitchConnectLayout.addGestureRecognizer(changeTwitch)
-            
-            updateLabel.isHidden = false
+            twitchOnlineStatus = "offline"
+            self.fullProfileTable.reloadData()
         } else {
             DispatchQueue.main.async() {
-                UIView.transition(with: self.twitchConnectLayout, duration: 0.3, options: .curveEaseInOut, animations: {
-                    self.twitchConnectLayout.backgroundColor = #colorLiteral(red: 0.1667544842, green: 0.6060172915, blue: 0.279296875, alpha: 1)
-                    self.twitchConnectLayoutWork.alpha = 0
-                    self.twitchConnectLayoutWorkSpinner.stopAnimating()
-                }, completion: nil)
-                
-                self.twitchConnectOffline.alpha = 0
-                self.twitchConnectNot.alpha = 0
-                self.twitchConnectOnline.alpha = 1
-                self.twitchConnect.alpha = 0
-                
+                self.twitchOnlineStatus = "online"
                 let currentStream = streams[0]
                 self.currentStream = currentStream.handle
                 
-                let playTwitch = UITapGestureRecognizer(target: self, action: #selector(self.startTwitch))
-                self.twitchConnectLayout.isUserInteractionEnabled = true
-                self.twitchConnectLayout.addGestureRecognizer(playTwitch)
+                self.fullProfileTable.reloadData()
             }
         }
     }
@@ -922,59 +801,18 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     }
     
     @objc func startTwitch(){
-        UIView.animate(withDuration: 0.5, animations: {
-            self.twitchConnectOnline.alpha = 0
-            self.twitchConnectLayoutWorkSpinner.startAnimating()
-            
-        }, completion: { (finished: Bool) in
-            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                self.twitchConnectLayoutWork.alpha = 1
-                
-                self.profileTwitchPlayer.setChannel(to: self.currentStream)
-                self.profileTwitchPlayer.play()
-            }, completion: nil)
-        })
+        self.twitchLoading = true
+        self.fullProfileTable.reloadData()
     }
     
-    @objc func connectTwitch(){
+    private func rebuildPayload(){
+        loadUserInfo(uid: self.uid)
+    }
+    
+    /*@objc func connectTwitch(){
         
         self.profileTwitchPlayer.play()
-    }
-    
-    @objc func refreshHandler() {
-        let deadlineTime = DispatchTime.now() + .seconds(1)
-        DispatchQueue.main.asyncAfter(deadline: deadlineTime, execute: { [weak self] in
-            if #available(iOS 10.0, *) {
-                self?.table.refreshControl?.endRefreshing()
-            }
-            self?.table.reloadData()
-        })
-    }
-    
-    private func updateToChatButton(){
-        actionButton.applyGradient(colours:  [#colorLiteral(red: 0, green: 0.4987006783, blue: 0, alpha: 1), #colorLiteral(red: 0.5843137503, green: 0.8235294223, blue: 0.4196078479, alpha: 1)], orientation: .horizontal)
-        actionButtonText.text = "Chat with this user"
-        
-        let singleTap = UITapGestureRecognizer(target: self, action: #selector(messagingButtonClicked))
-        actionButton.isUserInteractionEnabled = true
-        actionButton.addGestureRecognizer(singleTap)
-    }
-    
-    private func updateToRequestButton(){
-        let manager = GamerProfileManager()
-        if(!manager.gamertagBelongsToUser(gamerTag: manager.getGamerTag(user: self.userForProfile!))){
-            let singleTap = UITapGestureRecognizer(target: self, action: #selector(connectButtonClicked))
-           actionButton.applyGradient(colours:  [#colorLiteral(red: 0, green: 0.4987006783, blue: 0, alpha: 1), #colorLiteral(red: 0.5843137503, green: 0.8235294223, blue: 0.4196078479, alpha: 1)], orientation: .horizontal)
-           actionButtonText.text = "send friend request"
-
-           actionButton.isUserInteractionEnabled = true
-           actionButton.isHidden = false
-            actionButton.addGestureRecognizer(singleTap)
-        } else {
-            self.bottomBlur.isHidden = true
-            self.actionButton.isHidden = true
-        }
-    }
+    }*/
     
     private func setupGTView(){
         self.gtRegisterBox.layer.borderColor = UIColor.clear.cgColor
@@ -990,7 +828,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     private func showGamerTagRequest(){
         self.gtEntryField.delegate = self
         self.gtEntryField.text = ""
-        self.gtEntryField.addTarget(self, action: #selector(self.textFieldDidChange(_:)), for: UIControl.Event.editingChanged)
+        //self.gtEntryField.addTarget(self, action: #selector(self.textFieldDidChange(_:)), for: UIControl.Event.editingChanged)
         self.sendGt.alpha = 0.3
         self.dismissGtRegisterButton.addTarget(self, action: #selector(dismissEntry), for: .touchUpInside)
         self.sendGt.addTarget(self, action: #selector(dismissEntry), for: .touchUpInside)
@@ -1027,11 +865,6 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         })
     }
     
-    private func updateToPending(){
-        actionButton.applyGradient(colours:  [#colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1), #colorLiteral(red: 0.501960814, green: 0.501960814, blue: 0.501960814, alpha: 1)], orientation: .horizontal)
-        actionButtonText.text = "pending request"
-    }
-    
     @objc func connectButtonClicked(_ sender: AnyObject?) {
         let delegate = UIApplication.shared.delegate as! AppDelegate
         if(delegate.currentUser!.userCanSendInvites()){
@@ -1058,10 +891,6 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             self.actionDrawer.alpha = 1
               self.actionDrawer.transform = top
         }, completion: nil)
-        
-        //let singleTap = UITapGestureRecognizer(target: self, action: #selector(dismissDrawerAndOverlay))
-        //clickArea.isUserInteractionEnabled = true
-        //clickArea.addGestureRecognizer(singleTap)
     }
     
     @objc private func dismissDrawerAndOverlay(){
@@ -1079,88 +908,221 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     }
     
     func tableView(_ tableview: UITableView, numberOfRowsInSection _: Int) -> Int {
-        if(tableview == self.table){
-            return self.objects.count
+        if(tableview == self.fullProfileTable){
+            return self.fullProfilePayload.count
         } else {
             return self.quizPayload.count
         }
     }
-
-    func tableView(_ tableview: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if(tableview == self.table){
-            guard case let cell as FoldingCellCell = cell else {
-                return
-            }
-
-            cell.backgroundColor = .clear
-
-            if cellHeights[indexPath.row] == Const.closeCellHeight {
-                cell.unfold(false, animated: false, completion: nil)
-            } else {
-                cell.unfold(true, animated: false, completion: nil)
-            }
-        }
-    }
-
+    
     func tableView(_ tableview: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if(tableview == self.table){
-            let cell = tableview.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! FoldingCellCell
-            let current = self.objects[indexPath.item]
-            
-            cell.gameName.text = ""
-            cell.developer.text = ""
-            
-            if(self.gamesWithQuiz.contains(current.gameName)){
-                cell.quizAvailableContainer.isHidden = false
-            } else {
-                cell.quizAvailableContainer.isHidden = true
-            }
-            
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            let cache = appDelegate.imageCache
-            if(cache.object(forKey: current.imageUrl as NSString) != nil){
-                cell.gameBack.image = cache.object(forKey: current.imageUrl as NSString)
-            } else {
-                cell.gameBack.image = Utility.Image.placeholder
-                cell.gameBack.moa.onSuccess = { image in
-                    cell.gameBack.image = image
-                    appDelegate.imageCache.setObject(image, forKey: current.imageUrl as NSString)
-                    return image
-                }
-                cell.gameBack.moa.url = current.imageUrl
-            }
-            cell.gameBack.contentMode = .scaleAspectFill
-            cell.gameBack.clipsToBounds = true
-            
-            cell.coverGameName.text = current.gameName.lowercased()
-            cell.gameName.text = current.gameName
-            cell.developer.text = current.developer
-            
-            cell.statsAvailable.isHidden = true
-            cell.statsAvailableContainer.isHidden = true
-            
-            var contained = ""
-            for stat in self.userForProfile!.stats{
-                if(stat.gameName == current.gameName){
-                    contained = stat.gameName
-                    break
-                }
-            }
-            
-            if(!contained.isEmpty){
-                cell.statsAvailable.isHidden = false
-                cell.statsAvailableContainer.isHidden = false
+        if(tableview == self.fullProfileTable){
+            let current = self.fullProfilePayload[indexPath.item]
+            if(current is [String: [String]]){
+                let cell = tableview.dequeueReusableCell(withIdentifier: "header", for: indexPath) as! ProfileHeaderCell
+                let currentLib = (current as! [String: [String]])
+                let key = Array(currentLib.keys)[0]
+                cell.gamertag.text = key
+                cell.setConsoles(consoles: currentLib[key]!)
                 
-                self.gamesWithStats.append(contained)
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                let currentUser = appDelegate.currentUser!
+                if(currentUser.uId != self.userForProfile!.uId){
+                    cell.more.alpha = 1
+                    cell.more.isUserInteractionEnabled = true
+                    let singleTap = UITapGestureRecognizer(target: self, action: #selector(moreClicked))
+                    cell.more.isUserInteractionEnabled = true
+                    cell.more.addGestureRecognizer(singleTap)
+                } else {
+                    cell.more.alpha = 0
+                    cell.more.isUserInteractionEnabled = false
+                }
+            
+                return cell
+            } else if(current is [String]){
+                let cell = tableview.dequeueReusableCell(withIdentifier: "info", for: indexPath) as! ProfileUserInfoCell
+                let currentList = (current as! [String])
+                cell.ageText.text = self.mapAgeFromDB(value: currentList[0])
+                cell.primaryText.text = currentList[1]
+                cell.secondaryText.text = currentList[2]
+                return cell
+            } else if(current is Bool){
+                if(current as! Bool){
+                    let cell = tableview.dequeueReusableCell(withIdentifier: "interaction", for: indexPath) as! ProfileFriendInteractionCell
+                    
+                    cell.message.addTarget(self, action: #selector(openMessaging), for: .touchUpInside)
+                    
+                    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                    let currentUser = appDelegate.currentUser!
+                    if(self.userForProfile!.restrictList.contains(currentUser.uId)){
+                        cell.restrictedCover.alpha = 1
+                    } else {
+                        cell.restrictedCover.alpha = 0
+                        if(self.rivalStatus == "unavailable"){
+                            cell.wannaPlay.backgroundColor = #colorLiteral(red: 0.3333052099, green: 0.3333491981, blue: 0.3332902789, alpha: 1)
+                            cell.wannaPlay.setTitle("request sent.", for: .normal)
+                            cell.wannaPlay.alpha = 0.4
+                            cell.wannaPlay.isUserInteractionEnabled = false
+                        } else {
+                            cell.wannaPlay.backgroundColor = #colorLiteral(red: 0.1667544842, green: 0.6060172915, blue: 0.279296875, alpha: 1)
+                            cell.wannaPlay.setTitle("wanna play?", for: .normal)
+                            cell.wannaPlay.alpha = 1.0
+                            cell.isUserInteractionEnabled = true
+                            cell.wannaPlay.addTarget(self, action: #selector(playClicked), for: .touchUpInside)
+                        }
+                    }
+
+                    return cell
+                } else {
+                    let cell = tableview.dequeueReusableCell(withIdentifier: "unknown", for: indexPath) as! ProfileUnknownInteractionCell
+                    
+                    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                    let currentUser = appDelegate.currentUser!
+                    if(currentUser.uId == self.userForProfile!.uId){
+                        cell.pendingUserCover.alpha = 0
+                        cell.currentUserCover.alpha = 1
+                        cell.editButton.addTarget(self, action: #selector(editClicked), for: .touchUpInside)
+                    } else {
+                        let manager = FriendsManager()
+                        cell.currentUserCover.alpha = 0
+                        if(manager.isPendingRequest(user: self.userForProfile!, currentUser: appDelegate.currentUser!)){
+                            cell.pendingUserCover.alpha = 1
+                            cell.acceptButton.addTarget(self, action: #selector(acceptClicked), for: .touchUpInside)
+                            cell.declineButton.addTarget(self, action: #selector(declineClicked), for: .touchUpInside)
+                        } else if(manager.isSentRequest(user: self.userForProfile!, currentUser: appDelegate.currentUser!)){
+                            cell.requestButton.backgroundColor = #colorLiteral(red: 0.2880555391, green: 0.2778990865, blue: 0.2911514342, alpha: 0.8045537243)
+                            cell.requestButton.alpha = 0.5
+                            cell.requestButton.setTitle( "request sent.", for: .normal)
+                            cell.requestButton.isUserInteractionEnabled = false
+                        } else {
+                            cell.requestButton.addTarget(self, action: #selector(requestClicked), for: .touchUpInside)
+                        }
+                    }
+                    return cell
+                }
+            } else if(current is String){
+                if((current as! String) == "twitch"){
+                    let cell = tableview.dequeueReusableCell(withIdentifier: "twitch", for: indexPath) as! ProfileTwitchCell
+                    
+                    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                    let currentUser = appDelegate.currentUser!
+                    
+                    UIView.transition(with: cell.twitchLogo, duration: 0.8, options: .curveEaseInOut, animations: {
+                        cell.twitchLogo.tintColor = UIColor(named: "twitchPurple")
+                    }, completion: nil)
+                    
+                    if(self.twitchLoading){
+                        if(cell.workBlur.alpha == 0){
+                            UIView.animate(withDuration: 0.8, animations: {
+                                cell.workBlur.alpha = 1
+                            }, completion: { (finished: Bool) in
+                                UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                                    cell.workSpinner.loopMode = .loop
+                                    cell.workSpinner.play()
+                                    
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                        let test = "https://doublexpstorage.tech/stream.php?channel=" + self.currentStream
+                                        cell.twitchWV.load(NSURLRequest(url: NSURL(string: test)! as URL) as URLRequest)
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                                                cell.twitchWV.alpha = 1
+                                            }, completion: nil)
+                                        }
+                                    }
+                                }, completion: nil)
+                            })
+                        }
+                        return cell
+                    }
+                    
+                    if(!self.twitchLoading && cell.workBlur.alpha == 1){
+                        UIView.animate(withDuration: 0.8, animations: {
+                            cell.workSpinner.pause()
+                            cell.workSpinner.alpha = 0
+                        }, completion: { (finished: Bool) in
+                            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                                cell.workBlur.alpha = 0
+                            }, completion: nil)
+                        })
+                    }
+                    
+                    
+                    if(userForProfile!.uId == currentUser.uId){
+                        if(!userForProfile!.twitchConnect.isEmpty){
+                            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                            let manager = appDelegate.socialMediaManager
+                            cell.offlineView.alpha = 0
+                            cell.notConnectedView.alpha = 0
+                            cell.onlineView.alpha = 0
+                            cell.connectView.alpha = 0
+                            cell.currentUserView.alpha = 1
+                            //manager.checkTwitchStream(twitchId: userForProfile!.twitchConnect, callbacks: self)
+                        } else {
+                            let connectTwitch = UITapGestureRecognizer(target: self, action: #selector(showTwitchConnectOverlay))
+                            cell.connectView.isUserInteractionEnabled = true
+                            cell.connectView.addGestureRecognizer(connectTwitch)
+                            
+                            cell.offlineView.alpha = 0
+                            cell.notConnectedView.alpha = 0
+                            cell.onlineView.alpha = 0
+                            cell.connectView.alpha = 1
+                            cell.currentUserView.alpha = 0
+                        }
+                    } else {
+                        if(!userForProfile!.twitchConnect.isEmpty){
+                            if(self.twitchOnlineStatus.isEmpty){
+                                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                                let manager = appDelegate.socialMediaManager
+                                manager.checkTwitchStream(twitchId: userForProfile!.twitchConnect, callbacks: self)
+                            } else {
+                                if(self.twitchOnlineStatus == "online"){
+                                    let playTwitch = UITapGestureRecognizer(target: self, action: #selector(self.startTwitch))
+                                    cell.onlineView.isUserInteractionEnabled = true
+                                    cell.onlineView.addGestureRecognizer(playTwitch)
+                                    cell.offlineView.alpha = 0
+                                    cell.notConnectedView.alpha = 0
+                                    cell.onlineView.alpha = 1
+                                    cell.connectView.alpha = 0
+                                    cell.currentUserView.alpha = 0
+                                } else {
+                                    cell.offlineView.alpha = 1
+                                    cell.notConnectedView.alpha = 0
+                                    cell.onlineView.alpha = 0
+                                    cell.connectView.alpha = 0
+                                    cell.currentUserView.alpha = 0
+                                }
+                            }
+                        } else {
+                            cell.offlineView.alpha = 0
+                            cell.notConnectedView.alpha = 1
+                            cell.onlineView.alpha = 0
+                            cell.connectView.alpha = 0
+                            cell.currentUserView.alpha = 0
+                        }
+                    }
+                    return cell
+                } else {
+                    let cell = tableview.dequeueReusableCell(withIdentifier: "bio", for: indexPath) as! ProfileBioCell
+                    cell.bio.text = (current as? String) ?? "bio unavailable"
+                    
+                    if(cell.bio.calculateMaxLines() > 2){
+                        cell.expandCollapse.alpha = 1
+                        
+                        let expandTap = UITapGestureRecognizer(target: self, action: #selector(expandClicked))
+                        cell.expandCollapse.isUserInteractionEnabled = true
+                        cell.expandCollapse.addGestureRecognizer(expandTap)
+                    } else {
+                        cell.expandCollapse.alpha = 0
+                        cell.expandCollapse.isUserInteractionEnabled = false
+                    }
+                    
+                    return cell
+                }
             } else {
-                cell.statsAvailable.isHidden = true
-                cell.statsAvailableContainer.isHidden = true
+                let cell = tableview.dequeueReusableCell(withIdentifier: "games", for: indexPath) as! ProfileMyGamesCell
+                cell.setupGames()
+                return cell
             }
-            
-            cell.layoutMargins = UIEdgeInsets.zero
-            cell.separatorInset = UIEdgeInsets.zero
-            
-            return cell
         }
         else {
             let current = quizPayload[indexPath.item]
@@ -1209,13 +1171,55 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                     return cell
                 }
             }
-            
         }
     }
 
     func tableView(_ tableview: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if(tableview == self.table){
-            return cellHeights[indexPath.row]
+        if(tableview == self.fullProfileTable){
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let current = self.fullProfilePayload[indexPath.item]
+            if(current is [String: [String]]){
+                return CGFloat(120)
+            } else if(current is [String]){
+                return CGFloat(70)
+            } else if(current is Bool){
+                if(appDelegate.currentUser!.uId == self.userForProfile!.uId){
+                    return CGFloat(60)
+                } else {
+                    return CGFloat(100)
+                }
+            } else if(current is [String: String]){
+                return CGFloat(50)
+            } else if(current is String){
+                if(!bioExpanded){
+                    if(current as! String == "twitch"){
+                        return CGFloat(80)
+                    } else {
+                        return CGFloat(40)
+                    }
+                } else {
+                    if(current as! String == "twitch"){
+                        return CGFloat(80)
+                    } else {
+                        let cell = tableview.cellForRow(at: indexPath) as? ProfileBioCell
+                        if(cell != nil){
+                            if(cell!.bio.calculateMaxLines() == 2){
+                                return CGFloat(60)
+                            } else if(cell!.bio.calculateMaxLines() == 3){
+                                return CGFloat(80)
+                            } else if(cell!.bio.calculateMaxLines() == 4){
+                                return CGFloat(100)
+                            } else {
+                                return CGFloat(120)
+                            }
+                        } else {
+                            return CGFloat(40)
+                        }
+                    }
+                }
+            } else {
+                return CGFloat(450)
+            }
         } else {
             let cell = tableview.cellForRow(at: indexPath)
             if(cell is AnswerTableCell){
@@ -1228,12 +1232,107 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         }
     }
 
+    @objc private func requestClicked(){
+        self.showWork()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            let manager = FriendsManager()
+            manager.sendRequestFromProfile(currentUser: delegate.currentUser!, otherUser: self.userForProfile!, callbacks: self)
+        }
+    }
+    
+    @objc private func editClicked(){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "profile") as! ProfileFrag
+        currentViewController.cachedUidFromProfile = self.userForProfile!.uId
+        
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+    }
+    
+    @objc private func playClicked(){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "play") as! PlayDrawer
+        
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let profileManager = delegate.profileManager
+        profileManager.wannaPlayCachedUser = self.userForProfile!
+        
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        transitionDelegate.showCloseButton = true
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = false
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.customHeight = 450
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+    }
+    
+    func dismissModal(){
+        self.rebuildPayload()
+        self.updateMoreComplete()
+    }
+    
+    @objc func didDismissStorkBySwipe(){
+        self.fullProfileTable.reloadData()
+        self.updateMoreComplete()
+    }
+    
+    @objc func didDismissStorkByTap() {
+        self.fullProfileTable.reloadData()
+        self.updateMoreComplete()
+    }
+    
+    @objc private func expandClicked(){
+        if(self.bioExpanded){
+            self.bioExpanded = false
+        } else {
+            self.bioExpanded = true
+        }
+        
+        self.fullProfileTable.reloadData()
+    }
+    
+    @objc private func moreClicked(){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "options") as! OptionsList
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let profileManager = delegate.profileManager
+        profileManager.moreOptionsCachedUser = self.userForProfile!
+        
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.customHeight = 520
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+    }
+
     func tableView(_ tableview: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if(tableview == self.table){
+        /*if(tableview == self.table){
             let current = self.objects[indexPath.item]
             if(self.gamesWithStats.contains(current.gameName) || self.gamesWithQuiz.contains(current.gameName)){
                 self.showStatsOverlay(gameName: current.gameName, game: current)
             }
+        }*/
+    }
+    
+    func updateMoreComplete(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        if(delegate.currentUser!.blockList.contains(self.userForProfile!.uId)){
+            delegate.currentLanding!.navigateToHome()
         }
     }
     
@@ -1323,32 +1422,32 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     }
     
     func onFriendRequested(){
-        let top = CGAffineTransform(translationX: 0, y: -40)
+        self.fullProfileTable.reloadData()
         UIView.animate(withDuration: 0.5, animations: {
-            self.sentOverlay.alpha = 1
-            self.updateToPending()
+            self.successOverlay.alpha = 1
         }, completion: { (finished: Bool) in
-            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                self.sentText.transform = top
-                self.sentText.alpha = 1
-            }, completion: { (finished: Bool) in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                UIView.animate(withDuration: 0.5, delay: 0.8, options: [], animations: {
+                    self.workBlur.alpha = 0
+                }, completion: { (finished: Bool) in
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    UIView.animate(withDuration: 0.5, delay: 0.8, options: [], animations: {
-                        self.sentOverlay.alpha = 0
+                    UIView.animate(withDuration: 0.1, animations: {
+                        self.successOverlay.alpha = 0
                     }, completion: nil)
                 }
-            })
+                })
+            }
         })
     }
     
-    private func showStatsOverlay(gameName: String, game: GamerConnectGame){
+    func showStatsOverlay(gameName: String, game: GamerConnectGame){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         
         if(self.gamesWithStats.contains(game.gameName)){
-            self.showStats = true
-            self.statsOverlayCollection.alpha = 1
-            var currentStat: StatObject? = nil
-            
+        self.showStats = true
+        self.statsOverlayCollection.alpha = 1
+        var currentStat: StatObject? = nil
+        
             for stat in userForProfile!.stats{
                 if(stat.gameName == gameName){
                     currentStat = stat
@@ -1438,11 +1537,15 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 }
             }
             
+            //moves the statcard out of the way
             let top = CGAffineTransform(translationX: -338, y: 0)
-            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                self.profileTable.transform = top
-            }, completion: nil)
-            
+            UIView.animate(withDuration: 0.8, animations: {
+                self.statsOverlayCollection.transform = top
+            }, completion: { (finished: Bool) in
+                UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                    self.quizTable.transform = top
+                }, completion: nil)
+            })
         }
            
         //releasing with bug that, under unknown circumstances, the quiz table will not appear when drawer is opened.
@@ -1458,12 +1561,12 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             }
             
             if(!self.quizSet){
-                self.profileTable.dataSource = self
-                self.profileTable.delegate = self
-                self.reload(tableView: profileTable)
+                self.quizTable.dataSource = self
+                self.quizTable.delegate = self
+                self.reload(tableView: quizTable)
                 self.quizSet = true
             } else {
-                self.profileTable.reloadData()
+                self.quizTable.reloadData()
             }
         }
 
@@ -1672,6 +1775,27 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         }, completion: nil)
     }
     
+    @objc private func openMessaging(){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "messaging") as! MessagingFrag
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        
+        guard delegate.currentUser != nil else{
+            return
+        }
+        currentViewController.currentUser = delegate.currentUser!
+        currentViewController.otherUserId = self.userForProfile!.uId
+        
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+    }
+    
     private func sendPayload(){
         let manager = FriendsManager()
         manager.createRivalRequest(otherUser: self.userForProfile!, game: self.rivalSelectedGame, type: self.rivalSelectedType, callbacks: self, gamerTags: self.userForProfile!.gamerTags)
@@ -1710,22 +1834,6 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                     }, completion: { (finished: Bool) in
                         UIView.animate(withDuration: 0.8, delay: 0.3, options: [], animations: {
                             self.rivalBlur.alpha = 0
-                        
-                            self.self.rivalButton.alpha = 0.3
-                            self.rivalButton.isUserInteractionEnabled = false
-                        
-                            if(self.rivalSelectedType == "co-op"){
-                                UIView.transition(with: self.headerView, duration: 0.3, options: .curveEaseInOut, animations: {
-                                    self.rivalButton.backgroundColor = UIColor(named: "greenToDarker")
-                                    self.headerView.backgroundColor = UIColor(named: "greenToDarker")
-                                }, completion: nil)
-                            }
-                        else{
-                            UIView.transition(with: self.headerView, duration: 0.3, options: .curveEaseInOut, animations: {
-                                 self.rivalButton.backgroundColor = UIColor(named: "redToDark")
-                                 self.headerView.backgroundColor = UIColor(named: "redToDark")
-                            }, completion: nil)
-                        }
                     }, completion: nil)
                 })
             })
@@ -1763,6 +1871,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     private func checkRivals(){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let currentUser = delegate.currentUser!
+        let manager = delegate.profileManager
         var currentRival: RivalObj?
         
         var alreadyARival = false
@@ -1820,59 +1929,47 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             }
         }
         
-        var contained = false
-        var gcPayload = [String]()
-        for game in userForProfile!.gamerTags{
-            for currentUserGame in delegate.currentUser!.gamerTags{
-                if (game.game == currentUserGame.game && !game.gamerTag.isEmpty){
-                    contained = true
-                    gcPayload.append(game.game)
-                }
-            }
+        manager.updateTempRivalsDB()
+        
+        if(!alreadyARival){
+            self.rivalStatus = "available"
+        }
+        else if(alreadyARival){
+            self.rivalStatus = "unavailable"
         }
         
-        if(contained && !alreadyARival){
-            rivalButton.alpha = 1
-            rivalButton.addTarget(self, action: #selector(rivalClicked), for: .touchUpInside)
-            rivalButton.isUserInteractionEnabled = true
+        if(!dataSet){
+            self.dataSet = true
+            self.fullProfileTable.delegate = self
+            self.fullProfileTable.dataSource = self
+            self.fullProfileTable.reloadData()
             
-            checkGames(payload: gcPayload)
-        }
-        else if(contained && alreadyARival){
-            rivalButton.alpha = 0.3
-            rivalButton.isUserInteractionEnabled = false
-            
-            if(currentRival != nil){
-                if(currentRival!.type == "co-op"){
-                    UIView.transition(with: self.headerView, duration: 0.3, options: .curveEaseInOut, animations: {
-                        self.rivalButton.titleLabel?.text = "co-op"
-                        self.rivalButton.backgroundColor = UIColor(named: "greenToDarker")
-                        self.headerView.backgroundColor = UIColor(named: "greenToDarker")
-                    }, completion: nil)
-                }
-                else{
-                    UIView.transition(with: self.headerView, duration: 0.3, options: .curveEaseInOut, animations: {
-                        self.rivalButton.titleLabel?.text = "rival"
-                        self.rivalButton.backgroundColor = UIColor(named: "redToDark")
-                        self.headerView.backgroundColor = UIColor(named: "redToDark")
-                    }, completion: nil)
-                }
+            if(self.fullProfileTable.alpha == 0){
+                UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                    self.fullProfileTable.alpha = 1
+                }, completion: { (finished: Bool) in
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        self.hideWork()
+                    }
+                })
             }
-        }
-        else{
-            rivalButton.alpha = 0
-            rivalButton.isUserInteractionEnabled = false
-        }
-    }
-    
-    
-    private func checkGames(payload: [String]){
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        
-        for game in delegate.gcGames{
-            if(payload.contains(game.gameName)){
-                self.rivalOverlayPayload.append(game)
-            }
+        } else {
+            self.fullProfileTable.reloadData()
+            UIView.animate(withDuration: 0.5, animations: {
+                self.successOverlay.alpha = 1
+            }, completion: { (finished: Bool) in
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    UIView.animate(withDuration: 0.5, delay: 0.8, options: [], animations: {
+                        self.workBlur.alpha = 0
+                    }, completion: { (finished: Bool) in
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        UIView.animate(withDuration: 0.1, animations: {
+                            self.successOverlay.alpha = 0
+                        }, completion: nil)
+                    }
+                    })
+                }
+            })
         }
     }
 }
@@ -2064,5 +2161,16 @@ extension Dictionary {
         for (k, v) in dict {
             updateValue(v, forKey: k)
         }
+    }
+}
+
+extension UILabel {
+    func calculateMaxLines() -> Int {
+        let maxSize = CGSize(width: frame.size.width, height: CGFloat(Float.infinity))
+        let charSize = font.lineHeight
+        let text = (self.text ?? "") as NSString
+        let textSize = text.boundingRect(with: maxSize, options: .usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
+        let linesRoundedUp = Int(ceil(textSize.height/charSize))
+        return linesRoundedUp
     }
 }

@@ -884,28 +884,9 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     func checkRivals(){
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        let currentUser = delegate.currentUser!
+        let manager = delegate.profileManager
         
-        for rival in currentUser.currentTempRivals{
-            let dbDate = self.stringToDate(rival.date)
-            
-            if(dbDate != nil){
-                let now = NSDate()
-                let formatter = DateFormatter()
-                formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
-                formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                let future = formatter.string(from: dbDate as Date)
-                let dbTimeOut = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
-                
-                let validRival = (now as Date).compare(.isEarlier(than: dbTimeOut))
-                
-                if(dbTimeOut != nil){
-                    if(!validRival){
-                        currentUser.currentTempRivals.remove(at: currentUser.currentTempRivals.index(of: rival)!)
-                    }
-                }
-            }
-        }
+        manager.updateTempRivalsDB()
     }
     
     func stringToDate(_ str: String)->Date{
@@ -1444,7 +1425,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     @objc func navigateToCurrentUserProfile() {
         AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Current User Profile"))
-        
+        menuVie.viewShowing = false
         let top = CGAffineTransform(translationX: -320, y: 0)
         UIView.animate(withDuration: 0.4, delay: 0.0, options:[], animations: {
             self.menuVie.transform = top
@@ -1455,9 +1436,19 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                 UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
                     self.restoreBottomNav()
                 }, completion: { (finished: Bool) in
-                    Broadcaster.notify(NavigateToProfile.self) {
-                        $0.navigateToCurrentUserProfile()
-                    }
+                    let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "profile") as! ProfileFrag
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    currentViewController.cachedUidFromProfile = delegate.currentUser!.uId
+                    
+                    let transitionDelegate = SPStorkTransitioningDelegate()
+                    currentViewController.transitioningDelegate = transitionDelegate
+                    currentViewController.modalPresentationStyle = .custom
+                    currentViewController.modalPresentationCapturesStatusBarAppearance = true
+                    transitionDelegate.showIndicator = true
+                    transitionDelegate.swipeToDismissEnabled = true
+                    transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+                    transitionDelegate.storkDelegate = self
+                    self.present(currentViewController, animated: true, completion: nil)
                 })
             })
         })
@@ -1471,14 +1462,41 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     }
     
     @objc func navigateToSettings() {
-        dismissMenu()
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Settings"))
-            Broadcaster.notify(NavigateToProfile.self) {
-                $0.navigateToSettings()
-            }
-        }
+        menuVie.viewShowing = false
+        let top = CGAffineTransform(translationX: -320, y: 0)
+        UIView.animate(withDuration: 0.4, delay: 0.0, options:[], animations: {
+            self.menuVie.transform = top
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
+                self.blur.alpha = 0.0
+            }, completion: { (finished: Bool) in
+                UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
+                    self.restoreBottomNav()
+                }, completion: { (finished: Bool) in
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Settings"))
+                        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "settings") as! SettingsFrag
+                        let delegate = UIApplication.shared.delegate as! AppDelegate
+                        
+                        guard delegate.currentUser != nil else{
+                            return
+                        }
+                        
+                        let transitionDelegate = SPStorkTransitioningDelegate()
+                        currentViewController.transitioningDelegate = transitionDelegate
+                        currentViewController.modalPresentationStyle = .custom
+                        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+                        transitionDelegate.showIndicator = false
+                        transitionDelegate.customHeight = 520
+                        transitionDelegate.showCloseButton = true
+                        transitionDelegate.swipeToDismissEnabled = true
+                        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+                        transitionDelegate.storkDelegate = self
+                        self.present(currentViewController, animated: true, completion: nil)
+                    }
+                })
+            })
+        })
     }
     
     @objc func startDashNavigation(teamName: String?, teamInvite: TeamInviteObject?, newTeam: Bool) {
@@ -1652,9 +1670,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         }
     
         if(chatUrl != nil || chatOtherId != nil){
-            Broadcaster.notify(NavigateToProfile.self) {
-              $0.navigateToMessaging(groupChannelUrl: chatUrl, otherUserId: chatOtherId)
-            }
+            self.popMessagingModal(groupChannelUrl: chatUrl, otherUserId: chatOtherId)
         }
     }
     
@@ -1671,11 +1687,31 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
                 self.blur.alpha = 0.0
             }, completion: { (finished: Bool) in
-                    Broadcaster.notify(NavigateToProfile.self) {
-                      $0.navigateToMessaging(groupChannelUrl: nil, otherUserId: uId)
-                }
+                self.popMessagingModal(groupChannelUrl: nil, otherUserId: uId)
             })
         })
+    }
+    
+    private func popMessagingModal(groupChannelUrl: String?, otherUserId: String?){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "messaging") as! MessagingFrag
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        
+        guard delegate.currentUser != nil else{
+            return
+        }
+        currentViewController.currentUser = delegate.currentUser!
+        currentViewController.groupChannelUrl = groupChannelUrl
+        currentViewController.otherUserId = otherUserId
+        
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
     }
     
     func menuNavigateToProfile(uId: String){
@@ -1691,9 +1727,9 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                 self.blur.alpha = 0.0
             }, completion: { (finished: Bool) in
                 UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
-                        Broadcaster.notify(NavigateToProfile.self) {
-                                $0.navigateToProfile(uid: uId)
-                        }
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    delegate.cachedTest = uId
+                    self.performSegue(withIdentifier: "profile", sender: nil)
                 }, completion: nil)
             })
         })
@@ -2163,7 +2199,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         
         self.menuItems.append(0)
         //self.menuItems.append(1)
-        self.menuItems.append(3)
+        //self.menuItems.append(3)
         self.menuItems.append("Friends")
         self.menuItems.append(2)
         

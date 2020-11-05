@@ -12,19 +12,20 @@ import RAMPaperSwitch
 import Firebase
 
 class SettingsFrag: ParentVC{
-    @IBOutlet weak var closeText: UILabel!
-    @IBOutlet weak var closeButton: UIImageView!
     @IBOutlet weak var findSwitch: RAMPaperSwitch!
     @IBOutlet weak var notificationSwitch: RAMPaperSwitch!
     @IBOutlet weak var findView: UIView!
     @IBOutlet weak var noteView: UIView!
     @IBOutlet weak var cogs: UIImageView!
+    @IBOutlet weak var mainView: UIView!
+    //@IBOutlet weak var closeButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         notificationSwitch.addTarget(self, action: #selector(notificationSwitchChanged), for: UIControl.Event.valueChanged)
         findSwitch.addTarget(self, action: #selector(findSwitchChanged), for: UIControl.Event.valueChanged)
+        //closeButton.addTarget(self, action: #selector(backButtonClicked), for: UIControl.Event.valueChanged)
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         if(appDelegate.currentUser!.notifications == "true"){
@@ -38,40 +39,13 @@ class SettingsFrag: ParentVC{
     }
     
     @objc func backButtonClicked() {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        appDelegate.currentLanding!.backButtonClicked(self)
+        self.dismiss(animated: true, completion: nil)
     }
     
     private func animateView(){
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            self.cogs.alpha = 0.1
-            
-            let top = CGAffineTransform(translationX: 0, y: -20)
-            UIView.animate(withDuration: 0.3, animations: {
-                self.findView.alpha = 1
-                self.findView.transform = top
-            }, completion: { (finished: Bool) in
-                UIView.animate(withDuration: 0.3, animations: {
-                    self.noteView.transform = top
-                    self.noteView.alpha = 1
-                }, completion: { (finished: Bool) in
-                    UIView.animate(withDuration: 0.5, animations: {
-                        self.closeButton.transform = top
-                        self.closeText.transform = top
-                        self.closeButton.alpha = 1
-                        self.closeText.alpha = 1
-                        
-                        let closeTap = UITapGestureRecognizer(target: self, action: #selector(self.backButtonClicked))
-                        self.closeButton.isUserInteractionEnabled = true
-                        self.closeButton.addGestureRecognizer(closeTap)
-                        
-                        let backTap = UITapGestureRecognizer(target: self, action: #selector(self.backButtonClicked))
-                        self.closeText.isUserInteractionEnabled = true
-                        self.closeText.addGestureRecognizer(backTap)
-                    }, completion: nil)
-                })
-            })
-        }
+        UIView.animate(withDuration: 0.3, animations: {
+            self.mainView.alpha = 1
+        }, completion: nil)
     }
     
     @objc func notificationSwitchChanged(noteSwitch: UISwitch) {

@@ -361,6 +361,10 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                 let subscriptions = value?["subscriptions"] as? [String] ?? [String]()
                 let competitions = value?["competitions"] as? [String] ?? [String]()
                 let bio = value?["bio"] as? String ?? ""
+                let userLat = value?["userLat"] as? Double ?? 0.0
+                let userLong = value?["userLong"] as? Double ?? 0.0
+                let blockList = value?["blockList"] as? [String: String] ?? [String: String]()
+                let restrictList = value?["restrictList"] as? [String: String] ?? [String: String]()
                 
                 let search = value?["search"] as? String ?? ""
                 if(search.isEmpty){
@@ -917,6 +921,10 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                 user.rejectedTempRivals = rejectedRivals
                 user.tempRivals = tempRivals
                 user.viewedAnnouncements = viewedAnnouncements
+                user.userLat = userLat
+                user.userLong = userLong
+                user.blockList = Array(blockList.keys)
+                user.restrictList = Array(restrictList.keys)
                 
                 DispatchQueue.main.async {
                     let delegate = UIApplication.shared.delegate as! AppDelegate

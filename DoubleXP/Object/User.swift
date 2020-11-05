@@ -241,6 +241,16 @@ class User: NSObject, NSCoding {
         }
     }
     
+    var _timezone = "timezone"
+    var timezone: String {
+        get {
+            return (_timezone)
+        }
+        set (newVal) {
+            _timezone = newVal
+        }
+    }
+    
     var _notifications = "true"
     var notifications: String {
         get {
@@ -258,6 +268,26 @@ class User: NSObject, NSCoding {
         }
         set (newVal) {
             _userLat = newVal
+        }
+    }
+    
+    var _blockList = [String]()
+    var blockList: [String] {
+        get {
+            return (_blockList)
+        }
+        set (newVal) {
+            _blockList = newVal
+        }
+    }
+    
+    var _restrictList = [String]()
+    var restrictList: [String] {
+        get {
+            return (_restrictList)
+        }
+        set (newVal) {
+            _restrictList = newVal
         }
     }
     
@@ -475,6 +505,8 @@ class User: NSObject, NSCoding {
         self.selectedAge = (decoder.decodeObject(forKey: "selectedAge") as! String)
         self.primaryLanguage = (decoder.decodeObject(forKey: "primaryLanguage") as! String)
         self.secondaryLanguage = (decoder.decodeObject(forKey: "secondaryLanguage") as! String)
+        self.blockList = (decoder.decodeObject(forKey: "blockList") as! [String])
+        self.restrictList = (decoder.decodeObject(forKey: "restrictList") as! [String])
     }
     
     func encode(with coder: NSCoder) {
@@ -504,6 +536,8 @@ class User: NSObject, NSCoding {
         coder.encode(self.selectedAge, forKey: "selectedAge")
         coder.encode(self.primaryLanguage, forKey: "primaryLanguage")
         coder.encode(self.secondaryLanguage, forKey: "secondaryLanguage")
+        coder.encode(self.blockList, forKey: "blockList")
+        coder.encode(self.blockList, forKey: "restrictList")
     }
     
     struct Post: Hashable, Equatable {

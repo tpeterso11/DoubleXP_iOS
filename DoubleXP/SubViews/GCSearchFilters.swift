@@ -8,6 +8,11 @@
 
 import Foundation
 import UIKit
+import CoreLocation
+import SwiftLocation
+import PopupDialog
+import FirebaseDatabase
+import GeoFire
 
 struct filterCell {
     var opened = true
@@ -18,7 +23,7 @@ struct filterCell {
     //question: answer/db_value
 }
 
-class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSource, CLLocationManagerDelegate {
     @IBOutlet weak var table: UITableView!
     @IBOutlet weak var searchButton: UIButton!
     @IBOutlet weak var clearButton: UIButton!
@@ -27,6 +32,12 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
     var gcGame: GamerConnectGame!
     var basicFilterList = [filterCell]()
     var currentManager: SearchManager!
+    var locationManager: CLLocationManager?
+    var req: LocationRequest?
+    var popup: PopupDialog?
+    var locationShowing = false
+    var locationCell: filterCell?
+    var currentSelectedSender: DistanceGesture?
     
     
     override func viewDidLoad() {
@@ -36,7 +47,11 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
         currentManager = delegate.searchManager
         self.clear.alpha = 0.3
         
-        self.search.addTarget(self, action: #selector(searchFromButton), for: .touchUpInside)
+        self.searchButton.addTarget(self, action: #selector(searchFromButton), for: .touchUpInside)
+        
+        if(delegate.currentUser!.userLat != 0.0){
+            updateLocation()
+        }
         
         buildFilterList()
     }
@@ -60,18 +75,22 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
         header.title = "basic"
         header.options = [["": ""]]
         self.basicFilterList.append(header)
-        var locationSwitch = filterCell()
-        locationSwitch.header = true
-        locationSwitch.title = "location"
-        locationSwitch.type = "activate"
-        locationSwitch.options = [["": ""]]
-        self.basicFilterList.append(locationSwitch)
+        
+        locationCell = filterCell()
+        locationCell?.header = true
+        locationCell?.title = "location"
+        locationCell?.type = "activate"
+        locationCell?.opened = true
+        locationCell?.options = [["": ""]]
+        self.basicFilterList.append(locationCell!)
+        
         let baby = ["12 - 16": "12_16"]
         let young = ["17 - 24": "17_24"]
         let mid = ["25 - 31": "25_31"]
         let grown = ["32 +": "32_over"]
         let ageChoices = [baby, young, mid, grown]
-        let age = filterCell(opened: false, title: "age range", options: ageChoices, type: "age")
+        var opened = !self.currentManager.ageFilters.isEmpty
+        let age = filterCell(opened: opened, title: "age range", options: ageChoices, type: "age")
         self.basicFilterList.append(age)
         
         let english = ["english": "english"]
@@ -79,7 +98,8 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
         let french = ["french": "french"]
         let chinese = ["chinese": "chinese"]
         let languageChoices = [english, spanish, french, chinese]
-        let language = filterCell(opened: false, title: "language", options: languageChoices, type: "language")
+        opened = !self.currentManager.langaugeFilters.isEmpty
+        let language = filterCell(opened: opened, title: "language", options: languageChoices, type: "language")
         self.basicFilterList.append(language)
         
         if(!gcGame.filterQuestions.isEmpty){
@@ -123,10 +143,6 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if(indexPath.row == 0){
             if(self.basicFilterList[indexPath.section].header == true){
-                let cell = tableView.dequeueReusableCell(withIdentifier: "category", for: indexPath) as! FilterCategory
-                cell.title.text = self.basicFilterList[indexPath.section].title
-                return cell
-            } else {
                 if(self.basicFilterList[indexPath.section].type == "activate"){
                     let cell = tableView.dequeueReusableCell(withIdentifier: "activate", for: indexPath) as! FilterActivateCell
                     cell.label.text = self.basicFilterList[indexPath.section].title
@@ -138,24 +154,90 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
                         } else {
                             cell.switch.isOn = false
                         }
+                        cell.switch.addTarget(self, action: #selector(locationSwitchTriggered), for: UIControl.Event.valueChanged)
                     }
                     return cell
                 } else {
-                    let cell = tableView.dequeueReusableCell(withIdentifier: "header", for: indexPath) as! FilterHeader
-                    cell.header.text = self.basicFilterList[indexPath.section].title
-                    
-                    if(self.basicFilterList[indexPath.section].opened == true){
-                        cell.arrow.transform = CGAffineTransform(rotationAngle: CGFloat(Double.pi));
-                    } else {
-                        cell.arrow.transform = CGAffineTransform(rotationAngle: CGFloat(0));
-                    }
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "category", for: indexPath) as! FilterCategory
+                    cell.title.text = self.basicFilterList[indexPath.section].title
                     return cell
                 }
+            } else {
+                let cell = tableView.dequeueReusableCell(withIdentifier: "header", for: indexPath) as! FilterHeader
+                cell.header.text = self.basicFilterList[indexPath.section].title
+                
+                if(self.basicFilterList[indexPath.section].opened == true){
+                    cell.arrow.transform = CGAffineTransform(rotationAngle: CGFloat(Double.pi));
+                } else {
+                    cell.arrow.transform = CGAffineTransform(rotationAngle: CGFloat(0));
+                }
+                return cell
             }
         } else {
             if(self.basicFilterList[indexPath.section].header == true){
-                let cell = tableView.dequeueReusableCell(withIdentifier: "empty", for: indexPath) as! EmptyCell
-                return cell
+                if(self.basicFilterList[indexPath.section].title == "location"){
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "distance", for: indexPath) as! DistanceCell
+                    
+                    let fiftyTap = DistanceGesture(target: self, action: #selector(distanceChosen))
+                    fiftyTap.tag = "fifty_miles"
+                    fiftyTap.section = indexPath.section
+                    cell.fifty.isUserInteractionEnabled = true
+                    cell.fifty.addGestureRecognizer(fiftyTap)
+                    
+                    if(self.currentManager.locationFilter == "fifty_miles"){
+                        cell.fiftyCover.alpha = 1
+                    } else {
+                        cell.fiftyCover.alpha = 0
+                    }
+                    
+                    let hundredTap = DistanceGesture(target: self, action: #selector(distanceChosen))
+                    hundredTap.tag = "hundred_miles"
+                    hundredTap.section = indexPath.section
+                    cell.hundred.isUserInteractionEnabled = true
+                    cell.hundred.addGestureRecognizer(hundredTap)
+                    
+                    if(self.currentManager.locationFilter == "hundred_miles"){
+                        cell.hundredCover.alpha = 1
+                    } else {
+                        cell.hundredCover.alpha = 0
+                    }
+                    
+                    let timezoneTap = DistanceGesture(target: self, action: #selector(distanceChosen))
+                    timezoneTap.tag = "timezone"
+                    timezoneTap.section = indexPath.section
+                    cell.timezoneButton.isUserInteractionEnabled = true
+                    cell.timezoneButton.addGestureRecognizer(timezoneTap)
+                    
+                    if(self.currentManager.locationFilter == "timezone"){
+                        cell.timezoneCover.alpha = 1
+                    } else {
+                        cell.timezoneCover.alpha = 0
+                    }
+                    
+                    let noneTap = DistanceGesture(target: self, action: #selector(distanceChosen))
+                    noneTap.tag = "none"
+                    noneTap.section = indexPath.section
+                    cell.globalButton.isUserInteractionEnabled = true
+                    cell.globalButton.addGestureRecognizer(noneTap)
+                    
+                    if(self.currentManager.locationFilter == "none"){
+                        cell.globalCover.alpha = 1
+                    } else {
+                        cell.globalCover.alpha = 0
+                    }
+                    
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    if(delegate.currentUser!.userLat != 0.0){
+                        cell.cover.alpha = 0
+                    } else {
+                        cell.cover.alpha = 1
+                    }
+                    
+                    return cell
+                } else {
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "empty", for: indexPath) as! EmptyCell
+                    return cell
+                }
             }
             else {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "option", for: indexPath) as! FilterOption
@@ -198,6 +280,7 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if(indexPath.row == 0){
+            let type = self.basicFilterList[indexPath.section].type
             if(self.basicFilterList[indexPath.section].header != true){
                 if(self.basicFilterList[indexPath.section].opened == true){
                     self.basicFilterList[indexPath.section].opened = false
@@ -267,7 +350,11 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
             }
         } else {
             if(self.basicFilterList[indexPath.section].header == true){
-                return CGFloat(10)
+                if(self.basicFilterList[indexPath.section].title == "location"){
+                    return CGFloat(220)
+                } else{
+                    return CGFloat(10)
+                }
             }
             else {
                 return CGFloat(60)
@@ -278,7 +365,7 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
     @objc private func searchFromButton(){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.currentGCSearchFrag?.dismissModal()
-        dismiss(animated: true, completion: nil)
+        self.dismiss(animated: true, completion: nil)
     }
     
     @objc private func clearFilters(){
@@ -288,4 +375,114 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
         self.table.reloadData()
         self.checkClearButton()
     }
+    
+    @objc private func distanceChosen(sender: DistanceGesture){
+        self.currentManager.locationFilter = sender.tag
+        self.table.reloadData()
+    }
+    
+    @objc private func locationSwitchTriggered(sender: UISwitch) {
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        if(delegate.currentUser!.userLat != 0.0){
+            delegate.currentUser!.userLat = 0.0
+            delegate.currentUser!.userLong = 0.0
+            self.sendLocationInfo()
+            self.table.reloadData()
+        } else {
+            locationManager = CLLocationManager()
+            locationManager?.delegate = self
+            if #available(iOS 14.0, *) {
+                locationManager?.desiredAccuracy = kCLLocationAccuracyReduced
+            } else {
+                locationManager?.desiredAccuracy = 5000
+            }
+            locationManager?.requestWhenInUseAuthorization()
+        }
+    }
+    
+    private func updateLocation(){
+        locationManager = CLLocationManager()
+        locationManager?.delegate = self
+        if #available(iOS 14.0, *) {
+            locationManager?.desiredAccuracy = kCLLocationAccuracyReduced
+        } else {
+            locationManager?.desiredAccuracy = 5000
+        }
+        locationManager?.requestWhenInUseAuthorization()
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        if status == .authorizedWhenInUse {
+            //manager.startUpdatingLocation()
+            self.req = LocationManager.shared.locateFromGPS(.continous, accuracy: .city) { result in
+              switch result {
+                case .failure(let error):
+                  debugPrint("Received error: \(error)")
+                    self.popup?.dismiss()
+                    self.table.reloadData()
+                case .success(let location):
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    delegate.currentUser!.userLat = location.coordinate.latitude
+                    delegate.currentUser!.userLong = location.coordinate.longitude
+                    
+                    var localTimeZoneAbbreviation: String { return TimeZone.current.abbreviation() ?? "" }
+                    delegate.currentUser!.timezone = localTimeZoneAbbreviation
+                    
+                    self.sendLocationInfo()
+                    self.popup?.dismiss()
+                    self.table.reloadData()
+              }
+            }
+            self.req?.start()
+        } else if(status == .denied){
+            showLocationDialog()
+        } else if(status == .notDetermined){
+            if(self.currentSelectedSender != nil){
+                //locationSwitchTriggered(sender: 0)
+            }
+        }
+    }
+    
+    private func sendLocationInfo(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let ref = Database.database().reference().child("Users").child(delegate.currentUser!.uId)
+        ref.child("userLat").setValue(delegate.currentUser!.userLat)
+        ref.child("userLong").setValue(delegate.currentUser!.userLong)
+        ref.child("timezone").setValue(delegate.currentUser!.timezone)
+        
+        if(delegate.currentUser!.userLat != 0.0){
+            let geofireRef = Database.database().reference().child("geofire")
+            let geoFire = GeoFire(firebaseRef: geofireRef)
+            geoFire.setLocation(CLLocation(latitude: delegate.currentUser!.userLat, longitude: delegate.currentUser!.userLong), forKey: delegate.currentUser!.uId)
+            self.req?.stop()
+        }
+    }
+    
+    private func showLocationDialog(){
+        let title = "DoubleXP needs your permission."
+        let message = "we only use your location to find users near you."
+
+        popup = PopupDialog(title: title, message: message)
+        let buttonOne = CancelButton(title: "cancel.") {
+            print("dang it.")
+            self.table.reloadData()
+        }
+
+        // This button will not the dismiss the dialog
+        let buttonTwo = DefaultButton(title: "go to settings.", dismissOnTap: false) {
+            guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
+                        return
+            }
+            if UIApplication.shared.canOpenURL(settingsUrl) {
+                UIApplication.shared.open(settingsUrl, completionHandler: { (success) in })
+            }
+        }
+        popup!.addButtons([buttonOne, buttonTwo])//, buttonTwo, buttonThree])
+        self.present(popup!, animated: true, completion: nil)
+    }
+}
+
+class DistanceGesture: UITapGestureRecognizer {
+    var tag: String!
+    var section: Int!
 }

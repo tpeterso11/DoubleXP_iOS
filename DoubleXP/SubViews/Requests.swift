@@ -104,28 +104,9 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
     
     private func checkRivals(){
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        let currentUser = delegate.currentUser!
+        let manager = delegate.profileManager
         
-        for rival in currentUser.currentTempRivals{
-            let dbDate = self.stringToDate(rival.date)
-            
-            if(dbDate != nil){
-                let now = NSDate()
-                let formatter = DateFormatter()
-                formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
-                formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
-                let future = formatter.string(from: now as Date)
-                let dbFuture = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
-                
-                let validRival = !dbDate.compare(.isEarlier(than: dbFuture))
-                
-                if(dbFuture != nil){
-                    if(!validRival){
-                        currentUser.currentTempRivals.remove(at: currentUser.currentTempRivals.index(of: rival)!)
-                    }
-                }
-            }
-        }
+        manager.updateTempRivalsDB()
         self.showView()
     }
     
@@ -358,6 +339,12 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
     
     func rivalResponseFailed() {
         showFail()
+    }
+    
+    func friendRemoved() {
+    }
+    
+    func friendRemoveFail() {
     }
     
     func showConfirmation(){

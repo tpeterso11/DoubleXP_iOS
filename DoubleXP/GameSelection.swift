@@ -39,6 +39,8 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @IBOutlet weak var consoleTag: UILabel!
     @IBOutlet weak var gamertagTag: UILabel!
     @IBOutlet weak var keyboardNext: UIButton!
+    @IBOutlet weak var updateBlur: UIVisualEffectView!
+    @IBOutlet weak var updateAnimation: AnimationView!
     var currentSelectedConsoles = [String]()
     var currentSelectedGamerTags = [String]()
     var currentSelectedGame = ""
@@ -53,12 +55,21 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
     var gtDeckHeight: CGFloat?
     var constraint : NSLayoutConstraint?
     var keyboardOpen = false
+    var returning = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
         gameList = delegate.gcGames
+        
+        if(returning){
+            continueButton.addTarget(self, action: #selector(self.closeModal), for: .touchUpInside)
+            self.selectedGames.append(contentsOf: delegate.currentUser!.games)
+            self.profiles.append(contentsOf: delegate.currentUser!.gamerTags)
+        } else {
+            continueButton.addTarget(self, action: #selector(self.advanceToResults), for: .touchUpInside)
+        }
         
         gameTable.delegate = self
         gameTable.dataSource = self
@@ -85,11 +96,10 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
             object: nil
         )
         
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
+        //let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
         //view.addGestureRecognizer(tap)
         
         search.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
-        continueButton.addTarget(self, action: #selector(self.advanceToResults), for: .touchUpInside)
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -562,6 +572,69 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
         })
     }
     
+    @objc private func closeModal(){
+        UIView.animate(withDuration: 0.8, animations: {
+            self.updateBlur.alpha = 1
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                self.updateAnimation.alpha = 1
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    self.updateAnimation.loopMode = .loop
+                    self.updateAnimation.play()
+                    self.updatePayload()
+                }
+            }, completion: nil)
+        })
+    }
+    
+    private func updatePayload(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let ref = Database.database().reference().child("Users").child(delegate.currentUser!.uId)
+        ref.child("games").setValue(selectedGames)
+        delegate.currentUser!.games = selectedGames
+        
+        var sendUp = [[String: String]]()
+        if(profiles.isEmpty){
+            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - No GC"))
+        } else {
+            for profile in self.profiles {
+                self.consoles.append(profile.console)
+                let currentProfile = ["gamerTag": profile.gamerTag, "game": profile.game, "console": profile.console]
+                sendUp.append(currentProfile)
+            }
+        }
+        delegate.currentUser!.gamerTags = self.profiles
+        
+        if(self.consoles.contains("pc")){
+            delegate.currentUser!.pc = true
+            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PC User"))
+        }
+        if(self.consoles.contains("xbox")){
+            delegate.currentUser!.xbox = true
+            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - xBox User"))
+        }
+        if(self.consoles.contains("ps")){
+            delegate.currentUser!.ps = true
+            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PS User"))
+        }
+        if(self.consoles.contains("nintendo")){
+            delegate.currentUser!.nintendo = true
+            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Nintendo User"))
+        }
+        
+        ref.child("gamerTags").setValue(sendUp)
+        ref.child("consoles").child("ps").setValue(self.consoles.contains("ps"))
+        ref.child("consoles").child("xbox").setValue(self.consoles.contains("xbox"))
+        ref.child("consoles").child("nintendo").setValue(self.consoles.contains("nintendo"))
+        ref.child("consoles").child("pc").setValue(self.consoles.contains("pc"))
+        ref.child("consoles").child("mobile").setValue(self.consoles.contains("mobile"))
+        
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Update - GC"))
+        
+        self.dismiss(animated: true, completion: nil)
+    }
+    
     private func sendPayload(){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let ref = Database.database().reference().child("Users").child(delegate.currentUser!.uId)
@@ -650,27 +723,49 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
                 var currentArray = [String]()
                 currentArray.append(contentsOf: currentList!)
                 
-                let theirGames = snapshot.childSnapshot(forPath: "games").value as? [String] ?? [String]()
-                var gameContained = false
-                for game in theirGames {
-                    if(self.selectedGames.contains(game)){
-                        gameContained = true
-                        break
+                var gamerTags = [GamerProfile]()
+                let gamerTagsArray = snapshot.childSnapshot(forPath: "gamerTags")
+                for gamerTagObj in gamerTagsArray.children {
+                    let currentObj = gamerTagObj as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let currentTag = dict?["gamerTag"] as? String ?? ""
+                    let currentGame = dict?["game"] as? String ?? ""
+                    let console = dict?["console"] as? String ?? ""
+                    let quizTaken = dict?["quizTaken"] as? String ?? ""
+                    
+                    if(currentTag != "" && currentGame != "" && console != ""){
+                        let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
+                        gamerTags.append(currentGamerTagObj)
                     }
                 }
                 
-                if(gameContained){
+                var containedProfile = false
+                var gamerTag = ""
+                for tag in gamerTags {
+                    if(!tag.gamerTag.isEmpty){
+                        if(self.selectedGames.contains(tag.game)){
+                            if(self.currentSelectedConsoles.contains(tag.console)){
+                                containedProfile = true
+                                gamerTag = tag.gamerTag
+                                break
+                            }
+                        }
+                    }
+                }
+                
+                let theirGames = snapshot.childSnapshot(forPath: "games").value as? [String] ?? [String]()
+                
+                if(containedProfile){
                     let newUser = User(uId: uid)
                     newUser.games = theirGames
-                    let gtag = snapshot.childSnapshot(forPath: "gamerTag").value as? String ?? ""
-                    newUser.gamerTag = gtag
+                    newUser.gamerTag = gamerTag
                     
                     self.usersCache.append(newUser)
-                    currentArray.remove(at: currentList!.index(of: uid)!)
+                    currentArray.remove(at: currentArray.index(of: uid)!)
                     
                     let delegate = UIApplication.shared.delegate as! AppDelegate
-                    if(currentList!.count > 0){
-                        self.loadUsers(list: currentList)
+                    if(currentArray.count > 0){
+                        self.loadUsers(list: currentArray)
                     } else if(delegate.registerUserCache.count == 3){
                         delegate.registerUserCache = self.usersCache
                         delegate.cachedUserType = "location"
@@ -683,7 +778,7 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
                     
                     let delegate = UIApplication.shared.delegate as! AppDelegate
                     if(currentArray.count > 0){
-                        self.loadUsers(list: currentList)
+                        self.loadUsers(list: currentArray)
                     } else if(delegate.registerUserCache.count == 3){
                         delegate.registerUserCache = self.usersCache
                         delegate.cachedUserType = "location"
@@ -699,7 +794,7 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
                 
                 let delegate = UIApplication.shared.delegate as! AppDelegate
                 if(currentArray.count > 0){
-                    self.loadUsers(list: currentList)
+                    self.loadUsers(list: currentArray)
                 } else if(delegate.registerUserCache.count == 3){
                     delegate.registerUserCache = self.usersCache
                     delegate.cachedUserType = "location"

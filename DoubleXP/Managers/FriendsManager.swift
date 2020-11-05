@@ -35,6 +35,14 @@ class FriendsManager{
         return contained
     }
     
+    func isBlocked(user: User, currentUser: User) -> Bool{
+        if(user.blockList.contains(currentUser.uId) || currentUser.blockList.contains(user.uId)){
+            return true
+        } else {
+            return false
+        }
+    }
+    
     func isSentRequest(user: User, currentUser: User) -> Bool{
         var contained = false
         
@@ -85,7 +93,7 @@ class FriendsManager{
                 pendingSendList.append(current)
             }
             pendingRef.setValue(pendingSendList)
-            
+            delegate.currentUser!.pendingRequests = pendingArray
             
             let sendingRef = Database.database().reference().child("Users").child(currentUser!.uId).child("sent_requests")
             var sendingArray = [FriendRequestObject]()
@@ -103,6 +111,7 @@ class FriendsManager{
                 sendList.append(current)
             }
             sendingRef.setValue(sendList)
+            delegate.currentUser!.sentRequests = sendingArray
             
             self.updateLists(user: currentUser!, callbacks: callbacks)
         }
@@ -412,7 +421,7 @@ class FriendsManager{
                 let value = snapshot.value as? NSDictionary
                 if(value?["sent_requests"] is [String]){
                     var sentArray = [FriendRequestObject]()
-                    let sentRequests = value?["sent_requests"] as? [String] ?? [String]()
+                    let sentRequests = snapshot.value as? [String] ?? [String]()
                     if(!sentRequests.isEmpty){
                         for request in sentRequests{
                             let formatter = DateFormatter()
@@ -436,9 +445,7 @@ class FriendsManager{
                 }
                 else{
                     var sentRequests = [FriendRequestObject]()
-                    
-                    let friendsArray = snapshot.childSnapshot(forPath: "sent_requests")
-                    for friend in friendsArray.children{
+                    for friend in snapshot.children{
                         let currentObj = friend as! DataSnapshot
                         let dict = currentObj.value as? [String: Any]
                         let gamerTag = dict?["gamerTag"] as? String ?? ""
@@ -904,6 +911,10 @@ class FriendsManager{
                     }
                 }
                 
+                if(currentTag.isEmpty){
+                    currentTag = "one of your friends"
+                }
+                
                 let newRival = RivalObj(gamerTag: currentTag, date: dateString, game: game, uid: otherUser.uId, type: type)
                 currentUser!.currentTempRivals.append(newRival)
                 
@@ -1273,6 +1284,53 @@ class FriendsManager{
         }) { (error) in
             print(error.localizedDescription)
             callbacks.rivalResponseFailed()
+        }
+    }
+    
+    func removeFriend(otherUser: User, callbacks: RequestsUpdate ){
+        //removed CURRENT user from OTHER user
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser!
+        
+        let ref = Database.database().reference().child("Users")
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            let otherUserSnapshot = snapshot.childSnapshot(forPath: otherUser.uId)
+            if(otherUserSnapshot.exists()){
+                if(otherUserSnapshot.hasChild("friends")){
+                    let friendsList = otherUserSnapshot.childSnapshot(forPath: "friends")
+                    for friend in friendsList.children {
+                        if((friend as! DataSnapshot).hasChild("uid")){
+                            let dbUid = (friend as! DataSnapshot).childSnapshot(forPath: "uid").value as? String ?? ""
+                            if(dbUid == currentUser.uId){
+                                ref.child(otherUser.uId).child("friends").child((friend as! DataSnapshot).key).removeValue()
+                                break
+                            }
+                        }
+                    }
+                }
+            }
+            
+            let currentUserSnapshot = snapshot.childSnapshot(forPath: currentUser.uId)
+            if(currentUserSnapshot.exists()){
+                if(currentUserSnapshot.hasChild("friends")){
+                    let friendsList = currentUserSnapshot.childSnapshot(forPath: "friends")
+                    for friend in friendsList.children {
+                        if((friend as! DataSnapshot).hasChild("uid")){
+                            let dbUid = (friend as! DataSnapshot).childSnapshot(forPath: "uid").value as? String ?? ""
+                            if(dbUid == otherUser.uId){
+                                ref.child(currentUser.uId).child("friends").child((friend as! DataSnapshot).key).removeValue()
+                                break
+                            }
+                        }
+                    }
+                }
+            }
+            
+            callbacks.friendRemoved()
+            
+        }) { (error) in
+            print(error.localizedDescription)
+            callbacks.friendRemoveFail()
         }
     }
     

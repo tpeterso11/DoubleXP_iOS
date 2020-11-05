@@ -33,6 +33,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var interviewManager = InterviewManager()
     var mediaManager = MediaManager()
     var socialMediaManager = SocialMediaManager()
+    var profileManager = ProfileManage()
     var navStack = KeepOrderDictionary<String, ParentVC>() //pageNames
     var mediaCache = MediaCache()
     var twitchChannels = [TwitchChannelObj]()

@@ -63,11 +63,11 @@ class MenuFriendsList: UICollectionViewCell, ExpyTableViewDelegate, ExpyTableVie
         let cell = tableView.dequeueReusableCell(withIdentifier: "expanded", for: indexPath) as! ExpandedTVCell
         
         if(indexPath.row == 1){
-            cell.action.text = "Message"
+            cell.action.text = "message"
             cell.actionIcon.image = #imageLiteral(resourceName: "message.png")
         }
         else{
-            cell.action.text = "Profile"
+            cell.action.text = "profile"
             cell.actionIcon.image = #imageLiteral(resourceName: "information.png")
         }
         //cell.friendName.text = current.gamerTag

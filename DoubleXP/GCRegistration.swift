@@ -14,6 +14,7 @@ import SPStorkController
 import FirebaseDatabase
 import CoreLocation
 import GeoFire
+import SwiftLocation
 
 class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource, CLLocationManagerDelegate {
     
@@ -68,6 +69,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     var secondLanguage = [String]()
     var locationLat = 0.0
     var locationLong = 0.0
+    var req: LocationRequest?
     
     //location
     var locationManager: CLLocationManager?
@@ -566,6 +568,11 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     @objc private func requestLocation(){
         locationManager = CLLocationManager()
         locationManager?.delegate = self
+        if #available(iOS 14.0, *) {
+            locationManager?.desiredAccuracy = kCLLocationAccuracyReduced
+        } else {
+            locationManager?.desiredAccuracy = 5000
+        }
         locationManager?.requestWhenInUseAuthorization()
     }
     
@@ -592,6 +599,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     }
     
     @objc private func advanceToGames(){
+        self.req?.stop()
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let currentUser = delegate.currentUser
         let ref = Database.database().reference().child("Users").child(currentUser!.uId)
@@ -603,6 +611,11 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         if(self.locationLat != 0.0){
             currentUser!.userLat = self.locationLat
             currentUser!.userLong = self.locationLong
+            
+            var localTimeZoneAbbreviation: String { return TimeZone.current.abbreviation() ?? "" }
+            currentUser!.timezone = localTimeZoneAbbreviation
+            ref.child("timezone").setValue(currentUser!.timezone)
+            
             let geofireRef = Database.database().reference().child("geofire")
             let geoFire = GeoFire(firebaseRef: geofireRef)
             geoFire.setLocation(CLLocation(latitude: self.locationLat, longitude: self.locationLong), forKey: currentUser!.uId)
@@ -615,21 +628,22 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     //test all UX, then test data.
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == .authorizedWhenInUse {
-            manager.startUpdatingLocation()
-            
+            //manager.startUpdatingLocation()
+            self.req = LocationManager.shared.locateFromGPS(.continous, accuracy: .city) { result in
+              switch result {
+                case .failure(let error):
+                  debugPrint("Received error: \(error)")
+                case .success(let location):
+                    self.locationLat = (manager.location?.coordinate.latitude)!
+                    self.locationLong = (manager.location?.coordinate.longitude)!
+                    self.advanceToGames()
+                    debugPrint("Location received: \(location)")
+              }
+            }
+            self.req!.start()
         } else {
             advanceToGames()
         }
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        let coordinate = manager.location?.coordinate
-        if(coordinate != nil){
-            self.locationLat = (manager.location?.coordinate.latitude)!
-            self.locationLong = (manager.location?.coordinate.longitude)!
-        }
-        manager.stopUpdatingLocation()
-        advanceToGames()
     }
 }
 

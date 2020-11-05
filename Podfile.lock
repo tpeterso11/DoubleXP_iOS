@@ -164,6 +164,7 @@ PODS:
   - SwiftDate (6.2.0)
   - Swifter (2.4.0)
   - SwiftHTTP (3.0.1)
+  - SwiftLocation (4.2.0)
   - SwiftNotificationCenter (1.0.4)
   - SwiftRichString (3.7.2)
   - SwiftTwitch (0.1.0):
@@ -204,6 +205,7 @@ DEPENDENCIES:
   - SwiftDate
   - Swifter (from `https://github.com/mattdonnelly/Swifter.git`)
   - SwiftHTTP
+  - SwiftLocation (~> 4.0)
   - SwiftNotificationCenter
   - SwiftRichString
   - SwiftTwitch
@@ -263,6 +265,7 @@ SPEC REPOS:
     - SPStorkController
     - SwiftDate
     - SwiftHTTP
+    - SwiftLocation
     - SwiftNotificationCenter
     - SwiftRichString
     - SwiftTwitch
@@ -332,6 +335,7 @@ SPEC CHECKSUMS:
   SwiftDate: d117c3eb6beed72e47d3f4d1e3bc63fa1e66d7c3
   Swifter: 0955a05325dc182fabfb1468305aef887180e0f1
   SwiftHTTP: e94f1aa8cde58637dcc0100f6349de31a3337fde
+  SwiftLocation: 609ac8859f2c5d48a6cadd2a58c63b1dae02dc25
   SwiftNotificationCenter: 760386da2ce03d3594cb5e96d1e22ec80b44b46f
   SwiftRichString: d61b807db1f8834c26fee92b6dd3e1be2dc5af03
   SwiftTwitch: 40957abccac5d6d40d8e047224178364ebbaf20c
@@ -341,6 +345,6 @@ SPEC CHECKSUMS:
   ValidationToolkit: ce8e9c1a5d49eddc3266a009d46df5ea22042dbc
   VideoBackground: b4a2f39d3b16254b2bec9488cb2968a06dff69c5
 
-PODFILE CHECKSUM: 033f7c22f3312a04082ace831b6ad5b823d964cf
+PODFILE CHECKSUM: e23dade86718ba7c01fddf45e4203ee2014dabbe
 
 COCOAPODS: 1.9.1

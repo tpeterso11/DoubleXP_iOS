@@ -15,9 +15,10 @@ import VideoBackground
 import MSPeekCollectionViewDelegateImplementation
 import SwiftNotificationCenter
 import CollectionViewSlantedLayout
+import SPStorkController
 
 class GamerConnectFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout,
-UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
+                        UITableViewDelegate, UITableViewDataSource, LandingUICallbacks, SPStorkControllerDelegate {
     @IBOutlet weak var gcGameScroll: UICollectionView!
     @IBOutlet weak var recommendedUsers: UICollectionView!
     var selectedCell = false
@@ -164,19 +165,26 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
             }
         }
         
-        //episodes
-        let ignoredEpisodes = defaults.stringArray(forKey: "ignoredEpisodes") ?? [String]()
-        for episode in appDelegate.episodes {
-            if(!ignoredEpisodes.contains(episode.mediaId)){
-                secondaryPayload.append(episode)
-            }
-        }
-        
         //upcoming games
         let ignoreArray = defaults.stringArray(forKey: "ignoredUpcomingGames") ?? [String]()
         for game in appDelegate.upcomingGames {
             if(!ignoreArray.contains(game.id)){
                 secondaryPayload.append(game)
+            }
+        }
+        
+        let ignoreNewsArray = defaults.stringArray(forKey: "ignoredNews") ?? [String]()
+        for news in appDelegate.mediaCache.newsCache {
+            if(!ignoreNewsArray.contains(news.title)){
+                secondaryPayload.append(news)
+            }
+        }
+        
+        //episodes
+        let ignoredEpisodes = defaults.stringArray(forKey: "ignoredEpisodes") ?? [String]()
+        for episode in appDelegate.episodes {
+            if(!ignoredEpisodes.contains(episode.mediaId)){
+                secondaryPayload.append(episode)
             }
         }
 
@@ -231,6 +239,63 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
                 cell.layer.shadowOpacity = 0.5
                 cell.layer.masksToBounds = false
                 cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
+                
+                return cell
+            }
+            else if(current is NewsObject){
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "news", for: indexPath) as! NewsArticleCell
+                cell.title.text = (current as! NewsObject).title
+                
+                if((current as! NewsObject).videoUrl.isEmpty){
+                    cell.contents.text = "READ"
+                } else {
+                    cell.contents.text = "READ - WATCH"
+                }
+                
+                if((current as! NewsObject).source == "gs"){
+                    cell.authorLabel.text = "gamespot"
+                } else if((current as! NewsObject).source == "dxp"){
+                    cell.authorLabel.text = "doublexp"
+                } else {
+                    cell.authorLabel.text = (current as! NewsObject).author
+                }
+                
+                /*switch ((current as! NewsObject).author) {
+                case "Kwatakye Raven":
+                    //cell..text = "DoubleXP"
+                    cell.authorLabel.text = (current as! NewsObject).author
+                    cell.sourceImage.image = #imageLiteral(resourceName: "dxp_disc_dark_boom.png")
+                    break
+                case "Aaron Hodges":
+                    cell.authorLabel.text = (current as! NewsObject).author
+                    cell.sourceImage.image = #imageLiteral(resourceName: "dxp_disc_dark_boom.png")
+                    break
+                default:
+                    //cell.authorLabel.text = (current as! NewsObject).source
+                    //cell.sourceImage.image = #imageLiteral(resourceName: "gamespot_icon_ios.png")
+                }*/
+                
+                cell.articleBack.image = #imageLiteral(resourceName: "new_logo3.png")
+                
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                let cache = appDelegate.imageCache
+                if(cache.object(forKey: (current as! NewsObject).imageUrl as NSString) != nil){
+                    cell.articleBack.image = cache.object(forKey: (current as! NewsObject).imageUrl as NSString)
+                } else {
+                    cell.articleBack.image = Utility.Image.placeholder
+                    cell.articleBack.moa.onSuccess = { image in
+                        cell.articleBack.image = image
+                        cell.articleBack.alpha = 0.6
+                        cell.articleBack.contentMode = .scaleAspectFill
+                        cell.articleBack.clipsToBounds = true
+                        
+                        appDelegate.imageCache.setObject(image, forKey: (current as! NewsObject).imageUrl as NSString)
+                        return image
+                    }
+                    cell.articleBack.moa.url = (current as! NewsObject).imageUrl
+                }
+                
+                cell.tag = indexPath.item
                 
                 return cell
             }
@@ -456,7 +521,26 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
             } else if (cell is EpisodeCell){
                 let current = self.secondaryPayload[indexPath.item] as! EpisodeObj
                 self.playEpisode(url: current.url)
-            }   else{
+            } else if (cell is NewsArticleCell){
+                let current = self.secondaryPayload[indexPath.item] as! NewsObject
+                
+                let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "articleDrawer") as! ArticleDrawer
+                currentViewController.newsObj = current
+                if let cell = collectionView.cellForItem(at: indexPath) as? NewsArticleCell {
+                    currentViewController.selectedImage = cell.articleBack.image
+                }
+                
+                let transitionDelegate = SPStorkTransitioningDelegate()
+                currentViewController.transitioningDelegate = transitionDelegate
+                currentViewController.modalPresentationStyle = .custom
+                currentViewController.modalPresentationCapturesStatusBarAppearance = true
+                transitionDelegate.showIndicator = true
+                transitionDelegate.swipeToDismissEnabled = true
+                transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+                transitionDelegate.storkDelegate = self
+                self.present(currentViewController, animated: true, completion: nil)
+                //self.playEpisode(url: current.url)
+            }  else{
                 let current = self.secondaryPayload[indexPath.item]
                 
                 let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -478,13 +562,16 @@ UITableViewDelegate, UITableViewDataSource, LandingUICallbacks {
                 return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(180))
             }
             else if(current is AnnouncementObj){
-                return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(80))
+                return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(100))
             }
             else if(current is UpcomingGame){
                 return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(150))
             }
             else if(current is EpisodeObj){
                 return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(170))
+            }
+            else if(current is NewsObject){
+                return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(250))
             }
             else{
                 return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(100))

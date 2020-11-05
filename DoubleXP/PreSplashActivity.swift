@@ -11,7 +11,7 @@ import SwiftHTTP
 import Firebase
 import SwiftDate
 
-class PreSplashActivity: UIViewController {
+class PreSplashActivity: UIViewController, MediaCallbacks  {
     private var data: [NewsObject]!
     private var games: [GamerConnectGame]!
     
@@ -24,11 +24,26 @@ class PreSplashActivity: UIViewController {
         
         games = [GamerConnectGame]()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-            self.getAppConfig()
+            self.getArticles()
             
             //let manager = InterviewManager()
             //manager.getOpions(url: "http://doublexpstorage.tech/app-json/champion.json")
         }
+    }
+    
+    func getArticles(){
+        let manager = MediaManager()
+        manager.getGameSpotNews(callbacks: self)
+    }
+    
+    func onReviewsReceived(payload: [NewsObject]) {
+    }
+    
+    func onMediaReceived(category: String) {
+        self.getAppConfig()
+    }
+    
+    func onVideoLoaded(url: String) {
     }
     
     func getAppConfig(){
@@ -231,6 +246,8 @@ class PreSplashActivity: UIViewController {
             let subscriptions = value?["subscriptions"] as? [String] ?? [String]()
             let competitions = value?["competitions"] as? [String] ?? [String]()
             let bio = value?["bio"] as? String ?? ""
+            let blockList = value?["blockList"] as? [String: String] ?? [String: String]()
+            let restrictList = value?["restrictList"] as? [String: String] ?? [String: String]()
         
             let search = value?["search"] as? String ?? ""
             if(search.isEmpty){
@@ -807,6 +824,8 @@ class PreSplashActivity: UIViewController {
             user.viewedAnnouncements = viewedAnnouncements
             user.userLat = userLat
             user.userLong = userLong
+            user.blockList = Array(blockList.keys)
+            user.restrictList = Array(restrictList.keys)
             
             DispatchQueue.main.async {
                 let delegate = UIApplication.shared.delegate as! AppDelegate

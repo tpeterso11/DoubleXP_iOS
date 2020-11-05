@@ -30,7 +30,7 @@ class RivalObj: NSObject, NSCoding {
         }
     }
     
-    var _type = ""
+    var _type = "" //use for time-frame until I feel like fixing.
     var type:String {
         get {
             return (_type)

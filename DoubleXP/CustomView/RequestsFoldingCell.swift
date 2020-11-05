@@ -103,6 +103,12 @@ class RequestsFoldingCell: FoldingCell{
             
             requestType.text = "someone wants to get online and play."
             requestTypeLabel.text = "play request"
+            
+            if(rival?.type == "now."){
+                requestSince.text = "wants to jump online NOW"
+            } else {
+                requestSince.text = "wants to play in " + rival!.type
+            }
         }
         else{
             currentRequest = team

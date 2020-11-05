@@ -10,8 +10,9 @@ import Foundation
 import UIKit
 import FBSDKCoreKit
 import UnderLineTextField
+import SPStorkController
 
-class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, CurrentProfileCallbacks, UITextFieldDelegate{
+class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, CurrentProfileCallbacks, UITextFieldDelegate, SPStorkControllerDelegate{
     
     @IBOutlet weak var bottomDrawerCover: UIView!
     @IBOutlet weak var savedOverlay: UIView!
@@ -54,6 +55,9 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
     var addedIndex: IndexPath!
     var removedName = ""
     var removedIndex: IndexPath!
+    var statsAvailable = false
+    var quizAvailable = false
+    var cachedUidFromProfile = ""
     
     var bio: String?
     var ps: Bool!
@@ -76,9 +80,6 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         gcGames = appDelegate.gcGames
-        self.pageName = "Profile"
-        
-        appDelegate.addToNavStack(vc: self)
         
         self.saveButton.addTarget(self, action: #selector(saveButtonClicked), for: .touchUpInside)
         self.saveButton.isUserInteractionEnabled = false
@@ -95,6 +96,21 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         for game in gcGames{
             if(currentUser.games.contains(game.gameName)){
                 gamesPlayed.append(game)
+            }
+        }
+        
+        let games = currentUser.games
+        for game in appDelegate.gcGames {
+            if(game.statsAvailable && games.contains(game.gameName)){
+                self.statsAvailable = true
+                break
+            }
+        }
+        
+        for game in appDelegate.gcGames {
+            if(game.hasQuiz && games.contains(game.gameName)){
+                self.quizAvailable = true
+                break
             }
         }
         
@@ -117,151 +133,7 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         gamerTagField.delegate = self
         gamerTagField.returnKeyType = UIReturnKeyType.done
         
-        drawerSwitches.append(drawerPSSwitch)
-        drawerSwitches.append(drawerXboxSwitch)
-        drawerSwitches.append(drawerPcSwitch)
-        drawerSwitches.append(drawerNintendoSwitch)
-        
-        drawerPSSwitch.addTarget(self, action: #selector(psSwitchChanged), for: UIControl.Event.valueChanged)
-        drawerXboxSwitch.addTarget(self, action: #selector(xboxSwitchChanged), for: UIControl.Event.valueChanged)
-        drawerPcSwitch.addTarget(self, action: #selector(pcSwitchChanged), for: UIControl.Event.valueChanged)
-        drawerNintendoSwitch.addTarget(self, action: #selector(nintendoSwitchChanged), for: UIControl.Event.valueChanged)
-        
         AppEvents.logEvent(AppEvents.Name(rawValue: "User Profile"))
-    }
-    
-    func gameAdded(gameName: String, indexPath: IndexPath){
-        self.addedName = gameName
-        self.addedIndex = indexPath
-        
-        showBottomDrawer()
-    }
-    
-    func gameRemoved(gameName: String, indexPath: IndexPath) {
-        for array in self.currentProfilePayload{
-            if(array["game"] == gameName){
-                self.currentProfilePayload.remove(at: currentProfilePayload.index(of: array)!)
-            }
-        }
-        
-        checkGamerProfiles()
-        
-        currentGamesCell?.updateCell(indexPath: indexPath, gameName: gameName, show: false)
-    }
-    
-    @objc func psSwitchChanged(psSwitch: UISwitch) {
-        cycleSwitches(selectedSwitch:psSwitch)
-    }
-    
-    @objc func xboxSwitchChanged(psSwitch: UISwitch) {
-        cycleSwitches(selectedSwitch:psSwitch)
-    }
-    
-    @objc func pcSwitchChanged(psSwitch: UISwitch) {
-        cycleSwitches(selectedSwitch:psSwitch)
-    }
-    
-    @objc func nintendoSwitchChanged(psSwitch: UISwitch) {
-        cycleSwitches(selectedSwitch:psSwitch)
-    }
-    
-    private func cycleSwitches(selectedSwitch: UISwitch){
-        var console = ""
-        for uiSwitch in self.drawerSwitches{
-            if(uiSwitch == selectedSwitch){
-                if(!uiSwitch.isOn){
-                    uiSwitch.isOn = false
-                }
-                else{
-                    uiSwitch.isOn = true
-                    
-                    if(uiSwitch == self.drawerNintendoSwitch){
-                        console = "nintendo"
-                    }
-                    if(uiSwitch == self.drawerXboxSwitch){
-                        console = "xbox"
-                    }
-                    if(uiSwitch == self.drawerPSSwitch){
-                        console = "ps"
-                    }
-                    if(uiSwitch == self.drawerPcSwitch){
-                        console = "pc"
-                    }
-                    
-                    consoleChecked = true
-                }
-            }
-            else{
-                uiSwitch.isOn = false
-            }
-        }
-        
-        if(console == ""){
-            consoleChecked = false
-        }
-        self.chosenConsole = console
-        
-        checkNextActivation()
-    }
-    
-    private func checkNextActivation(){
-        if(consoleChecked && gamerTagField.text != nil){
-            self.drawerAddButton.alpha = 1
-            
-            self.drawerAddButton.isUserInteractionEnabled = true
-            self.drawerAddButton.addTarget(self, action: #selector(addButtonClicked), for: .touchUpInside)
-        }
-        else{
-            self.drawerAddButton.alpha = 0.33
-           
-            self.drawerAddButton.isUserInteractionEnabled = false
-        }
-    }
-    
-    @objc func addButtonClicked() {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let currentUser = appDelegate.currentUser
-        
-        if(drawerPSSwitch.isOn){
-            currentUser!.ps = true
-            if(self.currentConsoleCell?.psSwitch != nil){
-                if(!(self.currentConsoleCell?.psSwitch.isOn)!){
-                    self.currentConsoleCell?.psSwitch.isOn = true
-                }
-            }
-        }
-        if(drawerXboxSwitch.isOn){
-            currentUser!.xbox = true
-            if(self.currentConsoleCell?.xBoxSwitch != nil){
-                if(!(self.currentConsoleCell?.xBoxSwitch.isOn)!){
-                    self.currentConsoleCell?.xBoxSwitch.isOn = true
-                }
-            }
-        }
-        if(drawerPcSwitch.isOn){
-            currentUser!.pc = true
-            if(self.currentConsoleCell?.pcSwitch != nil){
-                if(!(self.currentConsoleCell?.pcSwitch.isOn)!){
-                    self.currentConsoleCell?.pcSwitch.isOn = true
-                }
-            }
-        }
-        if(drawerNintendoSwitch.isOn){
-            currentUser!.nintendo = true
-            if(self.currentConsoleCell?.pcSwitch != nil){
-                if(!(self.currentConsoleCell?.nintendoSwitch.isOn)!){
-                    self.currentConsoleCell?.nintendoSwitch.isOn = true
-                }
-            }
-        }
-        
-        dismissDrawer()
-        
-        let current = ["gamerTag": gamerTagField.text!, "game": self.addedName, "console": self.chosenConsole]
-        self.currentProfilePayload.append(current)
-        
-        currentGamesCell?.updateCell(indexPath: self.addedIndex, gameName: self.addedName, show: true)
-        // send broadcast to update cell
     }
     
     private func dismissDrawer(){
@@ -320,20 +192,16 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
     }
     
     private func setup(){
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        self.ps = appDelegate.currentUser!.ps
-        self.xbox = appDelegate.currentUser!.xbox
-        self.pc = appDelegate.currentUser!.pc
-        self.nintendo = appDelegate.currentUser!.nintendo
-        
-        
+        self.payload = [String]()
         self.payload.append("tag")
         self.payload.append("games")
-        self.payload.append("console")
+        self.payload.append("quiz")
+        self.payload.append("stats")
         
         profileCollection.dataSource = self
         profileCollection.delegate = self
         
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         self.bio = appDelegate.currentUser?.bio
     }
     
@@ -354,7 +222,7 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
                                                                              attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
             }
             else{
-                cell.bioTextField.attributedPlaceholder = NSAttributedString(string: "you don't have a bio yet. let the people know who you are.",
+                cell.bioTextField.attributedPlaceholder = NSAttributedString(string: currentUser.bio,
                 attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
             }
             
@@ -364,44 +232,74 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
             
             self.bioIndexPath = indexPath
             return cell
-        }
-        else if(current == "games"){
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "games", for: indexPath) as! ProfileGamesCell
-            self.currentGamesCell = cell
-            
-            cell.setUi(list: self.gamesPlayed, callbacks: self)
-            
-            self.gamesIndexPath = indexPath
+        } else if(current == "games") {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "games", for: indexPath) as! EditProfileGamesCell
+            return cell
+        } else if(current == "quiz") {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "quiz", for: indexPath) as! EditProfileQuizCell
+            if(!self.quizAvailable){
+                cell.cover.alpha = 1
+            } else {
+                cell.cover.alpha = 0
+            }
+            return cell
+        } else {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "stats", for: indexPath) as! EditProfileStatsCell
+            if(!self.statsAvailable){
+                cell.cover.alpha = 1
+            } else {
+                cell.cover.alpha = 0
+            }
             return cell
         }
-        else{
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "consoles", for: indexPath) as! ProfileConsolesCell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let current = self.payload[indexPath.item]
+        
+        if(current == "games"){
+            let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "gameSelection") as! GameSelection
+            currentViewController.returning = true
             
-            self.currentConsoleCell = cell
-            
-            if(currentUser.ps){
-                cell.psSwitch.isOn = true
+            let transitionDelegate = SPStorkTransitioningDelegate()
+            currentViewController.transitioningDelegate = transitionDelegate
+            currentViewController.modalPresentationStyle = .custom
+            currentViewController.modalPresentationCapturesStatusBarAppearance = true
+            transitionDelegate.showIndicator = true
+            transitionDelegate.swipeToDismissEnabled = true
+            transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+            transitionDelegate.storkDelegate = self
+            self.present(currentViewController, animated: true, completion: nil)
+        } else if(current == "stats"){
+            if(self.statsAvailable){
+                let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "upgrade") as! Upgrade
+                currentViewController.extra = "stats"
+                
+                let transitionDelegate = SPStorkTransitioningDelegate()
+                currentViewController.transitioningDelegate = transitionDelegate
+                currentViewController.modalPresentationStyle = .custom
+                currentViewController.modalPresentationCapturesStatusBarAppearance = true
+                transitionDelegate.showIndicator = true
+                transitionDelegate.swipeToDismissEnabled = true
+                transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+                transitionDelegate.storkDelegate = self
+                self.present(currentViewController, animated: true, completion: nil)
             }
-            cell.psSwitch.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
-            
-            if(currentUser.xbox){
-                cell.xBoxSwitch.isOn = true
+        } else if(current == "quiz"){
+            if(self.quizAvailable){
+                let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "upgrade") as! Upgrade
+                currentViewController.extra = "quiz"
+                
+                let transitionDelegate = SPStorkTransitioningDelegate()
+                currentViewController.transitioningDelegate = transitionDelegate
+                currentViewController.modalPresentationStyle = .custom
+                currentViewController.modalPresentationCapturesStatusBarAppearance = true
+                transitionDelegate.showIndicator = true
+                transitionDelegate.swipeToDismissEnabled = true
+                transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+                transitionDelegate.storkDelegate = self
+                self.present(currentViewController, animated: true, completion: nil)
             }
-            cell.xBoxSwitch.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
-            
-            if(currentUser.pc){
-                cell.pcSwitch.isOn = true
-            }
-            cell.pcSwitch.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
-            
-            if(currentUser.nintendo){
-                cell.nintendoSwitch.isOn = true
-            }
-            cell.nintendoSwitch.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
-            
-            self.testCell = cell
-            self.consoleIndexPath = indexPath
-            return cell
         }
     }
     
@@ -413,11 +311,8 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         if (current == "tag") {
             return CGSize(width: collectionView.bounds.size.width, height: CGFloat(150))
         }
-        else if(current == "games"){
-            return CGSize(width: collectionView.bounds.size.width, height: CGFloat(500))
-        }
         else{
-            return CGSize(width: collectionView.bounds.size.width, height: CGFloat(150))
+            return CGSize(width: collectionView.bounds.size.width, height: CGFloat(80))
         }
     }
     
@@ -433,68 +328,8 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         self.bio = textField.text
     }
     
-    @objc func switchChanged(cSwitch: UISwitch) {
-       checkChanges(updatedList: nil)
-        
-        let cell = self.profileCollection.cellForItem(at: self.consoleIndexPath!) as? ProfileConsolesCell
-        
-        if(cSwitch == cell?.psSwitch){
-            self.ps = cell?.psSwitch.isOn
-        }
-        
-        if(cSwitch == cell?.xBoxSwitch){
-            self.xbox = cell?.xBoxSwitch.isOn
-        }
-        
-        if(cSwitch == cell?.pcSwitch){
-            self.pc = cell?.pcSwitch.isOn
-        }
-        
-        if(cSwitch == cell?.nintendoSwitch){
-            self.nintendo = cell?.nintendoSwitch.isOn
-        }
-    }
-    
     func checkChanges(updatedList: [GamerConnectGame]?){
-        if(updatedList != nil){
-            self.gamesPlayed = updatedList!
-        }
-        
         var changed = false
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let currentUser = appDelegate.currentUser!
-        
-        //check games, check array is the users games at it's current state.
-        var checkArray = [GamerConnectGame]()
-        
-        //get a new version of the games from the user obj.
-        for game in gcGames{
-            if(currentUser.games.contains(game.gameName)){
-                checkArray.append(game)
-            }
-        }
-        
-        //user cleared options, if the user had options, and cleared them.
-        if(checkArray.count > 0 && self.gamesPlayed.isEmpty){
-            changed = true
-        }
-        
-        //if the user had any or none options, and added or subtracted one.
-        if(checkArray.count != self.gamesPlayed.count){
-            changed = true
-        }
-        
-        //if the user removed one, and added a different one.
-        if(!changed){
-            //compare check array to current working array.
-            for game in gamesPlayed{
-                if(!checkArray.contains(game)){
-                    changed = true
-                    break
-                }
-            }
-        }
-        
         if(!changed){
         //check bio
             let cell = self.profileCollection.cellForItem(at: self.bioIndexPath!) as? ProfileGamerTagCell
@@ -556,32 +391,35 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         }
         
         let manager = ProfileManage()
-        manager.saveChanges(bio: self.bio ?? "", games: games, ps: self.ps, pc: self.pc, xBox: self.xbox, nintendo: self.nintendo, profiles: self.currentProfilePayload, callbacks: self)
+        manager.saveChanges(bio: self.bio ?? "", callbacks: self)
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let currentUser = appDelegate.currentUser
-        currentUser!.ps = self.ps
-        currentUser!.xbox = self.xbox
-        currentUser!.pc = self.pc
-        currentUser!.nintendo = self.nintendo
-        
-        var profiles = [GamerProfile]()
-        for profile in self.currentProfilePayload{
-            let newProfile = GamerProfile(gamerTag: profile["gamerTag"]!, game: profile["game"]!, console: profile["console"]!, quizTaken: "false")
-            profiles.append(newProfile)
-        }
-        currentUser!.gamerTags = profiles
-        currentUser!.games = games
-        currentUser!.bio = self.bio ?? ""
+        appDelegate.currentUser!.bio = self.bio ?? ""
         
         
         AppEvents.logEvent(AppEvents.Name(rawValue: "User Profile - Profile Updated"))
     }
     
     @objc func cancelButtonClicked(_ sender: AnyObject?) {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        appDelegate.currentLanding!.navigateToHome()
+        if(!self.cachedUidFromProfile.isEmpty){
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            appDelegate.currentProfileFrag?.dismissModal()
+            self.dismiss(animated: true, completion: nil)
+            return
+        } else {
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            appDelegate.currentLanding!.navigateToHome()
+        }
     }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+         if (segue.identifier == "return") {
+            if let destination = segue.destination as? PlayerProfile {
+                destination.uid = self.cachedUidFromProfile
+            }
+        }
+    }
+    
     
     func checkGamerProfiles(){
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -611,14 +449,22 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
             }
         }
     }
+
     
     func changesComplete() {
         UIView.animate(withDuration: 0.5, animations: {
             self.savedOverlay.alpha = 1
         }, completion: { (finished: Bool) in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                let appDelegate = UIApplication.shared.delegate as! AppDelegate
-                appDelegate.currentLanding?.navigateToHome()
+                if(!self.cachedUidFromProfile.isEmpty){
+                    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                    appDelegate.currentProfileFrag?.dismissModal()
+                    self.dismiss(animated: true, completion: nil)
+                    return
+                } else {
+                    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                    appDelegate.currentLanding!.navigateToHome()
+                }
             }
         })
     }

@@ -85,13 +85,6 @@ class ProfileGamesCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let current = gcGames[indexPath.item]
-        
-        if(self.gamesPlayed.contains(current)){
-            callbacks.gameRemoved(gameName: current.gameName, indexPath: indexPath)
-        }
-        else{
-            callbacks.gameAdded(gameName: current.gameName, indexPath: indexPath)
-        }
     }
     
    func collectionView(_ collectionView: UICollectionView,
@@ -119,6 +112,5 @@ class ProfileGamesCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout
             }, completion: nil)
         }
         
-        self.callbacks.checkChanges(updatedList: self.gamesPlayed)
     }
 }

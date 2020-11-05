@@ -39,6 +39,7 @@ target 'DoubleXP' do
   pod 'SPStorkController'
   pod 'Giphy'
   pod 'GeoFire', '~> 4.0'
+  pod 'SwiftLocation', '~> 4.0'
   
   # Pods for DoubleXP
 

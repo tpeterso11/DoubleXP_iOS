@@ -17,6 +17,8 @@ class NewsArticleCell: UICollectionViewCell{
     @IBOutlet weak var subTitle: UILabel!
     @IBOutlet weak var title: UILabel!
     @IBOutlet weak var contents: UILabel!
+    @IBOutlet weak var clickArea: UIView!
+    @IBOutlet weak var closeX: UIImageView!
     
     override func awakeFromNib() {
         self.layer.cornerRadius = 10

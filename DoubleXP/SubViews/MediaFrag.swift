@@ -17,8 +17,9 @@ import SwiftRichString
 import FBSDKCoreKit
 import AnimatedCollectionViewLayout
 import Lottie
+import UnderLineTextField
 
-class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITableViewDelegate, UITableViewDataSource, MediaCallbacks, SocialMediaManagerCallback, LandingUICallbacks, SearchCallbacks {
+class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITableViewDelegate, UITableViewDataSource, MediaCallbacks, SocialMediaManagerCallback, LandingUICallbacks, SearchCallbacks, UITextFieldDelegate {
     
     @IBOutlet weak var authorCell: UIView!
     @IBOutlet weak var articleVideoView: UIView!
@@ -57,12 +58,15 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     @IBOutlet weak var twitchWV: WKWebView!
     @IBOutlet weak var twitchOptionDrawer: UIView!
     @IBOutlet weak var twitchOptionTable: UITableView!
-    @IBOutlet weak var twitchOptionClose: UIImageView!
     @IBOutlet weak var clickableSpace: UIView!
     @IBOutlet weak var scoobLoading: UIVisualEffectView!
     @IBOutlet weak var dismissHead: UILabel!
     @IBOutlet weak var dismissBody: UILabel!
     @IBOutlet weak var scoobSub: UIView!
+    @IBOutlet weak var searchField: UnderLineTextField!
+    @IBOutlet weak var searchButton: UIButton!
+    @IBOutlet weak var workAnimation: AnimationView!
+    @IBOutlet weak var twitchOptionClose: UIButton!
     var options = [String]()
     var selectedCategory = ""
     var newsSet = false
@@ -165,7 +169,10 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         }
         self.news.refreshControl?.addTarget(self, action: #selector(pullToRefresh), for: .valueChanged)
         self.channelCollection.refreshControl?.addTarget(self, action: #selector(downloadStreams), for: .valueChanged)
-        
+        self.searchField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+        self.searchField.returnKeyType = .done
+        self.searchField.delegate = self
+        checkSearchButton()
         //optionsCollection.dataSource = self
         //optionsCollection.delegate = self
         setupScoob()
@@ -193,6 +200,60 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         }
 
         animateView()
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool
+    {
+        textField.resignFirstResponder()
+        if(self.searchField.text!.count > 0){
+            self.searchForStreamer()
+            self.view.endEditing(true)
+        }
+        return true
+    }
+    
+    @objc func textFieldDidChange(_ textField: UITextField) {
+        checkSearchButton()
+    }
+    
+    private func checkSearchButton(){
+        if(self.searchField.text!.count > 0 && self.searchButton.alpha != 1.0){
+            UIView.animate(withDuration: 0.3, animations: {
+                self.searchButton.alpha = 1
+                self.searchButton.isUserInteractionEnabled = true
+                self.searchButton.addTarget(self, action: #selector(self.searchForStreamer), for: .touchUpInside)
+            }, completion: nil)
+        } else if(self.searchField.text!.count > 0 && self.searchButton.alpha == 1.0) {
+            self.searchButton.alpha = 1
+            self.searchButton.isUserInteractionEnabled = true
+            self.searchButton.addTarget(self, action: #selector(self.searchForStreamer), for: .touchUpInside)
+        } else if(self.searchField.text!.count == 0 && self.searchButton.alpha == 1.0){
+            UIView.animate(withDuration: 0.3, animations: {
+                self.searchButton.alpha = 0.3
+                self.searchButton.isUserInteractionEnabled = false
+            }, completion: nil)
+        } else {
+            self.searchButton.alpha = 0.3
+            self.searchButton.isUserInteractionEnabled = false
+        }
+    }
+    
+    @objc private func searchForStreamer(){
+        self.isSearch = true
+        self.view.endEditing(true)
+        
+        UIView.animate(withDuration: 0.3, animations: {
+            self.loadingView.alpha = 1
+        }, completion: { (finished: Bool) in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self.workAnimation.loopMode = .loop
+                self.workAnimation.play()
+                
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                let manager = delegate.socialMediaManager
+                manager.searchStreams(searchQuery: self.searchField.text!, callbacks: self)
+            }
+        })
     }
     
     private func showStandby(){
@@ -267,17 +328,18 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     
     private func animateView(){
         self.twitchShowing = true
-        self.loadingViewSpinner.startAnimating()
         self.currentCategory = "twitch"
         self.articlesLoaded = false
         AppEvents.logEvent(AppEvents.Name(rawValue: "Media - Twitch Selected"))
         //let delegate = UIApplication.shared.delegate as! AppDelegate
         //delegate.currentLanding?.updateNavColor(color: UIColor(named: "twitchPurpleDark")!)
         //delegate.currentLanding?.removeBottomNav(showNewNav: true, hideSearch: false, searchHint:"search for stream", searchButtonText: "search", isMessaging: false)
-        UIView.animate(withDuration: 0.3, animations: {
+        UIView.animate(withDuration: 0.8, animations: {
             self.loadingView.alpha = 1
+            self.workAnimation.loopMode = .loop
+            self.workAnimation.play()
         }, completion: { (finished: Bool) in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                 self.articles = [Any]()
                 
                 let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -541,7 +603,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                         self.currentCategory = "twitch"
                         self.articlesLoaded = false
                         AppEvents.logEvent(AppEvents.Name(rawValue: "Media - Twitch Selected"))
-                        delegate.currentLanding?.updateNavColor(color: UIColor(named: "twitchPurpleDark")!)
+                        //delegate.currentLanding?.updateNavColor(color: UIColor(named: "twitchPurpleDark")!)
                         delegate.currentLanding?.removeBottomNav(showNewNav: true, hideSearch: false, searchHint:"search for stream", searchButtonText: "search", isMessaging: false)
                         
                         UIView.animate(withDuration: 0.3, animations: {
@@ -911,7 +973,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                 let top = CGAffineTransform(translationX: 0, y: 40)
                 UIView.animate(withDuration: 0.3, animations: {
                     self.loadingView.alpha = 0
-                    self.loadingViewSpinner.stopAnimating()
+                    self.workAnimation.pause()
                 }, completion: { (finished: Bool) in
                     UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
                         self.news.transform = top
@@ -934,7 +996,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                 self.scrollToTop(collectionView: self.news)
                 UIView.animate(withDuration: 0.3, animations: {
                     self.loadingView.alpha = 0
-                    self.loadingViewSpinner.stopAnimating()
+                    self.workAnimation.pause()
                 }, completion: { (finished: Bool) in
                     UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
                         self.news.alpha = 1
@@ -1099,12 +1161,12 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     func showTwitchLogin(){
         if(!self.twitchCoverShowing){
             let delegate = UIApplication.shared.delegate as! AppDelegate
-            delegate.currentLanding?.updateNavColor(color: UIColor(named: "twitchPurpleDark")!)
-            UIView.transition(with: self.header, duration: 0.3, options: .curveEaseInOut, animations: {
+            //delegate.currentLanding?.updateNavColor(color: UIColor(named: "twitchPurpleDark")!)
+            /*UIView.transition(with: self.header, duration: 0.3, options: .curveEaseInOut, animations: {
                 self.header.backgroundColor = UIColor(named: "twitchPurpleDark")
                 self.optionsCollection.backgroundColor = UIColor(named: "twitchPurple")
                 self.twitchCover.alpha = 1
-            }, completion: nil)
+            }, completion: nil)*/
             
             self.twitchCoverShowing = true
         }
@@ -1223,9 +1285,9 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
             delegate.currentMediaFrag = self
             
             let top = CGAffineTransform(translationX: 0, y: 10)
-            UIView.animate(withDuration: 0.3, animations: {
+            UIView.animate(withDuration: 0.8, animations: {
                 self.loadingView.alpha = 0
-                self.loadingViewSpinner.stopAnimating()
+                self.workAnimation.pause()
             }, completion: { (finished: Bool) in
                 UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
                     let layout = UICollectionViewFlowLayout()
@@ -1317,6 +1379,9 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     }
     
     private func showTwitchOptions(streams: [TwitchStreamObject]){
+        self.searchButton.isUserInteractionEnabled = false
+        self.searchField.isUserInteractionEnabled = false
+        self.articleTable.isUserInteractionEnabled = false
         DispatchQueue.main.async {
             AppEvents.logEvent(AppEvents.Name(rawValue: "Twitch Option Drawer Shown"))
             self.twitchOptionTable.delegate = self
@@ -1324,8 +1389,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
             self.twitchOptionTable.reloadData()
             
             let close = UITapGestureRecognizer(target: self, action: #selector(self.dismissTwitchDrawer))
-            self.twitchOptionClose.isUserInteractionEnabled = true
-            self.twitchOptionClose.addGestureRecognizer(close)
+            self.twitchOptionClose.addTarget(self, action: #selector(self.dismissTwitchDrawer), for: .touchUpInside)
             self.clickableSpace.isUserInteractionEnabled = true
             self.clickableSpace.addGestureRecognizer(close)
             
@@ -1334,9 +1398,6 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
             }, completion: { (finished: Bool) in
                 let top = CGAffineTransform(translationX: -300, y: 0)
                 UIView.animate(withDuration: 0.3, delay: 0.2, options: [], animations: {
-                    let delegate = UIApplication.shared.delegate as! AppDelegate
-                    delegate.currentLanding?.removeBottomNav(showNewNav: false, hideSearch: false, searchHint: nil, searchButtonText: nil, isMessaging: false)
-                    
                     self.twitchOptionDrawer.transform = top
                 }, completion: nil)
             })
@@ -1344,6 +1405,9 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     }
     
     @objc private func dismissTwitchDrawer(){
+        self.searchButton.isUserInteractionEnabled = true
+        self.searchField.isUserInteractionEnabled = true
+        self.articleTable.isUserInteractionEnabled = true
         if(self.currentStream != nil){
             self.showScoob(callback: self, cancelableWV: self.twitchWV)
             //loading twitch streams
@@ -1370,9 +1434,9 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                 self.articleBlur.isUserInteractionEnabled = false
                 self.articleBlur.alpha = 0
                 
-                let delegate = UIApplication.shared.delegate as! AppDelegate
+                /*let delegate = UIApplication.shared.delegate as! AppDelegate
                 delegate.currentLanding?.updateNavColor(color: UIColor(named: "twitchPurpleDark")!)
-                delegate.currentLanding?.removeBottomNav(showNewNav: true, hideSearch: false, searchHint:"search for stream", searchButtonText: "search", isMessaging: false)
+                delegate.currentLanding?.removeBottomNav(showNewNav: true, hideSearch: false, searchHint:"search for stream", searchButtonText: "search", isMessaging: false)*/
             })
         }
         

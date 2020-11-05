@@ -75,6 +75,8 @@ protocol RequestsUpdate: class{
     func rivalResponseAccepted(indexPath: IndexPath)
     func rivalResponseRejected(indexPath: IndexPath)
     func rivalResponseFailed()
+    func friendRemoved()
+    func friendRemoveFail()
 }
 
 protocol TeamCallbacks: class{
@@ -162,10 +164,7 @@ protocol LandingUICallbacks: class{
 }
 
 protocol CurrentProfileCallbacks: class{
-    func checkChanges(updatedList: [GamerConnectGame]?)
     func changesComplete()
-    func gameAdded(gameName: String, indexPath: IndexPath)
-    func gameRemoved(gameName: String, indexPath: IndexPath)
 }
 
 protocol StatsManagerCallbacks: class{
