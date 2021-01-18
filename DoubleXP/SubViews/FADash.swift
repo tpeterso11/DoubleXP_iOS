@@ -19,7 +19,7 @@ class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource 
     @IBOutlet weak var createButton: UIButton!
     @IBOutlet weak var profileList: UITableView!
     private var profilePayload: [FreeAgentObject] = [FreeAgentObject]()
-    private var quizPayload = [[String]]()
+    private var quizPayload = [FAQuestion]()
     
     private var registered = [Int]()
     
@@ -33,6 +33,7 @@ class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource 
     
     private var quizOverlayShowing = false
     private var profilesLoaded = false
+    var localImageCache = NSCache<NSString, UIImage>()
     
     enum Const {
            static let closeCellHeight: CGFloat = 90
@@ -69,7 +70,193 @@ class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource 
                     let gamerTag = dict["gamerTag"] as? String ?? ""
                     let competitionId = dict["competitionId"] as? String ?? ""
                     let userId = dict["userId"] as? String ?? ""
-                    let questions = dict["questions"] as? [[String]] ?? [[String]]()
+                    
+                    var questions = [FAQuestion]()
+                    let questionList = dict["questions"] as? [[String: Any]] ?? [[String: Any]]()
+                            for question in questionList {
+                                var questionNumber = ""
+                                var questionString = ""
+                                var option1 = ""
+                                var option1Description = ""
+                                var option2 = ""
+                                var option2Description = ""
+                                var option3 = ""
+                                var option3Description = ""
+                                var option4 = ""
+                                var option4Description = ""
+                                var option5 = ""
+                                var option5Description = ""
+                                var option6 = ""
+                                var option6Description = ""
+                                var option7 = ""
+                                var option7Description = ""
+                                var option8 = ""
+                                var option8Description = ""
+                                var option9 = ""
+                                var option9Description = ""
+                                var option10 = ""
+                                var option10Description = ""
+                                var required = ""
+                                var questionDescription = ""
+                                var teamNeedQuestion = "false"
+                                var acceptMultiple = ""
+                                var question1SetURL = ""
+                                var question2SetURL = ""
+                                var question3SetURL = ""
+                                var question4SetURL = ""
+                                var question5SetURL = ""
+                                var optionsURL = ""
+                                var maxOptions = ""
+                                var answer = ""
+                                var answerArray = [String]()
+                                
+                                for (key, value) in question {
+                                    if(key == "questionNumber"){
+                                        questionNumber = (value as? String) ?? ""
+                                    }
+                                    if(key == "question"){
+                                        questionString = (value as? String) ?? ""
+                                    }
+                                    if(key == "option1"){
+                                        option1 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option1Description"){
+                                        option1Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option2"){
+                                        option2 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option2Description"){
+                                        option2Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option3"){
+                                        option3 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option3Description"){
+                                        option3Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option4"){
+                                        option4 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option4Description"){
+                                        option4Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option5"){
+                                        option5 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option5Description"){
+                                        option5Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option6"){
+                                        option6 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option6Description"){
+                                        option6Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option7"){
+                                        option7 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option7Description"){
+                                        option7Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option8"){
+                                        option8 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option8Description"){
+                                        option8Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option9"){
+                                        option9 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option9Description"){
+                                        option9Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option10"){
+                                        option10 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option10Description"){
+                                        option10Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "required"){
+                                        required = (value as? String) ?? ""
+                                    }
+                                    if(key == "questionDescription"){
+                                        questionDescription = (value as? String) ?? ""
+                                    }
+                                    if(key == "acceptMultiple"){
+                                        acceptMultiple = (value as? String) ?? ""
+                                    }
+                                    if(key == "question1SetURL"){
+                                        question1SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "question2SetURL"){
+                                        question2SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "question3SetURL"){
+                                        question3SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "question4SetURL"){
+                                        question4SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "question5SetURL"){
+                                        question5SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "teamNeedQuestion"){
+                                        teamNeedQuestion = (value as? String) ?? "false"
+                                    }
+                                    if(key == "optionsUrl"){
+                                        optionsURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "maxOptions"){
+                                        maxOptions = (value as? String) ?? ""
+                                    }
+                                    if(key == "answer"){
+                                        answer = (value as? String) ?? ""
+                                    }
+                                    if(key == "answerArray"){
+                                        answerArray = (value as? [String]) ?? [String]()
+                                    }
+                            }
+                                
+                                let faQuestion = FAQuestion(question: questionString)
+                                    faQuestion.questionNumber = questionNumber
+                                    faQuestion.question = questionString
+                                    faQuestion.option1 = option1
+                                    faQuestion.option1Description = option1Description
+                                    faQuestion.question1SetURL = question1SetURL
+                                    faQuestion.option2 = option2
+                                    faQuestion.option2Description = option2Description
+                                    faQuestion.question2SetURL = question2SetURL
+                                    faQuestion.option3 = option3
+                                    faQuestion.option3Description = option3Description
+                                    faQuestion.question3SetURL = question3SetURL
+                                    faQuestion.option4 = option4
+                                    faQuestion.option4Description = option4Description
+                                    faQuestion.question4SetURL = question4SetURL
+                                    faQuestion.option5 = option5
+                                    faQuestion.option5Description = option5Description
+                                    faQuestion.question5SetURL = question5SetURL
+                                    faQuestion.option6 = option6
+                                    faQuestion.option6Description = option6Description
+                                    faQuestion.option7 = option7
+                                    faQuestion.option7Description = option7Description
+                                    faQuestion.option8 = option8
+                                    faQuestion.option8Description = option8Description
+                                    faQuestion.option9 = option9
+                                    faQuestion.option9Description = option9Description
+                                    faQuestion.option10 = option10
+                                    faQuestion.option10Description = option10Description
+                                    faQuestion.required = required
+                                    faQuestion.acceptMultiple = acceptMultiple
+                                    faQuestion.questionDescription = questionDescription
+                                    faQuestion.teamNeedQuestion = teamNeedQuestion
+                                    faQuestion.optionsUrl = optionsURL
+                                    faQuestion.maxOptions = maxOptions
+                                    faQuestion.answer = answer
+                                    faQuestion.answerArray = answerArray
+                    
+                        questions.append(faQuestion)
+                    }
                     
                     let result = FreeAgentObject(gamerTag: gamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
                     self.profilePayload.append(result)
@@ -163,12 +350,50 @@ class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource 
         else{
             let current = quizPayload[indexPath.item]
             
-            let cell = tableView.dequeueReusableCell(withIdentifier: "answerCell", for: indexPath) as! AnswerTableCell
-            
-            cell.question.text = current[0]
-            cell.answer.text = current[1]
-
-            return cell
+            if(!current.answer.isEmpty){
+                if(current.answer.contains("/DXP/")){
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "optionCell", for: indexPath) as! OptionAnswerCell
+                    var adjustedPayload = [current.answer]
+                    cell.question.text = current.question
+                    
+                    //cell.setOptions(options: adjustedPayload, cache: self.localImageCache)
+                    
+                    return cell
+                } else {
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "answerCell", for: indexPath) as! AnswerTableCell
+                    
+                    cell.question.text = current.question
+                    cell.answer.text = current.answer
+                    
+                    return cell
+                }
+            } else {
+                let currentArray = current.answerArray
+                
+                if(currentArray[0].contains("/DXP/")){
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "optionCell", for: indexPath) as! OptionAnswerCell
+                    
+                    cell.question.text = current.question
+                    //cell.setOptions(options: current.answerArray, cache: self.localImageCache, )
+                    
+                    return cell
+                } else if(currentArray.count > 1){
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "multiOptionCell", for: indexPath) as! MultiOptionCell
+                    
+                    cell.question.text = current.question
+                    
+                    cell.setPayload(payload: currentArray)
+                    
+                    return cell
+                } else {
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "answerCell", for: indexPath) as! AnswerTableCell
+                    
+                    cell.question.text = current.question
+                    cell.answer.text = currentArray[0]
+                    
+                    return cell
+                }
+            }
         }
     }
     
@@ -193,7 +418,14 @@ class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource 
             return cellHeights[indexPath.row]
         }
         else{
-            return CGFloat(100)
+            let cell = tableView.cellForRow(at: indexPath)
+            if(cell is AnswerTableCell){
+                return CGFloat(50)
+            } else if (cell is MultiOptionCell){
+                 return CGFloat(140)
+            } else {
+                return CGFloat(180)
+            }
         }
     }
     
@@ -230,10 +462,7 @@ class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource 
     
     private func showQuiz(position: Int){
         let currentProfile = profilePayload[position]
-        
-        for array in currentProfile.questions{
-            self.quizPayload.append(array)
-        }
+        self.quizPayload = currentProfile.questions.sorted(by: {Int($0.questionNumber)! < Int($1.questionNumber)!} )
         
         quizTable.delegate = self
         quizTable.dataSource = self
@@ -304,7 +533,7 @@ class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource 
                 //self.clickArea.isUserInteractionEnabled = false
                 self.quizOverlayShowing = false
                 
-                self.quizPayload = [[String]]()
+                self.quizPayload = [FAQuestion]()
                 //self.view.sendSubviewToBack(self.clickArea)
             }, completion: nil)
         })
@@ -322,9 +551,9 @@ class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource 
     }
     
     @objc func quizButtonClicked(_ sender: AnyObject?) {
-        var position = sender?.tag
+        /*var position = sender?.tag
         if(sender?.tag != nil){
             showQuiz(position: sender!.tag)
-        }
+        }*/
     }
 }

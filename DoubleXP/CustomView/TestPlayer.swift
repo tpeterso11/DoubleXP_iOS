@@ -1,14 +1,11 @@
 //
-//  TestPlayer.swift
-//  DoubleXP
+//  TwitchPlayer.swift
+//  TwitchPlayer
 //
-//  Created by Toussaint Peterson on 1/27/20.
-//  Copyright © 2020 Peterson, Toussaint. All rights reserved.
+//  Created by Christopher Perkins on 1/13/19.
 //
 
-import Foundation
 import WebKit
-import SwiftTwitch
 
 /// `TwitchPlayer` is an embeddable Twitch Web Player. You can play Twitch Streams and Videos from a `TwitchPlayer`
 /// instance.
@@ -32,23 +29,6 @@ import SwiftTwitch
 /// - Note: You **cannot** load a Twitch Clip from this class.
 @IBDesignable public class TestPlayer: WKWebView {
 
-    internal static let allowsFullScreen = "allowfullscreen"
-       internal static let autoplay = "autoplay"
-       internal static let chatMode = "chat"
-       internal static let channel = "channel"
-       internal static let clip = "clip"
-       internal static let collection = "collection"
-       internal static let fontSize = "font-size"
-       internal static let height = "height"
-       internal static let layout = "layout"
-       internal static let muted = "muted"
-       internal static let preload = "preload"
-       internal static let scrolling = "scrolling"
-       internal static let source = "src"
-       internal static let theme = "theme"
-       internal static let video = "video"
-       internal static let width = "width"
-    
     // MARK: - Custom Data Types
 
     /// `PlayerTheme` specifies the potential color themes of a Twitch Player instance.
@@ -253,6 +233,7 @@ import SwiftTwitch
             scrollView.isScrollEnabled = scrollingEnabled
         }
     }
+
     /// Initializes a Twitch Player with the input parameters
     ///
     /// - Parameters:
@@ -285,9 +266,6 @@ import SwiftTwitch
         self.playerTheme = playerTheme
         self.playerLayout = playerLayout
 
-        configuration.allowsInlineMediaPlayback = true
-        configuration.mediaTypesRequiringUserActionForPlayback = []
-        
         super.init(frame: frame, configuration: configuration)
 
         scrollView.isScrollEnabled = scrollingEnabled
@@ -372,7 +350,6 @@ import SwiftTwitch
     ///
     /// - Parameter streamName: The name of the stream to load
     public func setChannel(to streamName: String) {
-        updateWebPlayerWithString(channel: streamName)
         evaluateJavaScript("performPlayerCommand(function() { player.setChannel(\"\(streamName)\"); })")
     }
 
@@ -419,15 +396,7 @@ import SwiftTwitch
                                              collectionToLoad: collectionToLoad, playerLayout: playerLayout,
                                              chatMode: chatMode, fontSize: nil, playerTheme: playerTheme,
                                              allowsFullScreen: allowsFullScreen)
-        loadHTMLString(playerHtml, baseURL: nil)
-    }
-    
-    public func updateWebPlayerWithString(channel: String) {
-        let playerHtml = getPlayerHtmlString(channelToLoad: channel, videoToLoad: videoToLoad,
-                                             collectionToLoad: collectionToLoad, playerLayout: playerLayout,
-                                             chatMode: chatMode, fontSize: nil, playerTheme: playerTheme,
-                                             allowsFullScreen: allowsFullScreen)
-        loadHTMLString(playerHtml, baseURL: nil)
+        loadHTMLString(playerHtml, baseURL: URL(string: "https://doublexpstorage.tech"))
     }
 
     /// `getPlayerHtmlString` is used to retrieve the HTML of an embedded web player for Twitch.
@@ -449,35 +418,35 @@ import SwiftTwitch
 
         if let channelToLoad = channelToLoad {
             currentPlayerParameters.append(
-                getJsonParameterFormat(forKey: TestPlayer.self.channel, forValue: channelToLoad))
+                getJsonParameterFormat(forKey: TwitchWebPlayerKeys.channel, forValue: channelToLoad))
         }
         if let videoToLoad = videoToLoad {
             currentPlayerParameters.append(
-                getJsonParameterFormat(forKey: TestPlayer.self.video, forValue: videoToLoad))
+                getJsonParameterFormat(forKey: TwitchWebPlayerKeys.video, forValue: videoToLoad))
         }
         if let collectionToLoad = collectionToLoad {
             currentPlayerParameters.append(
-                getJsonParameterFormat(forKey: TestPlayer.self.collection, forValue: collectionToLoad))
+                getJsonParameterFormat(forKey: TwitchWebPlayerKeys.collection, forValue: collectionToLoad))
         }
         if let playerLayout = playerLayout {
             currentPlayerParameters.append(
-                getJsonParameterFormat(forKey: TestPlayer.self.layout, forValue: playerLayout.rawValue))
+                getJsonParameterFormat(forKey: TwitchWebPlayerKeys.layout, forValue: playerLayout.rawValue))
         }
         if let chatMode = chatMode {
             currentPlayerParameters.append(
-                getJsonParameterFormat(forKey: TestPlayer.self.chatMode, forValue: chatMode.rawValue))
+                getJsonParameterFormat(forKey: TwitchWebPlayerKeys.chatMode, forValue: chatMode.rawValue))
         }
         if let fontSize = fontSize {
             currentPlayerParameters.append(
-                getJsonParameterFormat(forKey: TestPlayer.self.fontSize, forValue: fontSize.rawValue))
+                getJsonParameterFormat(forKey: TwitchWebPlayerKeys.fontSize, forValue: fontSize.rawValue))
         }
         if let playerTheme = playerTheme {
             currentPlayerParameters.append(
-                getJsonParameterFormat(forKey: TestPlayer.self.theme, forValue: playerTheme.rawValue))
+                getJsonParameterFormat(forKey: TwitchWebPlayerKeys.theme, forValue: playerTheme.rawValue))
         }
         if let allowsFullScreen = allowsFullScreen {
             currentPlayerParameters.append(
-                getJsonParameterFormat(forKey: TestPlayer.self.allowsFullScreen, forValue: allowsFullScreen,
+                getJsonParameterFormat(forKey: TwitchWebPlayerKeys.allowsFullScreen, forValue: allowsFullScreen,
                                        isStringValued: false))
         }
 

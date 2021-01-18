@@ -14,15 +14,41 @@ class FriendsManager{
     func isInFriendList(user: User, currentUser: User) -> Bool{
         var contained = false
         
-        var otherUserTags = [String]()
-        for tag in user.gamerTags{
-            otherUserTags.append(tag.gamerTag)
+        for friend in currentUser.friends{
+            if(friend.uid == user.uId){
+                contained = true
+            }
         }
         
-        for friend in currentUser.friends{
-            if(otherUserTags.contains(friend.gamerTag)){
+        return contained
+    }
+    
+    func isPendingRequest(user: User, currentUser: User) -> Bool{
+        var contained = false
+        
+        for friend in currentUser.pendingRequests {
+            if(friend.uid == user.uId){
                 contained = true
-                break
+            }
+        }
+        
+        return contained
+    }
+    
+    func isBlocked(user: User, currentUser: User) -> Bool{
+        if(user.blockList.contains(currentUser.uId) || currentUser.blockList.contains(user.uId)){
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    func isSentRequest(user: User, currentUser: User) -> Bool{
+        var contained = false
+        
+        for friend in currentUser.sentRequests {
+            if(friend.uid == user.uId){
+                contained = true
             }
         }
         
@@ -31,63 +57,146 @@ class FriendsManager{
     
     
     func sendRequestFromProfile(currentUser: User, otherUser: User, callbacks: ProfileCallbacks){
+        //check this. request is being sent to current user AND other user. Bad.
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let currentUser = delegate.currentUser
-        
-        let pendingFriendsArray = currentUser!.pendingRequests
-        let sentFriends = currentUser!.sentRequests
         
         if(!checkListsForUser(user: otherUser, currentUser: currentUser!)){
             //first, add the current user to the OTHER users requests.
             let pendingRef = Database.database().reference().child("Users").child(otherUser.uId).child("pending_friends")
-            
-            var pendingArray = [FriendRequestObject]()
-            
-            let manager = GamerProfileManager()
-            
-            if(!pendingFriendsArray.isEmpty){
-                pendingArray.append(contentsOf: pendingFriendsArray)
-            }
-            
-           let formatter = DateFormatter()
-            //2016-12-08 03:37:22 +0000
-            //formatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
-            formatter.dateFormat = "MM-dd-yyyy"
-            let now = Date()
-            let dateString = formatter.string(from:now)
-            
-            //gamerTag is the currentUsers gamertag, the one making the request.
-            let otherUserfriendRequest = FriendRequestObject(gamerTag: manager.getGamerTag(user: currentUser!), date: dateString, uid: currentUser!.uId)
-            
-            pendingArray.append(otherUserfriendRequest)
-            
-            var pendingSendList = [[String: Any]]()
-            for friend in pendingArray{
-                let current = ["gamerTag": friend.gamerTag, "date": friend.date, "uid": friend.uid] as [String : String]
-                pendingSendList.append(current)
-            }
-            pendingRef.setValue(pendingSendList)
-            
-            
-            let sendingRef = Database.database().reference().child("Users").child(currentUser!.uId).child("sent_requests")
-            var sendingArray = [FriendRequestObject]()
-            
-            if(!sentFriends.isEmpty){
-                sendingArray.append(contentsOf: sentFriends)
-            }
-            
-            let currentUserSentRequest = FriendRequestObject(gamerTag: manager.getGamerTag(user: otherUser), date: dateString, uid: otherUser.uId)
-            sendingArray.append(currentUserSentRequest)
-            
-            var sendList = [[String: Any]]()
-            for friend in sendingArray{
-                let current = ["gamerTag": friend.gamerTag, "date": friend.date, "uid": friend.uid] as [String : String]
-                sendList.append(current)
-            }
-            sendingRef.setValue(sendList)
-            
-            self.updateLists(user: currentUser!, callbacks: callbacks)
+            pendingRef.observeSingleEvent(of: .value, with: { (snapshot) in
+                if(snapshot.exists()){
+                    var requests = [FriendRequestObject]()
+                    for request in snapshot.children {
+                        let currentRequest = (request as! DataSnapshot)
+                        var uid = ""
+                        var gamertag = ""
+                        var date = ""
+                        if(currentRequest.hasChild("uid")){
+                            uid = currentRequest.childSnapshot(forPath: "uid").value as? String ?? ""
+                        }
+                        if(currentRequest.hasChild("gamerTag")){
+                            gamertag = currentRequest.childSnapshot(forPath: "gamerTag").value as? String ?? ""
+                        }
+                        if(currentRequest.hasChild("date")){
+                            date = currentRequest.childSnapshot(forPath: "date").value as? String ?? ""
+                        }
+                        if(!uid.isEmpty && !gamertag.isEmpty && !date.isEmpty){
+                            requests.append(FriendRequestObject(gamerTag: gamertag, date: date, uid: uid))
+                        }
+                    }
+                    
+                    let formatter = DateFormatter()
+                     //2016-12-08 03:37:22 +0000
+                     //formatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+                     formatter.dateFormat = "MM-dd-yyyy"
+                     let now = Date()
+                     let dateString = formatter.string(from:now)
+                     
+                     //gamerTag is the currentUsers gamertag, the one making the request.
+                     let otherUserfriendRequest = FriendRequestObject(gamerTag: currentUser!.gamerTag, date: dateString, uid: currentUser!.uId)
+                    requests.append(otherUserfriendRequest)
+                    
+                    var pendingSendList = [[String: Any]]()
+                    for friend in requests {
+                        let current = ["gamerTag": friend.gamerTag, "date": friend.date, "uid": friend.uid] as [String : String]
+                        pendingSendList.append(current)
+                    }
+                    pendingRef.setValue(pendingSendList)
+                } else {
+                    var requests = [FriendRequestObject]()
+                    let formatter = DateFormatter()
+                     //2016-12-08 03:37:22 +0000
+                     //formatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+                     formatter.dateFormat = "MM-dd-yyyy"
+                     let now = Date()
+                     let dateString = formatter.string(from:now)
+                     
+                     //gamerTag is the currentUsers gamertag, the one making the request.
+                     let otherUserfriendRequest = FriendRequestObject(gamerTag: currentUser!.gamerTag, date: dateString, uid: currentUser!.uId)
+                    requests.append(otherUserfriendRequest)
+                    
+                    var pendingSendList = [[String: Any]]()
+                    for friend in requests {
+                        let current = ["gamerTag": friend.gamerTag, "date": friend.date, "uid": friend.uid] as [String : String]
+                        pendingSendList.append(current)
+                    }
+                    pendingRef.setValue(pendingSendList)
+                }
+                
+                self.updateSendingReference(otherUser: otherUser, currentUser: currentUser!, callbacks: callbacks)
+            })
         }
+    }
+    
+    private func updateSendingReference(otherUser: User, currentUser: User, callbacks: ProfileCallbacks){
+        let sendingRef = Database.database().reference().child("Users").child(currentUser.uId).child("sent_requests")
+        sendingRef.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                var sendingArray = [FriendRequestObject]()
+                for request in snapshot.children {
+                    let currentRequest = (request as! DataSnapshot)
+                    var uid = ""
+                    var gamertag = ""
+                    var date = ""
+                    if(currentRequest.hasChild("uid")){
+                        uid = currentRequest.childSnapshot(forPath: "uid").value as? String ?? ""
+                    }
+                    if(currentRequest.hasChild("gamertag")){
+                        gamertag = currentRequest.childSnapshot(forPath: "gamertag").value as? String ?? ""
+                    }
+                    if(currentRequest.hasChild("date")){
+                        date = currentRequest.childSnapshot(forPath: "date").value as? String ?? ""
+                    }
+                    if(!uid.isEmpty && !gamertag.isEmpty && !date.isEmpty){
+                        sendingArray.append(FriendRequestObject(gamerTag: gamertag, date: date, uid: uid))
+                    }
+                }
+                
+                let formatter = DateFormatter()
+                //2016-12-08 03:37:22 +0000
+                //formatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+                formatter.dateFormat = "MM-dd-yyyy"
+                let now = Date()
+                let dateString = formatter.string(from:now)
+                let currentUserSentRequest = FriendRequestObject(gamerTag: otherUser.gamerTag, date: dateString, uid: otherUser.uId)
+                sendingArray.append(currentUserSentRequest)
+                
+                var sendList = [[String: Any]]()
+                for friend in sendingArray{
+                    let current = ["gamerTag": friend.gamerTag, "date": friend.date, "uid": friend.uid] as [String : String]
+                    sendList.append(current)
+                }
+                sendingRef.setValue(sendList)
+                
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                delegate.currentUser!.sentRequests = sendingArray
+                
+                self.updateLists(user: delegate.currentUser!, callbacks: callbacks)
+            } else {
+                var sendingArray = [FriendRequestObject]()
+                let formatter = DateFormatter()
+                //2016-12-08 03:37:22 +0000
+                //formatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+                formatter.dateFormat = "MM-dd-yyyy"
+                let now = Date()
+                let dateString = formatter.string(from:now)
+                let currentUserSentRequest = FriendRequestObject(gamerTag: otherUser.gamerTag, date: dateString, uid: otherUser.uId)
+                sendingArray.append(currentUserSentRequest)
+                
+                var sendList = [[String: Any]]()
+                for friend in sendingArray{
+                    let current = ["gamerTag": friend.gamerTag, "date": friend.date, "uid": friend.uid] as [String : String]
+                    sendList.append(current)
+                }
+                sendingRef.setValue(sendList)
+                
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                delegate.currentUser!.sentRequests = sendingArray
+                
+                self.updateLists(user: delegate.currentUser!, callbacks: callbacks)
+            }
+        })
     }
     
     func acceptFriendFromProfile(otherUserRequest: FriendRequestObject, currentUserUid: String, callbacks: ProfileCallbacks){
@@ -129,6 +238,9 @@ class FriendsManager{
                     
                     if(!pendingRequests.isEmpty){
                         for request in pendingRequests{
+                            if(request.uid == currentUserUid){
+                                pendingRequests.remove(at: pendingRequests.index(of: request)!)
+                            }
                             if(request.uid == otherUserRequest.uid){
                                 pendingRequests.remove(at: pendingRequests.index(of: request)!)
                                 break
@@ -139,7 +251,9 @@ class FriendsManager{
                     var pendingSendList = [[String: Any]]()
                         for friend in pendingRequests{
                             let current = ["gamerTag": friend.gamerTag, "date": friend.date, "uid": friend.uid] as [String : String]
-                            pendingSendList.append(current)
+                            if(friend.uid != otherUserRequest.uid && friend.uid != currentUserUid){
+                                pendingSendList.append(current)
+                            }
                     }
                     
                     ref.child("pending_friends").setValue(pendingSendList)
@@ -346,7 +460,6 @@ class FriendsManager{
             if(snapshot.exists()){
                 let delegate = UIApplication.shared.delegate as! AppDelegate
                 let currentUser = delegate.currentUser
-                let manager = GamerProfileManager()
                 
                 var tempArray = [FriendRequestObject]()
                 let requestsArray = snapshot.childSnapshot(forPath: "sent_requests")
@@ -395,7 +508,7 @@ class FriendsManager{
                 let value = snapshot.value as? NSDictionary
                 if(value?["sent_requests"] is [String]){
                     var sentArray = [FriendRequestObject]()
-                    let sentRequests = value?["sent_requests"] as? [String] ?? [String]()
+                    let sentRequests = snapshot.value as? [String] ?? [String]()
                     if(!sentRequests.isEmpty){
                         for request in sentRequests{
                             let formatter = DateFormatter()
@@ -411,14 +524,15 @@ class FriendsManager{
                         }
                         
                         sendingRef.setValue(sentArray)
-                        user.sentRequests = sentArray
+                        
+                        let delegate = UIApplication.shared.delegate as! AppDelegate
+                        let currentUser = delegate.currentUser
+                        currentUser!.sentRequests = sentArray
                     }
                 }
                 else{
                     var sentRequests = [FriendRequestObject]()
-                    
-                    let friendsArray = snapshot.childSnapshot(forPath: "sent_requests")
-                    for friend in friendsArray.children{
+                    for friend in snapshot.children{
                         let currentObj = friend as! DataSnapshot
                         let dict = currentObj.value as? [String: Any]
                         let gamerTag = dict?["gamerTag"] as? String ?? ""
@@ -429,7 +543,9 @@ class FriendsManager{
                         sentRequests.append(newFriend)
                     }
                     
-                    user.sentRequests = sentRequests
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    let currentUser = delegate.currentUser
+                    currentUser!.sentRequests = sentRequests
                 }
             }
             
@@ -478,13 +594,8 @@ class FriendsManager{
             }
         }
         
-        var otherUserTags = [String]()
-        for tag in user.gamerTags{
-            otherUserTags.append(tag.gamerTag)
-        }
-        
         for friend in currentUser.friends{
-            if(otherUserTags.contains(friend.gamerTag)){
+            if(friend.uid == user.uId){
                 contained = true
                 break
             }
@@ -810,8 +921,9 @@ class FriendsManager{
                         let game = dict?["game"] as? String ?? ""
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
+                        let id = dict?["id"] as? String ?? ""
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
                         
                         let dbDate = self.stringToDate(date)
                         
@@ -837,7 +949,7 @@ class FriendsManager{
                 let manager = GamerProfileManager()
                 var contained = false
                 for rival in rivals{
-                    if(rival.gamerTag == manager.getGamerTagForGame(gameName: game)){
+                    if(rival.gamerTag == currentUser!.gamerTag){
                         contained = true
                         callbacks.rivalRequestAlready()
                         return
@@ -851,13 +963,13 @@ class FriendsManager{
                     formatter.timeZone = TimeZone(abbreviation: "UTC")
                     let result = formatter.string(from: date)
                     
-                    let currentRival = RivalObj(gamerTag: manager.getGamerTagForGame(gameName: game), date: result, game: game, uid: currentUser!.uId, type: type)
+                    let currentRival = RivalObj(gamerTag: currentUser!.gamerTag, date: result, game: game, uid: currentUser!.uId, type: type, id: self.createTempId())
                     
                     rivals.append(currentRival)
                     
                     var sendList = [[String: Any]]()
                     for rival in rivals{
-                        let current = ["gamerTag": rival.gamerTag, "date": rival.date, "uid": rival.uid, "game": rival.game, "type": rival.type] as [String : String]
+                        let current = ["gamerTag": rival.gamerTag, "date": rival.date, "uid": rival.uid, "game": rival.game, "type": rival.type, "id": rival.id] as [String : String]
                         sendList.append(current)
                     }
                     
@@ -873,6 +985,99 @@ class FriendsManager{
         }
     }
     
+    func createOnlineAnnouncement(friends: [String], callbacks: RequestsUpdate){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser!
+        let announcementId = createTempId()
+        //send request
+        let ref = Database.database().reference().child("Users")
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                var tokens = [String]()
+                for friend in friends {
+                    let currentSnapshot = snapshot.childSnapshot(forPath: friend)
+                    if(currentSnapshot != nil){
+                        if(currentSnapshot.hasChild("fcmToken")){
+                            let tag = currentSnapshot.childSnapshot(forPath: "fcmToken").value as? String ?? ""
+                            if(!tokens.contains(tag)){
+                                tokens.append(currentSnapshot.childSnapshot(forPath: "fcmToken").value as? String ?? "")
+                            }
+                        }
+                        if(currentSnapshot.hasChild("receivedAnnouncements")){
+                            var array = currentSnapshot.childSnapshot(forPath: "receivedAnnouncements").value as? [String] ?? [String]()
+                            if(!array.contains(currentUser.uId)){
+                                array.append(currentUser.uId)
+                                ref.child(currentSnapshot.key).child("receivedAnnouncements").setValue(array)
+                            }
+                        } else {
+                            var array = [String]()
+                            array.append(currentUser.uId)
+                            ref.child(currentSnapshot.key).child("receivedAnnouncements").setValue(array)
+                        }
+                    }
+                }
+                
+                let currentUserSnapshot = snapshot.childSnapshot(forPath: currentUser.uId)
+                var announcements = [OnlineObj]()
+                if(currentUserSnapshot.hasChild("onlineAnnouncements")){
+                    let onlineAnnouncements = currentUserSnapshot.childSnapshot(forPath: "onlineAnnouncements")
+                    for announce in onlineAnnouncements.children{
+                        let currentObj = announce as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let date = dict?["date"] as? String ?? ""
+                        let tag = dict?["tag"] as? String ?? ""
+                        let id = dict?["id"] as? String ?? ""
+                        let friends = dict?["friends"] as? [String] ?? [String]()
+                        
+                        let request = OnlineObj(tag: tag, friends: friends, date: date, id: id)
+                        
+                        let dbDate = self.stringToDate(date)
+                        
+                        if(dbDate != nil){
+                            let now = NSDate()
+                            let formatter = DateFormatter()
+                            formatter.timeZone = TimeZone(abbreviation: "UTC")
+                            formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+                            let future = formatter.string(from: now as Date)
+                            let dbFuture = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                            
+                            let validAnnouncement = dbDate.compare(.isEarlier(than: dbFuture))
+                            
+                            if(dbFuture != nil){
+                                if(validAnnouncement){
+                                    announcements.append(request)
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                if(announcements.isEmpty){
+                    let date = Date()
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "MM-dd-yyyy HH:mm zzz"
+                    formatter.timeZone = TimeZone(abbreviation: "UTC")
+                    let result = formatter.string(from: date)
+                    
+                    let newObj = ["tag": currentUser.gamerTag, "friends": tokens, "id": announcementId, "date": result] as [String : Any]
+                    let ref = Database.database().reference().child("Users").child(currentUser.uId)
+                    ref.child("onlineAnnouncements").child(announcementId).setValue(newObj)
+                    
+                    callbacks.onlineAnnounceSent()
+                }
+            }
+            
+        }) { (error) in
+            print(error.localizedDescription)
+            callbacks.onlineAnnounceFail()
+        }
+    }
+    
+    private func createTempId() -> String {
+        let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        return String((0..<8).map{ _ in letters.randomElement()! })
+    }
+    
     private func updateCurrentUserRivals(currentUser: User, otherUser: User, game: String, type: String, callbacks: RequestsUpdate, gamerTags: [GamerProfile], dateString: String){
         let ref = Database.database().reference().child("Users").child(currentUser.uId)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
@@ -880,14 +1085,7 @@ class FriendsManager{
                 let delegate = UIApplication.shared.delegate as! AppDelegate
                 let currentUser = delegate.currentUser
                 
-                var currentTag = ""
-                for tag in gamerTags{
-                    if(tag.game == game){
-                        currentTag = tag.gamerTag
-                    }
-                }
-                
-                let newRival = RivalObj(gamerTag: currentTag, date: dateString, game: game, uid: otherUser.uId, type: type)
+                let newRival = RivalObj(gamerTag: currentUser!.gamerTag, date: dateString, game: game, uid: otherUser.uId, type: type, id: self.createTempId())
                 currentUser!.currentTempRivals.append(newRival)
                 
                 var rivals = [RivalObj]()
@@ -901,8 +1099,9 @@ class FriendsManager{
                         let game = dict?["game"] as? String ?? ""
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
+                        let id = dict?["id"] as? String ?? ""
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
                         
                         let dbDate = self.stringToDate(date)
                         if(dbDate != nil){
@@ -924,10 +1123,9 @@ class FriendsManager{
                     }
                 }
                 
-                let manager = GamerProfileManager()
                 var contained = false
                 for rival in rivals{
-                    if(rival.gamerTag == manager.getGamerTagForOtherUserForGame(gameName: game, returnedUser: otherUser)){
+                    if(rival.gamerTag == otherUser.gamerTag){
                         contained = true
                         return
                     }
@@ -938,7 +1136,7 @@ class FriendsManager{
                     
                     var sendList = [[String: Any]]()
                     for rival in rivals{
-                        let current = ["gamerTag": rival.gamerTag, "date": rival.date, "uid": rival.uid, "game": rival.game, "type": rival.type] as [String : String]
+                        let current = ["gamerTag": rival.gamerTag, "date": rival.date, "uid": rival.uid, "game": rival.game, "type": rival.type, "id": rival.id] as [String : String]
                         sendList.append(current)
                     }
                     
@@ -961,9 +1159,7 @@ class FriendsManager{
             if(snapshot.exists()){
                 let delegate = UIApplication.shared.delegate as! AppDelegate
                 let currentUser = delegate.currentUser
-                
-                let manager = GamerProfileManager()
-                let tag = manager.getGamerTagForGame(gameName: rival.game)
+                let tag = currentUser!.gamerTag
                 
                 var tempRivals = [RivalObj]()
                 if(snapshot.hasChild("tempRivals")){
@@ -976,19 +1172,32 @@ class FriendsManager{
                         let game = dict?["game"] as? String ?? ""
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
+                        let id = dict?["id"] as? String ?? ""
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
                         tempRivals.append(request)
                     }
                 }
                 
                 for tempRival in tempRivals{
-                    if(tempRival.uid == currentUser!.uId){
+                    if(tempRival.id == rival.id){
                         tempRivals.remove(at: tempRivals.index(of: tempRival)!)
                     }
                 }
                 
-                ref.child("tempRivals").setValue(tempRivals)
+                var sendArray = [[String: String]]()
+                for rival in tempRivals{
+                    var newMap = [String: String]()
+                    newMap["gamerTag"] = rival.gamerTag
+                    newMap["game"] = rival.game
+                    newMap["uid"] = rival.uid
+                    newMap["type"] = rival.type
+                    newMap["date"] = rival.date
+                    newMap["id"] = rival.id
+                    
+                    sendArray.append(newMap)
+                }
+                ref.child("tempRivals").setValue(sendArray)
                 
                 var rivals = [RivalObj]()
                 if(snapshot.hasChild("acceptedTempRivals")){
@@ -1001,18 +1210,19 @@ class FriendsManager{
                         let game = dict?["game"] as? String ?? ""
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
+                        let id = dict?["id"] as? String ?? ""
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
                         rivals.append(request)
                     }
                 }
                 
-                let newRival = RivalObj(gamerTag: tag, date: rival.date, game: rival.game, uid: currentUser!.uId, type: rival.type)
+                let newRival = RivalObj(gamerTag: tag, date: rival.date, game: rival.game, uid: currentUser!.uId, type: rival.type, id: self.createTempId())
                 rivals.append(newRival)
                     
                 var sendList = [[String: Any]]()
                 for rival in rivals{
-                    let current = ["gamerTag": rival.gamerTag, "date": rival.date, "uid": rival.uid, "game": rival.game] as [String : String]
+                    let current = ["gamerTag": rival.gamerTag, "date": rival.date, "uid": rival.uid, "game": rival.game, "id": rival.id] as [String : String]
                     sendList.append(current)
                 }
                 
@@ -1034,9 +1244,7 @@ class FriendsManager{
             if(snapshot.exists()){
                 let delegate = UIApplication.shared.delegate as! AppDelegate
                 let currentUser = delegate.currentUser
-                
-                let manager = GamerProfileManager()
-                let tag = manager.getGamerTagForGame(gameName: rival.game)
+                let tag = currentUser!.gamerTag
                 
                 var rivals = [RivalObj]()
                 if(snapshot.hasChild("rejectedTempRivals")){
@@ -1049,8 +1257,9 @@ class FriendsManager{
                         let game = dict?["game"] as? String ?? ""
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
+                        let id = dict?["id"] as? String ?? ""
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
                         rivals.append(request)
                     }
                 }
@@ -1066,26 +1275,39 @@ class FriendsManager{
                         let game = dict?["game"] as? String ?? ""
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
+                        let id = dict?["id"] as? String ?? ""
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
                         tempRivals.append(request)
                     }
                 }
                 
                 for tempRival in tempRivals{
-                    if(tempRival.uid == currentUser!.uId){
+                    if(tempRival.id == rival.id){
                         tempRivals.remove(at: tempRivals.index(of: tempRival)!)
                     }
                 }
-            
-                ref.child("tempRivals").setValue(tempRivals)
                 
-                let newRival = RivalObj(gamerTag: tag, date: rival.date, game: rival.game, uid: currentUser!.uId, type: rival.type)
+                var sendArray = [[String: String]]()
+                for rival in tempRivals{
+                    var newMap = [String: String]()
+                    newMap["gamerTag"] = rival.gamerTag
+                    newMap["game"] = rival.game
+                    newMap["uid"] = rival.uid
+                    newMap["type"] = rival.type
+                    newMap["date"] = rival.date
+                    newMap["id"] = rival.id
+                    
+                    sendArray.append(newMap)
+                }
+                ref.child("tempRivals").setValue(sendArray)
+                
+                let newRival = RivalObj(gamerTag: tag, date: rival.date, game: rival.game, uid: currentUser!.uId, type: rival.type, id: self.createTempId())
                 rivals.append(newRival)
                     
                 var sendList = [[String: Any]]()
                 for rival in rivals{
-                    let current = ["gamerTag": rival.gamerTag, "date": rival.date, "uid": rival.uid, "game": rival.game] as [String : String]
+                    let current = ["gamerTag": rival.gamerTag, "date": rival.date, "uid": rival.uid, "game": rival.game, "id": rival.id] as [String : String]
                     sendList.append(current)
                 }
                 
@@ -1101,13 +1323,12 @@ class FriendsManager{
     }
     
     private func updateAcceptRejectCurrentUser(position: IndexPath, rival: RivalObj, callbacks: RequestsUpdate, accepted: Bool){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser!
         
-        let ref = Database.database().reference().child("Users").child(rival.uid)
+        let ref = Database.database().reference().child("Users").child(currentUser.uId)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             if(snapshot.exists()){
-                let delegate = UIApplication.shared.delegate as! AppDelegate
-                let currentUser = delegate.currentUser
-                
                 var currentTempRivals = [RivalObj]()
                 if(snapshot.hasChild("currentTempRivals")){
                     let pendingArray = snapshot.childSnapshot(forPath: "currentTempRivals")
@@ -1119,8 +1340,9 @@ class FriendsManager{
                         let game = dict?["game"] as? String ?? ""
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
+                        let id = dict?["id"] as? String ?? ""
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
                         currentTempRivals.append(request)
                     }
                 }
@@ -1130,8 +1352,22 @@ class FriendsManager{
                         currentTempRivals.remove(at: currentTempRivals.index(of: tempRival)!)
                     }
                 }
-            
-                ref.child("currentTempRivals").setValue(currentTempRivals)
+                
+                delegate.currentUser!.tempRivals = currentTempRivals
+                
+                var sendArray = [[String: String]]()
+                for rival in currentTempRivals{
+                    var newMap = [String: String]()
+                    newMap["gamerTag"] = rival.gamerTag
+                    newMap["game"] = rival.game
+                    newMap["uid"] = rival.uid
+                    newMap["type"] = rival.type
+                    newMap["date"] = rival.date
+                    newMap["id"] = rival.id
+                    
+                    sendArray.append(newMap)
+                }
+                ref.child("currentTempRivals").setValue(sendArray)
                 
                 
                 var tempRivals = [RivalObj]()
@@ -1145,8 +1381,9 @@ class FriendsManager{
                         let game = dict?["game"] as? String ?? ""
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
+                        let id = dict?["id"] as? String ?? ""
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
                         tempRivals.append(request)
                     }
                 }
@@ -1157,66 +1394,22 @@ class FriendsManager{
                     }
                 }
                 
+                var sendList = [[String: Any]]()
+                for rival in tempRivals {
+                    let current = ["gamerTag": rival.gamerTag, "date": rival.date, "uid": rival.uid, "game": rival.game, "id": rival.id] as [String : String]
+                    sendList.append(current)
+                }
+                
+                if(!sendList.isEmpty){
+                    ref.child("tempRivals").setValue(sendList)
+                } else {
+                    ref.child("tempRivals").removeValue()
+                }
+                
                 if(accepted){
-                    var rivals = [RivalObj]()
-                    if(snapshot.hasChild("acceptedTempRivals")){
-                        let pendingArray = snapshot.childSnapshot(forPath: "acceptedTempRivals")
-                        for rival in pendingArray.children{
-                            let currentObj = rival as! DataSnapshot
-                            let dict = currentObj.value as? [String: Any]
-                            let date = dict?["date"] as? String ?? ""
-                            let tag = dict?["gamerTag"] as? String ?? ""
-                            let game = dict?["game"] as? String ?? ""
-                            let uid = dict?["uid"] as? String ?? ""
-                            let dbType = dict?["type"] as? String ?? ""
-                            
-                            let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
-                            rivals.append(request)
-                        }
-                    }
-                    
-                    let newRival = RivalObj(gamerTag: rival.gamerTag, date: rival.date, game: rival.game, uid: rival.uid, type: rival.type)
-                    rivals.append(newRival)
-                        
-                    var sendList = [[String: Any]]()
-                    for rival in rivals{
-                        let current = ["gamerTag": rival.gamerTag, "date": rival.date, "uid": rival.uid, "game": rival.game] as [String : String]
-                        sendList.append(current)
-                    }
-                    
-                    ref.child("acceptedTempRivals").setValue(sendList)
-                    
                     callbacks.rivalResponseAccepted(indexPath: position)
                 }
                 else{
-                    var rivals = [RivalObj]()
-                    if(snapshot.hasChild("rejectedTempRivals")){
-                        let pendingArray = snapshot.childSnapshot(forPath: "rejectedTempRivals")
-                        for rival in pendingArray.children{
-                            let currentObj = rival as! DataSnapshot
-                            let dict = currentObj.value as? [String: Any]
-                            let date = dict?["date"] as? String ?? ""
-                            let tag = dict?["gamerTag"] as? String ?? ""
-                            let game = dict?["game"] as? String ?? ""
-                            let uid = dict?["uid"] as? String ?? ""
-                            let dbType = dict?["type"] as? String ?? ""
-                            
-                            let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
-                            rivals.append(request)
-                        }
-                    }
-                    
-                    let newRival = RivalObj(gamerTag: rival.gamerTag, date: rival.date, game: rival.game, uid: rival.uid, type: rival.type)
-                    rivals.append(newRival)
-                        
-                    var sendList = [[String: Any]]()
-                    for rival in rivals{
-                        let current = ["gamerTag": rival.gamerTag, "date": rival.date, "uid": rival.uid, "game": rival.game] as [String : String]
-                        sendList.append(current)
-                    }
-                    
-                    ref.child("rejectedTempRivals").setValue(sendList)
-                    
                     callbacks.rivalResponseRejected(indexPath: position)
                 }
             }
@@ -1227,12 +1420,219 @@ class FriendsManager{
         }
     }
     
+    func removeFriend(otherUser: User, callbacks: RequestsUpdate ){
+        //removed CURRENT user from OTHER user
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser!
+        
+        let ref = Database.database().reference().child("Users")
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            let otherUserSnapshot = snapshot.childSnapshot(forPath: otherUser.uId)
+            if(otherUserSnapshot.exists()){
+                if(otherUserSnapshot.hasChild("friends")){
+                    let friendsList = otherUserSnapshot.childSnapshot(forPath: "friends")
+                    for friend in friendsList.children {
+                        if((friend as! DataSnapshot).hasChild("uid")){
+                            let dbUid = (friend as! DataSnapshot).childSnapshot(forPath: "uid").value as? String ?? ""
+                            if(dbUid == currentUser.uId){
+                                ref.child(otherUser.uId).child("friends").child((friend as! DataSnapshot).key).removeValue()
+                                break
+                            }
+                        }
+                    }
+                }
+            }
+            
+            let currentUserSnapshot = snapshot.childSnapshot(forPath: currentUser.uId)
+            if(currentUserSnapshot.exists()){
+                if(currentUserSnapshot.hasChild("friends")){
+                    let friendsList = currentUserSnapshot.childSnapshot(forPath: "friends")
+                    for friend in friendsList.children {
+                        if((friend as! DataSnapshot).hasChild("uid")){
+                            let dbUid = (friend as! DataSnapshot).childSnapshot(forPath: "uid").value as? String ?? ""
+                            if(dbUid == otherUser.uId){
+                                ref.child(currentUser.uId).child("friends").child((friend as! DataSnapshot).key).removeValue()
+                                break
+                            }
+                        }
+                    }
+                }
+            }
+            
+            callbacks.friendRemoved()
+            
+        }) { (error) in
+            print(error.localizedDescription)
+            callbacks.friendRemoveFail()
+        }
+    }
+    
+    func clearAllAnnouncements(callbacks: TodayCallbacks){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser!
+        
+        let ref = Database.database().reference().child("Users").child(currentUser.uId)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                if(snapshot.hasChild("receivedAnnouncements")){
+                    ref.child("receivedAnnouncements").removeValue()
+                }
+                if(snapshot.hasChild("acceptedTempRivals")){
+                    ref.child("acceptedTempRivals").removeValue()
+                }
+                if(snapshot.hasChild("rejectedTempRivals")){
+                    ref.child("rejectedTempRivals").removeValue()
+                }
+                
+                delegate.currentUser!.acceptedTempRivals = [RivalObj]()
+                delegate.currentUser!.rejectedTempRivals = [RivalObj]()
+                delegate.currentUser!.receivedAnnouncements = [String]()
+                callbacks.onSuccess()
+            }
+        })
+    }
+    
+    func cleanReceivedOnlineAnnouncements(announcementUid: String, callbacks: TodayCallbacks){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser!
+        
+        let ref = Database.database().reference().child("Users").child(currentUser.uId)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                if(snapshot.hasChild("receivedAnnouncements")){
+                    var receivedAnnouncements = snapshot.childSnapshot(forPath: "receivedAnnouncements").value as? [String] ?? [String]()
+                    if(receivedAnnouncements.contains(announcementUid)){
+                        receivedAnnouncements.remove(at: receivedAnnouncements.index(of: announcementUid)!)
+                    }
+                    
+                    ref.child("receivedAnnouncements").setValue(receivedAnnouncements)
+                    delegate.currentUser!.receivedAnnouncements = receivedAnnouncements
+                    callbacks.onSuccess()
+                }
+            }
+        })
+    }
+    
+    func cleanRivals(rivalId: String, callbacks: TodayCallbacks){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser!
+        
+        let ref = Database.database().reference().child("Users").child(currentUser.uId)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                if(snapshot.hasChild("acceptedTempRivals")){
+                    let acceptedRivals = snapshot.childSnapshot(forPath: "acceptedTempRivals")
+                    for rival in acceptedRivals.children {
+                        let current = (rival as! DataSnapshot)
+                        if(current.hasChild("id")){
+                            let currentId = current.childSnapshot(forPath: "id").value as? String ?? ""
+                            if(rivalId == currentId){
+                                ref.child("acceptedTempRivals").child(current.key).removeValue()
+                                
+                                for rival in currentUser.acceptedTempRivals {
+                                    if(rival.id == rivalId){
+                                        delegate.currentUser!.acceptedTempRivals.remove(at: delegate.currentUser!.acceptedTempRivals.index(of: rival)!)
+                                        break
+                                    }
+                                }
+                            }
+                            callbacks.onSuccess()
+                        }
+                    }
+                }
+                
+                if(snapshot.hasChild("rejectedTempRivals")){
+                    let acceptedRivals = snapshot.childSnapshot(forPath: "rejectedTempRivals")
+                    for rival in acceptedRivals.children {
+                        let current = (rival as! DataSnapshot)
+                        if(current.hasChild("id")){
+                            let currentId = current.childSnapshot(forPath: "id").value as? String ?? ""
+                            if(rivalId == currentId){
+                                ref.child("rejectedTempRivals").child(current.key).removeValue()
+                                
+                                for rival in currentUser.rejectedTempRivals {
+                                    if(rival.id == rivalId){
+                                        delegate.currentUser!.rejectedTempRivals.remove(at: delegate.currentUser!.rejectedTempRivals.index(of: rival)!)
+                                        break
+                                    }
+                                }
+                            }
+                        }
+                        callbacks.onSuccess()
+                    }
+                }
+            }
+        })
+    }
+    
+    func userListHasUid(list: [User], uid: String) -> Bool {
+        var contained = false
+        for user in list {
+            if(user.uId == uid){
+                contained = true
+                break
+            }
+        }
+        return contained
+    }
+    
+    func userListHasGamerTag(list: [User], gamertag: String) -> Bool {
+        var contained = false
+        for user in list {
+            if(user.gamerTag == gamertag){
+                contained = true
+                break
+            }
+        }
+        return contained
+    }
+    
     
     func stringToDate(_ str: String)->Date{
         let formatter = DateFormatter()
         formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
         formatter.timeZone = TimeZone(abbreviation: "UTC")
         return formatter.date(from: str)!
+    }
+    
+    func checkOnlineAnnouncements(){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = appDelegate.currentUser!
+        
+        let ref = Database.database().reference().child("Users").child(currentUser.uId)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.hasChild("onlineAnnouncements")){
+                let announcements = snapshot.childSnapshot(forPath: "onlineAnnouncements")
+                for online in announcements.children
+                {
+                    let current = (online as? DataSnapshot)
+                    if(current != nil){
+                        if(current!.hasChild("date")){
+                            let date = current!.childSnapshot(forPath: "date").value as? String ?? ""
+                            let dbDate = self.stringToDate(date)
+                            
+                            if(dbDate != nil){
+                                let now = NSDate()
+                                let formatter = DateFormatter()
+                                formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+                                formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                                let future = formatter.string(from: dbDate as Date)
+                                let dbTimeOut = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                                
+                                let validAnnounments = (now as Date).compare(.isEarlier(than: dbTimeOut))
+                                
+                                if(dbTimeOut != nil){
+                                    if(!validAnnounments){
+                                        let ref = Database.database().reference().child("Users").child(currentUser.uId)
+                                        ref.child("onlineAnnouncements").removeValue()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        })
     }
     
 }

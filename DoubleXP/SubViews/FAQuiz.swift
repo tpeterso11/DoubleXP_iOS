@@ -13,6 +13,7 @@ import SwiftHTTP
 import SwiftNotificationCenter
 
 class FAQuiz: ParentVC, EMPageViewControllerDelegate, FreeAgentQuizNav {
+    
     var user: User!
     var team: TeamObject?
     var gcGame: GamerConnectGame?
@@ -31,7 +32,10 @@ class FAQuiz: ParentVC, EMPageViewControllerDelegate, FreeAgentQuizNav {
         let interviewManager = delegate.interviewManager
         let currentUser = delegate.currentUser
         
-        interviewManager.initialize(gameName: gcGame!.gameName, uId: currentUser!.uId)
+        interviewManager.initialize(gameName: gcGame!.gameName, uId: currentUser!.uId, gamerConnectGame: gcGame!)
+    }
+    
+    func addQuestion(question: FAQuestion, interviewManager: InterviewManager) {
     }
     
     func addQuestion(question: FAQuestion) {
@@ -56,5 +60,8 @@ class FAQuiz: ParentVC, EMPageViewControllerDelegate, FreeAgentQuizNav {
     }
     
     func showEmpty() {
+    }
+    
+    func updateAnswerArray(answerArray: [String], question: FAQuestion) {
     }
 }

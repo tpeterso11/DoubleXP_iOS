@@ -11,13 +11,14 @@ import WebKit
 
 class NewsArticleCell: UICollectionViewCell{
     
-    @IBOutlet weak var cellWV: WKWebView!
     @IBOutlet weak var sourceImage: UIImageView!
     @IBOutlet weak var authorLabel: UILabel!
-    @IBOutlet weak var authorImage: UIImageView!
     @IBOutlet weak var articleBack: UIImageView!
     @IBOutlet weak var subTitle: UILabel!
     @IBOutlet weak var title: UILabel!
+    @IBOutlet weak var contents: UILabel!
+    @IBOutlet weak var clickArea: UIView!
+    @IBOutlet weak var closeX: UIImageView!
     
     override func awakeFromNib() {
         self.layer.cornerRadius = 10

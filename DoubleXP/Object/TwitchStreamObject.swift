@@ -10,70 +10,70 @@ import Foundation
 import CoreData
 
 class TwitchStreamObject: NSObject, NSCoding {
-    var _handle:String? = nil
+    var _handle:String = ""
     var handle:String {
         get {
-            return (_handle)!
+            return (_handle)
         }
         set (newVal) {
             _handle = newVal
         }
     }
     
-    var _thumbnail:String? = nil
+    var _thumbnail:String = ""
     var thumbnail:String {
         get {
-            return (_thumbnail)!
+            return (_thumbnail)
         }
         set (newVal) {
             _thumbnail = newVal
         }
     }
     
-    var _startedAt:String? = nil
+    var _startedAt:String = ""
     var startedAt:String {
         get {
-            return (_startedAt)!
+            return (_startedAt)
         }
         set (newVal) {
             _startedAt = newVal
         }
     }
     
-    var _id:String? = nil
+    var _id:String = ""
     var id:String {
        get {
-           return (_id)!
+           return (_id)
        }
        set (newVal) {
            _id = newVal
        }
     }
     
-    var _title:String? = nil
+    var _title:String = ""
     var title:String {
        get {
-           return (_title)!
+           return (_title)
        }
        set (newVal) {
            _title = newVal
        }
     }
     
-    var _userId:String? = nil
+    var _userId:String = ""
     var userId:String {
        get {
-           return (_userId)!
+           return (_userId)
        }
        set (newVal) {
            _userId = newVal
        }
     }
     
-    var _type:String? = nil
+    var _type:String = ""
     var type:String {
        get {
-           return (_type)!
+           return (_type)
        }
        set (newVal) {
            _type = newVal
@@ -88,6 +88,16 @@ class TwitchStreamObject: NSObject, NSCoding {
        set (newVal) {
            _viewerCount = newVal
        }
+    }
+    
+    var _isLive:String = ""
+    var isLive:String {
+        get {
+            return (_isLive)
+        }
+        set (newVal) {
+            _isLive = newVal
+        }
     }
     
     init(handle: String)

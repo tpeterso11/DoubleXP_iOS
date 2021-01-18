@@ -10,6 +10,6 @@ import Foundation
 import UIKit
 
 class ArticleTextCell: UITableViewCell{
-    @IBOutlet weak var label: UILabel!
     
+    @IBOutlet weak var label: UITextView!
 }

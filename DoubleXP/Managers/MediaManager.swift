@@ -174,13 +174,13 @@ class MediaManager {
                             }
                         }
                     }
-                let delegate = UIApplication.shared.delegate as! AppDelegate
-                let cache = delegate.mediaCache
-                cache.setNewsCache(payload: self.news)
-                
-                callbacks.onMediaReceived(category: "news")
-                    //print("Mah nigga...you got " + String(self.news.count) + " articles")
-                    //self.getDXPReviews(callbacks: callbacks)
+                    DispatchQueue.main.async {
+                        let delegate = UIApplication.shared.delegate as! AppDelegate
+                        let cache = delegate.mediaCache
+                        cache.setNewsCache(payload: self.news)
+                        
+                        callbacks.onMediaReceived(category: "news")
+                    }
                 }
             }
         }

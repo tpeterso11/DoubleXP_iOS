@@ -36,7 +36,20 @@ class ProfileGamesCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! ProfileGameSelectionCell
         let current = self.gcGames[indexPath.item]
         
-        cell.gameImage.image = Utility.Image.placeholder
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let cache = delegate.imageCache
+        if(cache.object(forKey: current.imageUrl as NSString) != nil){
+            cell.gameImage.image = cache.object(forKey: current.imageUrl as NSString)
+        } else {
+            cell.gameImage.image = Utility.Image.placeholder
+            cell.gameImage.moa.onSuccess = { image in
+                cell.gameImage.image = image
+                delegate.imageCache.setObject(image, forKey: current.imageUrl as NSString)
+                return image
+            }
+            cell.gameImage.moa.url = current.imageUrl
+        }
+        
         cell.gameImage.moa.url = current.imageUrl
         cell.gameImage.contentMode = .scaleAspectFill
         cell.gameImage.clipsToBounds = true
@@ -72,13 +85,6 @@ class ProfileGamesCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let current = gcGames[indexPath.item]
-        
-        if(self.gamesPlayed.contains(current)){
-            callbacks.gameRemoved(gameName: current.gameName, indexPath: indexPath)
-        }
-        else{
-            callbacks.gameAdded(gameName: current.gameName, indexPath: indexPath)
-        }
     }
     
    func collectionView(_ collectionView: UICollectionView,
@@ -106,6 +112,5 @@ class ProfileGamesCell: UICollectionViewCell, UICollectionViewDelegateFlowLayout
             }, completion: nil)
         }
         
-        self.callbacks.checkChanges(updatedList: self.gamesPlayed)
     }
 }

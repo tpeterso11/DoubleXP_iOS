@@ -14,6 +14,7 @@ import SwiftNotificationCenter
 import FBSDKCoreKit
 
 class FAQuizCover: ParentVC, FreeAgentQuizNav{
+    
     var question: FAQuestion?
     var gcGame: GamerConnectGame?
     var questions = [FAQuestion]()
@@ -45,16 +46,11 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
         
         getQuestions()
         
-        gameName.text = gcGame?.gameName
-        
         startButton.alpha = 0.4
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
         interviewManager = delegate.interviewManager
-        
-        //let doneTap = UITapGestureRecognizer(target: self, action: #selector(doneButtonClicked))
-        //gameOverButton.isUserInteractionEnabled = true
-        //gameOverButton.addGestureRecognizer(doneTap)
+        gameName.text = interviewManager?.currentGCGame?.gameName
         
         startButton.addTarget(self, action: #selector(doneButtonClicked), for: .touchUpInside)
         
@@ -98,14 +94,19 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
     }
     
     private func setImage(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        interviewManager = delegate.interviewManager
         gameImage.image = Utility.Image.placeholder
-        gameImage.moa.url = gcGame?.imageUrl
+        gameImage.moa.url = interviewManager?.currentGCGame?.imageUrl
         gameImage.contentMode = .scaleAspectFill
         gameImage.clipsToBounds = true
     }
     
     func getQuestions(){
-        let ref = Database.database().reference().child("Games").child(gcGame!.gameName)
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        interviewManager = delegate.interviewManager
+        
+        let ref = Database.database().reference().child("Games").child(interviewManager!.currentGCGame.gameName)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             if(snapshot.exists()){
                 let value = snapshot.value as? NSDictionary
@@ -117,11 +118,14 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
                 self.currentUrl = "https://firebasestorage.googleapis.com/v0/b/gameterminal-767f7.appspot.com/o/esports%2Fcompetition_questions%2Fgeneric_shooter_questions.json?alt=media&token=42895bf2-5881-4143-8eae-0099b7a8702d"
             }
             
-            self.interviewManager?.getQuiz(url: self.currentUrl, secondary: false, callbacks: self)
+            self.interviewManager?.getQuiz(url: self.currentUrl, secondary: false, gameName: (self.interviewManager?.currentGCGame!.gameName)!, callbacks: self)
         }) { (error) in
             AppEvents.logEvent(AppEvents.Name(rawValue: "FA Quiz Front - Error Loading Quiz"))
             print(error.localizedDescription)
         }
+    }
+    
+    func addQuestion(question: FAQuestion, interviewManager: InterviewManager) {
     }
     
     func addQuestion(question: FAQuestion) {
@@ -140,6 +144,9 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
     }
     
     func showSubmitted() {
+    }
+    
+    func updateAnswerArray(answerArray: [String], question: FAQuestion) {
     }
     
     func onInitialQuizLoaded() {

@@ -31,6 +31,19 @@ target 'DoubleXP' do
   pod 'GoogleSignIn'
   pod 'SwiftDate'
   pod 'Swifter', :git => 'https://github.com/mattdonnelly/Swifter.git'
+  pod 'CollectionViewSlantedLayout'
+  pod 'OrderedDictionary'
+  pod 'AnimatedCollectionViewLayout'
+  pod 'CountdownLabel'
+  pod 'CollectionPickerView'
+  pod 'SPStorkController'
+  pod 'Giphy'
+  pod 'Google-Mobile-Ads-SDK'
+  pod 'GeoFire', '~> 4.0'
+  pod 'SwiftLocation', '~> 4.0'
+  pod "LinearProgressBar"
+  pod 'Cosmos', '~> 23.0'
+  pod "FlagPhoneNumber"
   
   # Pods for DoubleXP
 

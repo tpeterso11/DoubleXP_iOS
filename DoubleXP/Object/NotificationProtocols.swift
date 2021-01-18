@@ -23,7 +23,7 @@ protocol NavigateToProfile: class {
     
     func navigateToCreateFrag()
     
-    func navigateToTeamDashboard(team: TeamObject?, newTeam: Bool)
+    func navigateToTeamDashboard(team: TeamObject?, teamInvite: TeamInviteObject?, newTeam: Bool)
     
     func navigateToTeamNeeds(team: TeamObject)
     
@@ -62,6 +62,8 @@ protocol NavigateToProfile: class {
     func navigateToCompetition(competition: CompetitionObj)
     
     func navigateToSponsor()
+    
+    func startDashNavigation(teamName: String?, teamInvite: TeamInviteObject?, newTeam: Bool)
 }
 
 protocol RequestsUpdate: class{
@@ -73,6 +75,10 @@ protocol RequestsUpdate: class{
     func rivalResponseAccepted(indexPath: IndexPath)
     func rivalResponseRejected(indexPath: IndexPath)
     func rivalResponseFailed()
+    func friendRemoved()
+    func friendRemoveFail()
+    func onlineAnnounceSent()
+    func onlineAnnounceFail()
 }
 
 protocol TeamCallbacks: class{
@@ -102,9 +108,11 @@ protocol TeamInteractionCallbacks: class{
 }
 
 protocol FreeAgentQuizNav: class {
-    func addQuestion(question: FAQuestion)
+    func addQuestion(question: FAQuestion, interviewManager: InterviewManager)
     
     func updateAnswer(answer: String, question: FAQuestion)
+    
+    func updateAnswerArray(answerArray: [String], question: FAQuestion)
     
     func onInitialQuizLoaded()
     
@@ -138,7 +146,7 @@ protocol ProfileCallbacks: class{
 protocol SocialMediaManagerCallback: class {
     func onTweetsLoaded(tweets: [TweetObject])
     func onStreamsLoaded(streams: [TwitchStreamObject])
-    func onChannelsLoaded(channels: [TwitchChannelObj])
+    func onChannelsLoaded(channels: [Any])
 }
 
 protocol LandingMenuCallbacks: class{
@@ -158,9 +166,26 @@ protocol LandingUICallbacks: class{
 }
 
 protocol CurrentProfileCallbacks: class{
-    func checkChanges(updatedList: [GamerConnectGame]?)
     func changesComplete()
-    func gameAdded(gameName: String, indexPath: IndexPath)
-    func gameRemoved(gameName: String, indexPath: IndexPath)
 }
 
+protocol StatsManagerCallbacks: class{
+    func onSuccess(gameName: String)
+    func onFailure(gameName: String)
+}
+
+protocol SearchManagerCallbacks: class{
+    func onSuccess(returnedUsers: [User])
+    func onFailure()
+}
+
+protocol DiscoverCallbacks: class{
+    func onSuccess(discoverPayload: [Int: Any])
+    func onFailure()
+}
+
+protocol TodayCallbacks: class{
+    func onSuccess()
+    func onSuccessShort()
+    func onRecommendedUsersLoaded()
+}

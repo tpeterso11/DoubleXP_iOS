@@ -11,7 +11,70 @@ import UIKit
 import Firebase
 
 class ProfileManage {
-    func saveChanges(bio: String, games: [String], ps: Bool, pc: Bool, xBox: Bool, nintendo: Bool, profiles: [[String: String]], callbacks: CurrentProfileCallbacks){
+    var wannaPlayCachedUser: User?
+    var moreOptionsCachedUser: User?
+    
+    func updateTempRivalsDB(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let user = delegate.currentUser!
+        
+        let ref = Database.database().reference().child("Users").child(user.uId)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            var rivals = [RivalObj]()
+            if(snapshot.hasChild("currentTempRivals")){
+                let pendingArray = snapshot.childSnapshot(forPath: "currentTempRivals")
+                for rival in pendingArray.children{
+                    let currentObj = rival as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let date = dict?["date"] as? String ?? ""
+                    let tag = dict?["gamerTag"] as? String ?? ""
+                    let game = dict?["game"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    let dbType = dict?["type"] as? String ?? ""
+                    let id = dict?["id"] as? String ?? ""
+                    
+                    let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
+                    
+                    let calendar = Calendar.current
+                    if(!date.isEmpty){
+                        let dbDate = self.stringToDate(date)
+                        
+                        if(dbDate != nil){
+                            let now = NSDate()
+                            let formatter = DateFormatter()
+                            formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+                            formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                            let future = formatter.string(from: dbDate as Date)
+                            let dbTimeOut = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                            
+                            let validRival = (now as Date).compare(.isEarlier(than: dbTimeOut))
+                            
+                            if(dbTimeOut != nil){
+                                if(validRival){
+                                    rivals.append(request)
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                delegate.currentUser!.currentTempRivals = rivals
+                
+                var sendList = [[String: Any]]()
+                for rival in rivals{
+                    let current = ["gamerTag": rival.gamerTag, "date": rival.date, "uid": rival.uid, "game": rival.game, "type": rival.type] as [String : String]
+                    sendList.append(current)
+                }
+                
+                ref.child("currentTempRivals").setValue(sendList)
+            }
+            
+        }) { (error) in
+            print(error.localizedDescription)
+        }
+    }
+    
+    func saveChanges(bio: String, gamertag: String?, callbacks: CurrentProfileCallbacks){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let user = delegate.currentUser!
         
@@ -19,28 +82,14 @@ class ProfileManage {
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             if(snapshot.exists()){
                 if(!bio.isEmpty){
-                    ref.child("Bio").setValue(bio)
+                    ref.child("bio").setValue(bio)
+                    user.bio = bio
                 }
                 
-                if(!profiles.isEmpty){
-                    if(!(profiles[0]["gamerTag"]!.isEmpty)){
-                        if(snapshot.hasChild("gamerTag")){
-                            let value = snapshot.value as? NSDictionary
-                            let gamerTag = value?["gamerTag"] as? String ?? ""
-                            
-                            if(gamerTag.isEmpty || gamerTag == "undefined"){
-                                ref.child("gamerTag").setValue(profiles[0]["gamerTag"]!)
-                            }
-                        }
-                    }
+                if(gamertag != nil){
+                    ref.child("gamerTag").setValue(gamertag)
+                    user.gamerTag = gamertag!
                 }
-                
-                ref.child("gamerTags").setValue(profiles)
-                
-                ref.child("games").setValue(games)
-                
-                let consoleDict = ["ps": ps, "xbox": xBox, "pc": pc, "nintendo": nintendo]
-                ref.child("consoles").setValue(consoleDict)
                 
                 callbacks.changesComplete()
             }
@@ -48,5 +97,12 @@ class ProfileManage {
         }) { (error) in
             print(error.localizedDescription)
         }
+    }
+    
+    func stringToDate(_ str: String)->Date{
+        let formatter = DateFormatter()
+        formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+        formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+        return formatter.date(from: str)!
     }
 }

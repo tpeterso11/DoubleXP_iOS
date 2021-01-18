@@ -14,8 +14,9 @@ import SendBirdSDK
 import SwiftNotificationCenter
 import SwiftyGif
 import FBSDKCoreKit
+import Lottie
 
-class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewDelegate, UITableViewDataSource {
+class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
     
     var currentUser: User?
     var groupChannelUrl: String?
@@ -33,9 +34,17 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
     @IBOutlet weak var messagingView: UITableView!
     @IBOutlet weak var errorOverlay: UIView!
     @IBOutlet weak var errorText: UILabel!
+    @IBOutlet weak var inputDrawer: UIView!
+    @IBOutlet weak var constraint: NSLayoutConstraint!
+    @IBOutlet weak var inputField: UITextField!
+    @IBOutlet weak var sendButton: UIButton!
+    @IBOutlet weak var loadingBlur: UIVisualEffectView!
+    @IBOutlet weak var loadingAnimation: AnimationView!
+    var messagingDeckHeight: CGFloat?
     //@IBOutlet weak var sendButton: UIButton!
     
     var estimatedHeight: CGFloat?
+    var constantInputHeight: CGFloat!
     private var emptyShowing = false
     private var messagesSet = false
     
@@ -47,12 +56,95 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let currentUser = delegate.currentUser
         
-        manager!.setup(sendBirdId: currentUser!.sendBirdId, currentUser: currentUser!, messagingCallbacks: self)
-        
         Broadcaster.register(SearchCallbacks.self, observer: self)
         
-        animateView()
+        self.showLoading()
         self.emptyShowing = true
+        self.constantInputHeight = self.inputDrawer.bounds.height
+        
+        self.inputField.returnKeyType = .done
+        self.inputField.delegate = self
+        self.inputField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+        //self.inputField.layer.borderWidth = 1
+        //self.inputField.layer.borderColor = UIColor.init(named: "stayWhite") as! CGColor
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillDisappear),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
+        
+        self.handleSendAlpha(show: false)
+    }
+    
+    private func showLoading(){
+        UIView.animate(withDuration: 0.8, animations: {
+            self.loadingBlur.alpha = 1
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                self.loadingAnimation.alpha = 1
+                self.loadingAnimation.loopMode = .loop
+                self.loadingAnimation.play()
+                self.animateView()
+            }, completion: { (finished: Bool) in
+                self.manager!.setup(sendBirdId: self.currentUser!.sendBirdId, currentUser: self.currentUser!, messagingCallbacks: self)
+            })
+        })
+    }
+    
+    private func hideLoading(){
+        UIView.animate(withDuration: 0.8, animations: {
+            self.loadingAnimation.alpha = 0
+            self.loadingAnimation.pause()
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                self.loadingBlur.alpha = 0
+            }, completion: nil)
+        })
+    }
+    
+    @objc func textFieldDidChange(_ textField: UITextField) {
+        if(self.inputField.text!.count > 0){
+            self.handleSendAlpha(show: true)
+        } else {
+            self.handleSendAlpha(show: false)
+        }
+    }
+    
+    @objc func sendMessage(){
+        self.messageTextSubmitted(string: self.inputField.text!, list: nil)
+        self.inputField.text = ""
+        self.handleSendAlpha(show: false)
+    }
+    
+    private func handleSendAlpha(show: Bool){
+        if(show && self.sendButton.alpha == 0){
+            UIView.animate(withDuration: 0.2, animations: {
+                self.sendButton.alpha = 1.0
+                self.sendButton.isUserInteractionEnabled = true
+                self.sendButton.addTarget(self, action: #selector(self.sendMessage), for: .touchUpInside)
+            }, completion: nil)
+        } else if(show){
+            self.sendButton.alpha = 1.0
+            self.sendButton.isUserInteractionEnabled = true
+            self.sendButton.addTarget(self, action: #selector(self.sendMessage), for: .touchUpInside)
+        } else if(!show && self.sendButton.alpha == 1){
+            UIView.animate(withDuration: 0.2, animations: {
+                self.sendButton.alpha = 0.3
+                self.sendButton.isUserInteractionEnabled = false
+            }, completion: nil)
+        } else {
+            self.sendButton.alpha = 0.3
+            self.sendButton.isUserInteractionEnabled = false
+        }
     }
     
     private func animateView(){
@@ -78,10 +170,15 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
                         self.emptyUser.alpha = 1
                     }
                 }, completion: { (finished: Bool) in
-                    UIView.animate(withDuration: 0.8, delay: 0.8, options: [], animations: {
+                    UIView.animate(withDuration: 0.8, delay: 0.3, options: [], animations: {
                         self.tapInstruc.alpha = 1
-                        self.tapInstruc.transform = top2
-                    }, completion: nil)
+                    }, completion: { (finished: Bool) in
+                        UIView.animate(withDuration: 0.8, delay: 0.3, options: [], animations: {
+                            self.inputDrawer.alpha = 1
+                            self.inputDrawer.transform = top
+                            self.hideLoading()
+                        }, completion: nil)
+                    })
                 })
             })
         }
@@ -94,7 +191,7 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
         else if(groupChannelUrl == nil && otherUserId == nil){
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             let currentUser = appDelegate.currentUser
-            manager?.createTeamChannel(userId: currentUser!.uId, callbacks: self)
+            manager?.createTeamChannel(userId: currentUser!.uId, otherUserId: self.otherUserId!, callbacks: self)
         }
         else{
             seeIfChannelExists()
@@ -149,13 +246,13 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
                     if(!contained){
                         let appDelegate = UIApplication.shared.delegate as! AppDelegate
                         let currentUser = appDelegate.currentUser
-                        self.manager?.createTeamChannel(userId: currentUser!.uId, callbacks: self)
+                        self.manager?.createTeamChannel(userId: currentUser!.uId, otherUserId: self.otherUserId!, callbacks: self)
                     }
                 }
                 else{
                     let appDelegate = UIApplication.shared.delegate as! AppDelegate
                     let currentUser = appDelegate.currentUser
-                    self.manager?.createTeamChannel(userId: currentUser!.uId, callbacks: self)
+                    self.manager?.createTeamChannel(userId: currentUser!.uId, otherUserId: self.otherUserId!, callbacks: self)
                 }
             }
             
@@ -258,11 +355,13 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
             
             messagingView.reloadData()
             messagingView.layoutIfNeeded()
-            messagingView.heightAnchor.constraint(equalToConstant: messagingView.contentSize.height).isActive = true
+            //messagingView.heightAnchor.constraint(equalToConstant: messagingView.contentSize.height).isActive = true
             
             reload(tableView: messagingView)
             
             scrollToBottom()
+            
+            self.hideLoading()
         }
     }
     
@@ -270,83 +369,7 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
         AppEvents.logEvent(AppEvents.Name(rawValue: "Messaging: Create Channel Successful"))
         
         if(team != nil){
-            //team channel was empty, attempted to make a new one.
-            for user in team!.teammateIds{
-                let ref = Database.database().reference().child("Users").child(user)
-                    ref.observeSingleEvent(of: .value, with: { (snapshot) in
-                        if(snapshot.exists()){
-                            var teams = [TeamObject]()
-                            let teamsArray = snapshot.childSnapshot(forPath: "teams")
-                            for teamObj in teamsArray.children {
-                                let currentObj = teamObj as! DataSnapshot
-                                let dict = currentObj.value as? [String: Any]
-                                let teamName = dict?["teamName"] as? String ?? ""
-                                let teamId = dict?["teamId"] as? String ?? ""
-                                let games = dict?["games"] as? [String] ?? [String]()
-                                let consoles = dict?["consoles"] as? [String] ?? [String]()
-                                let teammateTags = dict?["teammateTags"] as? [String] ?? [String]()
-                                let teammateIds = dict?["teammateIds"] as? [String] ?? [String]()
-                                let captainId = dict?["teamCaptainId"] as? String ?? String()
-                                
-                                var invites = [TeamInviteObject]()
-                                let teamInvites = snapshot.childSnapshot(forPath: "teamInvites")
-                                for invite in teamInvites.children{
-                                    let currentObj = invite as! DataSnapshot
-                                    let dict = currentObj.value as? [String: Any]
-                                    let gamerTag = dict?["gamerTag"] as? String ?? ""
-                                    let date = dict?["date"] as? String ?? ""
-                                    let uid = dict?["uid"] as? String ?? ""
-                                    let teamName = dict?["teamName"] as? String ?? ""
-                                    
-                                    let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid, teamName: teamName)
-                                    invites.append(newInvite)
-                                }
-                                
-                                let teamInvitetags = dict?["teamInviteTags"] as? [String] ?? [String]()
-                                let captain = dict?["teamCaptain"] as? String ?? ""
-                                let imageUrl = dict?["imageUrl"] as? String ?? ""
-                                let teamChat = dict?["teamChat"] as? String ?? String()
-                                let teamNeeds = dict?["teamNeeds"] as? [String] ?? [String]()
-                                let selectedTeamNeeds = dict?["selectedTeamNeeds"] as? [String] ?? [String]()
-                                
-                                let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl, teamCaptainId: captainId)
-                                
-                                var teammateArray = [TeammateObject]()
-                                if(currentObj.hasChild("teammates")){
-                                    let teammates = currentObj.childSnapshot(forPath: "teammates")
-                                    for teammate in teammates.children{
-                                        let currentTeammate = teammate as! DataSnapshot
-                                        let dict = currentTeammate.value as? [String: Any]
-                                        let gamerTag = dict?["gamerTag"] as? String ?? ""
-                                        let date = dict?["date"] as? String ?? ""
-                                        let uid = dict?["uid"] as? String ?? ""
-                                        
-                                        let teammate = TeammateObject(gamerTag: gamerTag, date: date, uid: uid)
-                                        teammateArray.append(teammate)
-                                    }
-                                    currentTeam.teammates = teammateArray
-                                    teams.append(currentTeam)
-                                }
-                            }
-                            
-                            var sendUp = [[String: Any]]()
-                            for team in teams{
-                                if(team.teamChat.isEmpty){
-                                    team.teamChat = groupChannel.channelUrl
-                                }
-                                
-                                let current = ["teamName": team.teamName, "teamId": team.teamId, "games": team.games, "consoles": team.consoles, "teammateTags": team.teammateTags, "teammateIds": team.teammateIds, "teamCaptain": team.teamCaptain, "teamInvites": team.teamInvites, "teamChat": team.teamChat, "teamInviteTags": team.teamInviteTags, "teamNeeds": team.teamNeeds, "selectedTeamNeeds": team.selectedTeamNeeds, "imageUrl": team.imageUrl] as [String : Any]
-                                
-                                sendUp.append(current)
-                            }
-                            ref.child("teams").setValue(sendUp)
-                        }
-                    })
-                { (error) in
-                    print(error.localizedDescription)
-                    self.showError(string: "error initializing team chat.")
-                }
-            }
+            Database.database().reference().child("Teams").child(team!.teamName).child("teamChat").setValue(groupChannel.channelUrl)
         }
         else{
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -450,7 +473,7 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
     func messageSuccessfullyReceived(message: SBDUserMessage) {
         let date = NSDate(timeIntervalSince1970: TimeInterval(message.createdAt))
                    let formatter = DateFormatter()
-                   formatter.dateFormat = "MMMM.dd.yyyy"
+                   formatter.dateFormat = "MM-dd-yyyy"
                    let result = formatter.string(from: date as Date)
         
         let chatMessage = ChatMessage(message: message.message, timeStamp: result)
@@ -700,7 +723,7 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
     func messageTextSubmitted(string: String, list: [String]?) {
         let date = Date()
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMMM.dd.yyyy"
+        formatter.dateFormat = "MM-dd-yyyy"
         let result = formatter.string(from: date)
         
         let message = ChatMessage(message: string, timeStamp: result)
@@ -730,6 +753,89 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
         //chatMessages.append(0)
         
         addMessage(chatMessage: chatMessage)*/
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) { // became first responder
+
+        //move textfields up
+        let myScreenRect: CGRect = UIScreen.main.bounds
+        let keyboardHeight : CGFloat = 500
+
+        UIView.beginAnimations( "animateView", context: nil)
+        var movementDuration:TimeInterval = 0.35
+        var needToMove: CGFloat = 0
+
+        var frame : CGRect = self.view.frame
+        if (textField.frame.origin.y + textField.frame.size.height + /*self.navigationController.navigationBar.frame.size.height + */UIApplication.shared.statusBarFrame.size.height > (myScreenRect.size.height - keyboardHeight)) {
+            needToMove = (textField.frame.origin.y + textField.frame.size.height + /*self.navigationController.navigationBar.frame.size.height +*/ UIApplication.shared.statusBarFrame.size.height) - (myScreenRect.size.height - keyboardHeight);
+        }
+
+        frame.origin.y = -needToMove
+        self.view.frame = frame
+        UIView.commitAnimations()
+    }
+
+    func textFieldDidEndEditing(_ textField: UITextField) {
+            //move textfields back down
+            UIView.beginAnimations( "animateView", context: nil)
+        var movementDuration:TimeInterval = 0.35
+            var frame : CGRect = self.view.frame
+            frame.origin.y = 0
+            self.view.frame = frame
+            UIView.commitAnimations()
+    }
+    
+    @objc func keyboardWillShow(_ notification: Notification) {
+        if let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+            let keyboardRectangle = keyboardFrame.cgRectValue
+            let keyboardHeight = keyboardRectangle.height
+            
+            extendBottom(height: keyboardHeight)
+        }
+    }
+    
+    @objc func keyboardWillDisappear() {
+        if(self.messagingDeckHeight != nil){
+            restoreBottom(height: self.messagingDeckHeight!)
+        }
+    }
+    
+    func extendBottom(height: CGFloat){
+        //let top = CGAffineTransform(translationX: 0, y: 50)
+        UIView.animate(withDuration: 0.3, animations: {
+            //self.searchButton.alpha = 1
+            //self.bottomNavSearch.transform = top
+            
+            self.messagingDeckHeight = height + 110
+            self.constraint?.constant = self.messagingDeckHeight!
+            
+            UIView.animate(withDuration: 0.5) {
+                //self.articleOverlay.alpha = 1
+                //self.view.bringSubviewToFront(self.secondaryNv)
+                self.view.layoutIfNeeded()
+            }
+        
+        }, completion: nil)
+    }
+    
+    func restoreBottom(height: CGFloat){
+        let top = CGAffineTransform(translationX: 0, y: 0)
+        UIView.animate(withDuration: 0.3, animations: {
+            self.inputDrawer.transform = top
+            self.constraint?.constant = 150
+            
+            UIView.animate(withDuration: 0.5) {
+                //self.articleOverlay.alpha = 1
+                //self.view.sendSubviewToBack(self.secondaryNv)
+                self.view.layoutIfNeeded()
+            }
+        
+        }, completion: nil)
     }
 }
 

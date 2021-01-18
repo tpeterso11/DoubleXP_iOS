@@ -31,6 +31,26 @@ class CompetitionObj: NSObject, NSCoding {
         }
     }
     
+    var _emergencyShowLiveStream: String = ""
+    var emergencyShowLiveStream: String {
+        get {
+            return (_emergencyShowLiveStream)
+        }
+        set (newVal) {
+            _emergencyShowLiveStream = newVal
+        }
+    }
+    
+    var _emergencyShowRegistrationOver: String = ""
+    var emergencyShowRegistrationOver: String {
+        get {
+            return (_emergencyShowRegistrationOver)
+        }
+        set (newVal) {
+            _emergencyShowRegistrationOver = newVal
+        }
+    }
+    
     var _gameName: String = ""
     var gameName: String {
         get {
@@ -98,6 +118,16 @@ class CompetitionObj: NSObject, NSCoding {
         }
         set (newVal) {
             _gcName = newVal
+        }
+    }
+    
+    var _expired: String = ""
+    var expired: String {
+        get {
+            return (_expired)
+        }
+        set (newVal) {
+            _expired = newVal
         }
     }
     
@@ -228,6 +258,17 @@ class CompetitionObj: NSObject, NSCoding {
         self.gameName = (decoder.decodeObject(forKey: "gameName") as! String)
         self.mainSponsor = (decoder.decodeObject(forKey: "mainSponsor") as! String)
         self.subscriptionId = (decoder.decodeObject(forKey: "subscriptionId") as! String)
+        self.emergencyShowLiveStream = (decoder.decodeObject(forKey: "emergencyShowLiveStream") as! String)
+        self.emergencyShowRegistrationOver = (decoder.decodeObject(forKey: "emergencyShowRegistrationOver") as! String)
+        self.topPrize = (decoder.decodeObject(forKey: "topPrize") as! String)
+        self.twitchChannelId = (decoder.decodeObject(forKey: "twitchChannelId") as! String)
+        self.competitionStartMillis = (decoder.decodeObject(forKey: "competitionStartMillis") as! String)
+        self.secondPrize = (decoder.decodeObject(forKey: "secondPrize") as! String)
+        self.thirdPrize = (decoder.decodeObject(forKey: "thirdPrize") as! String)
+        self.competitionDateString = (decoder.decodeObject(forKey: "competitionDateString") as! String)
+        self.competitionAirDate = (decoder.decodeObject(forKey: "competitionAirDate") as! String)
+        self.registrationDeadlineMillis = (decoder.decodeObject(forKey: "registrationDeadlineMillis") as! String)
+        
     }
 
     func encode(with coder: NSCoder) {
@@ -236,6 +277,17 @@ class CompetitionObj: NSObject, NSCoding {
         coder.encode(self.gameName, forKey: "gameName")
         coder.encode(self.mainSponsor, forKey: "mainSponsor")
         coder.encode(self.subscriptionId, forKey: "subscriptionId")
+        coder.encode(self.emergencyShowLiveStream, forKey: "emergencyShowLiveStream")
+        coder.encode(self.emergencyShowRegistrationOver, forKey: "emergencyShowRegistrationOver")
+        coder.encode(self.topPrize, forKey: "topPrize")
+        coder.encode(self.twitchChannelId, forKey: "twitchChannelId")
+        coder.encode(self.competitionStartMillis, forKey: "competitionStartMillis")
+        coder.encode(self.secondPrize, forKey: "secondPrize")
+        coder.encode(self.thirdPrize, forKey: "thirdPrize")
+        coder.encode(self.competitionDateString, forKey: "competitionDateString")
+        coder.encode(self.competitionAirDate, forKey: "competitionAirDate")
+        coder.encode(self.competitionAirDateString, forKey: "competitionAirDateString")
+        coder.encode(self.registrationDeadlineMillis, forKey: "registrationDeadlineMillis")
     }
 }
 

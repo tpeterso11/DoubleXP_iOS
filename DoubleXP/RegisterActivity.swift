@@ -12,22 +12,30 @@ import ValidationComponents
 import FBSDKLoginKit
 import PopupDialog
 import GoogleSignIn
+import CryptoKit
+import AuthenticationServices
+import FlagPhoneNumber
+import SPStorkController
 
 
-class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate {
+class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding, FPNTextFieldDelegate, SPStorkControllerDelegate {
+    
     @IBOutlet weak var headerImage: UIImageView!
     
     @IBOutlet weak var emailLoginCover: UIImageView!
     @IBOutlet weak var emailField: UITextField!
     @IBOutlet weak var passwordField: UITextField!
     @IBOutlet weak var closeX: UIImageView!
-    @IBOutlet weak var psSwitch: UISwitch!
-    @IBOutlet weak var xboxSwitch: UISwitch!
-    @IBOutlet weak var nintendoSwitch: UISwitch!
-    @IBOutlet weak var pcSwitch: UISwitch!
     @IBOutlet weak var nextButton: UIButton!
     @IBOutlet weak var facebook: UIImageView!
     @IBOutlet weak var googleSignIn: UIView!
+    @IBOutlet weak var appleRegister: UIImageView!
+    @IBOutlet weak var emailLayout: UIView!
+    @IBOutlet weak var phoneLayout: UIView!
+    @IBOutlet weak var phoneEntry: FPNTextField!
+    @IBOutlet weak var phoneSwitch: UILabel!
+    @IBOutlet weak var emailSwitch: UILabel!
+    @IBOutlet weak var phoneNext: UIButton!
     
     private var emailEntered = false
     private var passwordEntered = false
@@ -36,14 +44,21 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
     private var switches = [UISwitch]()
     private var facebookLoginAccepted = false
     private var googleLoginAccepted = false
+    private var appleLoginAccepted = false
     private var googleToken = ""
     private var facebookLoginUid = ""
     private var facebookTokenString = ""
     private var googleTokenString = ""
+    private var appleTokenString = ""
     private var registrationType = ""
+    private var currentCode = ""
+    private var validPhone = false
+    private var doneButtonHeight: CGFloat?
+    @IBOutlet weak var constraint: NSLayoutConstraint!
     
     var socialRegistered = ""
     var socialRegisteredUid = ""
+    fileprivate var currentNonce: String?
     
     func supportsAlertController() -> Bool {
         return NSClassFromString("UIAlertController") != nil
@@ -80,19 +95,9 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
             if let tokenString = result?.token?.tokenString {
                 self.facebookTokenString = tokenString
                 self.facebookLoginAccepted = true
+                self.registrationType = "facebook"
                 
-                self.emailLoginCover.image = #imageLiteral(resourceName: "facebook_logo.png")
-                
-                let top = CGAffineTransform(translationX: 0, y: 70)
-                UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5,
-                               initialSpringVelocity: 0.5, options: [], animations: {
-                                self.emailLoginCover.transform = top
-                                self.emailLoginCover.alpha = 1
-                                self.emailField.alpha = 0.1
-                                self.emailField.isUserInteractionEnabled = false
-                                self.passwordField.alpha = 0.1
-                                self.passwordField.isUserInteractionEnabled = false
-                }, completion: nil)
+                registerUser(email: nil, pass: nil, facebook: true, google: false, apple: false)
             } else {
                 AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Fail - " + "\(error?.localizedDescription ?? "")"))
                 
@@ -119,8 +124,93 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
             }
         }
     }
+    
+    private func showCode(){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "code") as! RegisterCodeDrawer
+        
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = false
+        transitionDelegate.customHeight = 550
+        transitionDelegate.showCloseButton = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+    }
+    
+    @objc private func continueClickedPhone(){
+        let phoneNumber = self.phoneEntry.getFormattedPhoneNumber(format: .E164)
+        if(phoneNumber != nil){
+            PhoneAuthProvider.provider().verifyPhoneNumber(phoneNumber!, uiDelegate: nil) { (verificationID, error) in
+              if let error = error {
+                var buttons = [PopupDialogButton]()
+                let title = "phone number signup error"
+                let message = "there was an error signing you up. make sure your phone number is correct and try again."
+                
+                let button = DefaultButton(title: "try again.") { [weak self] in
+                    self?.continueClickedPhone()
+                    
+                }
+                buttons.append(button)
+                
+                let buttonOne = CancelButton(title: "nevermind") { [weak self] in
+                    //do nothing
+                }
+                buttons.append(buttonOne)
+                
+                let popup = PopupDialog(title: title, message: message)
+                popup.addButtons(buttons)
+
+                // Present dialog
+                self.present(popup, animated: true, completion: nil)
+                return
+              }
+                UserDefaults.standard.set(verificationID, forKey: "authVerificationID")
+                self.showCode()
+            }
+        }
+    }
+    
+    @objc private func emailSwitchAction(){
+        if(phoneLayout.alpha == 1){ //if phone layout is showing, make email bold, show email layout
+            self.emailSwitch.font = UIFont.boldSystemFont(ofSize: self.phoneSwitch.font.pointSize)
+            self.phoneSwitch.font = UIFont.systemFont(ofSize: self.phoneSwitch.font.pointSize)
+            UIView.animate(withDuration: 0.8, animations: {
+                self.phoneLayout.alpha = 0
+            }, completion: { (finished: Bool) in
+                UIView.animate(withDuration: 0.5, delay: 0.3, options: [], animations: {
+                    self.emailLayout.alpha = 1
+                }, completion: nil)
+            })
+        } else {
+            self.phoneSwitch.font = UIFont.boldSystemFont(ofSize: self.phoneSwitch.font.pointSize)
+            self.emailSwitch.font = UIFont.systemFont(ofSize: self.emailSwitch.font.pointSize)
+        }
+    }
+    
+    @objc private func phoneSwitchAction(){
+        if(phoneLayout.alpha == 0){
+            self.phoneSwitch.font = UIFont.boldSystemFont(ofSize: self.phoneSwitch.font.pointSize)
+            self.emailSwitch.font = UIFont.systemFont(ofSize: self.phoneSwitch.font.pointSize)
+            UIView.animate(withDuration: 0.8, animations: {
+                self.emailLayout.alpha = 0
+            }, completion: { (finished: Bool) in
+                UIView.animate(withDuration: 0.5, delay: 0.3, options: [], animations: {
+                    self.phoneLayout.alpha = 1
+                }, completion: nil)
+            })
+            
+        } else {
+            self.phoneSwitch.font = UIFont.systemFont(ofSize: self.phoneSwitch.font.pointSize)
+            self.emailSwitch.font = UIFont.boldSystemFont(ofSize: self.phoneSwitch.font.pointSize)
+        }
+    }
 
     @IBAction private func loginWithReadPermissions() {
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login"))
         let loginManager = LoginManager()
         loginManager.logIn(permissions: ["public_profile", "email"], from: self) { [weak self] (result, error) in
             self?.loginManagerDidComplete(result, error)
@@ -142,6 +232,8 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.currentRegisterActivity = self
         nextButton.addTarget(self, action: #selector(nextButtonClicked(_:)), for: .touchUpInside)
         
         let backTap = UITapGestureRecognizer(target: self, action: #selector(backButtonClicked))
@@ -163,73 +255,170 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
         googleSignIn.isUserInteractionEnabled = true
         googleSignIn.addGestureRecognizer(googleTap)
         
-        switches.append(psSwitch)
-        switches.append(xboxSwitch)
-        switches.append(pcSwitch)
-        switches.append(nintendoSwitch)
-        
-        psSwitch.addTarget(self, action: #selector(psSwitchChanged), for: UIControl.Event.valueChanged)
-        xboxSwitch.addTarget(self, action: #selector(xboxSwitchChanged), for: UIControl.Event.valueChanged)
-        nintendoSwitch.addTarget(self, action: #selector(nintendoSwitchChanged), for: UIControl.Event.valueChanged)
-        pcSwitch.addTarget(self, action: #selector(pcSwitchChanged), for: UIControl.Event.valueChanged)
+        if #available(iOS 13, *) {
+           appleRegister.alpha = 1
+           
+           let appleTap = UITapGestureRecognizer(target: self, action: #selector(appleClicked))
+           appleRegister.isUserInteractionEnabled = true
+           appleRegister.addGestureRecognizer(appleTap)
+       } else {
+           appleRegister.alpha = 0.3
+           appleRegister.isUserInteractionEnabled = false
+       }
         
         GIDSignIn.sharedInstance().delegate = self
         
         checkNextButton()
         
-        if(!socialRegistered.isEmpty && !socialRegisteredUid.isEmpty){
-            if(socialRegistered == "google"){
-                self.emailLoginCover.image = #imageLiteral(resourceName: "google_logo.png")
-            }
-            else{
-                self.emailLoginCover.image = #imageLiteral(resourceName: "facebook_logo.png")
-            }
-            
-            
-            let top = CGAffineTransform(translationX: 0, y: 70)
-            UIView.animate(withDuration: 0.8, delay: 0.5, usingSpringWithDamping: 0.5,
-                           initialSpringVelocity: 0.5, options: [], animations: {
-                            self.emailLoginCover.transform = top
-                            self.emailLoginCover.alpha = 1
-                            self.emailField.alpha = 0.1
-                            self.emailField.isUserInteractionEnabled = false
-                            self.passwordField.alpha = 0.1
-                            self.passwordField.isUserInteractionEnabled = false
-            }, completion: nil)
-            
-            if(self.socialRegistered == "google"){
-                self.googleLoginAccepted = true
-            }
-            else{
-                self.facebookLoginAccepted = true
-            }
-        }
+        let phoneTap = UITapGestureRecognizer(target: self, action: #selector(phoneSwitchAction))
+        self.phoneSwitch.isUserInteractionEnabled = true
+        self.phoneSwitch.addGestureRecognizer(phoneTap)
+        
+        let emailTap = UITapGestureRecognizer(target: self, action: #selector(emailSwitchAction))
+        self.emailSwitch.isUserInteractionEnabled = true
+        self.emailSwitch.addGestureRecognizer(emailTap)
+        
+        self.phoneEntry.addTarget(self, action: #selector(textFieldDidChange), for: UIControl.Event.editingChanged)
+        self.phoneEntry.delegate = self
+        self.phoneEntry.returnKeyType = .done
+        self.phoneNext.addTarget(self, action: #selector(continueClickedPhone), for: .touchUpInside)
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillDisappear),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
         
         AppEvents.logEvent(AppEvents.Name(rawValue: "Register"))
     }
     
+    func fpnDidSelectCountry(name: String, dialCode: String, code: String) {
+        self.currentCode = code
+    }
+
+    @objc func doneButtonAction() {
+        self.phoneEntry.resignFirstResponder()
+    }
+    
+    func fpnDisplayCountryList() {
+    }
+    
     @objc func googleClicked(){
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Google Login"))
         GIDSignIn.sharedInstance()?.presentingViewController = self
         GIDSignIn.sharedInstance().signIn()
     }
     
-    @objc func psSwitchChanged(stationSwitch: UISwitch) {
-        checkNextButton()
+    @available(iOS 13, *)
+    @objc func appleClicked(){
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Apple Login"))
+        startSignInWithAppleFlow()
     }
     
-    @objc func xboxSwitchChanged(stationSwitch: UISwitch) {
-        checkNextButton()
+    @available(iOS 13.0, *)
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
+          guard let nonce = currentNonce else {
+            fatalError("Invalid state: A login callback was received, but no login request was sent.")
+          }
+          guard let appleIDToken = appleIDCredential.identityToken else {
+            print("Unable to fetch identity token")
+            return
+          }
+          guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
+            print("Unable to serialize token string from data: \(appleIDToken.debugDescription)")
+            return
+          }
+            
+          self.appleTokenString = idTokenString
+            self.appleLoginAccepted = true
+            self.registrationType = "apple"
+            registerUser(email: nil, pass: nil, facebook: false, google: false, apple: true)
+        }
     }
     
-    @objc func pcSwitchChanged(stationSwitch: UISwitch) {
-        checkNextButton()
+    @available(iOS 13, *)
+    func startSignInWithAppleFlow() {
+      let nonce = randomNonceString()
+      currentNonce = nonce
+      let appleIDProvider = ASAuthorizationAppleIDProvider()
+      let request = appleIDProvider.createRequest()
+      request.requestedScopes = [.fullName, .email]
+      request.nonce = sha256(nonce)
+
+      let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+      authorizationController.delegate = self
+      authorizationController.presentationContextProvider = self
+      authorizationController.performRequests()
+    }
+
+    @available(iOS 13, *)
+    private func sha256(_ input: String) -> String {
+      let inputData = Data(input.utf8)
+      let hashedData = SHA256.hash(data: inputData)
+      let hashString = hashedData.compactMap {
+        return String(format: "%02x", $0)
+      }.joined()
+
+      return hashString
     }
     
-    @objc func nintendoSwitchChanged(stationSwitch: UISwitch) {
-        checkNextButton()
+    private func randomNonceString(length: Int = 32) -> String {
+      precondition(length > 0)
+      let charset: Array<Character> =
+          Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
+      var result = ""
+      var remainingLength = length
+
+      while remainingLength > 0 {
+        let randoms: [UInt8] = (0 ..< 16).map { _ in
+          var random: UInt8 = 0
+          let errorCode = SecRandomCopyBytes(kSecRandomDefault, 1, &random)
+          if errorCode != errSecSuccess {
+            fatalError("Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)")
+          }
+          return random
+        }
+
+        randoms.forEach { random in
+          if remainingLength == 0 {
+            return
+          }
+
+          if random < charset.count {
+            result.append(charset[Int(random)])
+            remainingLength -= 1
+          }
+        }
+      }
+
+      return result
     }
     
-    func registerUser(email: String?, pass: String?, facebook: Bool, google: Bool){
+    @available(iOS 13.0, *)
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        return self.view.window!
+    }
+    
+    @available(iOS 13, *)
+    @objc func appleLoginClicked(_ sender: AnyObject?) {
+        //showWork()
+        
+       // self.selectedSocial = "apple"
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            self.startSignInWithAppleFlow()
+        }
+    }
+    
+    func registerUser(email: String?, pass: String?, facebook: Bool, google: Bool, apple: Bool){
         if(facebook && self.socialRegistered.isEmpty){
             let credential = FacebookAuthProvider.credential(withAccessToken: self.facebookTokenString)
             Auth.auth().signIn(with: credential) { (authResult, error) in
@@ -254,65 +443,25 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
               }
               else{
                 if(authResult != nil){
+                    UserDefaults.standard.set(authResult!.user.uid, forKey: "userId")
                     let checkRef = Database.database().reference().child("Users").child((authResult?.user.uid)!)
                     checkRef.observeSingleEvent(of: .value, with: { (snapshot) in
                         if(snapshot.exists()){
-                            self.downloadDBRef(uid: (authResult?.user.uid)!)
+                            self.downloadDBRef(uid: (authResult?.user.uid)!, registrationType: "facebook")
                         }
                     else{
                         let uId = authResult?.user.uid ?? ""
                             let user = User(uId: uId)
-                                
-                            if(self.psSwitch.isOn){
-                                user.ps = true
-                            }
-                            
-                            if(self.pcSwitch.isOn){
-                                user.pc = true
-                            }
-                            
-                            if(self.xboxSwitch.isOn){
-                                user.xbox = true
-                            }
-                            
-                            if(self.nintendoSwitch.isOn){
-                                user.nintendo = true
-                            }
-                            checkRef.child("consoles").child("xbox").setValue(self.xboxSwitch.isOn)
-                            checkRef.child("consoles").child("ps").setValue(self.psSwitch.isOn)
-                            checkRef.child("consoles").child("nintendo").setValue(self.nintendoSwitch.isOn)
-                            checkRef.child("consoles").child("pc").setValue(self.pcSwitch.isOn)
                             checkRef.child("platform").setValue("ios")
                             checkRef.child("search").setValue("true")
                             checkRef.child("registrationType").setValue("facebook")
                             checkRef.child("model").setValue(UIDevice.modelName)
                             checkRef.child("notifications").setValue("true")
                                 
-                            DispatchQueue.main.async {
-                                let delegate = UIApplication.shared.delegate as! AppDelegate
-                                delegate.currentUser = user
-                                    
-                                if(!user.pc && !user.xbox && !user.ps && !user.nintendo){
-                                    AppEvents.logEvent(AppEvents.Name(rawValue: "Register - No GC"))
-                                    self.performSegue(withIdentifier: "registerNoGC", sender: nil)
-                                }
-                                else{
-                                    if(user.pc){
-                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PC User"))
-                                    }
-                                    if(user.xbox){
-                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - xBox User"))
-                                    }
-                                    if(user.ps){
-                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PS User"))
-                                    }
-                                    if(user.nintendo){
-                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Nintendo User"))
-                                    }
-                                    
-                                    AppEvents.logEvent(AppEvents.Name(rawValue: "Register - GC"))
-                                    self.performSegue(withIdentifier: "registerGC", sender: nil)
-                                }
+                                DispatchQueue.main.async {
+                                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                                    delegate.currentUser = user
+                                    self.performSegue(withIdentifier: "newReg", sender: nil)
                                 }
                             }
                         }) { (error) in
@@ -347,65 +496,24 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                                }
                   else{
                     if(authResult != nil){
+                        UserDefaults.standard.set(authResult!.user.uid, forKey: "userId")
                         let checkRef = Database.database().reference().child("Users").child((authResult?.user.uid)!)
                         checkRef.observeSingleEvent(of: .value, with: { (snapshot) in
                             if(snapshot.exists()){
-                                self.downloadDBRef(uid: (authResult?.user.uid)!)
+                                self.downloadDBRef(uid: (authResult?.user.uid)!, registrationType: "google")
                             }
                             else{
                                 let uId = authResult?.user.uid ?? ""
                                     let user = User(uId: uId)
-                                        
-                                    if(self.psSwitch.isOn){
-                                        user.ps = true
-                                    }
-                                    
-                                    if(self.pcSwitch.isOn){
-                                        user.pc = true
-                                    }
-                                    
-                                    if(self.xboxSwitch.isOn){
-                                        user.xbox = true
-                                    }
-                                    
-                                    if(self.nintendoSwitch.isOn){
-                                        user.nintendo = true
-                                    }
-                                    checkRef.child("consoles").child("xbox").setValue(self.xboxSwitch.isOn)
-                                    checkRef.child("consoles").child("ps").setValue(self.psSwitch.isOn)
-                                    checkRef.child("consoles").child("nintendo").setValue(self.nintendoSwitch.isOn)
-                                    checkRef.child("consoles").child("pc").setValue(self.pcSwitch.isOn)
                                     checkRef.child("platform").setValue("ios")
                                     checkRef.child("search").setValue("true")
                                     checkRef.child("registrationType").setValue("google")
                                     checkRef.child("model").setValue(UIDevice.modelName)
                                     checkRef.child("notifications").setValue("true")
-                                        
-                                    DispatchQueue.main.async {
-                                        let delegate = UIApplication.shared.delegate as! AppDelegate
-                                        delegate.currentUser = user
-                                            
-                                        if(!user.pc && !user.xbox && !user.ps && !user.nintendo){
-                                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - No GC"))
-                                            self.performSegue(withIdentifier: "registerNoGC", sender: nil)
-                                        }
-                                        else{
-                                            if(user.pc){
-                                                AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PC User"))
-                                            }
-                                            if(user.xbox){
-                                                AppEvents.logEvent(AppEvents.Name(rawValue: "Register - xBox User"))
-                                            }
-                                            if(user.ps){
-                                                AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PS User"))
-                                            }
-                                            if(user.nintendo){
-                                                AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Nintendo User"))
-                                            }
-                                            
-                                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - GC"))
-                                            self.performSegue(withIdentifier: "registerGC", sender: nil)
-                                        }
+                                        DispatchQueue.main.async {
+                                            let delegate = UIApplication.shared.delegate as! AppDelegate
+                                            delegate.currentUser = user
+                                            self.performSegue(withIdentifier: "newReg", sender: nil)
                                         }
                                     }
                                 }) { (error) in
@@ -415,6 +523,61 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                     }
                 }
             }
+            else if(apple && self.socialRegistered.isEmpty){
+                // Initialize a Firebase credential.
+                let credential = OAuthProvider.credential(withProviderID: "apple.com",
+                                                          idToken: self.appleTokenString,
+                                                          rawNonce: currentNonce)
+                // Sign in with Firebase.
+                Auth.auth().signIn(with: credential) { (authResult, error) in
+                  if (error != nil) {
+                    let authError = error! as NSError
+                    AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Apple Login Fail Firebase"))
+                      
+                      var message: String = ""
+                      let code = String(error!._code)
+                      
+                      switch(code){
+                          case "17007": message = "sorry, that email is already in use."
+                          case "17008": message = "sorry, please enter a valid email to continue."
+                          case "17009": message = "sorry, that password is incorrect. please try again."
+                          case "17011": message = "sorry, we do not have that user in our database."
+                          default: message = "there was an error logging you in. please try again."
+                      }
+                      
+                      let alertController = UIAlertController(title: "registration error", message: message, preferredStyle: .alert)
+                      alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                      self.display(alertController: alertController)
+                  }
+                  else{
+                      if(authResult != nil){
+                        UserDefaults.standard.set(authResult!.user.uid, forKey: "userId")
+                          let checkRef = Database.database().reference().child("Users").child((authResult?.user.uid)!)
+                          checkRef.observeSingleEvent(of: .value, with: { (snapshot) in
+                              if(snapshot.exists()){
+                                  self.downloadDBRef(uid: (authResult?.user.uid)!, registrationType: "apple")
+                              }
+                              else{
+                                  let uId = authResult?.user.uid ?? ""
+                                      let user = User(uId: uId)
+                                      checkRef.child("platform").setValue("ios")
+                                      checkRef.child("search").setValue("true")
+                                      checkRef.child("registrationType").setValue("apple")
+                                      checkRef.child("model").setValue(UIDevice.modelName)
+                                      checkRef.child("notifications").setValue("true")
+                                        DispatchQueue.main.async {
+                                            let delegate = UIApplication.shared.delegate as! AppDelegate
+                                            delegate.currentUser = user
+                                            self.performSegue(withIdentifier: "newReg", sender: nil)
+                                        }
+                                      }
+                                  }) { (error) in
+                                      print(error.localizedDescription)
+                                    }
+                    }
+                }
+            }
+        }
         else if(!self.emailField.text!.isEmpty && !self.passwordField.text!.isEmpty && self.socialRegistered.isEmpty){
             if(email != nil && pass != nil){
                 Auth.auth().createUser(withEmail: email!, password: pass!) { authResult, error in
@@ -439,30 +602,11 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                                  }
                     else{
                         if(authResult != nil){
+                            UserDefaults.standard.set(authResult!.user.uid, forKey: "userId")
                             let uId = authResult?.user.uid ?? ""
                             let user = User(uId: uId)
                             
-                            if(self.psSwitch.isOn){
-                                user.ps = true
-                            }
-                            
-                            if(self.pcSwitch.isOn){
-                                user.pc = true
-                            }
-                            
-                            if(self.xboxSwitch.isOn){
-                                user.xbox = true
-                            }
-                            
-                            if(self.nintendoSwitch.isOn){
-                                user.nintendo = true
-                            }
-                            
                             let ref = Database.database().reference().child("Users").child((authResult?.user.uid)!)
-                            ref.child("consoles").child("xbox").setValue(self.xboxSwitch.isOn)
-                            ref.child("consoles").child("ps").setValue(self.psSwitch.isOn)
-                            ref.child("consoles").child("nintendo").setValue(self.nintendoSwitch.isOn)
-                            ref.child("consoles").child("pc").setValue(self.pcSwitch.isOn)
                             ref.child("platform").setValue("ios")
                             ref.child("search").setValue("true")
                             ref.child("registrationType").setValue("email")
@@ -472,28 +616,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                             DispatchQueue.main.async {
                                 let delegate = UIApplication.shared.delegate as! AppDelegate
                                 delegate.currentUser = user
-                                
-                                if(!user.pc && !user.xbox && !user.ps && !user.nintendo){
-                                    AppEvents.logEvent(AppEvents.Name(rawValue: "Register - No GC"))
-                                    self.performSegue(withIdentifier: "registerNoGC", sender: nil)
-                                }
-                                else{
-                                    if(user.pc){
-                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PC User"))
-                                    }
-                                    if(user.xbox){
-                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - xBox User"))
-                                    }
-                                    if(user.ps){
-                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PS User"))
-                                    }
-                                    if(user.nintendo){
-                                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Nintendo User"))
-                                    }
-                                    
-                                    AppEvents.logEvent(AppEvents.Name(rawValue: "Register - GC"))
-                                    self.performSegue(withIdentifier: "registerGC", sender: nil)
-                                }
+                                self.performSegue(withIdentifier: "newReg", sender: nil)
                             }
                         }
                     }
@@ -504,27 +627,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
             if(!self.socialRegistered.isEmpty && !socialRegisteredUid.isEmpty){
                 let user = User(uId: self.socialRegisteredUid)
                 
-                if(self.psSwitch.isOn){
-                    user.ps = true
-                }
-                
-                if(self.pcSwitch.isOn){
-                    user.pc = true
-                }
-                
-                if(self.xboxSwitch.isOn){
-                    user.xbox = true
-                }
-                
-                if(self.nintendoSwitch.isOn){
-                    user.nintendo = true
-                }
-                
                 let ref = Database.database().reference().child("Users").child(self.socialRegisteredUid)
-                ref.child("consoles").child("xbox").setValue(self.xboxSwitch.isOn)
-                ref.child("consoles").child("ps").setValue(self.psSwitch.isOn)
-                ref.child("consoles").child("nintendo").setValue(self.nintendoSwitch.isOn)
-                ref.child("consoles").child("pc").setValue(self.pcSwitch.isOn)
                 ref.child("platform").setValue("ios")
                 ref.child("search").setValue("true")
                 ref.child("registrationType").setValue(self.socialRegistered)
@@ -534,28 +637,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                 DispatchQueue.main.async {
                     let delegate = UIApplication.shared.delegate as! AppDelegate
                     delegate.currentUser = user
-                    
-                    if(!user.pc && !user.xbox && !user.ps && !user.nintendo){
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - No GC"))
-                        self.performSegue(withIdentifier: "registerNoGC", sender: nil)
-                    }
-                    else{
-                        if(user.pc){
-                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PC User"))
-                        }
-                        if(user.xbox){
-                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - xBox User"))
-                        }
-                        if(user.ps){
-                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PS User"))
-                        }
-                        if(user.nintendo){
-                            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Nintendo User"))
-                        }
-                        
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - GC"))
-                        self.performSegue(withIdentifier: "registerGC", sender: nil)
-                    }
+                    self.performSegue(withIdentifier: "newReg", sender: nil)
                 }
             }
             else{
@@ -582,7 +664,32 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
         }
     }
     
-    private func downloadDBRef(uid: String){
+    func transitionAfterPhoneRegistration(uid: String){
+        UserDefaults.standard.set(uid, forKey: "userId")
+        let checkRef = Database.database().reference().child("Users").child((uid))
+        checkRef.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                self.downloadDBRef(uid: uid, registrationType: "phone")
+            }
+            else{
+                    let user = User(uId: uid)
+                    checkRef.child("platform").setValue("ios")
+                    checkRef.child("search").setValue("true")
+                    checkRef.child("registrationType").setValue("google")
+                    checkRef.child("model").setValue(UIDevice.modelName)
+                    checkRef.child("notifications").setValue("true")
+                    DispatchQueue.main.async {
+                        let delegate = UIApplication.shared.delegate as! AppDelegate
+                        delegate.currentUser = user
+                        self.performSegue(withIdentifier: "newReg", sender: nil)
+                    }
+                }
+            }) { (error) in
+                print(error.localizedDescription)
+        }
+    }
+    
+    private func downloadDBRef(uid: String, registrationType: String){
         let ref = Database.database().reference().child("Users").child(uid)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
                 // Get user value
@@ -593,10 +700,23 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                 let subscriptions = value?["subscriptions"] as? [String] ?? [String]()
                 let competitions = value?["competitions"] as? [String] ?? [String]()
                 let bio = value?["bio"] as? String ?? ""
+                let userLat = value?["userLat"] as? Double ?? 0.0
+                let userLong = value?["userLong"] as? Double ?? 0.0
+                let blockList = value?["blockList"] as? [String: String] ?? [String: String]()
+                let restrictList = value?["restrictList"] as? [String: String] ?? [String: String]()
                 
                 let search = value?["search"] as? String ?? ""
                 if(search.isEmpty){
                     ref.child("search").setValue("true")
+                }
+                
+                let twitchToken = value?["twitchAppToken"] as? String ?? ""
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                let manager = delegate.socialMediaManager
+                if(twitchToken.isEmpty){
+                    manager.getTwitchAppToken(token: nil, uid: uid)
+                } else {
+                    manager.getTwitchAppToken(token: twitchToken, uid: uid)
                 }
                 
                 let notifications = value?["notifications"] as? String ?? ""
@@ -604,30 +724,59 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                     ref.child("notifications").setValue("true")
                 }
                 
+                let viewedAnnouncements = value?["viewedAnnouncements"] as? [String] ?? [String]()
+                
                 var sentRequests = [FriendRequestObject]()
-                let sentArray = snapshot.childSnapshot(forPath: "sent_requests")
-                for friend in sentArray.children{
-                    let currentObj = friend as! DataSnapshot
-                    let dict = currentObj.value as? [String: Any]
-                    let gamerTag = dict?["gamerTag"] as? String ?? ""
-                    let date = dict?["date"] as? String ?? ""
-                    let uid = dict?["uid"] as? String ?? ""
-                    
-                    let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
-                    sentRequests.append(newFriend)
+                
+                //if sent requests have not been converted, we convert NOW.
+                if(value?["sent_requests"] is [String]){
+                    self.convertRequests(list: value?["sent_requests"] as! [String], pathString: "sent_requests", userUid: uId)
+                }
+                else{
+                    let friendsArray = snapshot.childSnapshot(forPath: "sent_requests")
+                    for friend in friendsArray.children{
+                        let currentObj = friend as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let gamerTag = dict?["gamerTag"] as? String ?? ""
+                        let date = dict?["date"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
+                        
+                        let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
+                        sentRequests.append(newFriend)
+                    }
                 }
                 
+                //if pending requests have not been converted, we convert NOW.
                 var pendingRequests = [FriendRequestObject]()
-                let requestsArray = snapshot.childSnapshot(forPath: "pending_friends")
-                for friend in requestsArray.children{
-                    let currentObj = friend as! DataSnapshot
-                    let dict = currentObj.value as? [String: Any]
-                    let gamerTag = dict?["gamerTag"] as? String ?? ""
-                    let date = dict?["date"] as? String ?? ""
-                    let uid = dict?["uid"] as? String ?? ""
-                    
-                    let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
-                    pendingRequests.append(newFriend)
+                if(value?["pending_friends"] is [String]){
+                    self.convertRequests(list: value?["pending_friends"] as! [String], pathString: "pending_friends", userUid: uId)
+                }
+                else{
+                    let friendsArray = snapshot.childSnapshot(forPath: "pending_friends")
+                    for friend in friendsArray.children{
+                        let currentObj = friend as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let gamerTag = dict?["gamerTag"] as? String ?? ""
+                        let date = dict?["date"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
+                        
+                        let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
+                        pendingRequests.append(newFriend)
+                    }
+                }
+                
+                var badges = [BadgeObj]()
+                if(snapshot.hasChild("badges")){
+                    let badgesArray = snapshot.childSnapshot(forPath: "badges")
+                    for badge in badgesArray.children{
+                        let currentObj = badge as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let name = dict?["badgeName"] as? String ?? ""
+                        let desc = dict?["badgeDesc"] as? String ?? ""
+                        
+                        let badge = BadgeObj(badge: name, badgeDesc: desc)
+                        badges.append(badge)
+                    }
                 }
                 
                 var teamInviteReqs = [RequestObject]()
@@ -638,40 +787,232 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                     let status = dict?["status"] as? String ?? ""
                     let teamId = dict?["teamId"] as? String ?? ""
                     let teamName = dict?["teamName"] as? String ?? ""
-                    let captainId = dict?["teamCaptainId"] as? String ?? ""
+                    let captainId = dict?["captainId"] as? String ?? ""
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
                     let requestId = dict?["requestId"] as? String ?? ""
+                        let userUid = dict?["userUid"] as? String ?? ""
                      
                      let profile = currentObj.childSnapshot(forPath: "profile")
                      let profileDict = profile.value as? [String: Any]
                      let game = profileDict?["game"] as? String ?? ""
                      let consoles = profileDict?["consoles"] as? [String] ?? [String]()
-                     let gamerTag = profileDict?["gamerTag"] as? String ?? ""
+                     let profileGamerTag = profileDict?["gamerTag"] as? String ?? ""
                      let competitionId = profileDict?["competitionId"] as? String ?? ""
                      let userId = profileDict?["userId"] as? String ?? ""
-                     let questions = profileDict?["questions"] as? [[String]] ?? [[String]]()
                      
-                     let result = FreeAgentObject(gamerTag: gamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
+                    var questions = [FAQuestion]()
+                    let questionList = dict?["questions"] as? [[String: Any]] ?? [[String: Any]]()
+                            for question in questionList {
+                                var questionNumber = ""
+                                var questionString = ""
+                                var option1 = ""
+                                var option1Description = ""
+                                var option2 = ""
+                                var option2Description = ""
+                                var option3 = ""
+                                var option3Description = ""
+                                var option4 = ""
+                                var option4Description = ""
+                                var option5 = ""
+                                var option5Description = ""
+                                var option6 = ""
+                                var option6Description = ""
+                                var option7 = ""
+                                var option7Description = ""
+                                var option8 = ""
+                                var option8Description = ""
+                                var option9 = ""
+                                var option9Description = ""
+                                var option10 = ""
+                                var option10Description = ""
+                                var required = ""
+                                var questionDescription = ""
+                                var teamNeedQuestion = "false"
+                                var acceptMultiple = ""
+                                var question1SetURL = ""
+                                var question2SetURL = ""
+                                var question3SetURL = ""
+                                var question4SetURL = ""
+                                var question5SetURL = ""
+                                var optionsURL = ""
+                                var maxOptions = ""
+                                var answer = ""
+                                var answerArray = [String]()
+                                
+                                for (key, value) in question {
+                                    if(key == "questionNumber"){
+                                        questionNumber = (value as? String) ?? ""
+                                    }
+                                    if(key == "question"){
+                                        questionString = (value as? String) ?? ""
+                                    }
+                                    if(key == "option1"){
+                                        option1 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option1Description"){
+                                        option1Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option2"){
+                                        option2 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option2Description"){
+                                        option2Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option3"){
+                                        option3 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option3Description"){
+                                        option3Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option4"){
+                                        option4 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option4Description"){
+                                        option4Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option5"){
+                                        option5 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option5Description"){
+                                        option5Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option6"){
+                                        option6 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option6Description"){
+                                        option6Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option7"){
+                                        option7 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option7Description"){
+                                        option7Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option8"){
+                                        option8 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option8Description"){
+                                        option8Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option9"){
+                                        option9 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option9Description"){
+                                        option9Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option10"){
+                                        option10 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option10Description"){
+                                        option10Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "required"){
+                                        required = (value as? String) ?? ""
+                                    }
+                                    if(key == "questionDescription"){
+                                        questionDescription = (value as? String) ?? ""
+                                    }
+                                    if(key == "acceptMultiple"){
+                                        acceptMultiple = (value as? String) ?? ""
+                                    }
+                                    if(key == "question1SetURL"){
+                                        question1SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "question2SetURL"){
+                                        question2SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "question3SetURL"){
+                                        question3SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "question4SetURL"){
+                                        question4SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "question5SetURL"){
+                                        question5SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "teamNeedQuestion"){
+                                        teamNeedQuestion = (value as? String) ?? "false"
+                                    }
+                                    if(key == "optionsUrl"){
+                                        optionsURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "maxOptions"){
+                                        maxOptions = (value as? String) ?? ""
+                                    }
+                                    if(key == "answer"){
+                                        answer = (value as? String) ?? ""
+                                    }
+                                    if(key == "answerArray"){
+                                        answerArray = (value as? [String]) ?? [String]()
+                                    }
+                            }
+                                
+                                let faQuestion = FAQuestion(question: questionString)
+                                    faQuestion.questionNumber = questionNumber
+                                    faQuestion.question = questionString
+                                    faQuestion.option1 = option1
+                                    faQuestion.option1Description = option1Description
+                                    faQuestion.question1SetURL = question1SetURL
+                                    faQuestion.option2 = option2
+                                    faQuestion.option2Description = option2Description
+                                    faQuestion.question2SetURL = question2SetURL
+                                    faQuestion.option3 = option3
+                                    faQuestion.option3Description = option3Description
+                                    faQuestion.question3SetURL = question3SetURL
+                                    faQuestion.option4 = option4
+                                    faQuestion.option4Description = option4Description
+                                    faQuestion.question4SetURL = question4SetURL
+                                    faQuestion.option5 = option5
+                                    faQuestion.option5Description = option5Description
+                                    faQuestion.question5SetURL = question5SetURL
+                                    faQuestion.option6 = option6
+                                    faQuestion.option6Description = option6Description
+                                    faQuestion.option7 = option7
+                                    faQuestion.option7Description = option7Description
+                                    faQuestion.option8 = option8
+                                    faQuestion.option8Description = option8Description
+                                    faQuestion.option9 = option9
+                                    faQuestion.option9Description = option9Description
+                                    faQuestion.option10 = option10
+                                    faQuestion.option10Description = option10Description
+                                    faQuestion.required = required
+                                    faQuestion.acceptMultiple = acceptMultiple
+                                    faQuestion.questionDescription = questionDescription
+                                    faQuestion.teamNeedQuestion = teamNeedQuestion
+                                    faQuestion.optionsUrl = optionsURL
+                                    faQuestion.maxOptions = maxOptions
+                                    faQuestion.answer = answer
+                                    faQuestion.answerArray = answerArray
+                    
+                        questions.append(faQuestion)
+                    }
+                     
+                     let result = FreeAgentObject(gamerTag: profileGamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
                      
                      
-                     let newRequest = RequestObject(status: status, teamId: teamId, teamName: teamName, captainId: captainId, requestId: requestId)
+                    let newRequest = RequestObject(status: status, teamId: teamId, teamName: teamName, captainId: captainId, requestId: requestId, userUid: userUid, gamerTag: gamerTag)
                      newRequest.profile = result
                      
                      teamInviteReqs.append(newRequest)
                 }
                 
                 var friends = [FriendObject]()
-                let friendsArray = snapshot.childSnapshot(forPath: "friends")
-                for friend in friendsArray.children{
-                    let currentObj = friend as! DataSnapshot
-                    let dict = currentObj.value as? [String: Any]
-                    let gamerTag = dict?["gamerTag"] as? String ?? ""
-                    let date = dict?["date"] as? String ?? ""
-                    let uid = dict?["uid"] as? String ?? ""
-                    
-                    let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
-                    friends.append(newFriend)
+                if(value?["friends"] is [String]){
+                    self.convertFriends(list: value?["friends"] as! [String], pathString: "friends", userUid: uId)
                 }
-                
+                else{
+                    let friendsArray = snapshot.childSnapshot(forPath: "friends")
+                    for friend in friendsArray.children{
+                        let currentObj = friend as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let gamerTag = dict?["gamerTag"] as? String ?? ""
+                        let date = dict?["date"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
+                        
+                        let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
+                        friends.append(newFriend)
+                    }
+                }
                 
                 let games = value?["games"] as? [String] ?? [String]()
                 var gamerTags = [GamerProfile]()
@@ -682,118 +1023,38 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                     let currentTag = dict?["gamerTag"] as? String ?? ""
                     let currentGame = dict?["game"] as? String ?? ""
                     let console = dict?["console"] as? String ?? ""
+                    let quizTaken = dict?["quizTaken"] as? String ?? ""
                     
-                    let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console)
+                    let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
                     gamerTags.append(currentGamerTagObj)
                 }
-                
                 let messagingNotifications = value?["messagingNotifications"] as? Bool ?? false
-                var teams = [TeamObject]()
-                let teamsArray = snapshot.childSnapshot(forPath: "teams")
-                for teamObj in teamsArray.children {
-                    let currentObj = teamObj as! DataSnapshot
-                    let dict = currentObj.value as? [String: Any]
-                    let teamName = dict?["teamName"] as? String ?? ""
-                    let teamId = dict?["teamId"] as? String ?? ""
-                    let games = dict?["games"] as? [String] ?? [String]()
-                    let consoles = dict?["consoles"] as? [String] ?? [String]()
-                    let teammateTags = dict?["teammateTags"] as? [String] ?? [String]()
-                    let teammateIds = dict?["teammateIds"] as? [String] ?? [String]()
-                    
-                    var invites = [TeamInviteObject]()
-                    let teamInvites = snapshot.childSnapshot(forPath: "teamInvites")
-                    for invite in teamInvites.children{
-                        let currentObj = invite as! DataSnapshot
-                        let dict = currentObj.value as? [String: Any]
-                        let gamerTag = dict?["gamerTag"] as? String ?? ""
-                        let date = dict?["date"] as? String ?? ""
-                        let uid = dict?["uid"] as? String ?? ""
-                        let teamName = dict?["teamName"] as? String ?? ""
-                        
-                        let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid, teamName: teamName)
-                        invites.append(newInvite)
-                    }
-                    
-                    var teammateArray = [TeammateObject]()
-                    if(currentObj.hasChild("teammates")){
-                        let teammates = currentObj.childSnapshot(forPath: "teammates")
-                        for teammate in teammates.children{
-                            let currentTeammate = teammate as! DataSnapshot
-                            let dict = currentTeammate.value as? [String: Any]
-                            let gamerTag = dict?["gamerTag"] as? String ?? ""
-                            let date = dict?["date"] as? String ?? ""
-                            let uid = dict?["uid"] as? String ?? ""
-                            
-                            let teammate = TeammateObject(gamerTag: gamerTag, date: date, uid: uid)
-                            teammateArray.append(teammate)
-                        }
-                    }
-                    
-                    let teamInvitetags = dict?["teamInviteTags"] as? [String] ?? [String]()
-                    let captain = dict?["teamCaptain"] as? String ?? ""
-                    let imageUrl = dict?["imageUrl"] as? String ?? ""
-                    let teamChat = dict?["teamChat"] as? String ?? String()
-                    let teamNeeds = dict?["teamNeeds"] as? [String] ?? [String]()
-                    let selectedTeamNeeds = dict?["selectedTeamNeeds"] as? [String] ?? [String]()
-                    let captainId = dict?["teamCaptainId"] as? String ?? String()
-                    
-                    let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl, teamCaptainId: captainId)
-                    currentTeam.teammates = teammateArray
-                    teams.append(currentTeam)
-                }
                 
-                var currentTeamInvites = [TeamObject]()
-                let teamInvitesArray = snapshot.childSnapshot(forPath: "teamInvites")
-                for teamObj in teamInvitesArray.children {
-                    let currentObj = teamObj as! DataSnapshot
+               var teams = [EasyTeamObj]()
+               let teamsArray = snapshot.childSnapshot(forPath: "teams")
+               for teamObj in teamsArray.children {
+                   let currentObj = teamObj as! DataSnapshot
+                   let dict = currentObj.value as? [String: Any]
+                   let teamName = dict?["teamName"] as? String ?? ""
+                   let teamId = dict?["teamId"] as? String ?? ""
+                   let game = dict?["gameName"] as? String ?? ""
+                   let teamCaptainId = dict?["teamCaptainId"] as? String ?? ""
+                   let newTeam = dict?["newTeam"] as? String ?? ""
+                   
+                   teams.append(EasyTeamObj(teamName: teamName, teamId: teamId, gameName: game, teamCaptainId: teamCaptainId, newTeam: newTeam))
+               }
+                
+                var currentTeamInvites = [TeamInviteObject]()
+                let teamInvites = snapshot.childSnapshot(forPath: "teamInvites")
+                for invite in teamInvites.children{
+                    let currentObj = invite as! DataSnapshot
                     let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
                     let teamName = dict?["teamName"] as? String ?? ""
-                    let teamId = dict?["teamId"] as? String ?? ""
-                    let games = dict?["games"] as? [String] ?? [String]()
-                    let consoles = dict?["consoles"] as? [String] ?? [String]()
-                    let teammateTags = dict?["teammateTags"] as? [String] ?? [String]()
-                    let teammateIds = dict?["teammateIds"] as? [String] ?? [String]()
                     
-                    var invites = [TeamInviteObject]()
-                    let teamInvites = snapshot.childSnapshot(forPath: "teamInvites")
-                    for invite in teamInvites.children{
-                        let currentObj = invite as! DataSnapshot
-                        let dict = currentObj.value as? [String: Any]
-                        let gamerTag = dict?["gamerTag"] as? String ?? ""
-                        let date = dict?["date"] as? String ?? ""
-                        let uid = dict?["uid"] as? String ?? ""
-                        let teamName = dict?["teamName"] as? String ?? ""
-                        
-                        let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid, teamName: teamName)
-                        invites.append(newInvite)
-                    }
-                    
-                    var teammateArray = [TeammateObject]()
-                    if(currentObj.hasChild("teammates")){
-                        let teammates = currentObj.childSnapshot(forPath: "teammates")
-                        for teammate in teammates.children{
-                            let currentTeammate = teammate as! DataSnapshot
-                            let dict = currentTeammate.value as? [String: Any]
-                            let gamerTag = dict?["gamerTag"] as? String ?? ""
-                            let date = dict?["date"] as? String ?? ""
-                            let uid = dict?["uid"] as? String ?? ""
-                            
-                            let teammate = TeammateObject(gamerTag: gamerTag, date: date, uid: uid)
-                            teammateArray.append(teammate)
-                        }
-                    }
-                    
-                    let teamInvitetags = dict?["teamInviteTags"] as? [String] ?? [String]()
-                    let captain = dict?["teamCaptain"] as? String ?? ""
-                    let imageUrl = dict?["imageUrl"] as? String ?? ""
-                    let teamChat = dict?["teamChat"] as? String ?? String()
-                    let teamNeeds = dict?["teamNeeds"] as? [String] ?? [String]()
-                    let selectedTeamNeeds = dict?["selectedTeamNeeds"] as? [String] ?? [String]()
-                    let captainId = dict?["teamCaptainId"] as? String ?? String()
-                    
-                    let currentTeam = TeamObject(teamName: teamName, teamId: teamId, games: games, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: captain, teamInvites: invites, teamChat: teamChat, teamInviteTags: teamInvitetags, teamNeeds: teamNeeds, selectedTeamNeeds: selectedTeamNeeds, imageUrl: imageUrl, teamCaptainId: captainId)
-                    currentTeam.teammates = teammateArray
-                    currentTeamInvites.append(currentTeam)
+                    let newInvite = TeamInviteObject(gamerTag: gamerTag, date: date, uid: uid, teamName: teamName)
+                    currentTeamInvites.append(newInvite)
                 }
                 
                 var currentStats = [StatObject]()
@@ -823,8 +1084,22 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                     let codBestKills = dict?["codBestKills"] as? String ?? ""
                     let codWins = dict?["codWins"] as? String ?? ""
                     let codWlRatio = dict?["codWlRatio"] as? String ?? ""
+                    let overwatchCasualStats = dict?["overwatchCasualStats"] as? [String:String] ?? [String: String]()
+                    let overwatchCompetitiveStats = dict?["overwatchCompetitiveStats"] as? [String:String] ?? [String: String]()
+                    let killsPerMatch = dict?["killsPerMatch"] as? String ?? ""
+                    let matchesPlayed = dict?["matchesPlayed"] as? String ?? ""
+                    let seasonWins = dict?["seasonWins"] as? String ?? ""
+                    let seasonKills = dict?["seasonKills"] as? String ?? ""
+                    let supImage = dict?["supImage"] as? String ?? ""
                     
                     let currentStat = StatObject(gameName: gameName)
+                    currentStat.overwatchCasualStats = overwatchCasualStats
+                    currentStat.overwatchCompetitiveStats = overwatchCompetitiveStats
+                    currentStat.killsPerMatch = killsPerMatch
+                    currentStat.matchesPlayed = matchesPlayed
+                    currentStat.seasonWins = seasonWins
+                    currentStat.seasonKills = seasonKills
+                    currentStat.suppImage = supImage
                     currentStat.authorized = authorized
                     currentStat.playerLevelGame = playerLevelGame
                     currentStat.playerLevelPVP = playerLevelPVP
@@ -849,6 +1124,127 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                     currentStat.codWlRatio = codWlRatio
                     
                     currentStats.append(currentStat)
+                }
+                
+                var rivals = [RivalObj]()
+                if(snapshot.hasChild("currentTempRivals")){
+                    let pendingArray = snapshot.childSnapshot(forPath: "currentTempRivals")
+                    for rival in pendingArray.children{
+                        let currentObj = rival as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let date = dict?["date"] as? String ?? ""
+                        let tag = dict?["gamerTag"] as? String ?? ""
+                        let game = dict?["game"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
+                        let dbType = dict?["type"] as? String ?? ""
+                        let id = dict?["id"] as? String ?? ""
+                        
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
+                        
+                        let calendar = Calendar.current
+                        if(!date.isEmpty){
+                            let dbDate = self.stringToDate(date)
+                            
+                            if(dbDate != nil){
+                                let now = NSDate()
+                                let formatter = DateFormatter()
+                                formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+                                formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                                let future = formatter.string(from: dbDate as Date)
+                                let dbTimeOut = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                                
+                                let validRival = (now as Date).compare(.isEarlier(than: dbTimeOut))
+                                
+                                if(dbTimeOut != nil){
+                                    if(validRival){
+                                        rivals.append(request)
+                                    }
+                                    else{
+                                        ref.child("tempRivals").child(currentObj.key).removeValue()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                let reviews = value?["reviews"] as? [String] ?? [String]()
+                
+                var tempRivals = [RivalObj]()
+                if(snapshot.hasChild("tempRivals")){
+                    let pendingArray = snapshot.childSnapshot(forPath: "tempRivals")
+                    for rival in pendingArray.children{
+                        let currentObj = rival as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let date = dict?["date"] as? String ?? ""
+                        let tag = dict?["gamerTag"] as? String ?? ""
+                        let game = dict?["game"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
+                        let dbType = dict?["type"] as? String ?? ""
+                        let id = dict?["id"] as? String ?? ""
+                        
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
+                        
+                        if(!date.isEmpty){
+                            let dbDate = self.stringToDate(date)
+                            
+                            if(dbDate != nil){
+                                let now = NSDate()
+                                let formatter = DateFormatter()
+                                formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+                                formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                                let future = formatter.string(from: dbDate as Date)
+                                let dbTimeOut = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                                
+                                let validRival = (now as Date).compare(.isEarlier(than: dbTimeOut))
+                                
+                                if(dbTimeOut != nil){
+                                    if(validRival){
+                                        tempRivals.append(request)
+                                    }
+                                    else{
+                                        ref.child("tempRivals").child(currentObj.key).removeValue()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                var acceptedRivals = [RivalObj]()
+                if(snapshot.hasChild("acceptedTempRivals")){
+                    let pendingArray = snapshot.childSnapshot(forPath: "acceptedTempRivals")
+                    for rival in pendingArray.children{
+                        let currentObj = rival as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let date = dict?["date"] as? String ?? ""
+                        let tag = dict?["gamerTag"] as? String ?? ""
+                        let game = dict?["game"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
+                        let dbType = dict?["type"] as? String ?? ""
+                        let id = dict?["id"] as? String ?? ""
+                        
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
+                        acceptedRivals.append(request)
+                    }
+                }
+                
+                var rejectedRivals = [RivalObj]()
+                if(snapshot.hasChild("rejectedTempRivals")){
+                    let pendingArray = snapshot.childSnapshot(forPath: "rejectedTempRivals")
+                    for rival in pendingArray.children{
+                        let currentObj = rival as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let date = dict?["date"] as? String ?? ""
+                        let tag = dict?["gamerTag"] as? String ?? ""
+                        let game = dict?["game"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
+                        let dbType = dict?["type"] as? String ?? ""
+                        let id = dict?["id"] as? String ?? ""
+                        
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
+                        rejectedRivals.append(request)
+                    }
                 }
                 
                 let consoleArray = snapshot.childSnapshot(forPath: "consoles")
@@ -879,6 +1275,17 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                 user.teamInviteRequests = teamInviteReqs
                 user.subscriptions = subscriptions
                 user.competitions = competitions
+                user.currentTempRivals = rivals
+                user.acceptedTempRivals = acceptedRivals
+                user.rejectedTempRivals = rejectedRivals
+                user.tempRivals = tempRivals
+                user.viewedAnnouncements = viewedAnnouncements
+                user.userLat = userLat
+                user.userLong = userLong
+                user.blockList = Array(blockList.keys)
+                user.restrictList = Array(restrictList.keys)
+                user.badges = badges
+                user.reviews = reviews
                 
                 DispatchQueue.main.async {
                     let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -889,21 +1296,182 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                     self.performSegue(withIdentifier: "loginSuccessful", sender: nil)
                 }
             }
+            else{
+                let checkRef = Database.database().reference().child("Users").child(uid)
+                let user = User(uId: uid)
+                checkRef.child("platform").setValue("ios")
+                checkRef.child("search").setValue("true")
+                checkRef.child("registrationType").setValue(registrationType)
+                checkRef.child("model").setValue(UIDevice.modelName)
+                checkRef.child("notifications").setValue("true")
+                    
+                DispatchQueue.main.async {
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    delegate.currentUser = user
+                    self.performSegue(withIdentifier: "newReg", sender: nil)
+                }
+            }
             
             }) { (error) in
                 AppEvents.logEvent(AppEvents.Name(rawValue: "Login Error"))
                 print(error.localizedDescription)
         }
     }
-
-    func checkNextButton(){
-        if((self.emailEntered && passwordEntered && checkSwitches()) || (self.emailLoginCover.alpha == 1 && self.facebookLoginAccepted && checkSwitches()) || (self.googleLoginAccepted && checkSwitches())){
-            self.nextButton.alpha = 1
-        }
-        else{
-            self.nextButton.alpha = 0.3
+    
+    func stringToDate(_ str: String)->Date{
+        let formatter = DateFormatter()
+        formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+        formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+        return formatter.date(from: str)!
+    }
+    
+    private func convertFriends(list: [String], pathString: String, userUid: String){
+        let currentFriends = list
+        var friends = [[String: String]]()
+        
+        if(!currentFriends.isEmpty){
+            let ref = Database.database().reference().child("Users")
+            ref.observeSingleEvent(of: .value, with: { (snapshot) in
+                // Get user value
+                for _ in currentFriends{
+                    for user in snapshot.children{
+                        var contained = false
+                        
+                        let current = (user as! DataSnapshot)
+                        let uId = current.key
+                        var gamerTags = [GamerProfile]()
+                        let gamerTagsArray = current.childSnapshot(forPath: "gamerTags")
+                        for gamerTagObj in gamerTagsArray.children {
+                            let currentObj = gamerTagObj as! DataSnapshot
+                            let dict = currentObj.value as? [String: Any]
+                            let currentTag = dict?["gamerTag"] as? String ?? ""
+                            let currentGame = dict?["game"] as? String ?? ""
+                            let console = dict?["console"] as? String ?? ""
+                            let quizTaken = dict?["quizTaken"] as? String ?? ""
+                            
+                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
+                            gamerTags.append(currentGamerTagObj)
+                        }
+                        
+                        for tag in gamerTags{
+                            if(list.contains(tag.gamerTag)){
+                                let date = Date()
+                                let formatter = DateFormatter()
+                                formatter.dateFormat = "MMMM.dd.yyyy"
+                                let result = formatter.string(from: date)
+                                
+                                let newFriend = ["gamerTag": tag.gamerTag, "date": result, "uid": uId]
+                                friends.append(newFriend)
+                                
+                                contained = true
+                                
+                                break
+                            }
+                        }
+                        
+                        if(contained){
+                          break
+                        }
+                    }
+                }
+                
+                if(!friends.isEmpty){
+                    ref.child(userUid).child(pathString).setValue(friends)
+                }
+                
+            }) { (error) in
+                print(error.localizedDescription)
+            }
         }
     }
+    
+    private func convertRequests(list: [String], pathString: String, userUid: String){
+        var newArray = [FriendRequestObject]()
+        let tempRequests = list
+        if(!tempRequests.isEmpty){
+            let ref = Database.database().reference().child("Users")
+            ref.observeSingleEvent(of: .value, with: { (snapshot) in
+                // Get user value
+                for _ in tempRequests{
+                    for user in snapshot.children{
+                        var contained = false
+                        
+                        let current = (user as! DataSnapshot)
+                        let uId = current.key
+                        var gamerTags = [GamerProfile]()
+                        let gamerTagsArray = current.childSnapshot(forPath: "gamerTags")
+                        for gamerTagObj in gamerTagsArray.children {
+                            let currentObj = gamerTagObj as! DataSnapshot
+                            let dict = currentObj.value as? [String: Any]
+                            let currentTag = dict?["gamerTag"] as? String ?? ""
+                            let currentGame = dict?["game"] as? String ?? ""
+                            let console = dict?["console"] as? String ?? ""
+                            let quizTaken = dict?["quizTaken"] as? String ?? ""
+                            
+                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
+                            gamerTags.append(currentGamerTagObj)
+                        }
+                        
+                        for tag in gamerTags{
+                            if(list.contains(tag.gamerTag)){
+                                let date = Date()
+                                let formatter = DateFormatter()
+                                formatter.dateFormat = "MMMM.dd.yyyy"
+                                let result = formatter.string(from: date)
+                                
+                                let newRequest = FriendRequestObject(gamerTag: tag.gamerTag, date: result, uid: uId)
+                                newArray.append(newRequest)
+                                
+                                contained = true
+                                break
+                            }
+                        }
+                        if(contained){
+                            break
+                        }
+                    }
+                }
+                
+                var requests = [Dictionary<String, String>]()
+                for request in newArray{
+                    let current = ["gamerTag": request.gamerTag, "date": request.date, "uid": request.uid]
+                    requests.append(current)
+                }
+                
+                if(!requests.isEmpty){
+                    ref.child(userUid).child(pathString).setValue(requests)
+                }
+                
+            }) { (error) in
+                print(error.localizedDescription)
+            }
+        }
+    }
+
+    func checkNextButton(){
+        if(phoneLayout.alpha == 1){
+            if(validPhone){
+                self.phoneNext.alpha = 1
+            } else {
+                self.phoneNext.alpha = 0.3
+            }
+        } else {
+            if(self.emailEntered && passwordEntered){
+                self.nextButton.alpha = 1
+            }
+            else{
+                self.nextButton.alpha = 0.3
+            }
+        }
+    }
+    
+    func fpnDidValidatePhoneNumber(textField: FPNTextField, isValid: Bool) {
+          if isValid {
+            self.validPhone = true
+          } else {
+            self.validPhone = false
+          }
+       }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool
     {
@@ -915,25 +1483,14 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
         if(textField == self.emailField && textField.text?.count ?? 0 > 5){
             self.emailEntered = true
             checkNextButton()
-        }
-        else{
+        } else if(textField == self.phoneEntry && self.phoneEntry.text!.count > 4){
+            checkNextButton()
+        } else{
             if(textField.text?.count ?? 0 > 5){
                 self.passwordEntered = true
                 checkNextButton()
             }
         }
-    }
-    
-    private func checkSwitches() -> Bool{
-        var switchOn = false
-        for uiSwitch in self.switches{
-            if(uiSwitch.isOn){
-                switchOn = true
-                break
-            }
-        }
-        
-        return switchOn
     }
     
     private func modelIdentifier() -> String {
@@ -951,16 +1508,8 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
         
         //registerUser(email: email, pass: pass)
         if(!email.isEmpty && !pass.isEmpty && rule.evaluate(with: email)){
-            registerUser(email: email, pass: pass, facebook: false, google: false)
-        }
-        else if(self.facebookLoginAccepted && !self.facebookTokenString.isEmpty){
-            registerUser(email: nil, pass: nil, facebook: true, google: false)
-        }
-        else if(self.googleLoginAccepted && !self.googleTokenString.isEmpty && !self.googleToken.isEmpty){
-            registerUser(email: nil, pass: nil, facebook: false, google: true)
-        }
-        else if(!self.socialRegistered.isEmpty && !self.socialRegisteredUid.isEmpty){
-            registerUser(email: nil, pass: nil, facebook: socialRegistered == "facebook", google: socialRegistered == "google")
+            self.registrationType = "email"
+            registerUser(email: email, pass: pass, facebook: false, google: false, apple: false)
         }
         else{
             if(!rule.evaluate(with: email)){
@@ -1029,25 +1578,66 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
         self.googleTokenString = authentication.accessToken
         self.googleToken = authentication.idToken
         self.googleLoginAccepted = true
+        self.registrationType = "google"
         
-        self.emailLoginCover.image = #imageLiteral(resourceName: "google_logo.png")
-        
-        let top = CGAffineTransform(translationX: 0, y: 70)
-        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5,
-                       initialSpringVelocity: 0.5, options: [], animations: {
-                        self.emailLoginCover.transform = top
-                        self.emailLoginCover.alpha = 1
-                        self.emailField.alpha = 0.1
-                        self.emailField.isUserInteractionEnabled = false
-                        self.passwordField.alpha = 0.1
-                        self.passwordField.isUserInteractionEnabled = false
-        }, completion: nil)
-        
+        registerUser(email: nil, pass: nil, facebook: false, google: true, apple: false)
     }
 
     func sign(_ signIn: GIDSignIn!, didDisconnectWith user: GIDGoogleUser!, withError error: Error!) {
         // Perform any operations when the user disconnects from app here.
         // ...
+    }
+    
+    @objc func keyboardWillShow(_ notification: Notification) {
+        if(self.phoneLayout.alpha == 1){
+            if let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+                let keyboardRectangle = keyboardFrame.cgRectValue
+                let keyboardHeight = keyboardRectangle.height
+                
+                extendBottom(height: keyboardHeight)
+            }
+        }
+    }
+    
+    @objc func keyboardWillDisappear() {
+        if(self.phoneLayout.alpha == 1){
+            if(self.doneButtonHeight != nil){
+                restoreBottom(height: self.doneButtonHeight!)
+            }
+        }
+    }
+    
+    func extendBottom(height: CGFloat){
+        //let top = CGAffineTransform(translationX: 0, y: 50)
+        UIView.animate(withDuration: 0.3, animations: {
+            //self.searchButton.alpha = 1
+            //self.bottomNavSearch.transform = top
+            
+            self.doneButtonHeight = height + self.nextButton.bounds.height + 10
+            self.constraint?.constant = self.doneButtonHeight!
+            
+            UIView.animate(withDuration: 0.5) {
+                //self.articleOverlay.alpha = 1
+                //self.view.bringSubviewToFront(self.secondaryNv)
+                self.view.layoutIfNeeded()
+            }
+        
+        }, completion: nil)
+    }
+    
+    func restoreBottom(height: CGFloat){
+        let top = CGAffineTransform(translationX: 0, y: 0)
+        UIView.animate(withDuration: 0.3, animations: {
+            self.nextButton.transform = top
+            self.constraint?.constant = self.nextButton.bounds.height + 60
+            
+            UIView.animate(withDuration: 0.5) {
+                //self.articleOverlay.alpha = 1
+                //self.view.sendSubviewToBack(self.secondaryNv)
+                self.view.layoutIfNeeded()
+            }
+        
+        }, completion: nil)
     }
 
     

@@ -29,14 +29,23 @@ class FreeAgentFront: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         super.viewDidLoad()
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        games = delegate.gcGames
+        var list = [GamerConnectGame]()
+        for game in delegate.gcGames {
+            if(game.available == "true"){
+                list.append(game)
+            }
+        }
+        
+        games = list
+        
+        for game in games {
+            if(!game.hasQuiz){
+                games.remove(at: games.index(of: game)!)
+            }
+        }
         
         gcGameList.delegate = self
         gcGameList.dataSource = self
-        
-        behavior = MSCollectionViewPeekingBehavior()
-        gcGameList.configureForPeekingBehavior(behavior: behavior)
-        //gcGameList.configureForPeekingDelegate()
         
         handleNextButton(activate: false)
         
@@ -57,10 +66,21 @@ class FreeAgentFront: ParentVC, UICollectionViewDataSource, UICollectionViewDele
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! homeGCCell
+        let delegate = UIApplication.shared.delegate as! AppDelegate
         
         let game = games[indexPath.item]
-        cell.backgroundImage.image = Utility.Image.placeholder
-        cell.backgroundImage.moa.url = game.imageUrl
+        let cache = delegate.imageCache
+        if(cache.object(forKey: game.imageUrl as NSString) != nil){
+            cell.backgroundImage.image = cache.object(forKey: game.imageUrl as NSString)
+        } else {
+            cell.backgroundImage.image = Utility.Image.placeholder
+            cell.backgroundImage.moa.onSuccess = { image in
+                cell.backgroundImage.image = image
+                delegate.imageCache.setObject(image, forKey: game.imageUrl as NSString)
+                return image
+            }
+            cell.backgroundImage.moa.url = game.imageUrl
+        }
         cell.backgroundImage.contentMode = .scaleAspectFill
         cell.backgroundImage.clipsToBounds = true
         

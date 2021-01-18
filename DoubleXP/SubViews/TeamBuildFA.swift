@@ -86,11 +86,6 @@ class TeamBuildFA: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
                 ref.child("selectedTeamNeeds").setValue(self.selectedNeeds)
             }
             
-            let userRef = Database.database().reference().child("Users").child(self.currentUser!.uId).child("teams").child(self.team!.teamName)
-            if(snapshot.exists()){
-                userRef.child("selectedTeamNeeds").setValue(self.selectedNeeds)
-            }
-            
             self.team!.selectedTeamNeeds = self.selectedNeeds
             
             UIView.transition(with: self.saveChanges, duration: 0.3, options: .curveEaseInOut, animations: {
@@ -143,8 +138,7 @@ class TeamBuildFA: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let manager = GamerProfileManager()
-        if(manager.getGamerTagForGame(gameName: team!.games[0]) == team!.teamCaptain){
+        if(currentUser!.gamerTag == team!.teamCaptain){
             if(!selectedNeeds.contains((team?.teamNeeds[indexPath.item])!)){
                 selectedNeeds.append(team?.teamNeeds[indexPath.item] ?? "")
                 

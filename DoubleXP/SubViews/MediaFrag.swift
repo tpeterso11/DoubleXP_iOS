@@ -15,15 +15,17 @@ import SwiftNotificationCenter
 import WebKit
 import SwiftRichString
 import FBSDKCoreKit
+import AnimatedCollectionViewLayout
+import Lottie
+import UnderLineTextField
 
-class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITableViewDelegate, UITableViewDataSource, MediaCallbacks, SocialMediaManagerCallback {
+class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITableViewDelegate, UITableViewDataSource, MediaCallbacks, SocialMediaManagerCallback, LandingUICallbacks, SearchCallbacks, UITextFieldDelegate, UIScrollViewDelegate {
     
     @IBOutlet weak var authorCell: UIView!
     @IBOutlet weak var articleVideoView: UIView!
     @IBOutlet weak var articleTable: UITableView!
     @IBOutlet weak var gcTag: UILabel!
     @IBOutlet weak var channelDXPLogo: UIImageView!
-    @IBOutlet weak var twitchPlayer: TestPlayer!
     @IBOutlet weak var twitchPlayerOverlay: UIView!
     @IBOutlet weak var channelLoading: UIView!
     @IBOutlet weak var channelCollection: UICollectionView!
@@ -34,7 +36,6 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     @IBOutlet weak var channelOverlayDesc: UILabel!
     @IBOutlet weak var channelOverlayImage: UIImageView!
     @IBOutlet weak var twitchChannelOverlay: UIView!
-    @IBOutlet weak var loadingView: UIView!
     @IBOutlet weak var expandLabel: UILabel!
     @IBOutlet weak var collapseButton: UIImageView!
     @IBOutlet weak var expandButton: UIImageView!
@@ -46,12 +47,28 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     @IBOutlet weak var articleAuthorBadge: UIImageView!
     @IBOutlet weak var articleSourceImage: UIImageView!
     @IBOutlet weak var articleName: UILabel!
-    @IBOutlet weak var articleSub: UILabel!
+    @IBOutlet weak var scoob: AnimationView!
     @IBOutlet weak var authorLabel: UILabel!
+    @IBOutlet weak var scoobDismiss: UIButton!
     @IBOutlet weak var articleImage: UIImageView!
     @IBOutlet weak var articleWV: WKWebView!
     @IBOutlet weak var videoAvailLabel: UILabel!
     @IBOutlet weak var playLogo: UIImageView!
+    @IBOutlet weak var twitchWV: WKWebView!
+    @IBOutlet weak var twitchOptionDrawer: UIView!
+    @IBOutlet weak var twitchOptionTable: UITableView!
+    @IBOutlet weak var clickableSpace: UIView!
+    @IBOutlet weak var scoobLoading: UIVisualEffectView!
+    @IBOutlet weak var dismissHead: UILabel!
+    @IBOutlet weak var dismissBody: UILabel!
+    @IBOutlet weak var scoobSub: UIView!
+    @IBOutlet weak var searchField: UnderLineTextField!
+    @IBOutlet weak var searchButton: UIButton!
+    @IBOutlet weak var workAnimation: AnimationView!
+    @IBOutlet weak var twitchOptionClose: UIButton!
+    @IBOutlet weak var loadingView: UIVisualEffectView!
+    @IBOutlet weak var fade: UIView!
+    @IBOutlet weak var fadeHeight: NSLayoutConstraint!
     var options = [String]()
     var selectedCategory = ""
     var newsSet = false
@@ -63,13 +80,23 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     var articlePayload = [Any]()
     var twitchPayload = [Any]()
     var twitchCoverShowing = false
+    var twitchShowing = false
     var currentCell: NewsArticleCell?
     var selectedChannel: TwitchChannelObj!
     var currentVideoCell: ArticleVideoCell?
     var constraint : NSLayoutConstraint?
     var channelConstraint : NSLayoutConstraint?
-    var streams = [TwitchStreamObject]()
+    var streams = [Any]()
     var currentCategory = "news"
+    var isSearch = false
+    var channelsSet = false
+    var currentStream: TwitchStreamObject?
+    
+    let headerViewMaxHeight: CGFloat = 250
+    let headerViewMinHeight: CGFloat = 44 + UIApplication.shared.statusBarFrame.height
+    var discoverGameName: String?
+    
+    @IBOutlet weak var headerHeight: NSLayoutConstraint!
     
     var articlesLoaded = false
     private var streamsSet = false
@@ -83,6 +110,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     var mediaFragActive = false
     var channelOpen = false
     var articleOpen = false
+    var fromDiscover = false
     
     var currentTwitchImage: Image?
     private var isExpanded = false
@@ -128,6 +156,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     @IBOutlet weak var articleOverlayClose: UIImageView!
     private var standbyShowing = false
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.pageName = "Media"
@@ -136,6 +165,9 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         options.append("#reviews")
         options.append("#twitch")
         options.append("empty")
+        
+        self.workAnimation.loopMode = .loop
+        self.workAnimation.play()
         
         self.selectedCategory = options[0]
         
@@ -148,11 +180,13 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         }
         self.news.refreshControl?.addTarget(self, action: #selector(pullToRefresh), for: .valueChanged)
         self.channelCollection.refreshControl?.addTarget(self, action: #selector(downloadStreams), for: .valueChanged)
-        
-        optionsCollection.dataSource = self
-        optionsCollection.delegate = self
-        
-        self.news?.collectionViewLayout = TestCollection()
+        self.searchField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+        self.searchField.returnKeyType = .done
+        self.searchField.delegate = self
+        checkSearchButton()
+        //optionsCollection.dataSource = self
+        //optionsCollection.delegate = self
+        setupScoob()
         
         self.constraint = NSLayoutConstraint(item: self.articleOverlay, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0.0, constant: 0)
         
@@ -165,6 +199,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         expandButton.isUserInteractionEnabled = true
         expandButton.addGestureRecognizer(expand)
         
+        Broadcaster.register(SearchCallbacks.self, observer: self)
         AppEvents.logEvent(AppEvents.Name(rawValue: "Media"))
         
         NotificationCenter.default.addObserver(
@@ -172,10 +207,77 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
             object: self.view.window,
             queue: nil
         ) { notification in
-            self.hideStandby()
+            self.hideScoob()
         }
+        
+        self.header.layer.shadowColor = UIColor.black.cgColor
+        self.header.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+        self.header.layer.shadowRadius = 2.0
+        self.header.layer.shadowOpacity = 0.5
+        self.header.layer.masksToBounds = false
+        
+        let testBounds = CGRect(x: self.header.bounds.minX, y: self.header.bounds.minY, width: self.view.bounds.width, height: self.header.bounds.height)
+        self.header.layer.shadowPath = UIBezierPath(roundedRect: testBounds, cornerRadius: self.header.layer.cornerRadius).cgPath
 
-        animateView()
+        if(self.discoverGameName != nil){
+            animateViewForChannel()
+        } else {
+            animateView()
+        }
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool
+    {
+        textField.resignFirstResponder()
+        if(self.searchField.text!.count > 0){
+            self.searchForStreamer()
+            self.view.endEditing(true)
+        }
+        return true
+    }
+    
+    @objc func textFieldDidChange(_ textField: UITextField) {
+        checkSearchButton()
+    }
+    
+    private func checkSearchButton(){
+        if(self.searchField.text!.count > 0 && self.searchButton.alpha != 1.0){
+            UIView.animate(withDuration: 0.3, animations: {
+                self.searchButton.alpha = 1
+                self.searchButton.isUserInteractionEnabled = true
+                self.searchButton.addTarget(self, action: #selector(self.searchForStreamer), for: .touchUpInside)
+            }, completion: nil)
+        } else if(self.searchField.text!.count > 0 && self.searchButton.alpha == 1.0) {
+            self.searchButton.alpha = 1
+            self.searchButton.isUserInteractionEnabled = true
+            self.searchButton.addTarget(self, action: #selector(self.searchForStreamer), for: .touchUpInside)
+        } else if(self.searchField.text!.count == 0 && self.searchButton.alpha == 1.0){
+            UIView.animate(withDuration: 0.3, animations: {
+                self.searchButton.alpha = 0.3
+                self.searchButton.isUserInteractionEnabled = false
+            }, completion: nil)
+        } else {
+            self.searchButton.alpha = 0.3
+            self.searchButton.isUserInteractionEnabled = false
+        }
+    }
+    
+    @objc private func searchForStreamer(){
+        self.isSearch = true
+        self.view.endEditing(true)
+        
+        UIView.animate(withDuration: 0.3, animations: {
+            self.loadingView.alpha = 1
+        }, completion: { (finished: Bool) in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self.workAnimation.loopMode = .loop
+                self.workAnimation.play()
+                
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                let manager = delegate.socialMediaManager
+                manager.searchStreams(searchQuery: self.searchField.text!, callbacks: self)
+            }
+        })
     }
     
     private func showStandby(){
@@ -195,6 +297,20 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
             }, completion: nil)
         }
     }
+    
+    /*func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let y: CGFloat = scrollView.contentOffset.y
+        let newHeaderViewHeight: CGFloat = self.headerHeight.constant - y
+
+        if newHeaderViewHeight > headerViewMaxHeight {
+            self.headerHeight.constant = headerViewMaxHeight
+        } else if newHeaderViewHeight < headerViewMinHeight {
+            self.headerHeight.constant = headerViewMinHeight
+        } else {
+            self.headerHeight.constant = newHeaderViewHeight
+            scrollView.contentOffset.y = 0 // block scroll view
+        }
+    }*/
     
     @objc func pullToRefresh(){
         if(self.currentCategory == "news"){
@@ -249,14 +365,47 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     }
     
     private func animateView(){
-        let top = CGAffineTransform(translationX: 0, y: 50)
-        UIView.animate(withDuration: 0.5, animations: {
-            self.optionsCollection.alpha = 1
-            self.optionsCollection.transform = top
-        }, completion: nil)
+        self.twitchShowing = true
+        self.currentCategory = "twitch"
+        self.articlesLoaded = false
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Media - Twitch Selected"))
+        //let delegate = UIApplication.shared.delegate as! AppDelegate
+        //delegate.currentLanding?.updateNavColor(color: UIColor(named: "twitchPurpleDark")!)
+        //delegate.currentLanding?.removeBottomNav(showNewNav: true, hideSearch: false, searchHint:"search for stream", searchButtonText: "search", isMessaging: false)
+    
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            self.articles = [Any]()
+            
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let manager = appDelegate.socialMediaManager
+            manager.getTwitchGames(callbacks: self)
+        }
+    }
+    
+    private func animateViewForChannel(){
+        self.twitchShowing = true
+        self.currentCategory = "twitch"
+        self.articlesLoaded = false
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Media - Twitch Selected"))
+        //let delegate = UIApplication.shared.delegate as! AppDelegate
+        //delegate.currentLanding?.updateNavColor(color: UIColor(named: "twitchPurpleDark")!)
+        //delegate.currentLanding?.removeBottomNav(showNewNav: true, hideSearch: false, searchHint:"search for stream", searchButtonText: "search", isMessaging: false)
+       
+        self.articles = [Any]()
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        var game: GamerConnectGame?
+        for gc in appDelegate.gcGames {
+            if(gc.gameName == self.discoverGameName){
+                game = gc
+            }
+        }
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            self.getMedia()
+        if(game != nil){
+            self.fromDiscover = true
+            self.selectedChannel = TwitchChannelObj(gameName: game!.gameName, imageUrIOS: game!.imageUrl, twitchID: game!.twitchHandle)
+            self.showChannel(channel: self.selectedChannel)
+        } else {
+            self.dismiss(animated: true, completion: nil)
         }
     }
     
@@ -329,108 +478,138 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         else if(collectionView == self.channelCollection){
             let current = self.streams[indexPath.item]
             
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "contentCell", for: indexPath) as! TwitchContentCell
-            if(current is TwitchStreamObject){
-                let current = (self.streams[indexPath.item] as! TwitchStreamObject)
-                cell.channelName.text = current.title
-                cell.channelUser.text = current.handle
-                
-                let str = current.thumbnail
-                let replaced = str.replacingOccurrences(of: "{width}x{height}", with: "800x500")
-                cell.contentImage.image = Utility.Image.placeholder
-                cell.contentImage.moa.url = replaced
-                cell.contentImage.contentMode = .scaleAspectFill
-                cell.contentImage.clipsToBounds = true
+            if(current is AdObject){
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ad", for: indexPath) as! AdCell
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                cell.setAd(landingController: appDelegate.currentLanding!)
+                return cell
             }
-            return cell
+            else {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "contentCell", for: indexPath) as! TwitchContentCell
+                if(current is TwitchStreamObject){
+                    let current = (self.streams[indexPath.item] as! TwitchStreamObject)
+                    cell.channelName.text = current.title
+                    cell.channelUser.text = current.handle
+                    
+                    let str = current.thumbnail
+                    let replaced = str.replacingOccurrences(of: "{width}x{height}", with: "800x500")
+                    cell.contentImage.image = Utility.Image.placeholder
+                    
+                    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                    let cache = appDelegate.imageCache
+                    if(cache.object(forKey: replaced as NSString) != nil){
+                        cell.contentImage.image = cache.object(forKey: replaced as NSString)
+                    } else {
+                        cell.contentImage.image = Utility.Image.placeholder
+                        cell.contentImage.moa.onSuccess = { image in
+                            cell.contentImage.image = image
+                            appDelegate.imageCache.setObject(image, forKey: replaced as NSString)
+                            return image
+                        }
+                        cell.contentImage.moa.url = replaced
+                    }
+                    cell.contentImage.contentMode = .scaleAspectFill
+                    cell.contentImage.clipsToBounds = true
+                }
+                return cell
+            }
         }
         else{
             let current = self.articles[indexPath.item]
             if(current is NewsObject){
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "newsCell", for: indexPath) as! NewsArticleCell
                 cell.title.text = (current as! NewsObject).title
-                cell.subTitle.text = (current as! NewsObject).subTitle
                 
-                if(!(current as! NewsObject).imageAdded){
-                    cell.articleBack.moa.onSuccess = { image in
-                        UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                            cell.articleBack.alpha = 0.1
-                            cell.articleBack.contentMode = .scaleAspectFill
-                            cell.articleBack.clipsToBounds = true
-                        }, completion: nil)
-                        
-                        (current as! NewsObject).image = image
-                        (current as! NewsObject).imageAdded = true
-                        
-                      return image
-                    }
-                }
-                else{
-                    cell.articleBack.image = (current as! NewsObject).image
+                if((current as! NewsObject).videoUrl.isEmpty){
+                    cell.contents.text = "READ"
+                } else {
+                    cell.contents.text = "READ - WATCH"
                 }
                 
                 switch ((current as! NewsObject).author) {
                 case "Kwatakye Raven":
                     //cell..text = "DoubleXP"
                     cell.authorLabel.text = (current as! NewsObject).author
-                    cell.authorImage.image = #imageLiteral(resourceName: "mike_badge.png")
-                    cell.sourceImage.image = #imageLiteral(resourceName: "team_thumbs_up.png")
+                    cell.sourceImage.image = #imageLiteral(resourceName: "dxp_disc_dark_boom.png")
                     break
                 case "Aaron Hodges":
                     cell.authorLabel.text = (current as! NewsObject).author
-                    cell.sourceImage.image = #imageLiteral(resourceName: "team_thumbs_up.png")
-                    cell.authorImage.image = #imageLiteral(resourceName: "hodges_badge.png")
+                    cell.sourceImage.image = #imageLiteral(resourceName: "dxp_disc_dark_boom.png")
                     break
                 default:
                     cell.authorLabel.text = (current as! NewsObject).author
                     cell.sourceImage.image = #imageLiteral(resourceName: "gamespot_icon_ios.png")
-                    cell.authorImage.image = #imageLiteral(resourceName: "unknown_badge.png")
                 }
                 
                 cell.articleBack.image = #imageLiteral(resourceName: "new_logo3.png")
-                cell.articleBack.moa.url = (current as! NewsObject).imageUrl
+                
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                let cache = appDelegate.imageCache
+                if(cache.object(forKey: (current as! NewsObject).imageUrl as NSString) != nil){
+                    cell.articleBack.image = cache.object(forKey: (current as! NewsObject).imageUrl as NSString)
+                } else {
+                    cell.articleBack.image = Utility.Image.placeholder
+                    cell.articleBack.moa.onSuccess = { image in
+                        cell.articleBack.image = image
+                        cell.articleBack.alpha = 0.3
+                        cell.articleBack.contentMode = .scaleAspectFill
+                        cell.articleBack.clipsToBounds = true
+                        
+                        appDelegate.imageCache.setObject(image, forKey: (current as! NewsObject).imageUrl as NSString)
+                        return image
+                    }
+                    cell.articleBack.moa.url = (current as! NewsObject).imageUrl
+                }
                 
                 cell.tag = indexPath.item
                 
                 return cell
             }
-            else if(current is TwitchChannelObj){
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "channelCell", for: indexPath) as! TwitchChannelCell
-                cell.gameName.text = (current as! TwitchChannelObj).gameName
-                
-                let str = (current as! TwitchChannelObj).imageUrlIOS
-                let replaced = str.replacingOccurrences(of: "{width}x{height}", with: "800x500")
-                
-                cell.image.image = Utility.Image.placeholder
-                cell.image.moa.url = replaced
-                cell.image.contentMode = .scaleAspectFill
-                cell.image.clipsToBounds = true
-                
-                cell.contentView.layer.cornerRadius = 10.0
-                cell.contentView.layer.borderWidth = 1.0
-                cell.contentView.layer.borderColor = UIColor.clear.cgColor
-                cell.contentView.layer.masksToBounds = true
-                
-                cell.layer.shadowColor = UIColor.black.cgColor
-                cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
-                cell.layer.shadowRadius = 2.0
-                cell.layer.shadowOpacity = 0.5
-                cell.layer.masksToBounds = false
-                cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius:
-                    cell.contentView.layer.cornerRadius).cgPath
-                //cell.devLogo.contentMode = .scaleAspectFill
-                //cell.devLogo.clipsToBounds = true
-                
-                return cell
-            }
-            else if(current is Bool){
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "twitchLoginCell", for: indexPath) as! TwitchLoginCell
-                cell.loginButton.applyGradient(colours:  [#colorLiteral(red: 0.3081886768, green: 0.1980658174, blue: 0.5117434263, alpha: 1), #colorLiteral(red: 0.395016551, green: 0.2572917342, blue: 0.6494273543, alpha: 1)], orientation: .horizontal)
-                return cell
-            }
-            else{
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "contributorCell", for: indexPath) as! ContributorCell
-                return cell
+            else {
+                let current = self.articles[indexPath.item]
+                if(current is TwitchChannelObj){
+                    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "channelCell", for: indexPath) as! TwitchChannelCell
+                    cell.gameName.text = (current as! TwitchChannelObj).gameName
+                    
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    let str = (current as! TwitchChannelObj).imageUrlIOS
+                    let replaced = str.replacingOccurrences(of: "{width}x{height}", with: "800x500")
+                    
+                    let cache = delegate.imageCache
+                    if(cache.object(forKey: replaced as NSString) != nil){
+                        cell.image.image = cache.object(forKey: replaced as NSString)
+                    } else {
+                        cell.image.image = Utility.Image.placeholder
+                        cell.image.moa.onSuccess = { image in
+                            cell.image.image = image
+                            delegate.imageCache.setObject(image, forKey: replaced as NSString)
+                            return image
+                        }
+                        cell.image.moa.url = replaced
+                    }
+                    cell.image.contentMode = .scaleAspectFill
+                    cell.image.clipsToBounds = true
+                    
+                    cell.contentView.layer.cornerRadius = 10.0
+                    cell.contentView.layer.borderWidth = 1.0
+                    cell.contentView.layer.borderColor = UIColor.clear.cgColor
+                    cell.contentView.layer.masksToBounds = true
+                    
+                    cell.layer.shadowColor = UIColor.black.cgColor
+                    cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+                    cell.layer.shadowRadius = 2.0
+                    cell.layer.shadowOpacity = 0.5
+                    cell.layer.masksToBounds = false
+                    cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius:
+                        cell.contentView.layer.cornerRadius).cgPath
+                    //cell.devLogo.contentMode = .scaleAspectFill
+                    //cell.devLogo.clipsToBounds = true
+                    
+                    return cell
+                } else {
+                    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "empty", for: indexPath) as! EmptyCollectionViewCell
+                    return cell
+                }
             }
         }
     }
@@ -458,10 +637,17 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                 
                 switch(self.selectedCategory){
                     case "#popular":
+                        self.loadingViewSpinner.startAnimating()
                         self.currentCategory = "news"
                         self.articlesLoaded = false
                         AppEvents.logEvent(AppEvents.Name(rawValue: "Media - Popular Selected"))
                         delegate.currentLanding?.updateNavColor(color: UIColor(named: "darker")!)
+                        
+                        if(twitchShowing){
+                            self.twitchShowing = false
+                            
+                            delegate.currentLanding?.removeBottomNav(showNewNav: false, hideSearch: false, searchHint: nil, searchButtonText: nil, isMessaging: false)
+                        }
                         
                         UIView.animate(withDuration: 0.3, animations: {
                             self.loadingView.alpha = 1
@@ -480,10 +666,13 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                     
                     break;
                     case "#twitch":
+                        self.twitchShowing = true
+                        self.loadingViewSpinner.startAnimating()
                         self.currentCategory = "twitch"
                         self.articlesLoaded = false
                         AppEvents.logEvent(AppEvents.Name(rawValue: "Media - Twitch Selected"))
-                        delegate.currentLanding?.updateNavColor(color: UIColor(named: "twitchPurpleDark")!)
+                        //delegate.currentLanding?.updateNavColor(color: UIColor(named: "twitchPurpleDark")!)
+                        delegate.currentLanding?.removeBottomNav(showNewNav: true, hideSearch: false, searchHint:"search for stream", searchButtonText: "search", isMessaging: false)
                         
                         UIView.animate(withDuration: 0.3, animations: {
                             self.loadingView.alpha = 1
@@ -491,22 +680,28 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                 self.articles = [Any]()
                                 
-                                let manager = SocialMediaManager()
-                                manager.getTopGames(callbacks: self)
+                                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                                let manager = appDelegate.socialMediaManager
+                                manager.getTwitchGames(callbacks: self)
                             }
                         })
                     break;
                     case "#reviews":
+                        self.loadingViewSpinner.startAnimating()
                         self.currentCategory = "reviews"
                         self.articlesLoaded = false
                         AppEvents.logEvent(AppEvents.Name(rawValue: "Media - Reviews Selected"))
                         delegate.currentLanding?.updateNavColor(color: UIColor(named: "darker")!)
+                        if(twitchShowing){
+                            self.twitchShowing = false
+                            
+                            delegate.currentLanding?.removeBottomNav(showNewNav: false, hideSearch: false, searchHint: nil, searchButtonText: nil, isMessaging: false)
+                        }
                         
                         UIView.animate(withDuration: 0.3, animations: {
                             self.loadingView.alpha = 1
                         }, completion: { (finished: Bool) in
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                self.news?.collectionViewLayout = TestCollection()
                                 delegate.currentLanding?.updateNavColor(color: UIColor(named: "darker")!)
                                 
                                 if(!delegate.mediaCache.reviewsCache.isEmpty){
@@ -519,6 +714,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                         })
                     break;
                     default:
+                        self.twitchShowing = false
                         self.articles = [Any]()
                         self.articlesLoaded = false
                         articles.append(contentsOf: delegate.mediaCache.newsCache)
@@ -555,28 +751,52 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         }
         else if(collectionView == channelCollection){
             let current = streams[indexPath.item]
-            
-            NotificationCenter.default.addObserver(
-                forName: UIWindow.didBecomeKeyNotification,
-                object: self.view.window,
-                queue: nil
-            ) { notification in
-                print("Video stopped")
-                //self.twitchPlayer.isHidden = true
-                self.twitchPlayer.setChannel(to: "")
-                
-                UIView.animate(withDuration: 0.8) {
-                    self.twitchPlayerOverlay.alpha = 0
+        
+            if(current is TwitchStreamObject){
+                NotificationCenter.default.addObserver(
+                    forName: UIWindow.didBecomeKeyNotification,
+                    object: self.view.window,
+                    queue: nil
+                ) { notification in
+                    print("Video stopped")
+                    //self.twitchPlayer.isHidden = true
+                    //self.twitchPlayer.setChannel(to: "")
+                    
+                    UIView.animate(withDuration: 0.8) {
+                        self.twitchPlayerOverlay.alpha = 0
+                    }
                 }
-            }
-            
-            twitchPlayer.configuration.allowsInlineMediaPlayback = true
-            twitchPlayer.configuration.mediaTypesRequiringUserActionForPlayback = []
-            twitchPlayer.setChannel(to: current.handle)
-            //twitchPlayer.togglePlaybackState()
-            
-            UIView.animate(withDuration: 0.8) {
-                self.twitchPlayerOverlay.alpha = 1.0
+                
+                self.showScoob(callback: self, cancelableWV: self.twitchWV)
+                //loading twitch streams
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                    let test = "https://doublexpstorage.tech/stream.php?channel=" + (current as! TwitchStreamObject).handle
+                    
+                    if let encoded = test.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed),
+                        let url = URL(string: encoded)
+                    {
+                        self.twitchWV.load(NSURLRequest(url: url) as URLRequest)
+                    } else {
+                        let root = "https://doublexpstorage.tech/stream.php?channel="
+                        let path = (current as! TwitchStreamObject).handle
+                        var urlcomps = URLComponents(string: root)!
+                        urlcomps.path = path
+                        if let newUrl = urlcomps.url {
+                            self.twitchWV.load(NSURLRequest(url: newUrl) as URLRequest)
+                            return
+                        }
+                        
+                        self.hideScoob()
+                    }
+                    
+                    
+                    /*if(test != nil && !test.isEmpty){
+                        self.twitchWV.load(NSURLRequest(url: NSURL(string: test)! as URL) as URLRequest)
+                    } else {
+                        self.hideScoob()
+                    }*/
+                }
             }
         }
         else {
@@ -587,7 +807,15 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                 self.selectedArticleImage = cell.articleBack.image
                 self.currentCell = cell
             
-                self.showArticle(article: self.selectedArticle)
+                let top = CGAffineTransform(translationX: 0, y: 800)
+                UIView.animate(withDuration: 0.8, animations: {
+                    cell.transform = top
+                }, completion: { (finished: Bool) in
+                    UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                        self.showArticle(article: self.selectedArticle)
+                    }, completion: nil)
+                })
+                
                 
                 AppEvents.logEvent(AppEvents.Name(rawValue: "Article Selected: Source - " + selectedArticle.source))
                 //onVideoLoaded(url: "https://static-gamespotvideo.cbsistatic.com/vr/2019/04/23/kingsfieldiv1_700_1000.mp4")
@@ -618,7 +846,6 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         self.articlePayload = [Any]()
         
         self.articleName.text = self.selectedArticle.title
-        self.articleSub.text = self.selectedArticle.subTitle
         
         let source = self.selectedArticle.source
         if(source == "gs"){
@@ -646,7 +873,8 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         
         if(self.selectedArticle.videoUrl.isEmpty){
             self.playLogo.alpha = 0.1
-            self.videoAvailLabel.text = "No Video Available (wah wah waaaaaaah)"
+            self.videoAvailLabel.text = "No Video Available"
+            self.articleVideoView.isUserInteractionEnabled = false
             
             self.articleImage.alpha = 0
             self.articleWV.alpha = 0
@@ -693,13 +921,16 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
             self.articleBlur.alpha = 1
         }, completion: { (finished: Bool) in
             UIView.animate(withDuration: 0.3, delay: 0.2, options: [], animations: {
-                self.constraint?.constant = self.view.frame.size.height / 2
+                self.constraint?.constant = self.view.frame.size.height
                 
                 UIView.animate(withDuration: 0.5) {
                     self.articleOverlay.alpha = 1
                     self.view.bringSubviewToFront(self.articleOverlay)
+                    
+                    self.expandOverlay()
                     self.view.layoutIfNeeded()
                 }
+                
             
             }, completion: nil)
         })
@@ -709,6 +940,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     
     @objc func videoClicked(_ sender: AnyObject?) {
         let delegate = UIApplication.shared.delegate as! AppDelegate
+        self.showScoob(callback: self, cancelableWV: self.articleWV)
         
         if(self.selectedArticle.source == "gs"){
             AppEvents.logEvent(AppEvents.Name(rawValue: "Media - GS Video Selected"))
@@ -718,8 +950,6 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
             AppEvents.logEvent(AppEvents.Name(rawValue: "Media - DXP Video Selected"))
             self.onVideoLoaded(url: selectedArticle.videoUrl)
         }
-        
-        showStandby()
     }
     
     @objc func authorClicked(_ sender: AnyObject?) {
@@ -755,7 +985,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         self.articleOverlay.alpha = 0
         self.twitchChannelOverlay.alpha = 1
         self.channelOverlayDesc.text = channel.gameName
-        if(channel.isGCGame(game: channel.gameName)){
+        if(channel.isGCGame == "true"){
             self.channelDXPLogo.isHidden = false
             self.connectButton.isHidden = false
             self.connectButton.isUserInteractionEnabled = true
@@ -768,11 +998,17 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
             self.gcTag.isHidden = true
         }
         
-        let close = UITapGestureRecognizer(target: self, action: #selector(closeChannel))
-        channelOverlayClose.isUserInteractionEnabled = true
-        channelOverlayClose.addGestureRecognizer(close)
+        if(self.fromDiscover){
+            self.channelOverlayClose.alpha = 0
+        } else {
+            self.channelOverlayClose.alpha = 1.0
+            let close = UITapGestureRecognizer(target: self, action: #selector(closeChannel))
+            self.channelOverlayClose.isUserInteractionEnabled = true
+            self.channelOverlayClose.addGestureRecognizer(close)
+        }
         
-        streamsButton.addTarget(self, action: #selector(downloadStreams), for: .touchUpInside)
+        self.downloadStreams()
+        //streamsButton.addTarget(self, action: #selector(downloadStreams), for: .touchUpInside)
         videosButton.addTarget(self, action: #selector(downloadVideos), for: .touchUpInside)
         connectButton.addTarget(self, action: #selector(navigateToConnect), for: .touchUpInside)
         
@@ -819,34 +1055,48 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
             }
             
             if(!self.newsSet){
-                self.news?.collectionViewLayout = TestCollection()
+                
+               let layout = AnimatedCollectionViewLayout()
+               layout.animator = LinearCardAttributesAnimator()
+                layout.scrollDirection = .horizontal
+
+                self.news?.collectionViewLayout = layout
+                
                 self.news.delegate = self
                 self.news.dataSource = self
                 self.newsSet = true
                 
                 let top = CGAffineTransform(translationX: 0, y: 40)
-                UIView.animate(withDuration: 0.3, animations: {
-                    self.loadingView.alpha = 0
-                    self.loadingViewSpinner.stopAnimating()
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.news.transform = top
+                    self.news.alpha = 1
+                    self.articlesLoaded = true
                 }, completion: { (finished: Bool) in
                     UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                        self.news.transform = top
-                        self.news.alpha = 1
-                        self.articlesLoaded = true
+                        self.loadingView.alpha = 0
+                        self.workAnimation.pause()
                     }, completion: nil)
                 })
             }
             else{
-                self.news?.collectionViewLayout = TestCollection()
-                self.news.reloadData()
+                let layout = AnimatedCollectionViewLayout()
+                layout.animator = LinearCardAttributesAnimator()
+                layout.scrollDirection = .horizontal
+
+                self.news?.collectionViewLayout = layout
+                self.news?.reloadData()
+                self.news.setContentOffset(CGPoint(x:0,y:0), animated: true)
+                
+                //self.news?.collectionViewLayout = TestCollection()
+                //self.news.reloadData()
                 self.scrollToTop(collectionView: self.news)
                 UIView.animate(withDuration: 0.3, animations: {
-                    self.loadingView.alpha = 0
-                    self.loadingViewSpinner.stopAnimating()
+                    self.news.alpha = 1
+                    self.articlesLoaded = true
                 }, completion: { (finished: Bool) in
                     UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                        self.news.alpha = 1
-                        self.articlesLoaded = true
+                        self.loadingView.alpha = 0
+                        self.workAnimation.pause()
                     }, completion: nil)
                 })
             }
@@ -854,18 +1104,14 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     }
     
     func onVideoLoaded(url: String) {
+        //loading videos for articles
         DispatchQueue.main.async() {
 
             if let videoURL:URL = URL(string: url) {
-                let embedHTML = "<html><head><meta name='viewport' content='width=device-width, initial-scale=0.0, maximum-scale=1.0, minimum-scale=0.0'></head> <iframe width=\(self.currentCell!.bounds.width)\" height=\(self.currentCell!.bounds.width)\" src=\(url)?&playsinline=1\" frameborder=\"0\" allowfullscreen></iframe></html>"
-
-                //let html = "<video playsinline controls width=\"100%\" height=\"100%\" src=\"\(url)\"> </video>"
-                //self.testPlayer.loadHTMLString(embedHTML, baseURL: nil)
-                //self.currentVideoCell?.videoImage.isHidden = true
-                //self.currentWV!.isHidden = fals
+                
+                let embedHTML = "<html><head><meta name='viewport' content='width=device-width, initial-scale=0.0, maximum-scale=1.0, minimum-scale=0.0'></head> <iframe width=\(self.currentCell!.bounds.width)\" height=\(self.currentCell!.bounds.width)\" src=\(videoURL)?&playsinline=1\" frameborder=\"0\" allowfullscreen></iframe></html>"
+                
                 self.articleWV.loadHTMLString(embedHTML, baseURL: nil)
-                //let request:URLRequest = URLRequest(url: videoURL)
-                //self.testPlayer.load(request)
             }
         }
     }
@@ -908,8 +1154,9 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         UIView.animate(withDuration: 0.8, animations: {
             self.channelLoading.alpha = 1
         }, completion: { (finished: Bool) in
-            let manager = SocialMediaManager()
-            manager.getChannelTopStreams(currentChannel: self.selectedChannel, callbacks: self)
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let manager = appDelegate.socialMediaManager
+            manager.loadTwitchStreams2DotOhChannel(currentChannel: self.selectedChannel, callbacks: self)
         })
     }
     
@@ -923,8 +1170,9 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         UIView.animate(withDuration: 0.8, animations: {
             self.channelLoading.alpha = 1
         }, completion: { (finished: Bool) in
-            let manager = SocialMediaManager()
-            manager.getChannelTopVideos(currentChannel: self.selectedChannel, callbacks: self)
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let manager = appDelegate.socialMediaManager
+            //manager.getChannelTopVideos(currentChannel: self.selectedChannel, callbacks: self)
         })
     }
     
@@ -972,6 +1220,12 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
             self.articleBlur.alpha = 0
         })
         
+        let top = CGAffineTransform(translationX: 0, y: 0)
+        UIView.animate(withDuration: 0.8, animations: {
+            self.currentCell?.transform = top
+            self.news.reloadData()
+        }, completion: nil)
+        
         reloadColView()
         
         self.articleOpen = false
@@ -1003,12 +1257,12 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     func showTwitchLogin(){
         if(!self.twitchCoverShowing){
             let delegate = UIApplication.shared.delegate as! AppDelegate
-            delegate.currentLanding?.updateNavColor(color: UIColor(named: "twitchPurpleDark")!)
-            UIView.transition(with: self.header, duration: 0.3, options: .curveEaseInOut, animations: {
+            //delegate.currentLanding?.updateNavColor(color: UIColor(named: "twitchPurpleDark")!)
+            /*UIView.transition(with: self.header, duration: 0.3, options: .curveEaseInOut, animations: {
                 self.header.backgroundColor = UIColor(named: "twitchPurpleDark")
                 self.optionsCollection.backgroundColor = UIColor(named: "twitchPurple")
                 self.twitchCover.alpha = 1
-            }, completion: nil)
+            }, completion: nil)*/
             
             self.twitchCoverShowing = true
         }
@@ -1029,9 +1283,9 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
         else {
             let current = self.articles[indexPath.item]
             if(current is Int){
-                if((current as! Int) == 0){
+                if((current as? Int) == 0){
                     //empty cell
-                    return CGSize(width: (collectionView.bounds.width), height: CGFloat(30))
+                    return CGSize(width: (collectionView.bounds.width), height: CGFloat(80))
                 }
                 else{
                     return CGSize(width: (collectionView.bounds.width - 20), height: CGFloat(200))
@@ -1043,35 +1297,69 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                 //}
             }
             else{
-                return CGSize(width: (collectionView.bounds.width - 20), height: CGFloat(150))
+                if(self.twitchShowing){
+                    return CGSize(width: (collectionView.bounds.width - 20), height: (100))
+                } else {
+                    return CGSize(width: (collectionView.bounds.width - 20), height: (collectionView.bounds.height - 20))
+                }
             }
         }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.articlePayload.count
+        if(tableView == articleTable){
+            return self.articlePayload.count
+        } else {
+            return self.streams.count
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let current = self.articlePayload[indexPath.item]
-        let cell = tableView.dequeueReusableCell(withIdentifier: "text", for: indexPath) as! ArticleTextCell
-        
-        let groupStyle = StyleXML.init(base: styleBase, ["strong" : testAttr])
-        let attr = (current as! String).htmlToAttributedString
-                      
-        cell.label.attributedText = attr?.string.set(style: groupStyle)
-        cell.label.lineBreakMode = .byWordWrapping
-        
-        if(self.isExpanded){
-            cell.label.numberOfLines = 500
+        if(tableView == articleTable){
+            let current = self.articlePayload[indexPath.item]
+            let cell = tableView.dequeueReusableCell(withIdentifier: "text", for: indexPath) as! ArticleTextCell
+            
+            let groupStyle = StyleXML.init(base: styleBase, ["strong" : testAttr])
+            let attr = (current as! String).htmlToAttributedString
+                          
+            cell.label.attributedText = attr?.string.set(style: groupStyle)
+            cell.label.font = UIFont(name: cell.label.font!.fontName, size: 18)
+            
+            return cell
+        } else {
+            let current = self.streams[indexPath.item] as! TwitchStreamObject
+            let cell = tableView.dequeueReusableCell(withIdentifier: "option", for: indexPath) as! TwitchOptionCell
+            cell.handle.text = current.handle
+            
+            if(current.isLive == "true"){
+                cell.live.image = #imageLiteral(resourceName: "live_active.png")
+            } else {
+                cell.live.image = #imageLiteral(resourceName: "live_inactive.png")
+            }
+            
+            return cell
         }
-        else{
-            cell.label.numberOfLines = 4
-            cell.label.lineBreakMode = .byTruncatingTail
-        }
+        
+    }
     
-        return cell
-        
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if(tableView == self.twitchOptionTable){
+            let stream = self.streams[indexPath.item] as? TwitchStreamObject
+            if(stream != nil){
+                if(stream!.isLive == "true"){
+                    currentStream = self.streams[indexPath.item] as? TwitchStreamObject
+                    dismissTwitchDrawer()
+                }
+            }
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if(tableView == articleTable){
+            return 1500.0;
+        } else {
+            return 100.0;
+        }
     }
     
     func webViewDidClose(_ webView: WKWebView) {
@@ -1081,52 +1369,326 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     func onTweetsLoaded(tweets: [TweetObject]) {
     }
     
-    func onChannelsLoaded(channels: [TwitchChannelObj]) {
+    func onChannelsLoaded(channels: [Any]) {
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        var sortedPayload = [Any]()
+        //my games first
+        for channel in channels {
+            if(channel is TwitchChannelObj){
+                if(delegate.currentUser!.games.contains((channel as! TwitchChannelObj).gameName)){
+                    sortedPayload.append(channel)
+                }
+            }
+        }
+        
+        //all the rest
+        for channel in channels {
+            if(channel is TwitchChannelObj){
+                if(!delegate.currentUser!.games.contains((channel as! TwitchChannelObj).gameName)){
+                    sortedPayload.append(channel)
+                }
+            }
+        }
+        
         DispatchQueue.main.async {
-            self.articles.append(contentsOf: channels)
+            self.articles = sortedPayload
+            self.articles.append(0)
+            if(!self.channelsSet){
+                if(self.refreshControl.isRefreshing){
+                    self.refreshControl.endRefreshing()
+            }
             
-            self.news.reloadData()
-            UIView.animate(withDuration: 0.8, delay: 1, options: [], animations: {
-                self.loadingView.alpha = 0
-                self.articlesLoaded = true
-            }, completion: nil)
+            delegate.currentMediaFrag = self
+            
+            let top = CGAffineTransform(translationX: 0, y: 10)
+            UIView.animate(withDuration: 0.8, animations: {
+                let layout = UICollectionViewFlowLayout()
+                layout.scrollDirection = .vertical
+                self.news?.collectionViewLayout = layout
+                self.news.transform = top
+                self.news.delegate = self
+                self.news.dataSource = self
+                self.news.alpha = 1
+                self.channelsSet = true
+            }, completion: { (finished: Bool) in
+                UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                    self.loadingView.alpha = 0
+                    self.workAnimation.pause()
+                }, completion: nil)
+            })
+        } else {
+                self.articles.append(contentsOf: channels)
+                self.articles.append(0)
+                
+                let layout = UICollectionViewFlowLayout()
+                layout.scrollDirection = .vertical
+                self.news?.collectionViewLayout = layout
+                self.news.reloadData()
+                self.news.setContentOffset(CGPoint(x:0,y:0), animated: true)
+                
+                UIView.animate(withDuration: 0.8, delay: 1, options: [], animations: {
+                    self.loadingView.alpha = 0
+                    self.articlesLoaded = true
+                }, completion: nil)
+            }
         }
     }
     
     func onStreamsLoaded(streams: [TwitchStreamObject]) {
-        if(self.channelRefreshControl.isRefreshing){
-            self.channelRefreshControl.endRefreshing()
-        }
-        
-        self.streams = [TwitchStreamObject]()
-        self.streams.append(contentsOf: streams)
-        
-        DispatchQueue.main.async {
-            if(!self.streamsSet){
-                self.channelCollection.collectionViewLayout = UICollectionViewFlowLayout()
-                self.channelCollection.dataSource = self
-                self.channelCollection.delegate = self
+        if(isSearch){
+            DispatchQueue.main.async {
+                UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                    self.loadingView.alpha = 0
+                }, completion: nil)
                 
-                self.streamsSet = true
-                
-                UIView.animate(withDuration: 0.8, animations: {
-                    self.channelLoading.alpha = 0
-                }, completion: { (finished: Bool) in
-                    //let manager = SocialMediaManager()
-                    //manager.getChannelTopVideos(currentChannel: self.selectedChannel, callbacks: self)
-                })
+                AppEvents.logEvent(AppEvents.Name(rawValue: "Twitch Search"))
+                if(streams.count == 1){
+                    self.showScoob(callback: self, cancelableWV: self.twitchWV)
+                    //loading twitch streams
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        AppEvents.logEvent(AppEvents.Name(rawValue: "Twitch Search Exact Match"))
+                        if(streams[0] is TwitchStreamObject){
+                            let test = "https://doublexpstorage.tech/stream.php?channel=" + (streams[0] as! TwitchStreamObject).handle
+                            self.twitchWV.load(NSURLRequest(url: NSURL(string: test)! as URL) as URLRequest)
+                        }
+                    }
+                    self.isSearch = false
+                } else {
+                    self.streams = [Any]()
+                    self.streams.append(contentsOf: streams)
+                    self.showTwitchOptions(streams: self.streams)
+                }
             }
-            else{
-                UIView.animate(withDuration: 0.8, animations: {
-                    self.channelLoading.alpha = 0
-                }, completion: { (finished: Bool) in
-                    self.channelCollection.reloadData()
-                    self.scrollToTop(collectionView: self.channelCollection)
-                })
+        } else {
+            DispatchQueue.main.async {
+                if(self.channelRefreshControl.isRefreshing){
+                    self.channelRefreshControl.endRefreshing()
+                }
+                
+                self.streams = [TwitchStreamObject]()
+                self.streams.append(contentsOf: streams)
+            
+                if(!self.streamsSet){
+                    self.channelCollection.collectionViewLayout = UICollectionViewFlowLayout()
+                    self.channelCollection.dataSource = self
+                    self.channelCollection.delegate = self
+                    
+                    self.streamsSet = true
+                    
+                    if(self.channelLoading.alpha == 1){
+                        UIView.animate(withDuration: 0.8, animations: {
+                            self.channelLoading.alpha = 0
+                        }, completion: { (finished: Bool) in
+                            UIView.animate(withDuration: 0.8, delay: 0.5, animations: {
+                                self.loadingView.alpha = 0
+                                self.workAnimation.stop()
+                            }, completion: nil)
+                        })
+                    } else {
+                        UIView.animate(withDuration: 0.8, animations: {
+                            self.loadingView.alpha = 0
+                            self.workAnimation.stop()
+                        }, completion: nil)
+                    }
+                } else{
+                    UIView.animate(withDuration: 0.8, animations: {
+                        self.channelCollection.reloadData()
+                        self.scrollToTop(collectionView: self.channelCollection)
+                    }, completion: { (finished: Bool) in
+                        if(self.channelLoading.alpha == 1){
+                            self.channelLoading.alpha = 0
+                        } else {
+                            UIView.animate(withDuration: 0.8, delay: 0.5, animations: {
+                                self.loadingView.alpha = 0
+                                self.workAnimation.stop()
+                            }, completion: { (finished: Bool) in
+                            
+                            })
+                        }
+                    })
+                }
             }
         }
     }
     
+    private func showTwitchOptions(streams: [Any]){
+        self.searchButton.isUserInteractionEnabled = false
+        self.searchField.isUserInteractionEnabled = false
+        self.articleTable.isUserInteractionEnabled = false
+        DispatchQueue.main.async {
+            AppEvents.logEvent(AppEvents.Name(rawValue: "Twitch Option Drawer Shown"))
+            self.twitchOptionTable.delegate = self
+            self.twitchOptionTable.dataSource = self
+            self.twitchOptionTable.reloadData()
+            
+            let close = UITapGestureRecognizer(target: self, action: #selector(self.dismissTwitchDrawer))
+            self.twitchOptionClose.addTarget(self, action: #selector(self.dismissTwitchDrawer), for: .touchUpInside)
+            self.clickableSpace.isUserInteractionEnabled = true
+            self.clickableSpace.addGestureRecognizer(close)
+            
+            UIView.animate(withDuration: 0.3, animations: {
+                self.articleBlur.alpha = 1
+            }, completion: { (finished: Bool) in
+                let top = CGAffineTransform(translationX: -300, y: 0)
+                UIView.animate(withDuration: 0.3, delay: 0.2, options: [], animations: {
+                    self.twitchOptionDrawer.transform = top
+                }, completion: nil)
+            })
+        }
+    }
+    
+    @objc private func dismissTwitchDrawer(){
+        self.searchButton.isUserInteractionEnabled = true
+        self.searchField.isUserInteractionEnabled = true
+        self.articleTable.isUserInteractionEnabled = true
+        if(self.currentStream != nil){
+            self.showScoob(callback: self, cancelableWV: self.twitchWV)
+            //loading twitch streams
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                let test = "https://doublexpstorage.tech/stream.php?channel=" + self.currentStream!.handle
+                self.twitchWV.load(NSURLRequest(url: NSURL(string: test)! as URL) as URLRequest)
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    let top = CGAffineTransform(translationX: 0, y: 0)
+                    UIView.animate(withDuration: 0.3, animations: {
+                        self.twitchOptionDrawer.transform = top
+                    }, completion: { (finished: Bool) in
+                        self.clickableSpace.isUserInteractionEnabled = false
+                        self.articleBlur.alpha = 0
+                    })
+                }
+            }
+        } else {
+            let top = CGAffineTransform(translationX: 0, y: 0)
+            UIView.animate(withDuration: 0.3, animations: {
+                self.twitchOptionDrawer.transform = top
+            }, completion: { (finished: Bool) in
+                self.articleBlur.isUserInteractionEnabled = false
+                self.articleBlur.alpha = 0
+                
+                /*let delegate = UIApplication.shared.delegate as! AppDelegate
+                delegate.currentLanding?.updateNavColor(color: UIColor(named: "twitchPurpleDark")!)
+                delegate.currentLanding?.removeBottomNav(showNewNav: true, hideSearch: false, searchHint:"search for stream", searchButtonText: "search", isMessaging: false)*/
+            })
+        }
+        
+        self.isSearch = false
+    }
+    
+    func updateNavColor(color: UIColor) {
+    }
+    
+    func searchSubmitted(searchString: String) {
+        UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+            self.loadingView.alpha = 1
+        }, completion: nil)
+        
+        isSearch = true
+        
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let manager = delegate.socialMediaManager
+        manager.searchStreams(searchQuery: searchString, callbacks: self)
+    }
+    
+    func messageTextSubmitted(string: String, list: [String]?) {
+    }
+    
+    func showScoob(callback: LandingUICallbacks, cancelableWV: WKWebView?){
+        resetDismissScoob()
+        setupScoobCancel(cancelableWV: cancelableWV)
+        
+        let top = CGAffineTransform(translationX: 0, y: 40)
+        UIView.animate(withDuration: 0.5, animations: {
+            self.scoobLoading.alpha = 1
+            self.scoobSub.transform = top
+            self.scoobSub.alpha = 1
+        
+            DispatchQueue.main.asyncAfter(deadline: .now() + 20.0) {
+                self.showDismissScoob()
+            }
+        }, completion: nil)
+        
+        scoob.loopMode = .loop
+        scoob.play()
+    }
+    
+    func setupScoobCancel(cancelableWV: WKWebView?) {
+        if(cancelableWV != nil){
+            cancelableWV?.stopLoading()
+            cancelableWV?.loadHTMLString("", baseURL: nil)
+        } else {
+            hideScoob()
+        }
+    }
+    
+    func showDismissScoob(){
+        let top3 = CGAffineTransform(translationX: 0, y: -40)
+        UIView.animate(withDuration: 0.5, animations: {
+            self.scoobDismiss.transform = top3
+            self.dismissHead.transform = top3
+            self.dismissBody.transform = top3
+            self.scoobDismiss.alpha = 1
+            self.dismissHead.alpha = 1
+            self.dismissBody.alpha = 1
+        }, completion: nil)
+    }
+    
+    func resetDismissScoob(){
+        let top3 = CGAffineTransform(translationX: 0, y: 0)
+        UIView.animate(withDuration: 0.01, animations: {
+            self.scoobDismiss.transform = top3
+            self.dismissHead.transform = top3
+            self.dismissBody.transform = top3
+            self.scoobDismiss.alpha = 0
+            self.dismissHead.alpha = 0
+            self.dismissBody.alpha = 0
+        }, completion: nil)
+    }
+    
+    func setupScoob(){
+        scoobSub.layer.cornerRadius = 10.0
+        scoobSub.layer.borderWidth = 1.0
+        scoobSub.layer.borderColor = UIColor.clear.cgColor
+        scoobSub.layer.masksToBounds = true
+        
+        scoobSub.layer.shadowColor = UIColor.black.cgColor
+        scoobSub.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+        scoobSub.layer.shadowRadius = 2.0
+        scoobSub.layer.shadowOpacity = 0.5
+        scoobSub.layer.masksToBounds = false
+        scoobSub.layer.shadowPath = UIBezierPath(roundedRect: scoobSub.layer.bounds, cornerRadius: scoobSub.layer.cornerRadius).cgPath
+        
+        scoobDismiss.layer.shadowColor = UIColor.black.cgColor
+        scoobDismiss.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+        scoobDismiss.layer.shadowRadius = 2.0
+        scoobDismiss.layer.shadowOpacity = 0.5
+        scoobDismiss.layer.masksToBounds = false
+        scoobDismiss.layer.shadowPath = UIBezierPath(roundedRect: scoobDismiss.bounds, cornerRadius: scoobDismiss.layer.cornerRadius).cgPath
+        //add more scoob layouts
+        // -- like one that is like  (ACTUAL CONTROLLER SYMBOLS ->) " triangle triangle back forward" and then below have "Sub Zero's ice move" somethin like that. We can create a small library of these to pop up throughout the app whenever the loading screen shows.
+   
+        scoobDismiss.addTarget(self, action: #selector(hideScoob), for: .touchUpInside)
+    }
+    
+    
+    @objc func hideScoob(){
+        if(self.scoobLoading.alpha == 1){
+            let top = CGAffineTransform(translationX: 0, y: 0)
+            UIView.animate(withDuration: 0.5, animations: {
+                self.scoobLoading.alpha = 0
+            }, completion: { (finished: Bool) in
+                UIView.animate(withDuration: 0.5, delay: 0.8, options: [], animations: {
+                    self.scoobSub.transform = top
+                    self.scoobSub.alpha = 0
+                    self.resetDismissScoob()
+                    
+                    self.scoob.stop()
+                }, completion: nil)
+            })
+        }
+    }
     
 }
 extension String {

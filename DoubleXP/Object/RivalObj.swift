@@ -30,7 +30,7 @@ class RivalObj: NSObject, NSCoding {
         }
     }
     
-    var _type = ""
+    var _type = "" //use for time-frame until I feel like fixing.
     var type:String {
         get {
             return (_type)
@@ -60,7 +60,17 @@ class RivalObj: NSObject, NSCoding {
         }
     }
     
-    init(gamerTag: String, date: String, game: String, uid: String, type: String)
+    var _id = ""
+    var id: String {
+        get {
+            return (_id)
+        }
+        set (newVal) {
+            _id = newVal
+        }
+    }
+    
+    init(gamerTag: String, date: String, game: String, uid: String, type: String, id: String)
     {
         super.init()
         self.gamerTag = gamerTag
@@ -68,6 +78,7 @@ class RivalObj: NSObject, NSCoding {
         self.game = game
         self.uid = uid
         self.type = type
+        self.id = id
     }
     
     required init(coder decoder: NSCoder)
@@ -78,6 +89,7 @@ class RivalObj: NSObject, NSCoding {
         self.game = (decoder.decodeObject(forKey: "game") as! String)
         self.uid = (decoder.decodeObject(forKey: "uid") as! String)
         self.type = (decoder.decodeObject(forKey: "type") as! String)
+        self.id = (decoder.decodeObject(forKey: "id") as! String)
     }
     
     func encode(with coder: NSCoder) {
@@ -86,6 +98,7 @@ class RivalObj: NSObject, NSCoding {
         coder.encode(self.uid, forKey: "uid")
         coder.encode(self.game, forKey: "game")
         coder.encode(self.type, forKey: "type")
+        coder.encode(self.id, forKey: "id")
     }
     
 }

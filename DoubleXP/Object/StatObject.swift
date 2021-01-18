@@ -252,6 +252,173 @@ class StatObject: NSObject, NSCoding {
         }
     }
     
+    var _fortniteSoloStats = [String: Any]()
+    var fortniteSoloStats: [String: Any] {
+        get {
+            return (_fortniteSoloStats)
+        }
+        set (newVal) {
+            _fortniteSoloStats = newVal
+        }
+    }
+    
+    var _fortniteDuoStats = [String: Any]()
+    var fortniteDuoStats: [String: Any] {
+        get {
+            return (_fortniteDuoStats)
+        }
+        set (newVal) {
+            _fortniteDuoStats = newVal
+        }
+    }
+    
+    var _fortniteSquadStats = [String: Any]()
+    var fortniteSquadStats: [String: Any] {
+        get {
+            return (_fortniteSquadStats)
+        }
+        set (newVal) {
+            _fortniteSquadStats = newVal
+        }
+    }
+    
+    var _overwatchCasualStats = [String: Any]()
+    var overwatchCasualStats: [String: Any] {
+        get {
+            return (_overwatchCasualStats)
+        }
+        set (newVal) {
+            _overwatchCasualStats = newVal
+        }
+    }
+    
+    var _overwatchCompetitiveStats = [String: Any]()
+    var overwatchCompetitiveStats: [String: Any] {
+        get {
+            return (_overwatchCompetitiveStats)
+        }
+        set (newVal) {
+            _overwatchCompetitiveStats = newVal
+        }
+    }
+    
+    var _killsPerMatch = ""
+    var killsPerMatch: String {
+        get {
+            return (_killsPerMatch)
+        }
+        set (newVal) {
+            _killsPerMatch = newVal
+        }
+    }
+    
+    var _matchesPlayed = ""
+    var matchesPlayed: String {
+        get {
+            return (_matchesPlayed)
+        }
+        set (newVal) {
+            _matchesPlayed = newVal
+        }
+    }
+    
+    var _seasonWins = ""
+    var seasonWins: String {
+        get {
+            return (_seasonWins)
+        }
+        set (newVal) {
+            _seasonWins = newVal
+        }
+    }
+    
+    var _seasonKills = ""
+    var seasonKills: String {
+        get {
+            return (_seasonKills)
+        }
+        set (newVal) {
+            _seasonKills = newVal
+        }
+    }
+    
+    var _suppImage = ""
+    var suppImage: String {
+        get {
+            return (_suppImage)
+        }
+        set (newVal) {
+            _suppImage = newVal
+        }
+    }
+    
+    func createFortnitePayload() -> [Any]{
+        return ["solo", fortniteSoloStats, "squad", fortniteSquadStats, "duo", fortniteDuoStats]
+    }
+    
+    func createBasicPayload() -> [String]{
+        var payload = [String]()
+        if(!killsPVE.isEmpty){
+            payload.append("kills pve/"+killsPVE)
+        }
+        if(!killsPVP.isEmpty){
+            payload.append("kills pvp/"+killsPVP)
+        }
+        if(!playerLevelGame.isEmpty){
+            payload.append("player level: game/"+playerLevelGame)
+        }
+        if(!playerLevelPVP.isEmpty){
+            payload.append("player level pvp/"+playerLevelPVP)
+        }
+        if(!currentRank.isEmpty){
+            payload.append("current rank/"+currentRank)
+        }
+        if(!totalRankedWins.isEmpty){
+            payload.append("total ranked wins/"+totalRankedWins)
+        }
+        if(!totalRankedLosses.isEmpty){
+            payload.append("total ranked losses/"+totalRankedLosses)
+        }
+        if(!totalRankedKills.isEmpty){
+            payload.append("total ranked kills/"+totalRankedKills)
+        }
+        if(!totalRankedDeaths.isEmpty){
+           payload.append("total ranked deaths/"+totalRankedDeaths)
+        }
+        if(!mostUsedAttacker.isEmpty){
+            payload.append("most used attacker/"+mostUsedAttacker)
+        }
+        if(!mostUsedDefender.isEmpty){
+            payload.append("most used defender/"+mostUsedDefender)
+        }
+        /*if(!codWins.isEmpty){
+            payload["Wins"] = codWins
+        }
+        if(!codBestKills.isEmpty){
+            payload["Best Kills"] = codBestKills
+        }
+        if(!codKills.isEmpty){
+            payload["Kills"] = codKills
+        }
+        if(!codKd.isEmpty){
+            payload["KD"] = codKd
+        }*/
+        if(!killsPerMatch.isEmpty){
+            payload.append("kills per match/"+killsPerMatch)
+        }
+        if(!matchesPlayed.isEmpty){
+            payload.append("matches played/"+matchesPlayed)
+        }
+        if(!seasonWins.isEmpty){
+            payload.append("season wins/"+seasonWins)
+        }
+        if(!seasonKills.isEmpty){
+            payload.append("season kills/"+seasonKills)
+        }
+        
+        return payload
+    }
+    
     func getStatCount() -> Int{
         var count = 0
         
@@ -300,7 +467,13 @@ class StatObject: NSObject, NSCoding {
         if(!codKd.isEmpty){
             count += 1
         }
-        if(!codLevel.isEmpty){
+        if(!fortniteSoloStats.isEmpty){
+            count += 1
+        }
+        if(!fortniteDuoStats.isEmpty){
+            count += 1
+        }
+        if(!fortniteSquadStats.isEmpty){
             count += 1
         }
         
@@ -363,6 +536,15 @@ class StatObject: NSObject, NSCoding {
             count += 1
         }
         if(!codLevel.isEmpty){
+            count += 1
+        }
+        if(!fortniteSoloStats.isEmpty){
+            count += 1
+        }
+        if(!fortniteDuoStats.isEmpty){
+            count += 1
+        }
+        if(!fortniteSquadStats.isEmpty){
             count += 1
         }
         

@@ -60,8 +60,8 @@ class FreeAgentObject: NSObject, NSCoding {
         }
     }
     
-    var _questions = [[String]]()
-    var questions: [[String]] {
+    var _questions = [FAQuestion]()
+    var questions: [FAQuestion] {
         get {
             return (_questions)
         }
@@ -80,7 +80,7 @@ class FreeAgentObject: NSObject, NSCoding {
         }
     }
 
-    init(gamerTag: String, competitionId: String, consoles: [String], game: String, userId: String, questions: [[String]])
+    init(gamerTag: String, competitionId: String, consoles: [String], game: String, userId: String, questions: [FAQuestion])
     {
         super.init()
         self.gamerTag = gamerTag
@@ -99,7 +99,7 @@ class FreeAgentObject: NSObject, NSCoding {
         self.game = (decoder.decodeObject(forKey: "game") as! String)
         self.consoles = (decoder.decodeObject(forKey: "consoles") as! [String])
         self.userId = (decoder.decodeObject(forKey: "userId") as! String)
-        self.questions = (decoder.decodeObject(forKey: "questions") as! [[String]])
+        self.questions = (decoder.decodeObject(forKey: "questions") as! [FAQuestion])
         self.statTree = (decoder.decodeObject(forKey: "statTree") as! [String: String])
     }
 

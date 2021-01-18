@@ -141,6 +141,16 @@ class NewsObject: NSObject, NSCoding {
         }
     }
     
+    var _uid:String? = ""
+       var uid:String {
+           get {
+               return (_uid)!
+           }
+           set (newVal) {
+               _uid = newVal
+           }
+       }
+    
     init(title: String, author: String, storyText: String, imageUrl: String?)
     {
         super.init()
@@ -166,7 +176,7 @@ class NewsObject: NSObject, NSCoding {
         self.type = (decoder.decodeObject(forKey: "type") as! String)
         self.image = (decoder.decodeObject(forKey: "image") as! UIImage)
         self.imageAdded = (decoder.decodeObject(forKey: "imageAdded") as! Bool)
-        
+        self.uid = (decoder.decodeObject(forKey: "uid") as! String)
     }
     
     func encode(with coder: NSCoder) {
@@ -183,5 +193,6 @@ class NewsObject: NSObject, NSCoding {
         coder.encode(self.source, forKey: "type")
         coder.encode(self.source, forKey: "image")
         coder.encode(self.source, forKey: "imageAdded")
+        coder.encode(self.source, forKey: "uid")
     }
 }

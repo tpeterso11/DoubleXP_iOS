@@ -32,6 +32,11 @@ class FAQuizConfirmation: UIViewController, UICollectionViewDataSource, UICollec
         //questions.append(one)
         questions.append(contentsOf: interviewManager!.questions)
         questions.remove(at: 0)
+        for question in questions{
+            if(!question.optionsUrl.isEmpty){
+                questions.remove(at: questions.index(of: question)!)
+            }
+        }
         
         questionList.delegate = self
         questionList.dataSource = self

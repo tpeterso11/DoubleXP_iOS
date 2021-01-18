@@ -41,6 +41,36 @@ class User: NSObject, NSCoding {
         }
     }
     
+    var _selectedAge = ""
+    var selectedAge: String {
+        get {
+            return (_selectedAge)
+        }
+        set (newVal) {
+            _selectedAge = newVal
+        }
+    }
+    
+    var _primaryLanguage = ""
+    var primaryLanguage: String {
+        get {
+            return (_primaryLanguage)
+        }
+        set (newVal) {
+            _primaryLanguage = newVal
+        }
+    }
+    
+    var _secondaryLanguage = ""
+    var secondaryLanguage: String {
+        get {
+            return (_secondaryLanguage)
+        }
+        set (newVal) {
+            _secondaryLanguage = newVal
+        }
+    }
+    
     var _senderId = ""
        var senderId: String {
            get {
@@ -61,6 +91,16 @@ class User: NSObject, NSCoding {
         }
     }
     
+    var _onlineStatus = "idle"
+    var onlineStatus: String {
+        get {
+            return (_onlineStatus)
+        }
+        set (newVal) {
+            _onlineStatus = newVal
+        }
+    }
+    
     var _games = [String]()
     var games:[String] {
         get {
@@ -68,6 +108,16 @@ class User: NSObject, NSCoding {
         }
         set (newVal) {
             _games = newVal
+        }
+    }
+    
+    var _viewedAnnouncements = [String]()
+    var viewedAnnouncements:[String] {
+        get {
+            return (_viewedAnnouncements)
+        }
+        set (newVal) {
+            _viewedAnnouncements = newVal
         }
     }
     
@@ -121,6 +171,16 @@ class User: NSObject, NSCoding {
         }
     }
     
+    var _twitchConnect = ""
+    var twitchConnect: String {
+        get {
+            return (_twitchConnect)
+        }
+        set (newVal) {
+            _twitchConnect = newVal
+        }
+    }
+    
     var _messagingNotifications = false
     var messagingNotifications: Bool {
         get {
@@ -161,6 +221,16 @@ class User: NSObject, NSCoding {
         }
     }
     
+    var _mobile = false
+    var mobile: Bool {
+        get {
+            return (_mobile)
+        }
+        set (newVal) {
+            _mobile = newVal
+        }
+    }
+    
     var _nintendo = false
     var nintendo: Bool {
         get {
@@ -181,6 +251,26 @@ class User: NSObject, NSCoding {
         }
     }
     
+    var _dailyCheck = ""
+    var dailyCheck: String {
+        get {
+            return (_dailyCheck)
+        }
+        set (newVal) {
+            _dailyCheck = newVal
+        }
+    }
+    
+    var _timezone = "timezone"
+    var timezone: String {
+        get {
+            return (_timezone)
+        }
+        set (newVal) {
+            _timezone = newVal
+        }
+    }
+    
     var _notifications = "true"
     var notifications: String {
         get {
@@ -188,6 +278,96 @@ class User: NSObject, NSCoding {
         }
         set (newVal) {
             _notifications = newVal
+        }
+    }
+    
+    var _userLat = 0.0
+    var userLat: Double {
+        get {
+            return (_userLat)
+        }
+        set (newVal) {
+            _userLat = newVal
+        }
+    }
+    
+    var _blockList = [String]()
+    var blockList: [String] {
+        get {
+            return (_blockList)
+        }
+        set (newVal) {
+            _blockList = newVal
+        }
+    }
+    
+    var _badges = [BadgeObj]()
+    var badges: [BadgeObj] {
+        get {
+            return (_badges)
+        }
+        set (newVal) {
+            _badges = newVal
+        }
+    }
+    
+    var _restrictList = [String]()
+    var restrictList: [String] {
+        get {
+            return (_restrictList)
+        }
+        set (newVal) {
+            _restrictList = newVal
+        }
+    }
+    
+    var _cachedRecommendedUids = [String]()
+    var cachedRecommendedUids: [String] {
+        get {
+            return (_cachedRecommendedUids)
+        }
+        set (newVal) {
+            _cachedRecommendedUids = newVal
+        }
+    }
+    
+    var _reviews = [String]()
+    var reviews: [String] {
+        get {
+            return (_reviews)
+        }
+        set (newVal) {
+            _reviews = newVal
+        }
+    }
+    
+    var _receivedAnnouncements = [String]()
+    var receivedAnnouncements: [String] {
+        get {
+            return (_receivedAnnouncements)
+        }
+        set (newVal) {
+            _receivedAnnouncements = newVal
+        }
+    }
+    
+    var _recommendedGames = [String]()
+    var recommendedGames: [String] {
+        get {
+            return (_recommendedGames)
+        }
+        set (newVal) {
+            _recommendedGames = newVal
+        }
+    }
+    
+    var _userLong = 0.0
+    var userLong: Double {
+        get {
+            return (_userLong)
+        }
+        set (newVal) {
+            _userLong = newVal
         }
     }
     
@@ -211,8 +391,8 @@ class User: NSObject, NSCoding {
         }
     }
     
-    var _teams = [TeamObject]()
-    var teams: [TeamObject] {
+    var _teams = [EasyTeamObj]()
+    var teams: [EasyTeamObj] {
         get {
             return (_teams)
         }
@@ -221,8 +401,8 @@ class User: NSObject, NSCoding {
         }
     }
     
-    var _teamInvites = [TeamObject]()
-    var teamInvites: [TeamObject] {
+    var _teamInvites = [TeamInviteObject]()
+    var teamInvites: [TeamInviteObject] {
         get {
             return (_teamInvites)
         }
@@ -303,6 +483,16 @@ class User: NSObject, NSCoding {
         }
     }
     
+    var _currentOnlineAnnounement: OnlineObj?
+    var currentOnlineAnnounement: OnlineObj? {
+        get {
+            return (_currentOnlineAnnounement)
+        }
+        set (newVal) {
+            _currentOnlineAnnounement = newVal
+        }
+    }
+    
     
     func getConsoleString() -> String{
         var buildString = ""
@@ -340,6 +530,26 @@ class User: NSObject, NSCoding {
         return array
     }
     
+    func userCanSendInvites() -> Bool {
+        var canSend = false
+        if(!self.gamerTags.isEmpty){
+            for profile in self.gamerTags{
+                if(!profile.gamerTag.isEmpty){
+                    canSend = true
+                    break
+                }
+            }
+        }
+        
+        if(!canSend){
+            if(!self.gamerTag.isEmpty){
+                canSend = true
+            }
+        }
+        
+        return canSend
+    }
+    
     init(uId: String)
     {
         super.init()
@@ -357,12 +567,13 @@ class User: NSObject, NSCoding {
         self.messagingNotifications = (decoder.decodeObject(forKey: "messagingNotifications") as! Bool)
         self.sentRequests = (decoder.decodeObject(forKey: "sentRequests") as! [FriendRequestObject])
         self.pendingRequests = (decoder.decodeObject(forKey: "pendingRequests") as! [FriendRequestObject])
-        self.teams = (decoder.decodeObject(forKey: "teams") as! [TeamObject])
-        self.teamInvites = (decoder.decodeObject(forKey: "teamInvites") as! [TeamObject])
+        self.teams = (decoder.decodeObject(forKey: "teams") as! [EasyTeamObj])
+        self.teamInvites = (decoder.decodeObject(forKey: "teamInvites") as! [TeamInviteObject])
         self.stats = (decoder.decodeObject(forKey: "stats") as! [StatObject])
         self.chatObjects = (decoder.decodeObject(forKey: "chatObjects") as! [ChatObject])
         self.sendBirdId = (decoder.decodeObject(forKey: "sendBirdId") as! String)
         self.search = (decoder.decodeObject(forKey: "search") as! String)
+        self.dailyCheck = (decoder.decodeObject(forKey: "dailyCheck") as! String)
         self.notifications = (decoder.decodeObject(forKey: "notifications") as! String)
         self.teamInviteRequests = (decoder.decodeObject(forKey: "teamInviteRequests") as! [RequestObject])
         self.subscriptions = (decoder.decodeObject(forKey: "subscriptions") as! [String])
@@ -370,6 +581,20 @@ class User: NSObject, NSCoding {
         self.acceptedTempRivals = (decoder.decodeObject(forKey: "acceptedTempRivals") as! [RivalObj])
         self.rejectedTempRivals = (decoder.decodeObject(forKey: "rejectedTempRivals") as! [RivalObj])
         self.tempRivals = (decoder.decodeObject(forKey: "tempRivals") as! [RivalObj])
+        self.twitchConnect = (decoder.decodeObject(forKey: "twitchConnect") as! String)
+        self.viewedAnnouncements = (decoder.decodeObject(forKey: "viewedAnnouncements") as! [String])
+        self.selectedAge = (decoder.decodeObject(forKey: "selectedAge") as! String)
+        self.primaryLanguage = (decoder.decodeObject(forKey: "primaryLanguage") as! String)
+        self.secondaryLanguage = (decoder.decodeObject(forKey: "secondaryLanguage") as! String)
+        self.blockList = (decoder.decodeObject(forKey: "blockList") as! [String])
+        self.restrictList = (decoder.decodeObject(forKey: "restrictList") as! [String])
+        self.onlineStatus = (decoder.decodeObject(forKey: "onlineStatus") as! String)
+        self.currentOnlineAnnounement = (decoder.decodeObject(forKey: "currentOnlineAnnounement") as! OnlineObj)
+        self.reviews = (decoder.decodeObject(forKey: "reviews") as! [String])
+        self.cachedRecommendedUids = (decoder.decodeObject(forKey: "cachedRecommendedUids") as! [String])
+        self.receivedAnnouncements = (decoder.decodeObject(forKey: "receivedAnnouncements") as! [String])
+        self.recommendedGames = (decoder.decodeObject(forKey: "recommendedGames") as! [String])
+        self.badges = (decoder.decodeObject(forKey: "badges") as! [BadgeObj])
     }
     
     func encode(with coder: NSCoder) {
@@ -394,6 +619,30 @@ class User: NSObject, NSCoding {
         coder.encode(self.acceptedTempRivals, forKey: "acceptedTempRivals")
         coder.encode(self.rejectedTempRivals, forKey: "rejectedTempRivals")
         coder.encode(self.tempRivals, forKey: "tempRivals")
+        coder.encode(self.twitchConnect, forKey: "twitchConnect")
+        coder.encode(self.viewedAnnouncements, forKey: "viewedAnnouncements")
+        coder.encode(self.selectedAge, forKey: "selectedAge")
+        coder.encode(self.primaryLanguage, forKey: "primaryLanguage")
+        coder.encode(self.secondaryLanguage, forKey: "secondaryLanguage")
+        coder.encode(self.blockList, forKey: "blockList")
+        coder.encode(self.blockList, forKey: "restrictList")
+        coder.encode(self.onlineStatus, forKey: "onlineStatus")
+        coder.encode(self.currentOnlineAnnounement, forKey: "currentOnlineAnnounement")
+        coder.encode(self.reviews, forKey: "reviews")
+        coder.encode(self.badges, forKey: "badges")
+        coder.encode(self.dailyCheck, forKey: "dailyCheck")
+        coder.encode(self.cachedRecommendedUids, forKey: "cachedRecommendedUserIds")
+        coder.encode(self.receivedAnnouncements, forKey: "receivedAnnouncements")
+        coder.encode(self.recommendedGames, forKey: "recommendedGames")
+    }
+    
+    struct Post: Hashable, Equatable {
+        let gamertag: String
+        var hashValue: Int { get { return gamertag.hashValue } }
+    }
+
+    static func ==(left:User, right:User) -> Bool {
+        return left.gamerTag == right.gamerTag
     }
 }
 

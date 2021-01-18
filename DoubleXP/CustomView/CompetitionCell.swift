@@ -9,8 +9,9 @@
 import Foundation
 import UIKit
 import VideoBackground
+import CollectionViewSlantedLayout
 
-class CompetitionCell: UICollectionViewCell{
+class CompetitionCell: CollectionViewSlantedCell{
     @IBOutlet weak var competitionName: UILabel!
     @IBOutlet weak var topPrize: UILabel!
     @IBOutlet weak var gameName: UILabel!
