@@ -65,7 +65,8 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     private var selectedGames = [GamerConnectGame]()
     @IBOutlet weak var primaryPicker: UIPickerView!
     @IBOutlet weak var ageSkip: UIView!
-    var languages = ["none", "english", "chinese", "spanish", "hindi", "arabic", "bengali", "portuguese", "russian", "japanese", "lahnda"]
+    var fallBacklanguages = ["none", "english", "chinese", "spanish", "hindi", "arabic", "bengali", "portuguese", "russian", "japanese", "lahnda"]
+    var languageList = [String]()
     var secondLanguage = [String]()
     var locationLat = 0.0
     var locationLong = 0.0
@@ -88,6 +89,15 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         for game in delegate.gcGames {
             if(game.available == "true"){
                 list.append(game)
+            }
+        }
+        
+        
+        self.languageList.append("english")
+        let sortedList = delegate.languageList.sorted(by: <)
+        for language in sortedList {
+            if(!self.languageList.contains(language.value)){
+                self.languageList.append(language.key.lowercased())
             }
         }
         
@@ -153,7 +163,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             if(currendSelectedGender != "male"){
                 currendSelectedGender = "male"
                 self.updateGCContinueGender()
-                UIView.animate(withDuration: 0.5, animations: {
+                UIView.animate(withDuration: 0.3, animations: {
                     self.maleCover.alpha = 1
                     self.femaleCover.alpha = 0
                     self.transgenderCover.alpha = 0
@@ -163,7 +173,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             } else {
                 self.currendSelectedGender = ""
                 self.updateGCContinueGender()
-                UIView.animate(withDuration: 0.5, animations: {
+                UIView.animate(withDuration: 0.3, animations: {
                     self.maleCover.alpha = 0
                     self.femaleCover.alpha = 0
                     self.transgenderCover.alpha = 0
@@ -176,7 +186,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             if(currendSelectedGender != "female"){
                 currendSelectedGender = "female"
                 self.updateGCContinueGender()
-                UIView.animate(withDuration: 0.5, animations: {
+                UIView.animate(withDuration: 0.3, animations: {
                     self.maleCover.alpha = 0
                     self.femaleCover.alpha = 1
                     self.transgenderCover.alpha = 0
@@ -186,7 +196,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             } else {
                 self.currendSelectedGender = ""
                 self.updateGCContinueGender()
-                UIView.animate(withDuration: 0.5, animations: {
+                UIView.animate(withDuration: 0.3, animations: {
                     self.maleCover.alpha = 0
                     self.femaleCover.alpha = 0
                     self.transgenderCover.alpha = 0
@@ -199,7 +209,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             if(currendSelectedGender != "transgender"){
                 currendSelectedGender = "transgender"
                 self.updateGCContinueGender()
-                UIView.animate(withDuration: 0.5, animations: {
+                UIView.animate(withDuration: 0.3, animations: {
                     self.maleCover.alpha = 0
                     self.femaleCover.alpha = 0
                     self.transgenderCover.alpha = 1
@@ -209,7 +219,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             } else {
                 self.currendSelectedGender = ""
                 self.updateGCContinueGender()
-                UIView.animate(withDuration: 0.5, animations: {
+                UIView.animate(withDuration: 0.3, animations: {
                     self.maleCover.alpha = 0
                     self.femaleCover.alpha = 0
                     self.transgenderCover.alpha = 0
@@ -222,7 +232,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             if(currendSelectedGender != "other"){
                 currendSelectedGender = "other"
                 self.updateGCContinueGender()
-                UIView.animate(withDuration: 0.5, animations: {
+                UIView.animate(withDuration: 0.3, animations: {
                     self.maleCover.alpha = 0
                     self.femaleCover.alpha = 0
                     self.transgenderCover.alpha = 0
@@ -232,7 +242,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             } else {
                 self.currendSelectedGender = ""
                 self.updateGCContinueGender()
-                UIView.animate(withDuration: 0.5, animations: {
+                UIView.animate(withDuration: 0.3, animations: {
                     self.maleCover.alpha = 0
                     self.femaleCover.alpha = 0
                     self.transgenderCover.alpha = 0
@@ -245,7 +255,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             if(currendSelectedGender != "unidentified"){
                 currendSelectedGender = "unidentified"
                 self.updateGCContinueGender()
-                UIView.animate(withDuration: 0.5, animations: {
+                UIView.animate(withDuration: 0.3, animations: {
                     self.maleCover.alpha = 0
                     self.femaleCover.alpha = 0
                     self.transgenderCover.alpha = 0
@@ -255,7 +265,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             } else {
                 self.currendSelectedGender = ""
                 self.updateGCContinueGender()
-                UIView.animate(withDuration: 0.5, animations: {
+                UIView.animate(withDuration: 0.3, animations: {
                     self.maleCover.alpha = 0
                     self.femaleCover.alpha = 0
                     self.transgenderCover.alpha = 0
@@ -308,7 +318,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             if(selectedAge != "12_16"){
                 selectedAge = "12_16"
                 self.updateGCContinueAge()
-                UIView.animate(withDuration: 0.5, animations: {
+                UIView.animate(withDuration: 0.3, animations: {
                     self.youngCover.alpha = 1
                     self.oldCover.alpha = 0
                     self.midCover.alpha = 0
@@ -318,7 +328,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             } else {
                 self.selectedAge = ""
                 self.updateGCContinueAge()
-                UIView.animate(withDuration: 0.5, animations: {
+                UIView.animate(withDuration: 0.3, animations: {
                     self.youngCover.alpha = 0
                     self.oldCover.alpha = 0
                     self.midCover.alpha = 0
@@ -331,7 +341,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             if(selectedAge != "17_24"){
                 selectedAge = "17_24"
                 self.updateGCContinueAge()
-                UIView.animate(withDuration: 0.5, animations: {
+                UIView.animate(withDuration: 0.3, animations: {
                     self.youngCover.alpha = 0
                     self.oldCover.alpha = 0
                     self.midCover.alpha = 1
@@ -341,7 +351,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             } else {
                 self.selectedAge = ""
                 self.updateGCContinueAge()
-                UIView.animate(withDuration: 0.5, animations: {
+                UIView.animate(withDuration: 0.3, animations: {
                     self.youngCover.alpha = 0
                     self.oldCover.alpha = 0
                     self.midCover.alpha = 0
@@ -354,7 +364,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             if(selectedAge != "25_31"){
                 selectedAge = "25_31"
                 self.updateGCContinueAge()
-                UIView.animate(withDuration: 0.5, animations: {
+                UIView.animate(withDuration: 0.3, animations: {
                     self.youngCover.alpha = 0
                     self.oldCover.alpha = 1
                     self.midCover.alpha = 0
@@ -364,7 +374,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             } else {
                 self.selectedAge = ""
                 self.updateGCContinueAge()
-                UIView.animate(withDuration: 0.5, animations: {
+                UIView.animate(withDuration: 0.3, animations: {
                     self.youngCover.alpha = 0
                     self.oldCover.alpha = 0
                     self.midCover.alpha = 0
@@ -377,7 +387,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             if(selectedAge != "32_over"){
                 selectedAge = "32_over"
                 self.updateGCContinueAge()
-                UIView.animate(withDuration: 0.5, animations: {
+                UIView.animate(withDuration: 0.3, animations: {
                     self.youngCover.alpha = 0
                     self.oldCover.alpha = 0
                     self.midCover.alpha = 0
@@ -387,7 +397,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             } else {
                 self.selectedAge = ""
                 self.updateGCContinueAge()
-                UIView.animate(withDuration: 0.5, animations: {
+                UIView.animate(withDuration: 0.3, animations: {
                     self.youngCover.alpha = 0
                     self.oldCover.alpha = 0
                     self.midCover.alpha = 0
@@ -400,7 +410,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             if(selectedAge != "unidentified"){
                 selectedAge = "unidentified"
                 self.updateGCContinueAge()
-                UIView.animate(withDuration: 0.5, animations: {
+                UIView.animate(withDuration: 0.3, animations: {
                     self.youngCover.alpha = 0
                     self.oldCover.alpha = 0
                     self.midCover.alpha = 0
@@ -410,7 +420,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             } else {
                 self.selectedAge = ""
                 self.updateGCContinueAge()
-                UIView.animate(withDuration: 0.5, animations: {
+                UIView.animate(withDuration: 0.3, animations: {
                     self.youngCover.alpha = 0
                     self.oldCover.alpha = 0
                     self.midCover.alpha = 0
@@ -436,6 +446,8 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     }
     
     @objc private func advanceToLanguage(){
+        self.selectedPrimaryLanguage = "english"
+        
         updateContinueGCPrimaryLang()
         UIView.animate(withDuration: 0.5, animations: {
             self.ageLayout.alpha = 0
@@ -490,7 +502,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         if(pickerView == self.primaryPicker){
-            return languages.count
+            return languageList.count
         } else {
             return secondLanguage.count
         }
@@ -498,7 +510,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         if(pickerView == self.primaryPicker){
-            return languages[row]
+            return languageList[row]
         } else {
             return self.secondLanguage[row]
         }
@@ -506,18 +518,22 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         if(pickerView == self.primaryPicker){
-            let current = languages[row]
+            let current = languageList[row]
             self.selectedPrimaryLanguage = current
             updateContinueGCPrimaryLang()
         } else {
-            let current = languages[row]
+            let current = secondLanguage[row]
             self.selectedSecondaryLanguage = current
             updateContinueGCSecondaryLang()
         }
     }
     
     func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
-        return NSAttributedString(string: languages[row], attributes: [NSAttributedString.Key.foregroundColor: UIColor.white])
+        if(pickerView == self.primaryPicker){
+            return NSAttributedString(string: languageList[row], attributes: [NSAttributedString.Key.foregroundColor: UIColor.white])
+        } else {
+            return NSAttributedString(string: secondLanguage[row], attributes: [NSAttributedString.Key.foregroundColor: UIColor.white])
+        }
     }
     
     func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
@@ -544,9 +560,11 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     }
     
     @objc private func advanceToSecondary(){
-        self.secondLanguage = languages
+        self.secondLanguage = [String]()
+        self.secondLanguage.append("none")
+        self.secondLanguage.append(contentsOf: languageList)
         if(secondLanguage.contains(self.selectedPrimaryLanguage)){
-            self.secondLanguage.remove(at: secondLanguage.index(of: self.selectedPrimaryLanguage)!)
+            self.secondLanguage.remove(at: self.secondLanguage.index(of: self.selectedPrimaryLanguage)!)
         }
         updateContinueGCSecondaryLang()
         self.secondaryPicker.delegate = self

@@ -22,4 +22,5 @@ class ProfileTwitchCell: UITableViewCell {
     @IBOutlet weak var currentUserView: UIView!
     @IBOutlet weak var twitchWV: WKWebView!
     @IBOutlet weak var twitchLogo: UIImageView!
+    @IBOutlet weak var popOutPlayer: TestPlayer!
 }

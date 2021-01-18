@@ -25,7 +25,8 @@ class InterviewManager{
     func initialize(gameName: String, uId: String, gamerConnectGame: GamerConnectGame){
         self.currentGCGame = gamerConnectGame
         let profileManager = GamerProfileManager()
-        faObject = FreeAgentObject(gamerTag: profileManager.getGamerTagForGame(gameName: gameName), competitionId: "", consoles: [String](), game: gameName, userId: uId, questions: [FAQuestion]())
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        faObject = FreeAgentObject(gamerTag: profileManager.getGamerTag(user: delegate.currentUser!), competitionId: "", consoles: [String](), game: gameName, userId: uId, questions: [FAQuestion]())
     }
     
     func setConsoles(console: String){
@@ -71,7 +72,7 @@ class InterviewManager{
         if(currentQuestionIndex == 0 && !question.question1SetURL.isEmpty){
             updateQuestions(answer: answer, answerArray: answerArray, faQuestion: question)
             
-            getQuiz(url: question.question1SetURL, secondary: true, callbacks: nil)
+            getQuiz(url: question.question1SetURL, secondary: true, gameName: self.currentGCGame.gameName, callbacks: nil)
         }
         else{
             updateQuestions(answer: answer, answerArray: answerArray, faQuestion: question)
@@ -80,7 +81,29 @@ class InterviewManager{
                 showNextQuestion()
             }
             else{
-               showConsoles()
+                if(currentGCGame.availablebConsoles.count == 1){
+                    setConsoles(console: currentGCGame.availablebConsoles[0])
+                    return
+                }
+                
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                let currentUser = delegate.currentUser!
+                var console = ""
+                var consoleTwo = ""
+                for profile in currentUser.gamerTags {
+                    if(profile.game == currentGCGame.gameName){
+                        if(console.isEmpty){
+                            console = profile.console
+                        } else {
+                            consoleTwo = profile.console
+                        }
+                    }
+                }
+                if(!console.isEmpty && consoleTwo.isEmpty){
+                    setConsoles(console: console)
+                } else {
+                    showConsoles()
+                }
             }
         }
     }
@@ -99,7 +122,7 @@ class InterviewManager{
         }
     }
     
-    func getQuiz(url: String, secondary: Bool, callbacks: FreeAgentQuizNav?){
+    func getQuiz(url: String, secondary: Bool, gameName: String, callbacks: FreeAgentQuizNav?){
         HTTP.GET(url) { response in
             if let err = response.error {
                 print("error: \(err.localizedDescription)")
@@ -293,7 +316,7 @@ class InterviewManager{
                         faQuestion.optionsUrl = optionsURL
                         faQuestion.maxOptions = maxOptions
                         if(!optionsURL.isEmpty){
-                            self.getOptions(url: optionsURL)
+                            self.getOptions(url: optionsURL, gameName: gameName)
                         }
                         
                         self.questions.append(faQuestion)
@@ -316,7 +339,7 @@ class InterviewManager{
         }
     }
     
-    func getOptions(url: String){
+    func getOptions(url: String, gameName: String){
         HTTP.GET(url) { response in
             if let err = response.error {
                 print("error: \(err.localizedDescription)")
@@ -340,7 +363,7 @@ class InterviewManager{
                                 }
                             }
                             
-                            if(self.faObject!.game == "League Of Legends"){
+                            if(gameName == "League of Legends"){
                                 let imageUrl = self.convertLoLImageUrl(imageName: image)
                                 let moa = Moa()
                                 moa.onSuccess = { image in

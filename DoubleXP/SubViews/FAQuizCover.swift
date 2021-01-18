@@ -118,7 +118,7 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
                 self.currentUrl = "https://firebasestorage.googleapis.com/v0/b/gameterminal-767f7.appspot.com/o/esports%2Fcompetition_questions%2Fgeneric_shooter_questions.json?alt=media&token=42895bf2-5881-4143-8eae-0099b7a8702d"
             }
             
-            self.interviewManager?.getQuiz(url: self.currentUrl, secondary: false, callbacks: self)
+            self.interviewManager?.getQuiz(url: self.currentUrl, secondary: false, gameName: (self.interviewManager?.currentGCGame!.gameName)!, callbacks: self)
         }) { (error) in
             AppEvents.logEvent(AppEvents.Name(rawValue: "FA Quiz Front - Error Loading Quiz"))
             print(error.localizedDescription)

@@ -15,6 +15,9 @@ class ProfileUnknownInteractionCell: UITableViewCell {
     @IBOutlet weak var pendingUserCover: UIView!
     @IBOutlet weak var acceptButton: UIButton!
     @IBOutlet weak var declineButton: UIButton!
+    @IBOutlet weak var imGamingButton: UIButton!
+    @IBOutlet weak var noFriendsCover: UIView!
+    @IBOutlet weak var noFriendsEdit: UIButton!
     
     @IBOutlet weak var editButton: UIButton!
 }

@@ -356,7 +356,7 @@ class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource 
                     var adjustedPayload = [current.answer]
                     cell.question.text = current.question
                     
-                    cell.setOptions(options: adjustedPayload, cache: self.localImageCache)
+                    //cell.setOptions(options: adjustedPayload, cache: self.localImageCache)
                     
                     return cell
                 } else {
@@ -374,7 +374,7 @@ class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource 
                     let cell = tableView.dequeueReusableCell(withIdentifier: "optionCell", for: indexPath) as! OptionAnswerCell
                     
                     cell.question.text = current.question
-                    cell.setOptions(options: current.answerArray, cache: self.localImageCache)
+                    //cell.setOptions(options: current.answerArray, cache: self.localImageCache, )
                     
                     return cell
                 } else if(currentArray.count > 1){
@@ -551,9 +551,9 @@ class FADash: ParentVC, FACallbacks, UITableViewDelegate, UITableViewDataSource 
     }
     
     @objc func quizButtonClicked(_ sender: AnyObject?) {
-        var position = sender?.tag
+        /*var position = sender?.tag
         if(sender?.tag != nil){
             showQuiz(position: sender!.tag)
-        }
+        }*/
     }
 }

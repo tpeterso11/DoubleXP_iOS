@@ -68,6 +68,23 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
                 gameHeaderImage.moa.url = game!.imageUrl
             }
             gameHeaderImage.contentMode = .scaleAspectFill
+            
+            let testBounds = CGRect(x: self.gameHeaderImage.bounds.minX, y: self.gameHeaderImage.bounds.minY, width: self.view.bounds.width, height: self.gameHeaderImage.bounds.height)
+            
+            
+            let maskLayer = CAGradientLayer(layer: self.gameHeaderImage.layer)
+            maskLayer.colors = [UIColor.black.cgColor, UIColor.clear.cgColor]
+            maskLayer.startPoint = CGPoint(x: 0, y: 0.5)
+            maskLayer.endPoint = CGPoint(x: 0, y: 1)
+            maskLayer.frame = testBounds
+            self.gameHeaderImage.layer.mask = maskLayer
+            
+            /*gameHeaderImage.layer.shadowColor = UIColor.black.cgColor
+            gameHeaderImage.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+            gameHeaderImage.layer.shadowRadius = 2.0
+            gameHeaderImage.layer.shadowOpacity = 0.5
+            gameHeaderImage.layer.masksToBounds = true
+            gameHeaderImage.layer.shadowPath = UIBezierPath(roundedRect: gameHeaderImage.bounds, cornerRadius: gameHeaderImage.layer.cornerRadius).cgPath*/
             //gameImageHeader.clipsToBounds = true
             
             searchPS = false
@@ -121,36 +138,41 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
             }
             
             if(availableCount == 0 || availableCount == 1){
-                self.pcSwitch.alpha = 0
-                self.pcLabel.alpha = 0
-                self.mobileSwitch.alpha = 0
-                self.mobileLabel.alpha = 0
-                self.psSwitch.alpha = 0
-                self.psLabel.alpha = 0
-                self.nintendoSwitch.alpha = 0
-                self.nintendoLabel.alpha = 0
-                self.xboxSwitch.alpha = 0
-                self.xboxLabel.alpha = 0
+                self.pcSwitch.alpha = 0.4
+                self.pcLabel.alpha = 0.4
+                self.mobileSwitch.alpha = 0.4
+                self.mobileLabel.alpha = 0.4
+                self.psSwitch.alpha = 0.4
+                self.psLabel.alpha = 0.4
+                self.nintendoSwitch.alpha = 0.4
+                self.nintendoLabel.alpha = 0.4
+                self.xboxSwitch.alpha = 0.4
+                self.xboxLabel.alpha = 0.4
                 
                 if(availableCount == 1){
                     if(psAvailable){
                         searchPS = true
+                        self.psSwitch.setOn(true, animated: false)
                         manager.currentSelectedConsoles.append("ps")
                     }
                     if(xboxAvailable){
                         searchXbox = true
+                        self.xboxSwitch.setOn(true, animated: false)
                         manager.currentSelectedConsoles.append("xbox")
                     }
                     if(nintendoAvailable){
                         searchNintendo = true
+                        self.nintendoSwitch.setOn(true, animated: false)
                         manager.currentSelectedConsoles.append("nintendo")
                     }
                     if(pcAvailable){
                         searchPC = true
+                        self.pcSwitch.setOn(true, animated: false)
                         manager.currentSelectedConsoles.append("pc")
                     }
                     if(mobileAvailable){
                         searchMobile = true
+                        self.mobileSwitch.setOn(true, animated: false)
                         manager.currentSelectedConsoles.append("mobile")
                     }
                 }
@@ -324,6 +346,7 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
             filterButton.addGestureRecognizer(singleTap)
             
             checkRivals()
+            FriendsManager().checkOnlineAnnouncements()
         }
     }
     
@@ -517,13 +540,30 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
             
             let manager = GamerProfileManager()
             let current = returnedUsers[indexPath.item]
-            cell.gamerTag.text = manager.getGamerTagForOtherUserForGame(gameName: self.game!.gameName, returnedUser: (current as! User))
+            cell.gamerTag.text = manager.getGamerTag(user: (current as! User))
             
             if((current as! User).bio.isEmpty){
                 cell.consoleTag.text = "No bio available."
             }
             else{
                 cell.consoleTag.text = (current as! User).bio
+            }
+            
+            if((current as! User).onlineStatus.isEmpty){
+                cell.onlineStatus.alpha = 0
+            } else {
+                if((current as! User).onlineStatus == "online"){
+                    cell.onlineStatus.alpha = 1
+                    cell.onlineStatus.textColor = #colorLiteral(red: 0.2039215686, green: 0.7803921569, blue: 0.3490196078, alpha: 0.6032480736)
+                    cell.onlineStatus.text = "online now!"
+                } else if((current as! User).onlineStatus == "gaming right NOW!"){
+                    cell.onlineStatus.alpha = 1
+                    cell.onlineStatus.textColor = #colorLiteral(red: 0.2039215686, green: 0.7803921569, blue: 0.3490196078, alpha: 0.6032480736)
+                    cell.onlineStatus.text = "gaming right NOW!"
+                    cell.onlineStatus.font = UIFont.boldSystemFont(ofSize: cell.onlineStatus.font.pointSize)
+                } else {
+                    cell.onlineStatus.alpha = 0
+                }
             }
             
             cell.consoleOne.alpha = 1
@@ -845,7 +885,7 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
                         let gamerProfileManager = GamerProfileManager()
                         
                         if(userName != nil){
-                            if(!gamerTag.isEmpty && gamerTag == trimmedUser && (gamerProfileManager.getGamerTagForGame(gameName: self.game!.gameName) != userName)){
+                            if(!gamerTag.isEmpty && gamerTag == trimmedUser && (gamerProfileManager.getGamerTag(user: self.currentUser!) == userName)){
                                 
                                 let uId = (user as! DataSnapshot).key
                                 let bio = value?["bio"] as? String ?? ""
@@ -972,7 +1012,7 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
         if(current is String){
             return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(40))
         } else {
-            return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(100))
+            return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(120))
         }
     }
     
@@ -982,8 +1022,7 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
         
         for obj in returnedUsers{
             if(obj is User){
-                if(manager.getGamerTagForOtherUserForGame(gameName: self.game!.gameName, returnedUser: obj as! User) == manager.getGamerTagForOtherUserForGame(gameName: self.game!.gameName, returnedUser: returnedUser)){
-                    
+                if((obj as! User).gamerTag == returnedUser.gamerTag){
                     contained = true
                     break
                 }

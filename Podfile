@@ -38,8 +38,12 @@ target 'DoubleXP' do
   pod 'CollectionPickerView'
   pod 'SPStorkController'
   pod 'Giphy'
+  pod 'Google-Mobile-Ads-SDK'
   pod 'GeoFire', '~> 4.0'
   pod 'SwiftLocation', '~> 4.0'
+  pod "LinearProgressBar"
+  pod 'Cosmos', '~> 23.0'
+  pod "FlagPhoneNumber"
   
   # Pods for DoubleXP
 

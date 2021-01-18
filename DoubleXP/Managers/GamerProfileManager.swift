@@ -11,47 +11,13 @@ import UIKit
 
 class GamerProfileManager{
     
-    func getGamerTagForGame(gameName: String) -> String {
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        let user = delegate.currentUser
-        
-        if(user != nil){
-            for gamerProfile in user!.gamerTags{
-                if(gamerProfile.game == gameName){
-                    return gamerProfile.gamerTag
-                }
-            }
-        }
-        
-        return user?.gamerTag ?? ""
-    }
-    
-    func getGamerTagForOtherUserForGame(gameName: String, returnedUser: User) -> String{
-        for gamerProfile in returnedUser.gamerTags{
-            if(gamerProfile.game == gameName){
-                return gamerProfile.gamerTag
-            }
-        }
-        
-        return returnedUser.gamerTag
-    }
-    
-    func getGamerTagForOtherUserForGameProfiles(gameName: String, array: [GamerProfile]) -> String{
-        for gamerProfile in array{
-            if(gamerProfile.game == gameName){
-                return gamerProfile.gamerTag
-            }
-        }
-        
-        return array[0].gamerTag
-    }
-    
     func getGamerTag(user: User) -> String{
-        if(!user.gamerTags.isEmpty){
-            return (user.gamerTags[0].gamerTag)
-        }
-        else{
+        if(!user.gamerTag.isEmpty){
             return user.gamerTag
+        } else if(!user.gamerTags.isEmpty){
+            return (user.gamerTags[0].gamerTag)
+        } else{
+            return ""
         }
     }
     

@@ -44,6 +44,7 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
     //@IBOutlet weak var sendButton: UIButton!
     
     var estimatedHeight: CGFloat?
+    var constantInputHeight: CGFloat!
     private var emptyShowing = false
     private var messagesSet = false
     
@@ -59,6 +60,7 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
         
         self.showLoading()
         self.emptyShowing = true
+        self.constantInputHeight = self.inputDrawer.bounds.height
         
         self.inputField.returnKeyType = .done
         self.inputField.delegate = self
@@ -91,6 +93,7 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
                 self.loadingAnimation.alpha = 1
                 self.loadingAnimation.loopMode = .loop
                 self.loadingAnimation.play()
+                self.animateView()
             }, completion: { (finished: Bool) in
                 self.manager!.setup(sendBirdId: self.currentUser!.sendBirdId, currentUser: self.currentUser!, messagingCallbacks: self)
             })
@@ -188,7 +191,7 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
         else if(groupChannelUrl == nil && otherUserId == nil){
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             let currentUser = appDelegate.currentUser
-            manager?.createTeamChannel(userId: currentUser!.uId, callbacks: self)
+            manager?.createTeamChannel(userId: currentUser!.uId, otherUserId: self.otherUserId!, callbacks: self)
         }
         else{
             seeIfChannelExists()
@@ -243,13 +246,13 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
                     if(!contained){
                         let appDelegate = UIApplication.shared.delegate as! AppDelegate
                         let currentUser = appDelegate.currentUser
-                        self.manager?.createTeamChannel(userId: currentUser!.uId, callbacks: self)
+                        self.manager?.createTeamChannel(userId: currentUser!.uId, otherUserId: self.otherUserId!, callbacks: self)
                     }
                 }
                 else{
                     let appDelegate = UIApplication.shared.delegate as! AppDelegate
                     let currentUser = appDelegate.currentUser
-                    self.manager?.createTeamChannel(userId: currentUser!.uId, callbacks: self)
+                    self.manager?.createTeamChannel(userId: currentUser!.uId, otherUserId: self.otherUserId!, callbacks: self)
                 }
             }
             
@@ -308,7 +311,6 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
     }
     
     private func convertMessages(messages: [SBDUserMessage]){
-        self.animateView()
         let count = messages.count
         
         if(count == 0){
@@ -809,7 +811,7 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
             //self.searchButton.alpha = 1
             //self.bottomNavSearch.transform = top
             
-            self.messagingDeckHeight = height + 80
+            self.messagingDeckHeight = height + 110
             self.constraint?.constant = self.messagingDeckHeight!
             
             UIView.animate(withDuration: 0.5) {
@@ -825,7 +827,7 @@ class MessagingFrag: ParentVC, MessagingCallbacks, SearchCallbacks, UITableViewD
         let top = CGAffineTransform(translationX: 0, y: 0)
         UIView.animate(withDuration: 0.3, animations: {
             self.inputDrawer.transform = top
-            self.constraint?.constant = 250
+            self.constraint?.constant = 150
             
             UIView.animate(withDuration: 0.5) {
                 //self.articleOverlay.alpha = 1

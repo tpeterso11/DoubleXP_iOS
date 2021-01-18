@@ -214,8 +214,12 @@ class FAQuizPage: UIViewController, UICollectionViewDataSource, UICollectionView
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! OptionCell
             cell.answer.text = current as! String
-            if(!self.optionDescriptions.isEmpty){
-                cell.answerDesc.text = self.optionDescriptions[indexPath.item]
+            
+            let index = indexPath.item
+            if index >= 0 && index < self.optionDescriptions.count {
+                cell.answerDesc.text = self.optionDescriptions[index]
+            } else {
+                cell.answerDesc.alpha = 0
             }
             
             cell.contentView.layer.cornerRadius = 20.0
@@ -306,10 +310,19 @@ class FAQuizPage: UIViewController, UICollectionViewDataSource, UICollectionView
     }
     
     @objc private func continueClicked(){
+        if(self.answers.isEmpty){
+            return
+        }
+        
         if(self.answers.count == 1){
-            self.updateAnswer(answer: answers[0], question: question!)
+            let number = Int(question!.maxOptions)
+            if(number ?? 0 > 1){
+                self.updateAnswerArray(answerArray: self.answers, question: question!)
+            } else {
+                self.updateAnswer(answer: self.answers[0], question: question!)
+            }
         } else {
-            self.updateAnswerArray(answerArray: answers, question: question!)
+            self.updateAnswerArray(answerArray: self.answers, question: question!)
         }
     }
     
@@ -332,7 +345,7 @@ class FAQuizPage: UIViewController, UICollectionViewDataSource, UICollectionView
     }
     
     func updateAnswerArray(answerArray: [String], question: FAQuestion) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             self.interviewManager?.updateAnswer(answer: nil, answerArray: answerArray, question: question)
         }
     }

@@ -12,6 +12,8 @@ import Firebase
 import FBSDKCoreKit
 import GoogleSignIn
 import FirebaseMessaging
+import GoogleMobileAds
+import SwiftNotificationCenter
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
@@ -27,10 +29,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var currentLanding: LandingActivity?
     var currentMediaFrag: MediaFrag?
     var currentProfileFrag: PlayerProfile?
-    var currentConnectFrag: GamerConnectFrag?
+    var currentDiscoverGamePage: DiscoverGamePage?
     var currentTeamFrag: TeamFrag?
+    var currentRequests: Requests?
+    var currentFeedFrag: Feed?
     var currentFrag: String = ""
     var interviewManager = InterviewManager()
+    var recommendedUsersManager = RecommnededUsersManager()
     var mediaManager = MediaManager()
     var socialMediaManager = SocialMediaManager()
     var profileManager = ProfileManage()
@@ -45,7 +50,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var registerUserCache = [User]()
     var cachedUserType = ""
     var cachedTest = ""
+    var languageList = [String: String]()
     var currentUpgradeController: Upgrade?
+    var feedSub = "let's do this."
+    var heroLightUrl = ""
+    var heroDarkUrl = ""
+    var cachedUidForMessaging = ""
+    var currentRegisterActivity: RegisterActivity?
+    var currentLoginActivity: LoginController?
+    
+    var currentDiscoverFrag: DiscoverFrag?
+    var currentDiscoverCat: DiscoveryCategoryFrag?
     
     private var apnsToken: String = ""
     private var fcmToken: String = ""
@@ -59,6 +74,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
         
         Messaging.messaging().delegate = self
+        
+        GADMobileAds.sharedInstance().start(completionHandler: nil)
         
         TwitterHelper.shared.start(withConsumerKey: "sEWJZFZjZAIaxwZUrzdd2JPeI", consumerSecret: "K2yk5yy8AHmyC4mMFHecB1WBoowFnf4uMs4ET7zEjFe06hWmCm")
         
@@ -80,8 +97,41 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         application.registerForRemoteNotifications()
         
         getToken()
+        
+        let notificationCenter = NotificationCenter.default
+            notificationCenter.addObserver(self, selector: #selector(appMovedToBackground), name: UIApplication.willResignActiveNotification, object: nil)
+            notificationCenter.addObserver(self, selector: #selector(appCameToForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
 
         return true
+    }
+    
+    @objc func appMovedToBackground() {
+        print("App moved to background!")
+        
+        if(currentUser != nil){
+            let ref = Database.database().reference().child("Users").child(currentUser!.uId)
+            ref.child("onlineStatus").setValue("idle")
+        }
+    }
+    
+    @objc func appCameToForeground() {
+        print("app enters foreground")
+        
+        if(currentUser != nil){
+            let ref = Database.database().reference().child("Users").child(currentUser!.uId)
+            ref.child("onlineStatus").setValue("online")
+        }
+        
+        if(currentFeedFrag != nil){
+            currentFeedFrag!.checkOnlineAnnouncements()
+        }
+    }
+    
+    func registerUserOnlineStatus(){
+        if(currentUser != nil){
+            let ref = Database.database().reference().child("Users").child(currentUser!.uId)
+            ref.child("onlineStatus").setValue("online")
+        }
     }
     
     @available(iOS 9.0, *)
@@ -107,7 +157,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     }
     
     func resetStack(vc: ParentVC){
-        let homeController = GamerConnectFrag()
+        let homeController = Feed()
         homeController.pageName = "Home"
         homeController.navDictionary = ["state": "original"]
         
@@ -117,14 +167,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     }
     
     private func rebuildNavStack(vc: ParentVC){
-        let homeController = GamerConnectFrag()
+        let homeController = Feed()
         
         switch(vc.pageName){
         case "Home":
             self.navStack[vc.pageName!] = vc
         case "View Teams":
             self.navStack = KeepOrderDictionary<String, ParentVC>()
-            self.navStack["Home"] = GamerConnectFrag()
+            self.navStack["Home"] = Feed()
             self.navStack["Team"] = TeamFrag()
             self.navStack[vc.pageName!] = vc
             break
@@ -175,6 +225,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         // Saves changes in the application's managed object context before the application terminates.
         self.saveContext()
+        
+        if(currentUser != nil){
+            let ref = Database.database().reference().child("Users").child(currentUser!.uId)
+            ref.child("onlineStatus").setValue("offline")
+        }
     }
 
     // MARK: - Core Data stack
@@ -265,6 +320,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         print(userInfo)
 
         completionHandler(UIBackgroundFetchResult.newData)
+    }
+    
+    //showing baner in foreground
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.alert, .badge, .sound])
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {

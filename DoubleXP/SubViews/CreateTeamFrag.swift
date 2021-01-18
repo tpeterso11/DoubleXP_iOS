@@ -349,7 +349,7 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         let user = delegate.currentUser
         
         var teammateTags = [String]()
-        teammateTags.append(manager.getGamerTagForGame(gameName: chosenGame))
+        teammateTags.append(manager.getGamerTag(user: delegate.currentUser!))
         
         var teammateIds = [String]()
         teammateIds.append(user?.uId ?? "")
@@ -364,11 +364,11 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         let dateString = formatter.string(from:now)
         
         var teammates = [TeammateObject]()
-        let captain = TeammateObject(gamerTag: manager.getGamerTagForGame(gameName: currentGame!.gameName), date: dateString, uid: user!.uId)
+        let captain = TeammateObject(gamerTag: manager.getGamerTag(user: user!), date: dateString, uid: user!.uId)
         teammates.append(captain)
         
         if(!self.chosenGame.isEmpty){
-            let newTeam = TeamObject(teamName: teamName.text!, teamId: randomAlphaNumericString(length: 12), games: selected, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: manager.getGamerTagForGame(gameName: chosenGame), teamInvites: [TeamInviteObject](), teamChat: "", teamInviteTags: [String](), teamNeeds: currentGame?.teamNeeds ?? [String](), selectedTeamNeeds: [String](), imageUrl: currentGame?.imageUrl ?? "", teamCaptainId: delegate.currentUser!.uId, isRequest: "false")
+            let newTeam = TeamObject(teamName: teamName.text!, teamId: randomAlphaNumericString(length: 12), games: selected, consoles: consoles, teammateTags: teammateTags, teammateIds: teammateIds, teamCaptain: manager.getGamerTag(user: user!), teamInvites: [TeamInviteObject](), teamChat: "", teamInviteTags: [String](), teamNeeds: currentGame?.teamNeeds ?? [String](), selectedTeamNeeds: [String](), imageUrl: currentGame?.imageUrl ?? "", teamCaptainId: delegate.currentUser!.uId, isRequest: "false")
             newTeam.teammates = teammates
             
             createTeam(team: newTeam)
@@ -568,7 +568,7 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
             let manager = MessagingManager()
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             let user = appDelegate.currentUser
-            manager.createTeamChannel(userId: user!.uId, callbacks: self)
+            manager.createTeamChannel(userId: user!.uId, otherUserId: "", callbacks: self)
         }
     }
     
@@ -577,7 +577,7 @@ class CreateTeamFrag: ParentVC, UICollectionViewDataSource, UICollectionViewDele
             let manager = MessagingManager()
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             let user = appDelegate.currentUser
-            manager.createTeamChannel(userId: user!.uId, callbacks: self)
+            manager.createTeamChannel(userId: user!.uId, otherUserId: "", callbacks: self)
         }
     }
     

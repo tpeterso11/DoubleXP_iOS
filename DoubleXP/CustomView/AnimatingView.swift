@@ -11,7 +11,6 @@ import UIKit
 
 class AnimatingView: UIView {
     
-    
     var viewShowing = false
     
     func animateIn() {

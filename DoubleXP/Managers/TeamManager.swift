@@ -144,7 +144,7 @@ class TeamManager{
         let currentUser = delegate.currentUser
         
         let manager = GamerProfileManager()
-        let gamerTag = manager.getGamerTagForGame(gameName: team.games[0])
+        let gamerTag = manager.getGamerTag(user: currentUser!)
         let request = RequestObject(status: "PENDING", teamId: team.teamId, teamName: team.teamName, captainId: team.teamCaptainId, requestId: "\(self.generateRandomDigits(6))", userUid: currentUser?.uId ?? "", gamerTag: gamerTag)
         if(freeAgent != nil){
             request.profile = freeAgent!

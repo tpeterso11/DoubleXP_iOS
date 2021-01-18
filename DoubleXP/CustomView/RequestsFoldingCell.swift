@@ -27,6 +27,7 @@ class RequestsFoldingCell: FoldingCell{
     private var indexPath: IndexPath!
     private var callbacks: RequestsUpdate!
     private var requested = false
+    private var requests: Requests!
     private var currentTableView: UITableView!
     @IBOutlet weak var requestTypeLabel: UILabel!
     
@@ -43,10 +44,11 @@ class RequestsFoldingCell: FoldingCell{
         super.awakeFromNib()
     }
     
-    func setUI(friendRequest: FriendRequestObject?, team: TeamInviteObject?, request: RequestObject?, rival: RivalObj?, indexPath: IndexPath, currentTableView: UITableView, callbacks: RequestsUpdate){
+    func setUI(friendRequest: FriendRequestObject?, team: TeamInviteObject?, request: RequestObject?, rival: RivalObj?, indexPath: IndexPath, currentTableView: UITableView, callbacks: RequestsUpdate, requests: Requests){
         self.indexPath = indexPath
         self.callbacks = callbacks
         self.currentTableView = currentTableView
+        self.requests = requests
         
         requestTypeLabel.text = ""
         //requestType.text = ""
@@ -154,13 +156,13 @@ class RequestsFoldingCell: FoldingCell{
         let landing = delegate.currentLanding
         
         if(currentRequest is FriendRequestObject){
-           landing?.navigateToProfile(uid: (currentRequest as! FriendRequestObject).uid)
+            requests.launchProfile(uid: (currentRequest as! FriendRequestObject).uid)
         }
         else if(self.currentRequest is RequestObject){
-            landing?.navigateToProfile(uid: (currentRequest as! RequestObject).userUid)
+            requests.launchProfile(uid: (currentRequest as! RequestObject).userUid)
         }
         else if(self.currentRequest is RivalObj){
-            landing?.navigateToProfile(uid: (currentRequest as! RivalObj).uid)
+            requests.launchProfile(uid: (currentRequest as! RivalObj).uid)
         }
         else{
             landing?.startDashNavigation(teamName: "", teamInvite: (currentRequest as! TeamInviteObject), newTeam: false)

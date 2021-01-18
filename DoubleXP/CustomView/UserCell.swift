@@ -23,4 +23,5 @@ class UserCell: UICollectionViewCell{
     @IBOutlet weak var fourTag: UILabel!
     @IBOutlet weak var rivalTag: UILabel!
     @IBOutlet weak var rivalButton: UIImageView!
+    @IBOutlet weak var onlineStatus: UILabel!
 }

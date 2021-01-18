@@ -121,6 +121,16 @@ class CompetitionObj: NSObject, NSCoding {
         }
     }
     
+    var _expired: String = ""
+    var expired: String {
+        get {
+            return (_expired)
+        }
+        set (newVal) {
+            _expired = newVal
+        }
+    }
+    
     var _subscriptionId: String = ""
     var subscriptionId: String {
         get {

@@ -13,12 +13,14 @@ class OptionAnswerCell: UITableViewCell, UICollectionViewDelegate, UICollectionV
     
     @IBOutlet weak var question: UILabel!
     @IBOutlet weak var optionCollection: UICollectionView!
+    var game: GamerConnectGame?
     var options = [String]()
     var imageCache = NSCache<NSString, UIImage>()
     
-    func setOptions(options: [String], cache: NSCache<NSString, UIImage>){
+    func setOptions(options: [String], cache: NSCache<NSString, UIImage>, game: GamerConnectGame?){
         self.options = options
         self.imageCache = cache
+        self.game = game
         
         self.optionCollection.delegate = self
         self.optionCollection.dataSource = self
@@ -33,15 +35,31 @@ class OptionAnswerCell: UITableViewCell, UICollectionViewDelegate, UICollectionV
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "option", for: indexPath) as! OptionCollectionCell
                 
         let current = options[indexPath.item]
-        let startIndex = current.index(of: "http")
+        let startIndex = current.index(of: "P")
         let answerIndex = current.index(of: "/")
-        if(startIndex != nil){
-            let url = current.suffix(from: startIndex!)
-            let answer = current.prefix(upTo: answerIndex!)
-            
-            if(self.options.count < 3){
-                cell.optionText.text = String(answer) as String
+        var value = current.suffix(from: startIndex!)
+        let answer = current.prefix(upTo: answerIndex!)
+        var testVal = String(value) as String
+        testVal.remove(at: String.Index(encodedOffset: 0))
+        let test = getCorrectedImageUrl(value: String(value) as String)
+        if(testVal != nil){
+            var url = ""
+            if(self.game?.gameName == "League of Legends"){
+               url = getCorrectedImageUrl(value: testVal)
+            } else {
+                if let index = testVal.index(testVal.startIndex, offsetBy: 0, limitedBy: testVal.endIndex) {
+                    testVal.remove(at: index)
+                    url = testVal
+                } else {
+                    url = testVal
+                }
             }
+            cell.optionText.text = String(answer) as String
+            /*if(self.options.count < 3){
+                cell.optionText.text = String(answer) as String
+            } else {
+                cell.optionText.text = ""
+            }*/
             
             if(self.imageCache.object(forKey: url as NSString) != nil){
                 cell.optionImage.image = imageCache.object(forKey: url as NSString)
@@ -57,6 +75,10 @@ class OptionAnswerCell: UITableViewCell, UICollectionViewDelegate, UICollectionV
         }
         
         return cell
+    }
+    
+    private func getCorrectedImageUrl(value: String) -> String {
+        return "https://ddragon.leagueoflegends.com/cdn/10.11.1/img/champion" + value
     }
     
     func collectionView(_ collectionView: UICollectionView,

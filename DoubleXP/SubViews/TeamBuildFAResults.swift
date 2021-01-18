@@ -508,7 +508,7 @@ class TeamBuildFAResults: ParentVC, UITableViewDelegate, UITableViewDataSource, 
                         let adjustedPayload = [current.answer]
                         cell.question.text = current.question
                         
-                        cell.setOptions(options: adjustedPayload, cache: self.localImageCache)
+                        //cell.setOptions(options: adjustedPayload, cache: self.localImageCache)
                         
                         return cell
                     } else {
@@ -526,7 +526,7 @@ class TeamBuildFAResults: ParentVC, UITableViewDelegate, UITableViewDataSource, 
                         let cell = tableView.dequeueReusableCell(withIdentifier: "optionCell", for: indexPath) as! OptionAnswerCell
                         
                         cell.question.text = current.question
-                        cell.setOptions(options: current.answerArray, cache: self.localImageCache)
+                        //cell.setOptions(options: current.answerArray, cache: self.localImageCache)
                         
                         return cell
                     } else if(currentArray.count > 1){

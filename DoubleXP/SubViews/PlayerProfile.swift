@@ -27,6 +27,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     var objects = [GamerConnectGame]()
     var cellHeights: [CGFloat] = []
     var statsPayload = [String]()
+    var announcementAvailable = false
     var currentStream = ""
     @IBOutlet weak var twitchConnectDrawer: UIView!
     //@IBOutlet weak var connectButton: UIImageView!
@@ -154,7 +155,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             object: self.view.window,
             queue: nil
         ) { notification in
-            //self.hideTwitchConnectWork()
+            self.fullProfileTable.reloadData()
         }
     }
     
@@ -264,6 +265,8 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             let secondary = value?["secondaryLanguage"] as? String ?? ""
             let blockList = value?["blockList"] as? [String: String] ?? [String: String]()
             let restrictList = value?["restrictList"] as? [String: String] ?? [String: String]()
+            let onlineStatus = value?["onlineStatus"] as? String ?? ""
+            
             var gamerTags = [GamerProfile]()
             let gamerTagsArray = snapshot.childSnapshot(forPath: "gamerTags")
             for gamerTagObj in gamerTagsArray.children {
@@ -291,7 +294,56 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 
                 teams.append(EasyTeamObj(teamName: teamName, teamId: teamId, gameName: game, teamCaptainId: teamCaptainId, newTeam: newTeam))
             }
-
+            
+            var badges = [BadgeObj]()
+            if(snapshot.hasChild("badges")){
+                let badgesArray = snapshot.childSnapshot(forPath: "badges")
+                for badge in badgesArray.children{
+                    let currentObj = badge as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let name = dict?["badgeName"] as? String ?? ""
+                    let desc = dict?["badgeDesc"] as? String ?? ""
+                    
+                    let badge = BadgeObj(badge: name, badgeDesc: desc)
+                    badges.append(badge)
+                }
+            }
+            
+            var online = [OnlineObj]()
+            if(snapshot.hasChild("onlineAnnouncements")){
+                let announceArray = snapshot.childSnapshot(forPath: "onlineAnnouncements")
+                for onlineAnnounce in announceArray.children{
+                    let currentObj = onlineAnnounce as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let date = dict?["date"] as? String ?? ""
+                    let tag = dict?["tag"] as? String ?? ""
+                    let id = dict?["id"] as? String ?? ""
+                    
+                    let request = OnlineObj(tag: tag, friends: [String](), date: date, id: id)
+                    
+                    let calendar = Calendar.current
+                    if(!date.isEmpty){
+                        let dbDate = self.stringToDate(date)
+                        
+                        if(dbDate != nil){
+                            let now = NSDate()
+                            let formatter = DateFormatter()
+                            formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+                            formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                            let future = formatter.string(from: dbDate as Date)
+                            let dbTimeOut = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                            
+                            let validAnnouncement = (now as Date).compare(.isEarlier(than: dbTimeOut))
+                            
+                            if(dbTimeOut != nil){
+                                if(validAnnouncement){
+                                    online.append(request)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             
             var currentStats = [StatObject]()
             let statsArray = snapshot.childSnapshot(forPath: "stats")
@@ -392,6 +444,13 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             user.secondaryLanguage = secondary
             user.blockList = Array(blockList.keys)
             user.restrictList = Array(restrictList.keys)
+            user.onlineStatus = onlineStatus
+            if(!online.isEmpty){
+                user.currentOnlineAnnounement = online[0]
+            } else {
+                user.currentOnlineAnnounement = nil
+            }
+            user.badges = badges
             
             self.loadProfiles(user: user)
             
@@ -627,7 +686,14 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         let currentUser = delegate.currentUser
         self.fullProfilePayload = [Any]()
         
-        self.fullProfilePayload.append([manager.getGamerTag(user: user): user.getConsoleArray()]) //header
+        var consoleArray = [String]()
+        for profile in user.gamerTags {
+            if(!consoleArray.contains(profile.console)){
+                consoleArray.append(profile.console)
+            }
+        }
+        
+        self.fullProfilePayload.append([manager.getGamerTag(user: user): consoleArray]) //header
         var currentBio = "this user has not created a bio, yet."
         if(!user.bio.isEmpty){
             currentBio = user.bio
@@ -645,9 +711,18 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         
         self.fullProfilePayload.append("twitch")
         self.fullProfilePayload.append(friendsManager.isInFriendList(user: userForProfile!, currentUser: currentUser!)) // interaction buttons
+        
+        if(!self.userForProfile!.badges.isEmpty){
+            self.fullProfilePayload.append(self.userForProfile!.badges) //badges
+        }
+        
         self.fullProfilePayload.append(0) //game list
         
-        checkRivals()
+        if(userForProfile!.uId == currentUser!.uId){
+            checkOnlineAnnouncements()
+        } else {
+            checkRivals()
+        }
     }
     
     private func mapAgeFromDB(value: String) -> String {
@@ -783,11 +858,11 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     func onStreamsLoaded(streams: [TwitchStreamObject]) {
         self.twitchLoading = false
         
-        if(streams.isEmpty){
-            twitchOnlineStatus = "offline"
-            self.fullProfileTable.reloadData()
-        } else {
-            DispatchQueue.main.async() {
+        DispatchQueue.main.async() {
+            if(streams.isEmpty){
+                self.twitchOnlineStatus = "offline"
+                self.fullProfileTable.reloadData()
+            } else {
                 self.twitchOnlineStatus = "online"
                 let currentStream = streams[0]
                 self.currentStream = currentStream.handle
@@ -797,7 +872,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         }
     }
     
-    func onChannelsLoaded(channels: [TwitchChannelObj]) {
+    func onChannelsLoaded(channels: [Any]) {
     }
     
     @objc func startTwitch(){
@@ -806,7 +881,19 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     }
     
     private func rebuildPayload(){
-        loadUserInfo(uid: self.uid)
+        UIView.animate(withDuration: 0.8, animations: {
+            self.workBlur.alpha = 1
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                self.workSpinner.alpha = 1
+                self.workSpinner.loopMode = .loop
+                self.workSpinner.play()
+            }, completion: { (finished: Bool) in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    self.loadUserInfo(uid: self.uid)
+                }
+            })
+        })
     }
     
     /*@objc func connectTwitch(){
@@ -922,11 +1009,41 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 let cell = tableview.dequeueReusableCell(withIdentifier: "header", for: indexPath) as! ProfileHeaderCell
                 let currentLib = (current as! [String: [String]])
                 let key = Array(currentLib.keys)[0]
-                cell.gamertag.text = key
-                cell.setConsoles(consoles: currentLib[key]!)
-                
                 let appDelegate = UIApplication.shared.delegate as! AppDelegate
                 let currentUser = appDelegate.currentUser!
+                cell.gamertag.text = key
+                
+                if(!userForProfile!.onlineStatus.isEmpty){
+                    cell.onlineStatus.alpha = 1
+                    if(userForProfile!.uId == currentUser.uId){
+                        cell.onlineStatus.textColor = #colorLiteral(red: 0.2039215686, green: 0.7803921569, blue: 0.3490196078, alpha: 0.6032480736)
+                        cell.onlineStatus.text = "your status: online."
+                        //cell.onlineDot.alpha = 1
+                    } else {
+                        if(userForProfile!.onlineStatus == "online"){
+                            cell.onlineStatus.textColor = #colorLiteral(red: 0.2039215686, green: 0.7803921569, blue: 0.3490196078, alpha: 0.6032480736)
+                            cell.onlineStatus.text = "online."
+                            //cell.onlineDot.alpha = 1
+                        } else if(userForProfile!.onlineStatus == "idle"){
+                            cell.onlineStatus.textColor = #colorLiteral(red: 0.3333333433, green: 0.3333333433, blue: 0.3333333433, alpha: 1)
+                            cell.onlineStatus.text = "idle."
+                        } else if(self.announcementAvailable){
+                            cell.onlineStatus.textColor = #colorLiteral(red: 0.2039215686, green: 0.7803921569, blue: 0.3490196078, alpha: 0.6032480736)
+                            cell.onlineStatus.text = "gaming right now!"
+                            //cell.onlineStatus.font = UIFont.boldSystemFont(ofSize: cell.onlineStatus.font.pointSize)
+                            //cell.onlineDot.alpha = 1
+                        }
+                        else {//} else {
+                            cell.onlineStatus.alpha = 0
+                            cell.onlineDot.alpha = 0
+                        }
+                    }
+                } else {
+                    cell.onlineStatus.alpha = 0
+                }
+                
+                cell.setConsoles(consoles: currentLib[key]!)
+            
                 if(currentUser.uId != self.userForProfile!.uId){
                     cell.more.alpha = 1
                     cell.more.isUserInteractionEnabled = true
@@ -970,6 +1087,13 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                             cell.isUserInteractionEnabled = true
                             cell.wannaPlay.addTarget(self, action: #selector(playClicked), for: .touchUpInside)
                         }
+                        
+                        cell.wannaPlay.layer.shadowColor = UIColor.black.cgColor
+                        cell.wannaPlay.layer.shadowOffset = CGSize(width: 0, height: 1.0)
+                        cell.wannaPlay.layer.shadowRadius = 1.0
+                        cell.wannaPlay.layer.shadowOpacity = 0.5
+                        cell.wannaPlay.layer.masksToBounds = false
+                        cell.wannaPlay.layer.shadowPath = UIBezierPath(roundedRect:  cell.wannaPlay.bounds, cornerRadius:  cell.wannaPlay.layer.cornerRadius).cgPath
                     }
 
                     return cell
@@ -981,7 +1105,36 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                     if(currentUser.uId == self.userForProfile!.uId){
                         cell.pendingUserCover.alpha = 0
                         cell.currentUserCover.alpha = 1
+                        
+                        cell.noFriendsCover.alpha = 0
                         cell.editButton.addTarget(self, action: #selector(editClicked), for: .touchUpInside)
+                        
+                        cell.editButton.layer.shadowColor = UIColor.black.cgColor
+                        cell.editButton.layer.shadowOffset = CGSize(width: 0, height: 1.0)
+                        cell.editButton.layer.shadowRadius = 1.0
+                        cell.editButton.layer.shadowOpacity = 0.5
+                        cell.editButton.layer.masksToBounds = false
+                        cell.editButton.layer.shadowPath = UIBezierPath(roundedRect:  cell.editButton.bounds, cornerRadius:  cell.editButton.layer.cornerRadius).cgPath
+                        
+                        if(self.announcementAvailable){
+                            cell.imGamingButton.backgroundColor = #colorLiteral(red: 0.3333333433, green: 0.3333333433, blue: 0.3333333433, alpha: 1)
+                            cell.imGamingButton.isUserInteractionEnabled = false
+                            cell.imGamingButton.setTitle("alert sent", for: .normal)
+                        } else {
+                            cell.imGamingButton.setTitle("jumping online", for: .normal)
+                            cell.imGamingButton.backgroundColor = #colorLiteral(red: 0.1667544842, green: 0.6060172915, blue: 0.279296875, alpha: 1)
+                            cell.alpha = 1
+                            cell.imGamingButton.isUserInteractionEnabled = true
+                            cell.imGamingButton.addTarget(self, action: #selector(onlineClicked), for: .touchUpInside)
+                        }
+                        
+                        cell.imGamingButton.layer.shadowColor = UIColor.black.cgColor
+                        cell.imGamingButton.layer.shadowOffset = CGSize(width: 0, height: 1.0)
+                        cell.imGamingButton.layer.shadowRadius = 1.0
+                        cell.imGamingButton.layer.shadowOpacity = 0.5
+                        cell.imGamingButton.layer.masksToBounds = false
+                        cell.imGamingButton.layer.shadowPath = UIBezierPath(roundedRect:  cell.imGamingButton.bounds, cornerRadius:  cell.imGamingButton.layer.cornerRadius).cgPath
+                        
                     } else {
                         let manager = FriendsManager()
                         cell.currentUserCover.alpha = 0
@@ -995,7 +1148,14 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                             cell.requestButton.setTitle( "request sent.", for: .normal)
                             cell.requestButton.isUserInteractionEnabled = false
                         } else {
-                            cell.requestButton.addTarget(self, action: #selector(requestClicked), for: .touchUpInside)
+                            if(!currentUser.gamerTag.isEmpty){
+                                cell.requestButton.addTarget(self, action: #selector(requestClicked), for: .touchUpInside)
+                            } else {
+                                cell.requestButton.setTitle("unavailable", for: .normal)
+                                cell.requestButton.backgroundColor = #colorLiteral(red: 0.2549019754, green: 0.2745098174, blue: 0.3019607961, alpha: 1)
+                                cell.alpha = 0.3
+                                cell.isUserInteractionEnabled = false
+                            }
                         }
                     }
                     return cell
@@ -1022,12 +1182,8 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                                     
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                                         let test = "https://doublexpstorage.tech/stream.php?channel=" + self.currentStream
-                                        cell.twitchWV.load(NSURLRequest(url: NSURL(string: test)! as URL) as URLRequest)
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                                                cell.twitchWV.alpha = 1
-                                            }, completion: nil)
-                                        }
+                                        cell.popOutPlayer.load(NSURLRequest(url: NSURL(string: test)! as URL) as URLRequest)
+                                        self.twitchLoading = false
                                     }
                                 }, completion: nil)
                             })
@@ -1045,8 +1201,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                             }, completion: nil)
                         })
                     }
-                    
-                    
+                
                     if(userForProfile!.uId == currentUser.uId){
                         if(!userForProfile!.twitchConnect.isEmpty){
                             let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -1118,9 +1273,25 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                     
                     return cell
                 }
+            }  else if(current is [BadgeObj]){
+                let cell = tableview.dequeueReusableCell(withIdentifier: "badges", for: indexPath) as! ProfileBadgeCell
+                cell.setBadges(payload: (current as! [BadgeObj]))
+                return cell
             } else {
                 let cell = tableview.dequeueReusableCell(withIdentifier: "games", for: indexPath) as! ProfileMyGamesCell
-                cell.setupGames()
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                
+                if(userForProfile!.uId == appDelegate.currentUser!.uId){
+                    if(appDelegate.currentUser!.games.isEmpty){
+                        cell.noTagCover.alpha = 1
+                    } else {
+                        cell.noTagCover.alpha = 0
+                        cell.setupGames()
+                    }
+                } else {
+                    cell.noTagCover.alpha = 0
+                    cell.setupGames()
+                }
                 return cell
             }
         }
@@ -1133,7 +1304,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                     let adjustedPayload = [current.answer]
                     cell.question.text = current.question
                     
-                    cell.setOptions(options: adjustedPayload, cache: self.localImageCache)
+                    cell.setOptions(options: adjustedPayload, cache: self.localImageCache, game: self.currentStatsGame)
                     
                     return cell
                 } else {
@@ -1151,7 +1322,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                     let cell = tableview.dequeueReusableCell(withIdentifier: "optionCell", for: indexPath) as! OptionAnswerCell
                     
                     cell.question.text = current.question
-                    cell.setOptions(options: current.answerArray, cache: self.localImageCache)
+                    cell.setOptions(options: current.answerArray, cache: self.localImageCache, game: self.currentStatsGame)
                     
                     return cell
                 } else if(currentArray.count > 1){
@@ -1179,9 +1350,9 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             let current = self.fullProfilePayload[indexPath.item]
             if(current is [String: [String]]){
-                return CGFloat(120)
+                return CGFloat(180)
             } else if(current is [String]){
-                return CGFloat(70)
+                return CGFloat(100)
             } else if(current is Bool){
                 if(appDelegate.currentUser!.uId == self.userForProfile!.uId){
                     return CGFloat(60)
@@ -1190,6 +1361,8 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 }
             } else if(current is [String: String]){
                 return CGFloat(50)
+            } else if(current is [BadgeObj]){
+                return CGFloat(180)
             } else if(current is String){
                 if(!bioExpanded){
                     if(current as! String == "twitch"){
@@ -1199,7 +1372,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                     }
                 } else {
                     if(current as! String == "twitch"){
-                        return CGFloat(80)
+                        return CGFloat(100)
                     } else {
                         let cell = tableview.cellForRow(at: indexPath) as? ProfileBioCell
                         if(cell != nil){
@@ -1267,6 +1440,28 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         let transitionDelegate = SPStorkTransitioningDelegate()
         currentViewController.transitioningDelegate = transitionDelegate
         currentViewController.modalPresentationStyle = .custom
+        currentViewController.variation = "play"
+        transitionDelegate.showCloseButton = true
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = false
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.customHeight = 450
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+    }
+    
+    @objc private func onlineClicked(){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "play") as! PlayDrawer
+        
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let profileManager = delegate.profileManager
+        profileManager.wannaPlayCachedUser = self.userForProfile!
+        
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.variation = "online"
         transitionDelegate.showCloseButton = true
         currentViewController.modalPresentationCapturesStatusBarAppearance = true
         transitionDelegate.showIndicator = false
@@ -1283,12 +1478,12 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     }
     
     @objc func didDismissStorkBySwipe(){
-        self.fullProfileTable.reloadData()
+        self.rebuildPayload()
         self.updateMoreComplete()
     }
     
     @objc func didDismissStorkByTap() {
-        self.fullProfileTable.reloadData()
+        self.rebuildPayload()
         self.updateMoreComplete()
     }
     
@@ -1467,7 +1662,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                     self.statCardBack.moa.url = self.currentStatsGame!.imageUrl
                 }
                 
-                if(gameName == "Fortnite"){
+                if(gameName == "Fortnite" || gameName == "PlayerUnknown's Battlegrounds"){
                     var build = [String]()
                     build.append("HEADER_0/solo stats")
                     
@@ -1618,8 +1813,8 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             self.statsOverlayCollection.alpha = 0
         }, completion: { (finished: Bool) in
             UIView.animate(withDuration: 0.3, animations: {
-                self.profileTable.transform = top
-                self.profileTable.alpha = 1
+                self.quizTable.transform = top
+                self.quizTable.alpha = 1
                 
                 self.quizButtonSwitcher.isUserInteractionEnabled = true
                 self.statsButtonSwitcher.isUserInteractionEnabled = true
@@ -1633,8 +1828,8 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         
         let topReturn = CGAffineTransform(translationX: 0, y: 0)
         UIView.animate(withDuration: 0.3, animations: {
-            self.profileTable.transform = topReturn
-            self.profileTable.alpha = 0
+            self.quizTable.transform = topReturn
+            self.quizTable.alpha = 0
         }, completion: { (finished: Bool) in
             UIView.animate(withDuration: 0.3, animations: {
                 self.statsOverlayCollection.transform = topReturn
@@ -1776,10 +1971,11 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     }
     
     @objc private func openMessaging(){
-        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "messaging") as! MessagingFrag
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        
-        guard delegate.currentUser != nil else{
+        //let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "messaging") as! MessagingFrag
+        //let delegate = UIApplication.shared.delegate as! AppDelegate
+        self.performSegue(withIdentifier: "messaging", sender: nil)
+        //delegate.currentLanding!.navigateToMessaging(groupChannelUrl: nil, otherUserId: self.userForProfile!.uId)
+        /*guard delegate.currentUser != nil else{
             return
         }
         currentViewController.currentUser = delegate.currentUser!
@@ -1793,7 +1989,17 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         transitionDelegate.swipeToDismissEnabled = true
         transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
         transitionDelegate.storkDelegate = self
-        self.present(currentViewController, animated: true, completion: nil)
+        self.present(currentViewController, animated: true, completion: nil)*/
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if (segue.identifier == "messaging") {
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            if let currentViewController = segue.destination as? MessagingFrag {
+                currentViewController.currentUser = delegate.currentUser!
+                currentViewController.otherUserId = self.userForProfile!.uId
+            }
+        }
     }
     
     private func sendPayload(){
@@ -1817,6 +2023,12 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     }
     
     func rivalResponseFailed() {
+    }
+    
+    func onlineAnnounceFail() {
+    }
+    
+    func onlineAnnounceSent() {
     }
     
     func rivalRequestSuccess() {
@@ -1955,21 +2167,62 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             }
         } else {
             self.fullProfileTable.reloadData()
-            UIView.animate(withDuration: 0.5, animations: {
-                self.successOverlay.alpha = 1
-            }, completion: { (finished: Bool) in
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    UIView.animate(withDuration: 0.5, delay: 0.8, options: [], animations: {
-                        self.workBlur.alpha = 0
-                    }, completion: { (finished: Bool) in
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        UIView.animate(withDuration: 0.1, animations: {
-                            self.successOverlay.alpha = 0
-                        }, completion: nil)
-                    }
-                    })
+            
+            if(self.workBlur.alpha == 1){
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.hideWork()
                 }
-            })
+            }
+        }
+    }
+    
+    private func checkOnlineAnnouncements(){
+        if(userForProfile!.currentOnlineAnnounement != nil){
+            let dbDate = self.stringToDate(userForProfile!.currentOnlineAnnounement!.date)
+            
+            if(dbDate != nil){
+                let now = NSDate()
+                let formatter = DateFormatter()
+                formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+                formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                let future = formatter.string(from: dbDate as Date)
+                let dbTimeOut = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                
+                let validAnnounments = (now as Date).compare(.isEarlier(than: dbTimeOut))
+                
+                if(dbTimeOut != nil){
+                    if(!validAnnounments){
+                        userForProfile!.currentOnlineAnnounement = nil
+                        
+                        let ref = Database.database().reference().child("Users").child(userForProfile!.uId)
+                        ref.child("onlineAnnouncements").removeValue()
+                    }
+                }
+            }
+        }
+        
+        self.announcementAvailable = (userForProfile!.currentOnlineAnnounement != nil)
+        
+        if(!dataSet){
+            self.dataSet = true
+            self.fullProfileTable.delegate = self
+            self.fullProfileTable.dataSource = self
+            self.fullProfileTable.reloadData()
+            
+            if(self.fullProfileTable.alpha == 0){
+                UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                    self.fullProfileTable.alpha = 1
+                }, completion: { (finished: Bool) in
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        self.hideWork()
+                    }
+                })
+            }
+        } else {
+            self.fullProfileTable.reloadData()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.hideWork()
+            }
         }
     }
 }

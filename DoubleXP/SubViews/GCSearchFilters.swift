@@ -93,14 +93,14 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
         let age = filterCell(opened: opened, title: "age range", options: ageChoices, type: "age")
         self.basicFilterList.append(age)
         
-        let english = ["english": "english"]
+        /*let english = ["english": "english"]
         let spanish = ["spanish": "spanish"]
         let french = ["french": "french"]
         let chinese = ["chinese": "chinese"]
         let languageChoices = [english, spanish, french, chinese]
         opened = !self.currentManager.langaugeFilters.isEmpty
         let language = filterCell(opened: opened, title: "language", options: languageChoices, type: "language")
-        self.basicFilterList.append(language)
+        self.basicFilterList.append(language)*/
         
         if(!gcGame.filterQuestions.isEmpty){
             var advancedHeader = filterCell()

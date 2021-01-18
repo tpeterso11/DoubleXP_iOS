@@ -336,7 +336,7 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
     }
     
     func onStreamsLoaded(streams: [TwitchStreamObject]) {
-        self.streams = streams
+        //self.streams = streams
         self.streams.insert("label", at: 0)
         
         self.manager.loadTweets(team: self.team!, gcGame: self.gcGame, callbacks: self)
@@ -408,7 +408,7 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
     //sEWJZFZjZAIaxwZUrzdd2JPeI (consumer API key)
     //K2yk5yy8AHmyC4mMFHecB1WBoowFnf4uMs4ET7zEjFe06hWmCm (consumer API secret)
     
-    func onChannelsLoaded(channels: [TwitchChannelObj]) {
+    func onChannelsLoaded(channels: [Any]) {
     }
     
     func updateNavColor(color: UIColor) {

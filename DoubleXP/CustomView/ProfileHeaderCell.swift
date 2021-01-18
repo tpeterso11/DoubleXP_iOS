@@ -13,6 +13,8 @@ class ProfileHeaderCell: UITableViewCell, UICollectionViewDelegate, UICollection
     @IBOutlet weak var more: UIImageView!
     @IBOutlet weak var gamertag: UILabel!
     @IBOutlet weak var consoleCollection: UICollectionView!
+    @IBOutlet weak var onlineStatus: UILabel!
+    @IBOutlet weak var onlineDot: UIImageView!
     var payload = [String]()
     
     
@@ -37,8 +39,8 @@ class ProfileHeaderCell: UITableViewCell, UICollectionViewDelegate, UICollection
         cell.contentView.layer.masksToBounds = true
         
         cell.layer.shadowColor = UIColor.black.cgColor
-        cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
-        cell.layer.shadowRadius = 2.0
+        cell.layer.shadowOffset = CGSize(width: 0, height: 1.0)
+        cell.layer.shadowRadius = 1.0
         cell.layer.shadowOpacity = 0.5
         cell.layer.masksToBounds = false
         cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
@@ -48,6 +50,6 @@ class ProfileHeaderCell: UITableViewCell, UICollectionViewDelegate, UICollection
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: CGFloat(70), height: CGFloat(40))
+        return CGSize(width: CGFloat(80), height: CGFloat(50))
     }
 }

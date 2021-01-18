@@ -91,9 +91,10 @@ class MessagingManager: UIViewController, SBDConnectionDelegate, SBDUserEventDel
         }
     }
     
-    func createTeamChannel(userId: String, callbacks: MessagingCallbacks){
+    func createTeamChannel(userId: String, otherUserId: String, callbacks: MessagingCallbacks){
         let params = SBDGroupChannelParams()
         params.addUserId(userId)
+        params.addUserId(otherUserId)
         params.isDistinct = false
         params.isPublic = true
         

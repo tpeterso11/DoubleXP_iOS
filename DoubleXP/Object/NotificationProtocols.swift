@@ -77,6 +77,8 @@ protocol RequestsUpdate: class{
     func rivalResponseFailed()
     func friendRemoved()
     func friendRemoveFail()
+    func onlineAnnounceSent()
+    func onlineAnnounceFail()
 }
 
 protocol TeamCallbacks: class{
@@ -144,7 +146,7 @@ protocol ProfileCallbacks: class{
 protocol SocialMediaManagerCallback: class {
     func onTweetsLoaded(tweets: [TweetObject])
     func onStreamsLoaded(streams: [TwitchStreamObject])
-    func onChannelsLoaded(channels: [TwitchChannelObj])
+    func onChannelsLoaded(channels: [Any])
 }
 
 protocol LandingMenuCallbacks: class{
@@ -175,4 +177,15 @@ protocol StatsManagerCallbacks: class{
 protocol SearchManagerCallbacks: class{
     func onSuccess(returnedUsers: [User])
     func onFailure()
+}
+
+protocol DiscoverCallbacks: class{
+    func onSuccess(discoverPayload: [Int: Any])
+    func onFailure()
+}
+
+protocol TodayCallbacks: class{
+    func onSuccess()
+    func onSuccessShort()
+    func onRecommendedUsersLoaded()
 }

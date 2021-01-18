@@ -205,6 +205,12 @@ class OptionsList: UIViewController, UITableViewDelegate, UITableViewDataSource,
     func rivalResponseFailed() {
     }
     
+    func onlineAnnounceFail() {
+    }
+    
+    func onlineAnnounceSent() {
+    }
+    
     private func showSuccess(status: String){
         self.doneStatus.text = status
         UIView.animate(withDuration: 0.8, animations: {

@@ -46,6 +46,13 @@ class Results: UIViewController, UITableViewDataSource, UITableViewDelegate {
         
         let currentUser = delegate.currentUser!
         let games = currentUser.games
+        
+        for game in delegate.gcGames {
+            if((game.hasQuiz && games.contains(game.gameName)) || (game.statsAvailable && games.contains(game.gameName))){
+                payload.append("toolsHeader")
+                break
+            }
+        }
         //quizzes
         for game in delegate.gcGames {
             if(game.hasQuiz && games.contains(game.gameName)){
@@ -88,6 +95,23 @@ class Results: UIViewController, UITableViewDataSource, UITableViewDelegate {
                 }
                 cell.header.alpha = 1
                 cell.header.isHidden = false
+                
+                cell.whiteGuyContainer.layer.cornerRadius = 15.0
+                cell.whiteGuyContainer.layer.borderWidth = 1.0
+                cell.whiteGuyContainer.layer.borderColor = UIColor.clear.cgColor
+                cell.whiteGuyContainer.layer.masksToBounds = true
+                
+                cell.whiteGuyContainer.layer.shadowColor = UIColor.black.cgColor
+                cell.whiteGuyContainer.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+                cell.whiteGuyContainer.layer.shadowRadius = 2.0
+                cell.whiteGuyContainer.layer.shadowOpacity = 0.5
+                cell.whiteGuyContainer.layer.masksToBounds = false
+                cell.whiteGuyContainer.layer.shadowPath = UIBezierPath(roundedRect: cell.whiteGuyContainer.bounds, cornerRadius: cell.whiteGuyContainer.layer.cornerRadius).cgPath
+                
+                return cell
+            }
+            else if((current as! String) == "toolsHeader"){
+                let cell = tableView.dequeueReusableCell(withIdentifier: "toolsHeader", for: indexPath) as! EmptyCell
                 return cell
             }
         }
@@ -172,16 +196,20 @@ class Results: UIViewController, UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let current = self.payload[indexPath.item]
         if(current is String){
-            return CGFloat(150)
+            if((current as! String) == "toolsHeader"){
+                return CGFloat(120)
+            } else {
+                return CGFloat(350)
+            }
         }
         if(current is [String: [User]]){
-            return CGFloat(550)
+            return CGFloat(570)
         }
         if(current is Int){
             return CGFloat(80)
         }
         if(current is Bool){
-            return CGFloat(150)
+            return CGFloat(180)
         }
         return CGFloat(150)
     }

@@ -146,6 +146,9 @@ class StatsManager {
         else if(gameName == "Overwatch"){
             getOverwatchStats(gamerTag: gamerTag, console: console)
         }
+        else if(gameName == "PlayerUnknown's Battlegrounds"){
+            getPubgStats(gamerTag: gamerTag)
+        }
         else {
             callbacks.onFailure(gameName: gameName)
         }
@@ -201,6 +204,117 @@ class StatsManager {
         if(!userConsole.isEmpty){
             let url = "https://thedivisiontab.com/api/search.php?name="+gamerTag+"&platform="+userConsole
             getDivisionPlayerId(url: url)
+        }
+    }
+    
+    func getPubgStats(gamerTag: String){
+        self.currentGameName = "PlayerUnknown's Battlegrounds"
+        let url = "https://api.pubg.com/shards/steam/players?filter[playerNames]="+gamerTag
+        getPubgPlayerId(url: url)
+    }
+    
+    func getPubgPlayerId(url: String){
+        let key = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI4MzI0NDFkMC0wZTJmLTAxMzktYjQzZC00ZGM1NzI4MWEwMmMiLCJpc3MiOiJnYW1lbG9ja2VyIiwiaWF0IjoxNjA1OTY3MDg5LCJwdWIiOiJibHVlaG9sZSIsInRpdGxlIjoicHViZyIsImFwcCI6ImRvdWJsZXhwIn0.EX06EJUnzhD8_-SfqNCfldP51AM4LbUyK0-d-luFufg"
+        
+        HTTP.GET(url, headers: ["Authorization": key,"accept": "application/json"]) { response in
+            if let err = response.error {
+                print("error: \(err.localizedDescription)")
+                self.callbacks!.onFailure(gameName: self.currentGameName!)
+                AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Pubg PlayerID Error" + url))
+                return //also notify app of failure as needed
+            }
+            else{
+                if let jsonObj = try? JSONSerialization.jsonObject(with: response.data, options: .allowFragments) as? NSDictionary {
+                    let data = jsonObj?["data"] as? [[String: Any]] ?? [[String: Any]]()
+                
+                    for obj in data {
+                        let id = obj["id"] as? String ?? ""
+                        print(id)
+                        
+                        if(id.isEmpty){
+                            AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Pubg no Id"))
+                            self.callbacks!.onFailure(gameName: self.currentGameName!)
+                        } else {
+                            self.getPubgCurrentSeason(id: id)
+                        }
+                    }
+                }
+                else{
+                    AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Pubg Wrong Payload"))
+                    self.callbacks!.onFailure(gameName: self.currentGameName!)
+                }
+            }
+        }
+    }
+    
+    private func getPubgCurrentSeason(id: String){
+        let url = "https://api.pubg.com/shards/steam/players/"+id+"/seasons/lifetime?filter[gamepad]=false"
+        let key = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI4MzI0NDFkMC0wZTJmLTAxMzktYjQzZC00ZGM1NzI4MWEwMmMiLCJpc3MiOiJnYW1lbG9ja2VyIiwiaWF0IjoxNjA1OTY3MDg5LCJwdWIiOiJibHVlaG9sZSIsInRpdGxlIjoicHViZyIsImFwcCI6ImRvdWJsZXhwIn0.EX06EJUnzhD8_-SfqNCfldP51AM4LbUyK0-d-luFufg"
+        
+        HTTP.GET(url, headers: ["Authorization": key,"accept": "application/json"]) { response in
+            if let err = response.error {
+                print("error: \(err.localizedDescription)")
+                self.callbacks!.onFailure(gameName: self.currentGameName!)
+                AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Pubg PlayerID Error" + url))
+                return //also notify app of failure as needed
+            }
+            else{
+                if let jsonObj = try? JSONSerialization.jsonObject(with: response.data, options: .allowFragments) as? NSDictionary {
+                    let data = jsonObj?["data"] as? [String: Any] ?? [String: Any]()
+                    print(data)
+                    let newStat = StatObject(gameName: self.currentGameName!)
+                    let attributes = data["attributes"] as? [String: Any] ?? [String: Any]()
+                    if(!attributes.isEmpty){
+                        let gameModes = attributes["gameModeStats"] as? [String: Any] ?? [String: Any]()
+                        if(!gameModes.isEmpty){
+                            let duoStats = gameModes["duo"] as? [String: Any] ?? [String: Any]()
+                    
+                            let duoAssists = duoStats["assists"] as? Double ?? 0.0
+                            let duoKills = duoStats["kills"] as? Double ?? 0.0
+                            let duoHeadshotKills = duoStats["headshotKills"] as? Double ?? 0.0
+                            let duoWins = duoStats["wins"] as? Double ?? 0.0
+                            let duoRevives = duoStats["revives"] as? Double ?? 0.0
+                            
+                            let duoStatsObj = ["assists": duoAssists, "headshot kills": duoHeadshotKills, "kills": duoKills, "wins": duoWins, "revives": duoRevives]
+                            
+                            newStat.fortniteDuoStats = duoStatsObj
+                            
+                            let soloStats = gameModes["solo"] as? [String: Any] ?? [String: Any]()
+                    
+                            let soloAssists = soloStats["assists"] as? Double ?? 0.0
+                            let soloKills = soloStats["kills"] as? Double ?? 0.0
+                            let soloHeadshotKills = soloStats["headshotKills"] as? Double ?? 0.0
+                            let soloWins = soloStats["wins"] as? Double ?? 0.0
+                            let soloRevives = soloStats["revives"] as? Double ?? 0.0
+                            let soloStatsObj = ["assists": soloAssists, "headshot kills": soloHeadshotKills, "kills": soloKills, "wins": soloWins, "revives": soloRevives]
+                            
+                            newStat.fortniteSoloStats = soloStatsObj
+                        
+                            
+                            let squadStats = gameModes["squad"] as? [String: Any] ?? [String: Any]()
+                            let squadAssists = squadStats["assists"] as? Double ?? 0.0
+                            let squadKills = squadStats["kills"] as? Double ?? 0.0
+                            let squadHeadshotKills = squadStats["headshotKills"] as? Double ?? 0.0
+                            let squadWins = squadStats["wins"] as? Double ?? 0.0
+                            let squadRevives = squadStats["revives"] as? Double ?? 0.0
+                            
+                            let squadStatsObj = ["assists": squadAssists, "headshot kills": squadHeadshotKills, "kills": squadKills, "wins": squadWins, "revives": squadRevives]
+                            
+                            newStat.fortniteSquadStats = squadStatsObj
+                            
+                            self.saveAndProceed(statObj: newStat)
+                        }
+                        else {
+                            AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Pubg no Id"))
+                            self.callbacks!.onFailure(gameName: self.currentGameName!)
+                        }
+                    }
+                }
+                else{
+                    AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Pubg Wrong Payload"))
+                    self.callbacks!.onFailure(gameName: self.currentGameName!)
+                }
+            }
         }
     }
     
@@ -280,7 +394,7 @@ class StatsManager {
         HTTP.GET(url) { response in
             if let err = response.error {
                 print("error: \(err.localizedDescription)")
-                self.callbacks!.onFailure(gameName: self.currentGameName!)
+                //self.callbacks!.onFailure(gameName: self.currentGameName!)
                 AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Division PlayerID Error" + url))
                 return //also notify app of failure as needed
             }

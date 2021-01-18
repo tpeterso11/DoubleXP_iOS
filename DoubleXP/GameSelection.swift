@@ -56,12 +56,15 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
     var constraint : NSLayoutConstraint?
     var keyboardOpen = false
     var returning = false
+    var modalPopped = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        gameList = delegate.gcGames
+        let list = delegate.gcGames
+        let sorted = list!.sorted(by: { $0.gameName < $1.gameName })
+        gameList = sorted
         
         if(returning){
             continueButton.addTarget(self, action: #selector(self.closeModal), for: .touchUpInside)
@@ -229,7 +232,7 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
             }
             self.gameTable.reloadData()
         } else {
-            self.currentSelectedGT = textField.text!
+            self.currentSelectedGT = textField.text!.replacingOccurrences(of: "\\s+$", with: "", options: .regularExpression)
             checkAddButton()
             checkKeyboardNext()
         }
@@ -336,16 +339,19 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.availableConsoles = [String]()
         self.availableConsoles.append(contentsOf: gcGame.availablebConsoles)
         configureAddButtons()
+        self.keyboardNext.alpha = 0
         
-        if(!consolesSet){
-            self.consolesSet = true
-            self.consoleTable.delegate = self
-            self.consoleTable.dataSource = self
-            self.consoleTable.reloadData()
-            self.consoleTable.alpha = 1
-        } else {
-            self.consoleTable.reloadData()
-            self.consoleTable.alpha = 1
+        if(self.availableConsoles.count > 1){
+            if(!consolesSet){
+                self.consolesSet = true
+                self.consoleTable.delegate = self
+                self.consoleTable.dataSource = self
+                self.consoleTable.reloadData()
+                self.consoleTable.alpha = 1
+            } else {
+                self.consoleTable.reloadData()
+                self.consoleTable.alpha = 1
+            }
         }
         
         self.gameDrawerTagEntry.text = ""
@@ -354,6 +360,7 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.gameDrawerNo.addTarget(self, action: #selector(self.dismissDrawer), for: .touchUpInside)
         if(self.currentSelectedConsoles.count == 1){
             self.checkAddButton()
+            showGamertag()
         } else {
             checkNextButton()
         }
@@ -367,7 +374,7 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
                 self.gameDrawer.transform = top
                 self.gameDrawer.alpha = 1.0
             }, completion: { (finished: Bool) in
-                
+                self.keyboardNext.alpha = 0.4
             })
         })
     }
@@ -541,7 +548,7 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @objc private func addGame(){
         dismissKeyboard()
         //add the one on screen now, whether there were more or not.
-        self.currentSelectedGT = self.gameDrawerTagEntry.text!
+        self.currentSelectedGT = self.gameDrawerTagEntry.text!.replacingOccurrences(of: "\\s+$", with: "", options: .regularExpression)
         if(!self.currentSelectedGT.isEmpty && !self.currentSelectedConsole.isEmpty && !self.currentSelectedGame.isEmpty){
             let currentGameProfile = GamerProfile(gamerTag: self.currentSelectedGT, game: self.currentSelectedGame, console: self.currentSelectedConsole, quizTaken: "false")
             self.profiles.append(currentGameProfile)
@@ -623,6 +630,10 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
             AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Nintendo User"))
         }
         
+        if(!self.currentSelectedGT.isEmpty && delegate.currentUser!.gamerTag.isEmpty){
+            ref.child("gamerTag").setValue(self.currentSelectedGT)
+            delegate.currentUser!.gamerTag = self.currentSelectedGT
+        }
         ref.child("gamerTags").setValue(sendUp)
         ref.child("consoles").child("ps").setValue(self.consoles.contains("ps"))
         ref.child("consoles").child("xbox").setValue(self.consoles.contains("xbox"))
@@ -632,7 +643,15 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
         AppEvents.logEvent(AppEvents.Name(rawValue: "Update - GC"))
         
-        self.dismiss(animated: true, completion: nil)
+        
+        if(self.modalPopped){
+            self.dismiss(animated: true) {
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                delegate.currentFeedFrag?.checkOnlineAnnouncements()
+            }
+        } else {
+            self.proceedToLanding()
+        }
     }
     
     private func sendPayload(){
@@ -670,6 +689,10 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
             AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Nintendo User"))
         }
         
+        if(!self.currentSelectedGT.isEmpty && delegate.currentUser!.gamerTag.isEmpty){
+            ref.child("gamerTag").setValue(self.currentSelectedGT)
+            delegate.currentUser!.gamerTag = self.currentSelectedGT
+        }
         ref.child("gamerTags").setValue(sendUp)
         ref.child("consoles").child("ps").setValue(self.consoles.contains("ps"))
         ref.child("consoles").child("xbox").setValue(self.consoles.contains("xbox"))
@@ -677,9 +700,23 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
         ref.child("consoles").child("pc").setValue(self.consoles.contains("pc"))
         ref.child("consoles").child("mobile").setValue(self.consoles.contains("mobile"))
         
+        let manager = delegate.socialMediaManager
+        manager.getTwitchAppToken(token: nil, uid: delegate.currentUser!.uId)
+        
         AppEvents.logEvent(AppEvents.Name(rawValue: "Register - GC"))
         
-        buildUserCache()
+        if(!self.returning && !delegate.currentUser!.gamerTag.isEmpty){
+            self.buildUserCache()
+        } else {
+            if(self.modalPopped){
+                self.dismiss(animated: true) {
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    delegate.currentFeedFrag?.checkOnlineAnnouncements()
+                }
+            } else {
+                self.proceedToLanding()
+            }
+        }
     }
     
     private func buildUserCache(){
@@ -908,6 +945,12 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
             user.gamerTag = gamerTag
         }
         return user
+    }
+    
+    private func proceedToLanding(){
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+            self.performSegue(withIdentifier: "home", sender: nil)
+        }
     }
     
     private func proceedToResults(){

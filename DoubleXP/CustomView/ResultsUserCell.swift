@@ -48,23 +48,29 @@ class ResultsUserCell: UITableViewCell, UITableViewDelegate, UITableViewDataSour
         cell.profile.addTarget(self, action: #selector(self.navigateToProfile), for: .touchUpInside)
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        var contained = false
-        if(!delegate.currentUser!.sentRequests.isEmpty){
-            for request in delegate.currentUser!.sentRequests {
-                if(request.uid == current.uId){
-                    contained = true
-                    break
-                }
-            }
-        }
-        if(contained){
+        if(delegate.currentUser!.gamerTag.isEmpty){
             cell.request.backgroundColor = #colorLiteral(red: 0.2880555391, green: 0.2778990865, blue: 0.2911514342, alpha: 1)
-            cell.request.titleLabel?.text = "requested"
+            cell.request.titleLabel?.text = "unavailable"
             cell.request.isUserInteractionEnabled = false
         } else {
-            cell.request.isUserInteractionEnabled = true
-            cell.request.tag = indexPath.item
-            cell.request.addTarget(self, action: #selector(self.sendRequest), for: .touchUpInside)
+            var contained = false
+            if(!delegate.currentUser!.sentRequests.isEmpty){
+                for request in delegate.currentUser!.sentRequests {
+                    if(request.uid == current.uId){
+                        contained = true
+                        break
+                    }
+                }
+            }
+            if(contained){
+                cell.request.backgroundColor = #colorLiteral(red: 0.2880555391, green: 0.2778990865, blue: 0.2911514342, alpha: 1)
+                cell.request.titleLabel?.text = "requested"
+                cell.request.isUserInteractionEnabled = false
+            } else {
+                cell.request.isUserInteractionEnabled = true
+                cell.request.tag = indexPath.item
+                cell.request.addTarget(self, action: #selector(self.sendRequest), for: .touchUpInside)
+            }
         }
         
         return cell

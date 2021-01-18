@@ -49,6 +49,7 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
     var drawerHeight: CGFloat!
     var currentConsoleCell: ProfileConsolesCell?
     var currentGamesCell: ProfileGamesCell?
+    var selectedTag = ""
     
     var drawerSwitches = [UISwitch]()
     var addedName = ""
@@ -58,6 +59,7 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
     var statsAvailable = false
     var quizAvailable = false
     var cachedUidFromProfile = ""
+    var uniqueTags = [String]()
     
     var bio: String?
     var ps: Bool!
@@ -82,13 +84,19 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         gcGames = appDelegate.gcGames
         
         self.saveButton.addTarget(self, action: #selector(saveButtonClicked), for: .touchUpInside)
-        self.saveButton.isUserInteractionEnabled = false
+        self.saveButton.alpha = 1
+        self.saveButton.isUserInteractionEnabled = true
         
         self.cancelButton.addTarget(self, action: #selector(cancelButtonClicked), for: .touchUpInside)
         
         let currentUser = appDelegate.currentUser!
         
+        self.selectedTag = currentUser.gamerTag
+        
         for profile in currentUser.gamerTags{
+            if(!self.uniqueTags.contains(profile.gamerTag)){
+                self.uniqueTags.append(profile.gamerTag)
+            }
             let current = ["gamerTag": profile.gamerTag, "game": profile.game, "console": profile.console]
             currentProfilePayload.append(current)
         }
@@ -193,11 +201,18 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
     
     private func setup(){
         self.payload = [String]()
+        if(self.uniqueTags.count > 1){
+            self.payload.append("preferred")
+        }
         self.payload.append("tag")
         self.payload.append("games")
-        self.payload.append("quiz")
-        self.payload.append("stats")
-        
+        if(quizAvailable){
+            self.payload.append("quiz")
+        }
+        if(statsAvailable){
+            self.payload.append("stats")
+        }
+    
         profileCollection.dataSource = self
         profileCollection.delegate = self
         
@@ -242,6 +257,10 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
             } else {
                 cell.cover.alpha = 0
             }
+            return cell
+        } else if(current == "preferred") {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "preferred", for: indexPath) as! EditProfileTagCell
+            cell.setTable(list: uniqueTags, modal: self)
             return cell
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "stats", for: indexPath) as! EditProfileStatsCell
@@ -311,6 +330,9 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         if (current == "tag") {
             return CGSize(width: collectionView.bounds.size.width, height: CGFloat(150))
         }
+        else if(current == "preferred"){
+            return CGSize(width: collectionView.bounds.size.width, height: CGFloat(180))
+        }
         else{
             return CGSize(width: collectionView.bounds.size.width, height: CGFloat(80))
         }
@@ -323,7 +345,7 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
     }
     
     @objc func textFieldDidChange(_ textField: UITextField) {
-        checkChanges(updatedList: nil)
+        //checkChanges(updatedList: nil)
         
         self.bio = textField.text
     }
@@ -391,11 +413,25 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         }
         
         let manager = ProfileManage()
-        manager.saveChanges(bio: self.bio ?? "", callbacks: self)
-        
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        appDelegate.currentUser!.bio = self.bio ?? ""
+        let currentUser = appDelegate.currentUser!
         
+        
+        if((self.bio != currentUser.bio) || (currentUser.gamerTag != self.selectedTag)){
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            if(selectedTag.isEmpty){
+                manager.saveChanges(bio: ProfanityFilter.sharedInstance.cleanUp(self.bio ?? ""), gamertag: nil, callbacks: self)
+            } else {
+                manager.saveChanges(bio: ProfanityFilter.sharedInstance.cleanUp(self.bio ?? ""), gamertag: self.selectedTag, callbacks: self)
+                appDelegate.currentUser!.gamerTag = self.selectedTag
+            }
+            appDelegate.currentUser!.bio = ProfanityFilter.sharedInstance.cleanUp(self.bio ?? "")
+        } else {
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            appDelegate.currentProfileFrag?.dismissModal()
+            appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
+            self.dismiss(animated: true, completion: nil)
+        }
         
         AppEvents.logEvent(AppEvents.Name(rawValue: "User Profile - Profile Updated"))
     }

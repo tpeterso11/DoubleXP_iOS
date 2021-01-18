@@ -15,10 +15,11 @@ import PopupDialog
 import SwiftDate
 import CryptoKit
 import AuthenticationServices
+import FlagPhoneNumber
+import SPStorkController
 
 
-class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding, UITextFieldDelegate {
-    
+class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding, UITextFieldDelegate, FPNTextFieldDelegate, SPStorkControllerDelegate {
     private var data: [NewsObject]!
     private var games: [GamerConnectGame]!
     var handle: AuthStateDidChangeListenerHandle?
@@ -31,6 +32,13 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
     @IBOutlet weak var workOverlay: UIView!
     @IBOutlet weak var workSpinner: UIActivityIndicatorView!
     @IBOutlet weak var appleLogin: UIImageView!
+    @IBOutlet weak var phoneLayout: UIView!
+    @IBOutlet weak var emailLayout: UIView!
+    @IBOutlet weak var phoneNumberSwitch: UILabel!
+    @IBOutlet weak var emailSwitch: UILabel!
+    @IBOutlet weak var phoneEntry: FPNTextField!
+    @IBOutlet weak var phoneLogin: UIButton!
+    private var validPhone = false
     
     var socialRegisteredUid = ""
     var selectedSocial = ""
@@ -121,6 +129,40 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
             }
         }
     }
+    
+    @objc private func emailSwitchAction(){
+        if(phoneLayout.alpha == 1){ //if phone layout is showing, make email bold, show email layout
+            self.emailSwitch.font = UIFont.boldSystemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
+            self.phoneNumberSwitch.font = UIFont.systemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
+            UIView.animate(withDuration: 0.8, animations: {
+                self.phoneLayout.alpha = 0
+            }, completion: { (finished: Bool) in
+                UIView.animate(withDuration: 0.5, delay: 0.3, options: [], animations: {
+                    self.emailLayout.alpha = 1
+                }, completion: nil)
+            })
+        } else {
+            self.phoneNumberSwitch.font = UIFont.boldSystemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
+            self.emailSwitch.font = UIFont.systemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
+        }
+    }
+    
+    @objc private func phoneSwitchAction(){
+        if(phoneLayout.alpha == 0){
+            self.phoneNumberSwitch.font = UIFont.boldSystemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
+            self.emailSwitch.font = UIFont.systemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
+            UIView.animate(withDuration: 0.8, animations: {
+                self.emailLayout.alpha = 0
+            }, completion: { (finished: Bool) in
+                UIView.animate(withDuration: 0.5, delay: 0.3, options: [], animations: {
+                    self.phoneLayout.alpha = 1
+                }, completion: nil)
+            })
+            
+        } else {
+            self.phoneNumberSwitch.font = UIFont.systemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
+        }
+    }
 
     @IBAction private func loginWithReadPermissions() {
         let loginManager = LoginManager()
@@ -149,6 +191,8 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
         super.viewDidLoad()
         games = [GamerConnectGame]()
         // Do any additional setup after loading the view, typically from a nib.
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.currentLoginActivity = self
         
         loginButton.addTarget(self, action: #selector(loginButtonClicked), for: .touchUpInside)
         
@@ -178,18 +222,47 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
         
         GIDSignIn.sharedInstance().delegate = self
         
+        addDoneButtonOnKeyboard()
+        
         AppEvents.logEvent(AppEvents.Name(rawValue: "Login"))
         
         emailField.returnKeyType = .done
         emailField.delegate = self
         passwordFieild.returnKeyType = .done
         passwordFieild.delegate = self
+        
+        self.phoneEntry.addTarget(self, action: #selector(textFieldDidChange), for: UIControl.Event.editingChanged)
+        self.phoneEntry.delegate = self
+        self.phoneEntry.returnKeyType = .done
+        self.phoneLogin.addTarget(self, action: #selector(continueClickedPhone), for: .touchUpInside)
+        
+        let phoneTap = UITapGestureRecognizer(target: self, action: #selector(phoneSwitchAction))
+        self.phoneNumberSwitch.isUserInteractionEnabled = true
+        self.phoneNumberSwitch.addGestureRecognizer(phoneTap)
+        
+        let emailTap = UITapGestureRecognizer(target: self, action: #selector(emailSwitchAction))
+        self.emailSwitch.isUserInteractionEnabled = true
+        self.emailSwitch.addGestureRecognizer(emailTap)
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool
     {
         textField.resignFirstResponder()
         return true
+    }
+    
+    @objc func textFieldDidChange(_ textField: UITextField) {
+        if(textField == self.phoneEntry && self.phoneEntry.text!.count > 4){
+            self.checkNextButton()
+        }
+    }
+    
+    private func checkNextButton(){
+        if(validPhone){
+            self.phoneLogin.alpha = 1
+        } else {
+            self.phoneLogin.alpha = 0.3
+        }
     }
     
     @objc func loginButtonClicked(_ sender: AnyObject?) {
@@ -264,8 +337,9 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
     }
     
     @objc func registerClicked(_ sender: AnyObject?) {
-        self.performSegue(withIdentifier: "register", sender: nil)
-        //self.performSegue(withIdentifier: "test", sender: nil)
+        self.performSegue(withIdentifier: "register", sender: nil) // noraml
+        //self.performSegue(withIdentifier: "test", sender: nil) // game selection
+        //self.performSegue(withIdentifier: "newReg", sender: nil) //registration
     }
     
     private func display(alertController: UIAlertController){
@@ -319,12 +393,14 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
             else{
                 if(authResult != nil){
                     let uId = authResult?.user.uid ?? ""
+                    UserDefaults.standard.set(uId, forKey: "userId")
                     self.downloadDBRef(uid: uId, registrationType: "apple")
                 }
                 else{
                     //need to redo this. AuthResult is null, so then uId will be empty.
                     let uId = authResult?.user.uid ?? ""
                     if(!uId.isEmpty){
+                        UserDefaults.standard.set(uId, forKey: "userId")
                         if(authResult != nil){
                             self.downloadDBRef(uid: uId, registrationType: "apple")
                         }
@@ -423,6 +499,20 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                         
                         let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
                         pendingRequests.append(newFriend)
+                    }
+                }
+                
+                var badges = [BadgeObj]()
+                if(snapshot.hasChild("badges")){
+                    let badgesArray = snapshot.childSnapshot(forPath: "badges")
+                    for badge in badgesArray.children{
+                        let currentObj = badge as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let name = dict?["badgeName"] as? String ?? ""
+                        let desc = dict?["badgeDesc"] as? String ?? ""
+                        
+                        let badge = BadgeObj(badge: name, badgeDesc: desc)
+                        badges.append(badge)
                     }
                 }
                 
@@ -784,8 +874,9 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                         let game = dict?["game"] as? String ?? ""
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
+                        let id = dict?["id"] as? String ?? ""
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
                         
                         let calendar = Calendar.current
                         if(!date.isEmpty){
@@ -814,6 +905,8 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                     }
                 }
                 
+                let reviews = value?["reviews"] as? [String] ?? [String]()
+                
                 var tempRivals = [RivalObj]()
                 if(snapshot.hasChild("tempRivals")){
                     let pendingArray = snapshot.childSnapshot(forPath: "tempRivals")
@@ -825,8 +918,9 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                         let game = dict?["game"] as? String ?? ""
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
+                        let id = dict?["id"] as? String ?? ""
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
                         
                         if(!date.isEmpty){
                             let dbDate = self.stringToDate(date)
@@ -865,8 +959,9 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                         let game = dict?["game"] as? String ?? ""
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
+                        let id = dict?["id"] as? String ?? ""
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
                         acceptedRivals.append(request)
                     }
                 }
@@ -882,8 +977,9 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                         let game = dict?["game"] as? String ?? ""
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
+                        let id = dict?["id"] as? String ?? ""
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
                         rejectedRivals.append(request)
                     }
                 }
@@ -925,6 +1021,8 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                 user.userLong = userLong
                 user.blockList = Array(blockList.keys)
                 user.restrictList = Array(restrictList.keys)
+                user.badges = badges
+                user.reviews = reviews
                 
                 DispatchQueue.main.async {
                     let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -1146,6 +1244,100 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
         }
     }
     
+    @objc private func continueClickedPhone(){
+        self.view.endEditing(true)
+        let phoneNumber = self.phoneEntry.getFormattedPhoneNumber(format: .E164)
+        if(phoneNumber != nil){
+            PhoneAuthProvider.provider().verifyPhoneNumber(phoneNumber!, uiDelegate: nil) { (verificationID, error) in
+              if let error = error {
+                var buttons = [PopupDialogButton]()
+                let title = "phone number signup error"
+                let message = "there was an error signing you up. make sure your phone number is correct and try again."
+                
+                let button = DefaultButton(title: "try again.") { [weak self] in
+                    self?.continueClickedPhone()
+                    
+                }
+                buttons.append(button)
+                
+                let buttonOne = CancelButton(title: "nevermind") { [weak self] in
+                    //do nothing
+                }
+                buttons.append(buttonOne)
+                
+                let popup = PopupDialog(title: title, message: message)
+                popup.addButtons(buttons)
+
+                // Present dialog
+                self.present(popup, animated: true, completion: nil)
+                return
+              }
+                UserDefaults.standard.set(verificationID, forKey: "authVerificationID")
+                self.showCode()
+            }
+        }
+    }
+    
+    func addDoneButtonOnKeyboard() {
+        let doneToolbar: UIToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: 320, height: 50))
+        doneToolbar.barStyle       = UIBarStyle.default
+        let flexSpace              = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
+        let done: UIBarButtonItem  = UIBarButtonItem(title: "Done", style: UIBarButtonItem.Style.done, target: self, action: #selector(doneButtonAction))
+
+        var items = [UIBarButtonItem]()
+        items.append(flexSpace)
+        items.append(done)
+
+        doneToolbar.items = items
+        doneToolbar.sizeToFit()
+
+        self.phoneEntry.inputAccessoryView = doneToolbar
+    }
+    
+    @objc func doneButtonAction() {
+        self.phoneEntry.resignFirstResponder()
+    }
+    
+    private func showCode(){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "code") as! RegisterCodeDrawer
+        
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = false
+        transitionDelegate.customHeight = 550
+        transitionDelegate.showCloseButton = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+    }
+    
+    func transitionAfterPhoneRegistration(uid: String){
+        let checkRef = Database.database().reference().child("Users").child((uid))
+        checkRef.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                self.downloadDBRef(uid: uid, registrationType: "phone")
+            }
+            else{
+                    let user = User(uId: uid)
+                    checkRef.child("platform").setValue("ios")
+                    checkRef.child("search").setValue("true")
+                    checkRef.child("registrationType").setValue("google")
+                    checkRef.child("model").setValue(UIDevice.modelName)
+                    checkRef.child("notifications").setValue("true")
+                    DispatchQueue.main.async {
+                        let delegate = UIApplication.shared.delegate as! AppDelegate
+                        delegate.currentUser = user
+                        self.performSegue(withIdentifier: "newReg", sender: nil)
+                    }
+                }
+            }) { (error) in
+                print(error.localizedDescription)
+        }
+    }
+    
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error?) {
       // ...
       if let error = error {
@@ -1186,12 +1378,14 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                else{
                    if(authResult != nil){
                        let uId = authResult?.user.uid ?? ""
+                    UserDefaults.standard.set(uId, forKey: "userId")
                     self.downloadDBRef(uid: uId, registrationType: "google")
                 }
                else{
                 let uId = authResult?.user.uid ?? ""
                 if(!uId.isEmpty){
                     if(authResult != nil){
+                        UserDefaults.standard.set(uId, forKey: "userId")
                         self.downloadDBRef(uid: uId, registrationType: "google")
                     }
                     else{
@@ -1228,6 +1422,22 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
             }
         }
     }
+    
+    func fpnDidSelectCountry(name: String, dialCode: String, code: String) {
+    }
+    
+    func fpnDidValidatePhoneNumber(textField: FPNTextField, isValid: Bool) {
+          if isValid {
+            self.validPhone = true
+          } else {
+            self.validPhone = false
+          }
+       }
+    
+    func fpnDisplayCountryList() {
+    
+    }
+    
 }
 
 extension UITextField {

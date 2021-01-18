@@ -138,8 +138,7 @@ class TeamBuildFA: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let manager = GamerProfileManager()
-        if(manager.getGamerTagForGame(gameName: team!.games[0]) == team!.teamCaptain){
+        if(currentUser!.gamerTag == team!.teamCaptain){
             if(!selectedNeeds.contains((team?.teamNeeds[indexPath.item])!)){
                 selectedNeeds.append(team?.teamNeeds[indexPath.item] ?? "")
                 

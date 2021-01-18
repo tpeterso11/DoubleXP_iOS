@@ -13,6 +13,7 @@ import FoldingCell
 class ProfileMyGamesCell: UITableViewCell, UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var tableHeight: NSLayoutConstraint!
     @IBOutlet weak var gamesCell: UITableView!
+    @IBOutlet weak var noTagCover: UIView!
     var payload = [GamerConnectGame]()
     var userForProfile: User?
     var cellHeights: [CGFloat] = []

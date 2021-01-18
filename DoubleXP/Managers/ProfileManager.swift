@@ -31,8 +31,9 @@ class ProfileManage {
                     let game = dict?["game"] as? String ?? ""
                     let uid = dict?["uid"] as? String ?? ""
                     let dbType = dict?["type"] as? String ?? ""
+                    let id = dict?["id"] as? String ?? ""
                     
-                    let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                    let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
                     
                     let calendar = Calendar.current
                     if(!date.isEmpty){
@@ -73,7 +74,7 @@ class ProfileManage {
         }
     }
     
-    func saveChanges(bio: String, callbacks: CurrentProfileCallbacks){
+    func saveChanges(bio: String, gamertag: String?, callbacks: CurrentProfileCallbacks){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let user = delegate.currentUser!
         
@@ -83,6 +84,11 @@ class ProfileManage {
                 if(!bio.isEmpty){
                     ref.child("bio").setValue(bio)
                     user.bio = bio
+                }
+                
+                if(gamertag != nil){
+                    ref.child("gamerTag").setValue(gamertag)
+                    user.gamerTag = gamertag!
                 }
                 
                 callbacks.changesComplete()

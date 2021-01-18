@@ -32,6 +32,7 @@ class SearchManager {
     }
     
     func searchWithLocation(callbacks: SearchManagerCallbacks){
+        returnedUsers = [User]()
         if(locationFilter == "none" || locationFilter == "timezone"){
             self.searchWithFilters(callbacks: callbacks)
             return
@@ -103,13 +104,18 @@ class SearchManager {
                     
                     var containedProfile = false
                     var gamerTag = ""
-                    for tag in gamerTags {
-                        if(!tag.gamerTag.isEmpty){
-                            if(tag.game == self.currentGameSearch){
-                                if(self.currentSelectedConsoles.contains(tag.console)){
-                                    containedProfile = true
-                                    gamerTag = tag.gamerTag
-                                    break
+                    if(snapshot.hasChild("gamerTag")){
+                        gamerTag = snapshot.childSnapshot(forPath: "gamerTag").value as? String ?? ""
+                    }
+                    if(gamerTag.isEmpty){
+                        for tag in gamerTags {
+                            if(!tag.gamerTag.isEmpty){
+                                if(tag.game == self.currentGameSearch){
+                                    if(self.currentSelectedConsoles.contains(tag.console)){
+                                        containedProfile = true
+                                        gamerTag = tag.gamerTag
+                                        break
+                                    }
                                 }
                             }
                         }
@@ -197,6 +203,11 @@ class SearchManager {
                             let uId = snapshot.childSnapshot(forPath: uid).key
                             let bio = value?["bio"] as? String ?? ""
                             let sentRequests = value?["sentRequests"] as? [FriendRequestObject] ?? [FriendRequestObject]()
+                            var onlineStatus = value?["onlineStatus"] as? String ?? ""
+                            let onlineAnnouncements = value?["onlineAnnouncements"] as? [String: String] ?? [String: String]()
+                            if(!onlineAnnouncements.isEmpty){
+                                onlineStatus = "gaming right NOW!"
+                            }
                             
                             var friends = [FriendObject]()
                             let friendsArray = snapshot.childSnapshot(forPath: "friends")
@@ -244,6 +255,7 @@ class SearchManager {
                             returnedUser.xbox = xbox
                             returnedUser.nintendo = nintendo
                             returnedUser.bio = bio
+                            returnedUser.onlineStatus = onlineStatus
                             
                             //if the returned user plays the game being searched AND the returned users gamertag
                             //does not equal the current users gamertag, then add to list.
@@ -290,13 +302,18 @@ class SearchManager {
                 
                 var containedProfile = false
                 var gamerTag = ""
-                for tag in gamerTags {
-                    if(!tag.gamerTag.isEmpty){
-                        if(tag.game == self.currentGameSearch){
-                            if(self.currentSelectedConsoles.contains(tag.console)){
-                                containedProfile = true
-                                gamerTag = tag.gamerTag
-                                break
+                if(snapshot.hasChild("gamerTag")){
+                    gamerTag = snapshot.childSnapshot(forPath: "gamerTag").value as? String ?? ""
+                }
+                if(gamerTag.isEmpty){
+                    for tag in gamerTags {
+                        if(!tag.gamerTag.isEmpty){
+                            if(tag.game == self.currentGameSearch){
+                                if(self.currentSelectedConsoles.contains(tag.console)){
+                                    containedProfile = true
+                                    gamerTag = tag.gamerTag
+                                    break
+                                }
                             }
                         }
                     }
@@ -403,6 +420,44 @@ class SearchManager {
                     if(ageMatch && languageMatch && advancedMatch && timezoneMatch){
                         let uId = (user as! DataSnapshot).key
                         let bio = value?["bio"] as? String ?? ""
+                        var onlineStatus = value?["onlineStatus"] as? String ?? ""
+                        var announcementAvailable = false
+                        if((user as! DataSnapshot).hasChild("onlineAnnouncements")){
+                            let announcements = (user as! DataSnapshot).childSnapshot(forPath: "onlineAnnouncements")
+                            for online in announcements.children
+                            {
+                                let current = (online as? DataSnapshot)
+                                if(current != nil){
+                                    if(current!.hasChild("date")){
+                                        let date = current!.childSnapshot(forPath: "date").value as? String ?? ""
+                                        let dbDate = self.stringToDate(date)
+                                        
+                                        if(dbDate != nil){
+                                            let now = NSDate()
+                                            let formatter = DateFormatter()
+                                            formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+                                            formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                                            let future = formatter.string(from: dbDate as Date)
+                                            let dbTimeOut = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                                            
+                                            let validAnnounments = (now as Date).compare(.isEarlier(than: dbTimeOut))
+                                            
+                                            if(dbTimeOut != nil){
+                                                if(!validAnnounments){
+                                                    let ref = Database.database().reference().child("Users").child((user as! DataSnapshot).key)
+                                                    ref.child("onlineAnnouncements").child((online as! DataSnapshot).key).removeValue()
+                                                } else {
+                                                    announcementAvailable = true
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if(announcementAvailable){
+                            onlineStatus = "gaming right NOW!"
+                        }
                         let sentRequests = value?["sentRequests"] as? [FriendRequestObject] ?? [FriendRequestObject]()
                         
                         var friends = [FriendObject]()
@@ -419,6 +474,7 @@ class SearchManager {
                         }
                         
                         let games = value?["games"] as? [String] ?? [String]()
+                        let userGamerTag = value?["gamerTag"] as? String ?? ""
                         var gamerTags = [GamerProfile]()
                         let gamerTagsArray = (user as! DataSnapshot).childSnapshot(forPath: "gamerTags")
                         for gamerTagObj in gamerTagsArray.children {
@@ -445,12 +501,13 @@ class SearchManager {
                         returnedUser.games = games
                         returnedUser.friends = friends
                         returnedUser.sentRequests = sentRequests
-                        returnedUser.gamerTag = gamerTag
+                        returnedUser.gamerTag = userGamerTag
                         returnedUser.pc = pc
                         returnedUser.ps = ps
                         returnedUser.xbox = xbox
                         returnedUser.nintendo = nintendo
                         returnedUser.bio = bio
+                        returnedUser.onlineStatus = onlineStatus
                         
                         //if the returned user plays the game being searched AND the returned users gamertag
                         //does not equal the current users gamertag, then add to list.
@@ -464,6 +521,13 @@ class SearchManager {
             }
             callbacks.onSuccess(returnedUsers: self.returnedUsers)
         })
+    }
+    
+    func stringToDate(_ str: String)->Date{
+        let formatter = DateFormatter()
+        formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+        formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+        return formatter.date(from: str)!
     }
     
     func searchForUser(searchTag: String, callbacks: SearchManagerCallbacks){
@@ -503,6 +567,45 @@ class SearchManager {
                 if(containedProfile && (search == "true")){
                     let uId = (user as! DataSnapshot).key
                     let bio = value?["bio"] as? String ?? ""
+                    var onlineStatus = value?["onlineStatus"] as? String ?? ""
+                    var announcementAvailable = false
+                    if((user as! DataSnapshot).hasChild("onlineAnnouncements")){
+                        let announcements = (user as! DataSnapshot).childSnapshot(forPath: "onlineAnnouncements")
+                        for online in announcements.children
+                        {
+                            let current = (online as? DataSnapshot)
+                            if(current != nil){
+                                if(current!.hasChild("date")){
+                                    let date = current!.childSnapshot(forPath: "date").value as? String ?? ""
+                                    let dbDate = self.stringToDate(date)
+                                    
+                                    if(dbDate != nil){
+                                        let now = NSDate()
+                                        let formatter = DateFormatter()
+                                        formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+                                        formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
+                                        let future = formatter.string(from: dbDate as Date)
+                                        let dbTimeOut = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                                        
+                                        let validAnnounments = (now as Date).compare(.isEarlier(than: dbTimeOut))
+                                        
+                                        if(dbTimeOut != nil){
+                                            if(!validAnnounments){
+                                                let ref = Database.database().reference().child("Users").child((user as! DataSnapshot).key)
+                                                ref.child("onlineAnnouncements").child((online as! DataSnapshot).key).removeValue()
+                                            } else {
+                                                announcementAvailable = true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if(announcementAvailable){
+                        onlineStatus = "gaming right NOW!"
+                    }
+                    
                     let sentRequests = value?["sentRequests"] as? [FriendRequestObject] ?? [FriendRequestObject]()
                     
                     var friends = [FriendObject]()
@@ -551,6 +654,7 @@ class SearchManager {
                     returnedUser.xbox = xbox
                     returnedUser.nintendo = nintendo
                     returnedUser.bio = bio
+                    returnedUser.onlineStatus = onlineStatus
                     
                     self.returnedUsers.append(returnedUser)
                     callbacks.onSuccess(returnedUsers: self.returnedUsers)
@@ -565,11 +669,9 @@ class SearchManager {
     
     private func addUserToList(returnedUser: User){
         var contained = false
-        let manager = GamerProfileManager()
         
         for user in returnedUsers{
-            if(manager.getGamerTagForOtherUserForGame(gameName: self.currentGameSearch, returnedUser: user) == manager.getGamerTagForOtherUserForGame(gameName: self.currentGameSearch, returnedUser: returnedUser)){
-                
+            if(user.gamerTag == returnedUser.gamerTag){
                 contained = true
                 break
             }

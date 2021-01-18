@@ -11,6 +11,8 @@ import UIKit
 
 class ResultsHeaderCell: UITableViewCell {
     
+    @IBOutlet weak var whiteGuyContainer: UIView!
+    @IBOutlet weak var whiteGuy: UIImageView!
     @IBOutlet weak var header: UILabel!
     @IBOutlet weak var sub: UILabel!
 }

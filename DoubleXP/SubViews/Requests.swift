@@ -11,12 +11,14 @@ import Firebase
 import moa
 import PopupDialog
 import MSPeekCollectionViewDelegateImplementation
+import SPStorkController
 
-class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUpdate {
+class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUpdate, SPStorkControllerDelegate {
 
     var userRequests = [Any]()
     var cellHeights: [CGFloat] = []
     
+    @IBOutlet weak var divider: UIView!
     @IBOutlet weak var quizTable: UITableView!
     @IBOutlet weak var closeView: UIView!
     @IBOutlet weak var quizView: UIView!
@@ -33,18 +35,22 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
     var questionPayload = [[String]]()
     
     var quizSet = false
+    var dataSet = false
     
     @IBOutlet weak var requestsSub: UILabel!
     @IBOutlet weak var requestsHeader: UILabel!
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.currentRequests = self
         checkRivals()
         //self.pageName = "Requests"
         //appDelegate.addToNavStack(vc: self)
     }
     
     private func animateView(){
+        self.dataSet = true
         requestList.delegate = self
         requestList.dataSource = self
         
@@ -53,6 +59,15 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
             self.requestList.alpha = 1
             self.requestList.transform = top
         }, completion: nil)
+    }
+    
+    private func dismissModal(){
+        
+    }
+    
+    func didDismissStorkBySwipe() {
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        self.buildRequests(user: delegate.currentUser!)
     }
     
     private func buildRequests(user: User){
@@ -82,23 +97,34 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
         
         cellHeights = Array(repeating: Const.closeCellHeight, count: self.userRequests.count)
         
-        if(!userRequests.isEmpty){
-            requestList.estimatedRowHeight = Const.closeCellHeight
-            requestList.rowHeight = UITableView.automaticDimension
-            
-            if #available(iOS 10.0, *) {
-                requestList.refreshControl = UIRefreshControl()
-                requestList.refreshControl?.addTarget(self, action: #selector(refreshHandler), for: .valueChanged)
+        if(!dataSet){
+            if(!userRequests.isEmpty){
+                requestList.estimatedRowHeight = Const.closeCellHeight
+                requestList.rowHeight = UITableView.automaticDimension
+                
+                if #available(iOS 10.0, *) {
+                    requestList.refreshControl = UIRefreshControl()
+                    requestList.refreshControl?.addTarget(self, action: #selector(refreshHandler), for: .valueChanged)
+                }
+                
+                animateView()
+            } else{
+                let top = CGAffineTransform(translationX: 0, y: -10)
+                UIView.animate(withDuration: 0.8, animations: {
+                    self.emptyLayout.alpha = 1
+                    self.emptyLayout.transform = top
+                }, completion: nil)
             }
-            
-            animateView()
-        }
-        else{
-            let top = CGAffineTransform(translationX: 0, y: -10)
-            UIView.animate(withDuration: 0.8, animations: {
-                self.emptyLayout.alpha = 1
-                self.emptyLayout.transform = top
-            }, completion: nil)
+        } else {
+            if(!userRequests.isEmpty){
+                let top = CGAffineTransform(translationX: 0, y: -10)
+                UIView.animate(withDuration: 0.8, animations: {
+                    self.emptyLayout.alpha = 1
+                    self.emptyLayout.transform = top
+                }, completion: nil)
+            } else {
+                self.requestList.reloadData()
+            }
         }
     }
     
@@ -113,24 +139,22 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
     func showView(){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let currentUser = delegate.currentUser
+        
         let top = CGAffineTransform(translationX: 0, y: 30)
         UIView.animate(withDuration: 0.8, delay: 0.3, options:[], animations: {
             self.requestsHeader.alpha = 1
             self.requestsHeader.transform = top
-            self.requestsSub.alpha = 1
-            self.requestsSub.transform = top
-        }, completion: { (finished: Bool) in
-            UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
-                if(currentUser != nil){
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                        self.buildRequests(user: currentUser!)
-                    }
+            
+            if(currentUser != nil){
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    self.buildRequests(user: currentUser!)
                 }
-                else{
-                    return
-                }
-            }, completion: nil)
-        })
+            }
+            else{
+                return
+            }
+            
+        }, completion: nil)
     }
     
     func stringToDate(_ str: String)->Date{
@@ -138,6 +162,22 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
         formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
         formatter.timeZone = NSTimeZone(name: "UTC") as TimeZone?
         return formatter.date(from: str)!
+    }
+    
+    func launchProfile(uid: String){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.cachedTest = uid
+        
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "playerProfile") as! PlayerProfile
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
     }
     
     @objc func refreshHandler() {
@@ -193,16 +233,16 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
             let current = userRequests[indexPath.item]
             
             if(current is FriendRequestObject){
-                cell.setUI(friendRequest: (current as! FriendRequestObject), team: nil, request: nil, rival: nil, indexPath: indexPath, currentTableView: self.requestList, callbacks: self)
+                cell.setUI(friendRequest: (current as! FriendRequestObject), team: nil, request: nil, rival: nil, indexPath: indexPath, currentTableView: self.requestList, callbacks: self, requests: self)
             }
             else if(current is RequestObject){
-                cell.setUI(friendRequest: nil, team: nil, request: (current as! RequestObject), rival: nil, indexPath: indexPath, currentTableView: self.requestList, callbacks: self)
+                cell.setUI(friendRequest: nil, team: nil, request: (current as! RequestObject), rival: nil, indexPath: indexPath, currentTableView: self.requestList, callbacks: self, requests: self)
             }
             else if(current is RivalObj){
-                cell.setUI(friendRequest: nil, team: nil, request: nil, rival: (current as! RivalObj), indexPath: indexPath, currentTableView: self.requestList, callbacks: self)
+                cell.setUI(friendRequest: nil, team: nil, request: nil, rival: (current as! RivalObj), indexPath: indexPath, currentTableView: self.requestList, callbacks: self, requests: self)
             }
             else{
-                cell.setUI(friendRequest: nil, team: (current as! TeamInviteObject), request: nil, rival: nil, indexPath: indexPath, currentTableView: self.requestList, callbacks: self)
+                cell.setUI(friendRequest: nil, team: (current as! TeamInviteObject), request: nil, rival: nil, indexPath: indexPath, currentTableView: self.requestList, callbacks: self, requests: self)
             }
             
             cell.layoutMargins = UIEdgeInsets.zero
@@ -256,6 +296,9 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
     //later, add "accepted" and "invited" array to user. This way. when they are invited or accepted, we can observe this in the DB and open a nice little overlay that says "you've been accepted, chat or check out the team". We cannot do this just by observing teams because if they create a team themselves, we do not want this overlay showing.
     
     func updateCell(indexPath: IndexPath) {
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.currentFeedFrag?.checkOnlineAnnouncements()
+        
         if indexPath.item >= 0 && indexPath.item < self.userRequests.count {
             self.userRequests.remove(at: indexPath.item)
             self.requestList.deleteRows(at: [indexPath], with: .automatic)
@@ -345,6 +388,12 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
     }
     
     func friendRemoveFail() {
+    }
+    
+    func onlineAnnounceFail() {
+    }
+    
+    func onlineAnnounceSent() {
     }
     
     func showConfirmation(){

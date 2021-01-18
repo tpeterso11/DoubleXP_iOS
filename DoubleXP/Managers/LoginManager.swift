@@ -31,6 +31,7 @@ class LoginHelper{
                     let gameName = dict?["gameName"] as? String ?? ""
                     let mainSponsor = dict?["mainSponsor"] as? String ?? ""
                     let topPrize = dict?["topPrize"] as? String ?? ""
+                    let expired = dict?["expired"] as? String ?? ""
                     let secondPrize = dict?["secondPrize"] as? String ?? ""
                     let thirdPrize = dict?["thirdPrize"] as? String ?? ""
                     let competitionDate = dict?["competitionDate"] as? String ?? ""
@@ -70,8 +71,11 @@ class LoginHelper{
                     newCompetition.subscriptionId = subscriptionId
                     newCompetition.emergencyShowLiveStream = emergencyShowLiveStream
                     newCompetition.emergencyShowRegistrationOver = emergencyShowRegistrationOver
+                    newCompetition.expired = expired
                     
-                    displayCompetitions.append(newCompetition)
+                    if(expired != "true"){
+                        displayCompetitions.append(newCompetition)
+                    }
                 }
                 
                 let delegate = UIApplication.shared.delegate as! AppDelegate

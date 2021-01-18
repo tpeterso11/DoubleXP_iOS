@@ -91,6 +91,16 @@ class User: NSObject, NSCoding {
         }
     }
     
+    var _onlineStatus = "idle"
+    var onlineStatus: String {
+        get {
+            return (_onlineStatus)
+        }
+        set (newVal) {
+            _onlineStatus = newVal
+        }
+    }
+    
     var _games = [String]()
     var games:[String] {
         get {
@@ -241,6 +251,16 @@ class User: NSObject, NSCoding {
         }
     }
     
+    var _dailyCheck = ""
+    var dailyCheck: String {
+        get {
+            return (_dailyCheck)
+        }
+        set (newVal) {
+            _dailyCheck = newVal
+        }
+    }
+    
     var _timezone = "timezone"
     var timezone: String {
         get {
@@ -281,6 +301,16 @@ class User: NSObject, NSCoding {
         }
     }
     
+    var _badges = [BadgeObj]()
+    var badges: [BadgeObj] {
+        get {
+            return (_badges)
+        }
+        set (newVal) {
+            _badges = newVal
+        }
+    }
+    
     var _restrictList = [String]()
     var restrictList: [String] {
         get {
@@ -288,6 +318,46 @@ class User: NSObject, NSCoding {
         }
         set (newVal) {
             _restrictList = newVal
+        }
+    }
+    
+    var _cachedRecommendedUids = [String]()
+    var cachedRecommendedUids: [String] {
+        get {
+            return (_cachedRecommendedUids)
+        }
+        set (newVal) {
+            _cachedRecommendedUids = newVal
+        }
+    }
+    
+    var _reviews = [String]()
+    var reviews: [String] {
+        get {
+            return (_reviews)
+        }
+        set (newVal) {
+            _reviews = newVal
+        }
+    }
+    
+    var _receivedAnnouncements = [String]()
+    var receivedAnnouncements: [String] {
+        get {
+            return (_receivedAnnouncements)
+        }
+        set (newVal) {
+            _receivedAnnouncements = newVal
+        }
+    }
+    
+    var _recommendedGames = [String]()
+    var recommendedGames: [String] {
+        get {
+            return (_recommendedGames)
+        }
+        set (newVal) {
+            _recommendedGames = newVal
         }
     }
     
@@ -413,6 +483,16 @@ class User: NSObject, NSCoding {
         }
     }
     
+    var _currentOnlineAnnounement: OnlineObj?
+    var currentOnlineAnnounement: OnlineObj? {
+        get {
+            return (_currentOnlineAnnounement)
+        }
+        set (newVal) {
+            _currentOnlineAnnounement = newVal
+        }
+    }
+    
     
     func getConsoleString() -> String{
         var buildString = ""
@@ -493,6 +573,7 @@ class User: NSObject, NSCoding {
         self.chatObjects = (decoder.decodeObject(forKey: "chatObjects") as! [ChatObject])
         self.sendBirdId = (decoder.decodeObject(forKey: "sendBirdId") as! String)
         self.search = (decoder.decodeObject(forKey: "search") as! String)
+        self.dailyCheck = (decoder.decodeObject(forKey: "dailyCheck") as! String)
         self.notifications = (decoder.decodeObject(forKey: "notifications") as! String)
         self.teamInviteRequests = (decoder.decodeObject(forKey: "teamInviteRequests") as! [RequestObject])
         self.subscriptions = (decoder.decodeObject(forKey: "subscriptions") as! [String])
@@ -507,6 +588,13 @@ class User: NSObject, NSCoding {
         self.secondaryLanguage = (decoder.decodeObject(forKey: "secondaryLanguage") as! String)
         self.blockList = (decoder.decodeObject(forKey: "blockList") as! [String])
         self.restrictList = (decoder.decodeObject(forKey: "restrictList") as! [String])
+        self.onlineStatus = (decoder.decodeObject(forKey: "onlineStatus") as! String)
+        self.currentOnlineAnnounement = (decoder.decodeObject(forKey: "currentOnlineAnnounement") as! OnlineObj)
+        self.reviews = (decoder.decodeObject(forKey: "reviews") as! [String])
+        self.cachedRecommendedUids = (decoder.decodeObject(forKey: "cachedRecommendedUids") as! [String])
+        self.receivedAnnouncements = (decoder.decodeObject(forKey: "receivedAnnouncements") as! [String])
+        self.recommendedGames = (decoder.decodeObject(forKey: "recommendedGames") as! [String])
+        self.badges = (decoder.decodeObject(forKey: "badges") as! [BadgeObj])
     }
     
     func encode(with coder: NSCoder) {
@@ -538,6 +626,14 @@ class User: NSObject, NSCoding {
         coder.encode(self.secondaryLanguage, forKey: "secondaryLanguage")
         coder.encode(self.blockList, forKey: "blockList")
         coder.encode(self.blockList, forKey: "restrictList")
+        coder.encode(self.onlineStatus, forKey: "onlineStatus")
+        coder.encode(self.currentOnlineAnnounement, forKey: "currentOnlineAnnounement")
+        coder.encode(self.reviews, forKey: "reviews")
+        coder.encode(self.badges, forKey: "badges")
+        coder.encode(self.dailyCheck, forKey: "dailyCheck")
+        coder.encode(self.cachedRecommendedUids, forKey: "cachedRecommendedUserIds")
+        coder.encode(self.receivedAnnouncements, forKey: "receivedAnnouncements")
+        coder.encode(self.recommendedGames, forKey: "recommendedGames")
     }
     
     struct Post: Hashable, Equatable {

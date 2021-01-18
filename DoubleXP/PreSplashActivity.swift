@@ -10,11 +10,14 @@ import UIKit
 import SwiftHTTP
 import Firebase
 import SwiftDate
+import VideoBackground
+import AdSupport
 
 class PreSplashActivity: UIViewController, MediaCallbacks  {
     private var data: [NewsObject]!
     private var games: [GamerConnectGame]!
     
+    @IBOutlet weak var videoBack: VideoBackground!
     struct Constants {
         static let secret = "uyvhqn68476njzzdvja9ulqsb8esn3"
         static let id = "aio1d4ucufi6bpzae0lxtndanh3nob"
@@ -22,10 +25,35 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        guard let videoPath = Bundle.main.path(forResource: "splash", ofType: "mov"),
+        let imagePath = Bundle.main.path(forResource: "null", ofType: "png") else{
+            games = [GamerConnectGame]()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.getArticles()
+                
+                //let manager = InterviewManager()
+                //manager.getOpions(url: "http://doublexpstorage.tech/app-json/champion.json")
+            }
+            return
+        }
+        
+        let options = VideoOptions(pathToVideo: videoPath,
+                                   pathToImage: imagePath,
+                                   isMuted: true,
+                                   shouldLoop: false)
+        let videoView = VideoBackground(frame: view.bounds, options: options)
+        videoView.layer.masksToBounds = true
+        videoView.alpha = 0.8
+        view.insertSubview(videoView, at: 0)
+        
         games = [GamerConnectGame]()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.8) {
             self.getArticles()
+            self.getFeedExtras()
+            self.loadLanguages()
             
+            //let manager = StatsManager()
+            //manager.getPubgStats(gamerTag: "superNayr")
             //let manager = InterviewManager()
             //manager.getOpions(url: "http://doublexpstorage.tech/app-json/champion.json")
         }
@@ -34,6 +62,24 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
     func getArticles(){
         let manager = MediaManager()
         manager.getGameSpotNews(callbacks: self)
+    }
+    
+    func getFeedExtras(){
+        let ref = Database.database().reference().child("Feed")
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                if(snapshot.hasChild("sub")){
+                    appDelegate.feedSub = snapshot.childSnapshot(forPath: "sub").value as? String ?? "let's do this."
+                }
+                if(snapshot.hasChild("heroLightXXHDPI")){
+                    appDelegate.heroLightUrl = snapshot.childSnapshot(forPath: "heroLightXXHDPI").value as? String ?? ""
+                }
+                if(snapshot.hasChild("heroLightXXHDPI")){
+                    appDelegate.heroDarkUrl = snapshot.childSnapshot(forPath: "heroDarkXXHDPI").value as? String ?? ""
+                }
+            }
+        })
     }
     
     func onReviewsReceived(payload: [NewsObject]) {
@@ -162,9 +208,19 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
                             var available = "true"
                             var hasQuiz = false
                             var mobileGame = ""
+                            var gameType = ""
+                            var releaseDate = ""
+                            var gameDescription = ""
+                            var ideal = ""
+                            var timeCommitment = ""
+                            var complexity = ""
+                            var alternateImageUrl = ""
+                            var ratings = [[String: String]]()
+                            var quickReviews = [[String: String]]()
                             var gameModes = [String]()
                             var statsAvailable = false
                             var teamNeeds = [String]()
+                            var categoryFilters = [String]()
                             var availableConsoles = [String]()
                             var filterQuestions = [[String: Any]]()
                             if let gameDict = game as? NSDictionary {
@@ -175,12 +231,22 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
                                 statsAvailable = (gameDict.value(forKey: "statsAvailable") as? Bool ?? false)
                                 teamNeeds = (gameDict.value(forKey: "teamNeeds") as? [String]) ?? [String]()
                                 secondaryName = (gameDict.value(forKey: "secondaryName") as? String ?? "")
+                                gameType = (gameDict.value(forKey: "gameType") as? String ?? "")
+                                releaseDate = (gameDict.value(forKey: "releaseDate") as? String ?? "")
                                 gameModes = (gameDict).value(forKey: "gameModes") as? [String] ?? [String]()
+                                categoryFilters = (gameDict).value(forKey: "categoryFilters") as? [String] ?? [String]()
                                 twitterHandle = (gameDict).value(forKey: "twitterHandle") as? String ?? ""
                                 twitchHandle = (gameDict).value(forKey: "twitchHandle") as? String ?? ""
                                 mobileGame = (gameDict).value(forKey: "mobileGame") as? String ?? "false"
                                 available = (gameDict).value(forKey: "available") as? String ?? "true"
                                 availableConsoles = (gameDict.value(forKey: "availableConsoles") as? [String]) ?? [String]()
+                                gameDescription = (gameDict).value(forKey: "gameDescription") as? String ?? ""
+                                ideal = (gameDict).value(forKey: "ideal") as? String ?? ""
+                                timeCommitment = (gameDict).value(forKey: "timeCommitment") as? String ?? ""
+                                alternateImageUrl = (gameDict).value(forKey: "alternateImageUrlXXHDPI") as? String ?? ""
+                                complexity = (gameDict).value(forKey: "complexity") as? String ?? ""
+                                ratings = (gameDict).value(forKey: "ratings") as? [[String: String]] ?? [[String: String]]()
+                                quickReviews = (gameDict).value(forKey: "quickReviews") as? [[String: String]] ?? [[String: String]]()
                                 
                                 let quiz = (gameDict).value(forKey: "quiz") as? String ?? ""
                                 if(quiz == "true"){
@@ -196,6 +262,16 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
                                 newGame.hasQuiz = hasQuiz
                                 newGame.mobileGame = mobileGame
                                 newGame.availablebConsoles = availableConsoles
+                                newGame.categoryFilters = categoryFilters
+                                newGame.gameType = gameType
+                                newGame.releaseDate = releaseDate
+                                newGame.ratings = ratings
+                                newGame.gameDescription = gameDescription
+                                newGame.ideal = ideal
+                                newGame.timeCommitment = timeCommitment
+                                newGame.complexity = complexity
+                                newGame.quickReviews = quickReviews
+                                newGame.alternateImageUrl = alternateImageUrl
                                 
                                 if(gameDict.value(forKey: "filterQuestions") != nil){
                                     //let test = gameDict["filterQuestions"] as? [[String: Any]] ?? [[String: Any]]()
@@ -219,6 +295,37 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
             }
         }
     
+    func loadLanguages(){
+        HTTP.GET("http://doublexpstorage.tech/app-json/languages.json") { response in
+            if let err = response.error {
+                print("error: \(err.localizedDescription)")
+                return //also notify app of failure as needed
+            }
+            else{
+                if let jsonObj = try? JSONSerialization.jsonObject(with: response.data, options: .allowFragments) as? NSDictionary {
+                    var langaugeList = [String: String]()
+                    for game in jsonObj! {
+                        var name = ""
+                        var nativeName = ""
+                        
+                        if let langauageDict = game.value as? NSDictionary {
+                            name = (langauageDict.value(forKey: "name") as? String ?? "")
+                            nativeName = (langauageDict.value(forKey: "nativeName") as? String ?? "")
+                            
+                            if(!nativeName.isEmpty){
+                                langaugeList[name] = nativeName
+                            }
+                        }
+                    }
+                    DispatchQueue.main.async {
+                        let delegate = UIApplication.shared.delegate as! AppDelegate
+                        delegate.languageList = langaugeList
+                    }
+                }
+            }
+        }
+    }
+    
     func onFeedCompleted(uid: String?){
         if(uid != nil){
             if(!uid!.isEmpty){
@@ -239,6 +346,7 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
                 // Get user value
             let value = snapshot.value as? NSDictionary
+            let delegate = UIApplication.shared.delegate as! AppDelegate
             let uId = snapshot.key
             let gamerTag = value?["gamerTag"] as? String ?? ""
             let userLat = value?["userLat"] as? Double ?? 0.0
@@ -248,14 +356,15 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
             let bio = value?["bio"] as? String ?? ""
             let blockList = value?["blockList"] as? [String: String] ?? [String: String]()
             let restrictList = value?["restrictList"] as? [String: String] ?? [String: String]()
-        
+            let cachedRecommendedUids = value?["cachedRecommendedUids"] as? [String] ?? [String]()
+            let dailyCheck = value?["dailyCheck"] as? String ?? ""
+            var receivedAnnouncements = value?["receivedAnnouncements"] as? [String] ?? [String]()
             let search = value?["search"] as? String ?? ""
             if(search.isEmpty){
                 ref.child("search").setValue("true")
             }
             
             let twitchToken = value?["twitchAppToken"] as? String ?? ""
-            let delegate = UIApplication.shared.delegate as! AppDelegate
             let manager = delegate.socialMediaManager
             if(twitchToken.isEmpty){
                 manager.getTwitchAppToken(token: nil, uid: uid)
@@ -269,6 +378,7 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
             }
             
             let viewedAnnouncements = value?["viewedAnnouncements"] as? [String] ?? [String]()
+            let reviews = value?["reviews"] as? [String] ?? [String]()
             
             var sentRequests = [FriendRequestObject]()
             
@@ -595,8 +705,9 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
                     let game = dict?["game"] as? String ?? ""
                     let uid = dict?["uid"] as? String ?? ""
                     let dbType = dict?["type"] as? String ?? ""
+                    let id = dict?["id"] as? String ?? ""
                     
-                    let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                    let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
                     
                     let calendar = Calendar.current
                     if(!date.isEmpty){
@@ -633,8 +744,9 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
                     let game = dict?["game"] as? String ?? ""
                     let uid = dict?["uid"] as? String ?? ""
                     let dbType = dict?["type"] as? String ?? ""
+                    let id = dict?["id"] as? String ?? ""
                     
-                    let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                    let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
                     
                     if(!date.isEmpty){
                         let dbDate = self.stringToDate(date)
@@ -670,8 +782,9 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
                     let game = dict?["game"] as? String ?? ""
                     let uid = dict?["uid"] as? String ?? ""
                     let dbType = dict?["type"] as? String ?? ""
+                    let id = dict?["id"] as? String ?? ""
                     
-                    let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                    let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
                     acceptedRivals.append(request)
                 }
             }
@@ -687,9 +800,24 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
                     let game = dict?["game"] as? String ?? ""
                     let uid = dict?["uid"] as? String ?? ""
                     let dbType = dict?["type"] as? String ?? ""
+                    let id = dict?["id"] as? String ?? ""
                     
-                    let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType)
+                    let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
                     rejectedRivals.append(request)
+                }
+            }
+            
+            var badges = [BadgeObj]()
+            if(snapshot.hasChild("badges")){
+                let badgesArray = snapshot.childSnapshot(forPath: "badges")
+                for badge in badgesArray.children{
+                    let currentObj = badge as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let name = dict?["badgeName"] as? String ?? ""
+                    let desc = dict?["badgeDesc"] as? String ?? ""
+                    
+                    let badge = BadgeObj(badge: name, badgeDesc: desc)
+                    badges.append(badge)
                 }
             }
             
@@ -826,6 +954,11 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
             user.userLong = userLong
             user.blockList = Array(blockList.keys)
             user.restrictList = Array(restrictList.keys)
+            user.reviews = reviews
+            user.badges = badges
+            user.dailyCheck = dailyCheck
+            user.cachedRecommendedUids = cachedRecommendedUids
+            user.receivedAnnouncements = receivedAnnouncements
             
             DispatchQueue.main.async {
                 let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -1037,5 +1170,15 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
             let controller = segue.destination as! LandingActivity
             let _ = controller.view
         }
+    }
+    
+    func identifierForAdvertising() -> String? {
+        // Check whether advertising tracking is enabled
+        guard ASIdentifierManager.shared().isAdvertisingTrackingEnabled else {
+            return nil
+        }
+
+        // Get and return IDFA
+        return ASIdentifierManager.shared().advertisingIdentifier.uuidString
     }
 }

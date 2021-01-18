@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import Lottie
+import FirebaseDatabase
 
 class PlayDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource, UIPickerViewDelegate, UIPickerViewDataSource, RequestsUpdate {
     
@@ -36,6 +37,11 @@ class PlayDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource, 
     @IBOutlet weak var whatsnext: UIView!
     @IBOutlet weak var doneButton: UIView!
     @IBOutlet weak var errorView: UIView!
+    @IBOutlet weak var onlineView: UIView!
+    @IBOutlet weak var onlineAnimation: AnimationView!
+    @IBOutlet weak var onlineButton: UIButton!
+    @IBOutlet weak var whatNextText: UILabel!
+    var variation = ""
     var gamesPayload = [GamerConnectGame]()
     var selectedGame = "anything"
     var timePayload = [String]()
@@ -44,14 +50,64 @@ class PlayDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource, 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.showAbout()
         
-        self.doneButton.layer.shadowColor = UIColor.black.cgColor
-        self.doneButton.layer.shadowOffset = CGSize(width: 0, height: 2.0)
-        self.doneButton.layer.shadowRadius = 2.0
-        self.doneButton.layer.shadowOpacity = 0.5
-        self.doneButton.layer.masksToBounds = false
-        self.doneButton.layer.shadowPath = UIBezierPath(roundedRect: self.doneButton.bounds, cornerRadius: self.whatsnext.layer.cornerRadius).cgPath
+        if(variation == "play"){
+            self.showAbout()
+            
+            self.doneButton.layer.shadowColor = UIColor.black.cgColor
+            self.doneButton.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+            self.doneButton.layer.shadowRadius = 2.0
+            self.doneButton.layer.shadowOpacity = 0.5
+            self.doneButton.layer.masksToBounds = false
+            self.doneButton.layer.shadowPath = UIBezierPath(roundedRect: self.doneButton.bounds, cornerRadius: self.doneButton.layer.cornerRadius).cgPath
+        } else {
+            self.showOnlineLayout()
+            
+            self.onlineButton.layer.shadowColor = UIColor.black.cgColor
+            self.onlineButton.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+            self.onlineButton.layer.shadowRadius = 2.0
+            self.onlineButton.layer.shadowOpacity = 0.5
+            self.onlineButton.layer.masksToBounds = false
+            self.onlineButton.layer.shadowPath = UIBezierPath(roundedRect: self.onlineButton.bounds, cornerRadius: self.onlineButton.layer.cornerRadius).cgPath
+            
+            self.onlineButton.addTarget(self, action: #selector(onlineClicked), for: .touchUpInside)
+        }
+    }
+    
+    @objc private func onlineClicked(){
+        showWork()
+    }
+    
+    private func sendOnlinePayload(){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = appDelegate.currentUser!
+        
+        var friends = [String]()
+        for friend in currentUser.friends {
+            if(!friends.contains(friend.uid)){
+                friends.append(friend.uid)
+            }
+        }
+        
+        let manager = FriendsManager()
+        manager.createOnlineAnnouncement(friends: friends, callbacks: self)
+    }
+    
+    private func createTempId() -> String {
+        let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        return String((0..<8).map{ _ in letters.randomElement()! })
+    }
+    
+    
+    private func showOnlineLayout(){
+        UIView.animate(withDuration: 0.8, delay: 0.3, options: [], animations: {
+            self.onlineView.alpha = 1
+        }, completion: { (finished: Bool) in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.onlineAnimation.loopMode = .playOnce
+                self.onlineAnimation.play()
+            }
+        })
     }
     
     private func showAbout(){
@@ -136,6 +192,7 @@ class PlayDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource, 
         
         UIView.animate(withDuration: 0.8, animations: {
             self.gameLayout.alpha = 0
+            self.mainLayout.alpha = 0
             self.confirmationView.alpha = 0
         }, completion: { (finished: Bool) in
             UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
@@ -161,6 +218,7 @@ class PlayDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource, 
         UIView.animate(withDuration: 0.8, animations: {
             self.gameLayout.alpha = 0
             self.timeLayout.alpha = 0
+            self.mainLayout.alpha = 0
         }, completion: { (finished: Bool) in
             UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
                 self.confirmationView.alpha = 1
@@ -179,10 +237,19 @@ class PlayDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource, 
     }
     
     @objc private func doneClicked(){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.currentProfileFrag?.dismissModal()
         self.dismiss(animated: true, completion: nil)
     }
     
     private func transitionToDone(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.currentFeedFrag?.checkOnlineAnnouncements()
+        
+        if(self.variation != "play"){
+            self.whatNextText.text = "we just sent a notification to your friends letting them know you're getting on. now go play!"
+        }
+        
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(doneClicked))
         self.doneButton.isUserInteractionEnabled = true
         self.doneButton.addGestureRecognizer(singleTap)
@@ -198,6 +265,9 @@ class PlayDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource, 
     }
     
     private func transitionToError(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.currentFeedFrag?.checkOnlineAnnouncements()
+        
         UIView.animate(withDuration: 0.8, animations: {
             self.sendingAnimation.pause()
             self.sendingAnimation.alpha = 0
@@ -218,7 +288,11 @@ class PlayDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource, 
                 self.sendingAnimation.play()
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    self.sendPayload()
+                    if(self.variation == "play"){
+                        self.sendPayload()
+                    } else {
+                        self.sendOnlinePayload()
+                    }
                 }
             }, completion: nil)
         })
@@ -309,6 +383,14 @@ class PlayDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource, 
     
     func rivalRequestFail() {
         transitionToError()
+    }
+    
+    func onlineAnnounceFail() {
+        self.transitionToError()
+    }
+    
+    func onlineAnnounceSent() {
+        self.transitionToDone()
     }
     
     func rivalResponseAccepted(indexPath: IndexPath) {

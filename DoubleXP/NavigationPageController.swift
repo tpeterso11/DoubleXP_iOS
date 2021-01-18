@@ -27,7 +27,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         
         dataSource = self
         
-        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "gamerConnectFrag") as! GamerConnectFrag
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "gamerConnectFrag") as! Feed
 
         selectViewController(currentViewController, direction: .forward, animated: false, completion: nil)
         
@@ -41,7 +41,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
     }
     
     fileprivate func populateItems() {
-         let c = GamerConnectFrag()
+         let c = Feed()
     
         items.append(c)
     }
@@ -106,7 +106,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
     func navigateToSearch(game: GamerConnectGame){
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "gamerConnectSearch") as! GamerConnectSearch
         currentViewController.pageName = "GC Search"
-        currentViewController.navDictionary = ["state": "search", "searchHint": "Search for player", "searchButton": "Search"]
+        currentViewController.navDictionary = ["state": "search", "searchHint": "search for player", "searchButton": "search"]
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.addToNavStack(vc: currentViewController)
@@ -121,7 +121,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
     func navigateToCurrentUserProfile(){
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "profile") as! ProfileFrag
         currentViewController.pageName = "Edit Profile"
-        currentViewController.navDictionary = ["state": "backOnly"]
+        currentViewController.navDictionary = ["state": "none"]
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.addToNavStack(vc: currentViewController)
@@ -135,7 +135,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
     func navigateToSettings(){
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "settings") as! SettingsFrag
         currentViewController.pageName = "Settings"
-        currentViewController.navDictionary = ["state": "backOnly"]
+        currentViewController.navDictionary = ["state": "none"]
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.addToNavStack(vc: currentViewController)
@@ -164,7 +164,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
     func navigateToRequests(){
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "requests") as! Requests
         currentViewController.pageName = "Requests"
-        currentViewController.navDictionary = ["state": "backOnly"]
+        currentViewController.navDictionary = ["state": "none"]
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.addToNavStack(vc: currentViewController)
@@ -179,7 +179,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
     func navigateToMedia(){
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "mediaFrag") as! MediaFrag
         currentViewController.pageName = "Media"
-        currentViewController.navDictionary = ["state": "backOnly"]
+        currentViewController.navDictionary = ["state": "none"]
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.addToNavStack(vc: currentViewController)
@@ -206,12 +206,12 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
     }
     
     func navigateToHome(){
-        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "gamerConnectFrag") as! GamerConnectFrag
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "gamerConnectFrag") as! Feed
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.currentLanding!.checkRivals()
         currentViewController.pageName = "Home"
-        currentViewController.navDictionary = ["state": "original"]
+        currentViewController.navDictionary = ["state": "none"]
         appDelegate.clearAndAddToNavStack(vc: currentViewController)
         appDelegate.currentFrag = currentViewController.pageName ?? "Home"
         appDelegate.currentMediaFrag = nil
@@ -356,7 +356,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
     func navigateToTeamFreeAgentFront(){
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "faFront") as! FreeAgentFront
         currentViewController.pageName = "FA Front"
-        currentViewController.navDictionary = ["state": "backOnly"]
+        currentViewController.navDictionary = ["state": "none"]
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
@@ -368,7 +368,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
     func navigateToTeamFreeAgentFront(team: TeamObject?, currentUser: User) {
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "faFront") as! FreeAgentFront
         currentViewController.pageName = "FA Front"
-        currentViewController.navDictionary = ["state": "backOnly"]
+        currentViewController.navDictionary = ["state": "none"]
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.addToNavStack(vc: currentViewController)
@@ -390,7 +390,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "faQuiz") as! FAQuiz
         currentViewController.pageName = "FA Quiz"
-        currentViewController.navDictionary = ["state": "backOnly"]
+        currentViewController.navDictionary = ["state": "none"]
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
@@ -412,7 +412,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "faQuiz") as! FAQuiz
         currentViewController.pageName = "FA Quiz"
-        currentViewController.navDictionary = ["state": "backOnly"]
+        currentViewController.navDictionary = ["state": "none"]
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.currentLanding?.updateNavigation(currentFrag: currentViewController)
@@ -437,7 +437,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         }
         
         currentViewController.pageName = "Messaging"
-        currentViewController.navDictionary = ["state": "messaging", "searchHint": "Message this user.", "searchButton": "Send"]
+        currentViewController.navDictionary = ["state": "none"]
         
         delegate.addToNavStack(vc: currentViewController)
         delegate.currentLanding?.stackDepth = delegate.navStack.count

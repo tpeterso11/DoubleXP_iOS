@@ -110,10 +110,10 @@ class SocialMediaManager{
                     
                     if let resultArray = jsonObj!.value(forKey: "data") as? NSArray {
                         DispatchQueue.main.async {
-                            var channels = [TwitchChannelObj]()
+                            var channels = [Any]()
                             let delegate = UIApplication.shared.delegate as! AppDelegate
                             let gameList = delegate.gcGames!
-                            
+                            var currentIndex = 0
                             for game in resultArray{
                                 if let gameDict = game as? NSDictionary {
                                         let name = (gameDict.value(forKey: "name") as? String ?? "")
@@ -128,6 +128,10 @@ class SocialMediaManager{
                                                 gcGame.twitchGameId = obj.twitchID
                                             }
                                         }
+                                    
+                                    if(currentIndex.isMultiple(of: 5) && currentIndex != 0){
+                                        channels.append(AdObject())
+                                    }
                                     channels.append(obj)
                                 }
                             }
@@ -158,6 +162,7 @@ class SocialMediaManager{
                 if let jsonObj = try? JSONSerialization.jsonObject(with: response.data, options: .allowFragments) as? NSDictionary {
                     if let resultArray = jsonObj!.value(forKey: "data") as? NSArray {
                         var streams = [TwitchStreamObject]()
+                        var currentIndex = 0
                         for stream in resultArray{
                             var startedAt = ""
                             var thumbnail = ""
@@ -186,7 +191,10 @@ class SocialMediaManager{
                                 newStream.startedAt = startedAt
                                 newStream.viewerCount = viewerCount
                                 
-                                streams.append(newStream)
+                                let chinese = newStream.handle.range(of: "\\p{Han}", options: .regularExpression) != nil
+                                if(!chinese){
+                                    streams.append(newStream)
+                                }
                             }
                         }
                         callbacks.onStreamsLoaded(streams: streams)
