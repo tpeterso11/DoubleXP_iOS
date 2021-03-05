@@ -712,6 +712,7 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
             currentViewController.transitioningDelegate = transitionDelegate
             currentViewController.modalPresentationStyle = .custom
             currentViewController.modalPresentationCapturesStatusBarAppearance = true
+            currentViewController.editMode = false
             transitionDelegate.showIndicator = true
             transitionDelegate.swipeToDismissEnabled = true
             transitionDelegate.hapticMoments = [.willPresent, .willDismiss]

@@ -215,6 +215,7 @@ class AlertsDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource
             currentViewController.transitioningDelegate = transitionDelegate
             currentViewController.modalPresentationStyle = .custom
             currentViewController.modalPresentationCapturesStatusBarAppearance = true
+            currentViewController.editMode = false
             transitionDelegate.showIndicator = true
             transitionDelegate.swipeToDismissEnabled = true
             transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
@@ -231,6 +232,7 @@ class AlertsDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource
             currentViewController.transitioningDelegate = transitionDelegate
             currentViewController.modalPresentationStyle = .custom
             currentViewController.modalPresentationCapturesStatusBarAppearance = true
+            currentViewController.editMode = false
             transitionDelegate.showIndicator = true
             transitionDelegate.swipeToDismissEnabled = true
             transitionDelegate.hapticMoments = [.willPresent, .willDismiss]

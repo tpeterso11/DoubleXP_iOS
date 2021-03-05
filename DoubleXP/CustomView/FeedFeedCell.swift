@@ -394,6 +394,15 @@ class FeedFeedCell : UITableViewCell, UICollectionViewDataSource, UICollectionVi
         }
     }
     
+    override func systemLayoutSizeFitting(_ targetSize: CGSize, withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority, verticalFittingPriority: UILayoutPriority) -> CGSize {
+            // `collectionView.contentSize` has a wrong width because in this nested example, the sizing pass occurs before the layout pass,
+            // so we need to force a layout pass with the correct width.
+            self.contentView.frame = self.bounds
+            self.contentView.layoutIfNeeded()
+            // Returns `collectionView.contentSize` in order to set the UITableVieweCell height a value greater than 0.
+        return CGSize(width: self.feedCollection.contentSize.width, height: self.feedCollection.contentSize.height + 80)
+    }
+    
     @objc func ignoreGame(_ sender: UITapGestureRecognizer){
         let defaults = UserDefaults.standard
         var ignoreArray = defaults.stringArray(forKey: "ignoredUpcomingGames") ?? [String]()

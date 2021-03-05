@@ -13,6 +13,7 @@ import WebKit
 
 class ProfileTwitchCell: UITableViewCell {
     
+    @IBOutlet weak var fullWVShell: UIView!
     @IBOutlet weak var onlineView: UIView!
     @IBOutlet weak var connectView: UIView!
     @IBOutlet weak var offlineView: UIView!

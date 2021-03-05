@@ -10,7 +10,10 @@ import Foundation
 import UIKit
 
 class ProfileBioCell : UITableViewCell {
-    @IBOutlet weak var bio: UILabel!
+    
+    @IBOutlet weak var myBio: UILabel!
+    @IBOutlet weak var addBioTag: UILabel!
+    @IBOutlet weak var bio: UITextView!
     @IBOutlet weak var expandCollapse: UIImageView!
     
 }

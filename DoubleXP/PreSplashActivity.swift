@@ -51,6 +51,7 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
             self.getArticles()
             self.getFeedExtras()
             self.loadLanguages()
+            self.getGeneralLookingFor()
             
             //let manager = StatsManager()
             //manager.getPubgStats(gamerTag: "superNayr")
@@ -78,6 +79,17 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
                 if(snapshot.hasChild("heroLightXXHDPI")){
                     appDelegate.heroDarkUrl = snapshot.childSnapshot(forPath: "heroDarkXXHDPI").value as? String ?? ""
                 }
+            }
+        })
+    }
+    
+    func getGeneralLookingFor(){
+        let ref = Database.database().reference().child("Looking")
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                let answers = snapshot.value as? [String] ?? [String]()
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                appDelegate.generalLookingFor = answers
             }
         })
     }
@@ -222,6 +234,7 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
                             var teamNeeds = [String]()
                             var categoryFilters = [String]()
                             var availableConsoles = [String]()
+                            var lookingFor = [String]()
                             var filterQuestions = [[String: Any]]()
                             if let gameDict = game as? NSDictionary {
                                 hook = (gameDict.value(forKey: "hook") as? String ?? "")
@@ -240,6 +253,7 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
                                 mobileGame = (gameDict).value(forKey: "mobileGame") as? String ?? "false"
                                 available = (gameDict).value(forKey: "available") as? String ?? "true"
                                 availableConsoles = (gameDict.value(forKey: "availableConsoles") as? [String]) ?? [String]()
+                                lookingFor = (gameDict.value(forKey: "lookingFor") as? [String]) ?? [String]()
                                 gameDescription = (gameDict).value(forKey: "gameDescription") as? String ?? ""
                                 ideal = (gameDict).value(forKey: "ideal") as? String ?? ""
                                 timeCommitment = (gameDict).value(forKey: "timeCommitment") as? String ?? ""
@@ -272,6 +286,7 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
                                 newGame.complexity = complexity
                                 newGame.quickReviews = quickReviews
                                 newGame.alternateImageUrl = alternateImageUrl
+                                newGame.lookingFor = lookingFor
                                 
                                 if(gameDict.value(forKey: "filterQuestions") != nil){
                                     //let test = gameDict["filterQuestions"] as? [[String: Any]] ?? [[String: Any]]()
@@ -660,6 +675,17 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
                 }
             }
             
+            var lookingForArray = [LookingForSelection]()
+            if(snapshot.hasChild("lookingFor")){
+                let lookingFor = snapshot.childSnapshot(forPath: "lookingFor")
+                for lookingForChild in lookingFor.children {
+                    let newSelection = LookingForSelection()
+                    newSelection.gameName = (lookingForChild as? DataSnapshot)?.key ?? ""
+                    newSelection.choices = (lookingForChild as? DataSnapshot)?.value as? [String] ?? [String]()
+                    lookingForArray.append(newSelection)
+                }
+            }
+            
             var currentTeamInvites = [TeamInviteObject]()
             if(snapshot.hasChild("teamInvites")){
                 let teamInvites = snapshot.childSnapshot(forPath: "teamInvites")
@@ -959,6 +985,7 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
             user.dailyCheck = dailyCheck
             user.cachedRecommendedUids = cachedRecommendedUids
             user.receivedAnnouncements = receivedAnnouncements
+            user.userLookingFor = lookingForArray
             
             DispatchQueue.main.async {
                 let delegate = UIApplication.shared.delegate as! AppDelegate

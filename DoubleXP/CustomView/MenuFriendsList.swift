@@ -24,8 +24,6 @@ class MenuFriendsList: UICollectionViewCell, ExpyTableViewDelegate, ExpyTableVie
         friendsList.estimatedRowHeight = 200
         
         Broadcaster.register(LandingMenuCallbacks.self, observer: self)
-        //friendsList.expandingAnimation = .fade
-        //friendsList.collapsingAnimation = .fade
     }
     
     func tableView(_ tableView: ExpyTableView, expandableCellForSection section: Int) -> UITableViewCell {
@@ -34,14 +32,6 @@ class MenuFriendsList: UICollectionViewCell, ExpyTableViewDelegate, ExpyTableVie
         let current = appDelegate.currentUser!.friends[section]
         cell.friendName.text = current.gamerTag
         
-        //if(expandedCells.contains(section)){
-            cell.layer.shadowColor = UIColor.black.cgColor
-            cell.layer.shadowOffset = CGSize(width: 0, height: 4.0)
-            cell.layer.shadowRadius = 5.0
-            cell.layer.shadowOpacity = 0.8
-            cell.layer.masksToBounds = false
-            cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
-        //}
         return cell
     }
     

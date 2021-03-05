@@ -261,6 +261,26 @@ class User: NSObject, NSCoding {
         }
     }
     
+    var _instagramConnect = ""
+    var instagramConnect: String {
+        get {
+            return (_instagramConnect)
+        }
+        set (newVal) {
+            _instagramConnect = newVal
+        }
+    }
+    
+    var _discordConnect = ""
+    var discordConnect: String {
+        get {
+            return (_discordConnect)
+        }
+        set (newVal) {
+            _discordConnect = newVal
+        }
+    }
+    
     var _timezone = "timezone"
     var timezone: String {
         get {
@@ -298,6 +318,16 @@ class User: NSObject, NSCoding {
         }
         set (newVal) {
             _blockList = newVal
+        }
+    }
+    
+    var _userLookingFor = [LookingForSelection]()
+    var userLookingFor: [LookingForSelection] {
+        get {
+            return (_userLookingFor)
+        }
+        set (newVal) {
+            _userLookingFor = newVal
         }
     }
     
@@ -582,13 +612,16 @@ class User: NSObject, NSCoding {
         self.rejectedTempRivals = (decoder.decodeObject(forKey: "rejectedTempRivals") as! [RivalObj])
         self.tempRivals = (decoder.decodeObject(forKey: "tempRivals") as! [RivalObj])
         self.twitchConnect = (decoder.decodeObject(forKey: "twitchConnect") as! String)
+        self.instagramConnect = (decoder.decodeObject(forKey: "instagramConnect") as! String)
         self.viewedAnnouncements = (decoder.decodeObject(forKey: "viewedAnnouncements") as! [String])
+        self.userLookingFor = (decoder.decodeObject(forKey: "userLookingFor") as! [LookingForSelection])
         self.selectedAge = (decoder.decodeObject(forKey: "selectedAge") as! String)
         self.primaryLanguage = (decoder.decodeObject(forKey: "primaryLanguage") as! String)
         self.secondaryLanguage = (decoder.decodeObject(forKey: "secondaryLanguage") as! String)
         self.blockList = (decoder.decodeObject(forKey: "blockList") as! [String])
         self.restrictList = (decoder.decodeObject(forKey: "restrictList") as! [String])
         self.onlineStatus = (decoder.decodeObject(forKey: "onlineStatus") as! String)
+        self.discordConnect = (decoder.decodeObject(forKey: "discordConnect") as! String)
         self.currentOnlineAnnounement = (decoder.decodeObject(forKey: "currentOnlineAnnounement") as! OnlineObj)
         self.reviews = (decoder.decodeObject(forKey: "reviews") as! [String])
         self.cachedRecommendedUids = (decoder.decodeObject(forKey: "cachedRecommendedUids") as! [String])
@@ -634,6 +667,9 @@ class User: NSObject, NSCoding {
         coder.encode(self.cachedRecommendedUids, forKey: "cachedRecommendedUserIds")
         coder.encode(self.receivedAnnouncements, forKey: "receivedAnnouncements")
         coder.encode(self.recommendedGames, forKey: "recommendedGames")
+        coder.encode(self.instagramConnect, forKey: "instagramConnect")
+        coder.encode(self.userLookingFor, forKey: "userLookingFor")
+        coder.encode(self.discordConnect, forKey: "discordConnect")
     }
     
     struct Post: Hashable, Equatable {

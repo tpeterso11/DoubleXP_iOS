@@ -13,8 +13,8 @@ import FBSDKCoreKit
 import moa
 import Firebase
 import Lottie
-import GiphyUISDK
-import GiphyCoreSDK
+//import GiphyUISDK
+//import GiphyCoreSDK
 import SPStorkController
 
 typealias Runnable = () -> ()
@@ -129,7 +129,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     var bottomNavHeight = CGFloat()
     
     private var giphyKey = "KCFi8XVyX2VzniYepciJJnEPUc8H4Hpk"
-    let giphy = GiphyViewController()
+    //let giphy = GiphyViewController()
 
     
     override func viewDidLoad() {
@@ -150,7 +150,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         
         stackDepth = appDelegate.navStack.count
         
-        Giphy.configure(apiKey: giphyKey)
+        /*Giphy.configure(apiKey: giphyKey)
         giphy.mediaTypeConfig = [.gifs, .emoji]
         giphy.rating = .ratedPG13
         giphy.renditionType = .fixedWidth
@@ -158,7 +158,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         giphy.showConfirmationScreen = true
         GiphyViewController.trayHeightMultiplier = 0.7
         
-        giphy.delegate = self
+        giphy.delegate = self*/
         
         self.constraint = NSLayoutConstraint(item: self.secondaryNv, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0.0, constant: 0)
         self.constraint?.isActive = true
@@ -2635,7 +2635,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
 }
 
-extension LandingActivity: GiphyDelegate {
+/*extension LandingActivity: GiphyDelegate {
    func didSelectMedia(giphyViewController: GiphyViewController, media: GPHMedia)   {
    
         // your user tapped a GIF!
@@ -2649,7 +2649,7 @@ extension LandingActivity: GiphyDelegate {
    func didDismiss(controller: GiphyViewController?) {
         // your user dismissed the controller without selecting a GIF.
    }
-}
+}*/
 
 extension Array {
     func getElement(at index: Int) -> Element? {

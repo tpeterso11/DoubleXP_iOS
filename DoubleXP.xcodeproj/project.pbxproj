@@ -7,10 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		13FDB2B588429E86A21FD897 /* Pods_DoubleXPTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB14DCEAA91C1113A93075A4 /* Pods_DoubleXPTests.framework */; };
 		2DE540DC246495930053C57A /* TwitterHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE540DB246495930053C57A /* TwitterHelper.swift */; };
 		300201B9256483B400859CE6 /* AdCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300201B8256483B400859CE6 /* AdCell.swift */; };
 		300201BD256485E700859CE6 /* AdObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300201BC256485E700859CE6 /* AdObject.swift */; };
 		300201C12564B39200859CE6 /* AdCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300201C02564B39200859CE6 /* AdCollectionCell.swift */; };
+		3005677B25EAD943006CF888 /* LookingForHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3005677A25EAD943006CF888 /* LookingForHeader.swift */; };
 		3008EE782267F89800E0D9ED /* NewsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3008EE772267F89800E0D9ED /* NewsCell.swift */; };
 		300F37EE2588285E0050C21D /* test_hero.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 300F37ED2588285C0050C21D /* test_hero.jpg */; };
 		300F37F225882B450050C21D /* test_hero_dark.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 300F37F125882B430050C21D /* test_hero_dark.jpg */; };
@@ -57,6 +59,11 @@
 		304E17FD2430E1D0009BE1C0 /* two.png in Resources */ = {isa = PBXBuildFile; fileRef = 304E17FC2430E1CF009BE1C0 /* two.png */; };
 		304E17FF2430F098009BE1C0 /* lf30_editor_ISR839.json in Resources */ = {isa = PBXBuildFile; fileRef = 304E17FE2430F098009BE1C0 /* lf30_editor_ISR839.json */; };
 		304E1801243107C1009BE1C0 /* GCRegisterTemp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 304E1800243107C1009BE1C0 /* GCRegisterTemp.swift */; };
+		30528CE625E743C0004166B0 /* InstagramConnectedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30528CE525E743C0004166B0 /* InstagramConnectedCell.swift */; };
+		30528CEA25E743EC004166B0 /* TwitchConnectedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30528CE925E743EC004166B0 /* TwitchConnectedCell.swift */; };
+		30528CEE25E743FC004166B0 /* ConnectCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30528CED25E743FC004166B0 /* ConnectCell.swift */; };
+		30528D3825EAA9C8004166B0 /* LookingOptionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30528D3725EAA9C8004166B0 /* LookingOptionCell.swift */; };
+		30528D3C25EAC20F004166B0 /* LookingFor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30528D3B25EAC20F004166B0 /* LookingFor.swift */; };
 		3052E194253B100900EE5BB3 /* MenuUpgradeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3052E193253B100900EE5BB3 /* MenuUpgradeCell.swift */; };
 		3052E198253B8D8800EE5BB3 /* TestSegue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3052E197253B8D8800EE5BB3 /* TestSegue.swift */; };
 		3052E19C253B9C5300EE5BB3 /* Upgrade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3052E19B253B9C5300EE5BB3 /* Upgrade.swift */; };
@@ -196,7 +203,6 @@
 		3068D4AF254E1E1600580FB3 /* edit-button.png in Resources */ = {isa = PBXBuildFile; fileRef = 3068D4AE254E1E1500580FB3 /* edit-button.png */; };
 		306DF5F425867CB80078DB95 /* we_did_it.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 306DF5F325867CB60078DB95 /* we_did_it.jpg */; };
 		306DF5F825867EBE0078DB95 /* white_guy.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 306DF5F725867EBC0078DB95 /* white_guy.jpg */; };
-		306E5C4D25633A9D00B4FE3D /* splash.mov in Resources */ = {isa = PBXBuildFile; fileRef = 306E5C4C25633A9D00B4FE3D /* splash.mov */; };
 		306E5C5125633ACC00B4FE3D /* newlogo2xp_transparent.png in Resources */ = {isa = PBXBuildFile; fileRef = 306E5C5025633ACC00B4FE3D /* newlogo2xp_transparent.png */; };
 		306E5C5525633BC100B4FE3D /* gamespot_white.png in Resources */ = {isa = PBXBuildFile; fileRef = 306E5C5425633BBF00B4FE3D /* gamespot_white.png */; };
 		306E5C9925634F5D00B4FE3D /* EditProfilePreferredTagCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306E5C9825634F5D00B4FE3D /* EditProfilePreferredTagCell.swift */; };
@@ -213,6 +219,16 @@
 		3071171323E1019F005F6355 /* TwitchDescCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3071171223E1019F005F6355 /* TwitchDescCell.swift */; };
 		3071171523E137A4005F6355 /* splash.png in Resources */ = {isa = PBXBuildFile; fileRef = 3071171423E137A4005F6355 /* splash.png */; };
 		3071171723E13864005F6355 /* TwitterDescCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3071171623E13864005F6355 /* TwitterDescCell.swift */; };
+		3076920725EADCA70072A156 /* LookingForOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3076920625EADCA70072A156 /* LookingForOptions.swift */; };
+		3076959025EB0FD80072A156 /* BaseLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3076958F25EB0FD80072A156 /* BaseLayout.swift */; };
+		3076959425EB100B0072A156 /* ContentAlignableLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3076959325EB100B0072A156 /* ContentAlignableLayout.swift */; };
+		3076959825EB10320072A156 /* TagsLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3076959725EB10320072A156 /* TagsLayout.swift */; };
+		3077FFE325ED851D00FFB524 /* VerticallyCenteredTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3077FFE225ED851D00FFB524 /* VerticallyCenteredTextView.swift */; };
+		3077FFE725EE8EF800FFB524 /* DynamicHeightCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3077FFE625EE8EF800FFB524 /* DynamicHeightCollectionView.swift */; };
+		3077FFEB25EEAABF00FFB524 /* ProfileSocialListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3077FFEA25EEAABF00FFB524 /* ProfileSocialListItem.swift */; };
+		3077FFEF25EEAE9F00FFB524 /* discord.png in Resources */ = {isa = PBXBuildFile; fileRef = 3077FFEE25EEAE9F00FFB524 /* discord.png */; };
+		3077FFF325EEAEA800FFB524 /* instagram.png in Resources */ = {isa = PBXBuildFile; fileRef = 3077FFF225EEAEA800FFB524 /* instagram.png */; };
+		3077FFF725EEEF8800FFB524 /* SelfSizingTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3077FFF625EEEF8800FFB524 /* SelfSizingTableView.swift */; };
 		30781C8F24270E0400C5D886 /* FAResultsFoldingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30781C8E24270E0400C5D886 /* FAResultsFoldingCell.swift */; };
 		30781C91242813F700C5D886 /* InviteFrag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30781C90242813F700C5D886 /* InviteFrag.swift */; };
 		30781C93242820F100C5D886 /* sms.png in Resources */ = {isa = PBXBuildFile; fileRef = 30781C92242820F100C5D886 /* sms.png */; };
@@ -364,6 +380,7 @@
 		309264E92568816000BC4EBA /* OnlineObj.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309264E82568816000BC4EBA /* OnlineObj.swift */; };
 		3092E67B2516969D00E8FE08 /* GCRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3092E67A2516969D00E8FE08 /* GCRegistration.swift */; };
 		3092E67D2516985200E8FE08 /* 18353-confetti-celebration.json in Resources */ = {isa = PBXBuildFile; fileRef = 3092E67C2516985200E8FE08 /* 18353-confetti-celebration.json */; };
+		3092ECFA25D562B8003BA8B9 /* splash.mov in Resources */ = {isa = PBXBuildFile; fileRef = 3092ECF925D562B8003BA8B9 /* splash.mov */; };
 		3095CBCD2455F2BC001C19E7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3095CBCC2455F2BC001C19E7 /* GoogleService-Info.plist */; };
 		309A38B5244EA15000B4FF35 /* division_new_logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 309A38B4244EA15000B4FF35 /* division_new_logo.png */; };
 		309A38B7244EA3CD00B4FF35 /* division_new_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 309A38B6244EA3CD00B4FF35 /* division_new_dark.png */; };
@@ -474,6 +491,9 @@
 		30D57CC625721599004024A7 /* star (9).png in Resources */ = {isa = PBXBuildFile; fileRef = 30D57CC525721599004024A7 /* star (9).png */; };
 		30D57CCA25733092004024A7 /* Basic_green_dot.png in Resources */ = {isa = PBXBuildFile; fileRef = 30D57CC925733092004024A7 /* Basic_green_dot.png */; };
 		30D60CE1251C07E500C914EF /* GCGameController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30D60CE0251C07E500C914EF /* GCGameController.swift */; };
+		30DB087D25EC221F00746AAE /* SocialConnectModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30DB087C25EC221F00746AAE /* SocialConnectModal.swift */; };
+		30DB088125EC28DA00746AAE /* DiscordConnectedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30DB088025EC28DA00746AAE /* DiscordConnectedCell.swift */; };
+		30DB088525EC7DFC00746AAE /* ProfileLookingForCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30DB088425EC7DFC00746AAE /* ProfileLookingForCell.swift */; };
 		30E0B1D5249588CE007F0B9B /* QuizOptionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E0B1D4249588CE007F0B9B /* QuizOptionCell.swift */; };
 		30E0B1D724958FF3007F0B9B /* QuizOptionPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E0B1D624958FF3007F0B9B /* QuizOptionPage.swift */; };
 		30E0B1D92495AC04007F0B9B /* AnswerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E0B1D82495AC04007F0B9B /* AnswerCell.swift */; };
@@ -523,8 +543,6 @@
 		30FC34C123E7DAE8007F0080 /* settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 30FC34C023E7DAE8007F0080 /* settings.png */; };
 		30FC34C323E914CA007F0080 /* MenuHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FC34C223E914CA007F0080 /* MenuHeaderCell.swift */; };
 		30FC34C723E927BE007F0080 /* MenuSettingsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FC34C623E927BE007F0080 /* MenuSettingsCell.swift */; };
-		398E99D7454D231296D6F804 /* Pods_DoubleXPTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 609C098C47EE24F3E230CA55 /* Pods_DoubleXPTests.framework */; };
-		4675893BBCBADB61687F5863 /* Pods_DoubleXPUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B7BF829B5B8265BC48CDA6D /* Pods_DoubleXPUITests.framework */; };
 		48343FFE2465CE580034CF12 /* envelope.png in Resources */ = {isa = PBXBuildFile; fileRef = 48343FF92465CE570034CF12 /* envelope.png */; };
 		48343FFF2465CE580034CF12 /* star.png in Resources */ = {isa = PBXBuildFile; fileRef = 48343FFA2465CE570034CF12 /* star.png */; };
 		483440002465CE580034CF12 /* restaurant-membership-card-tool.png in Resources */ = {isa = PBXBuildFile; fileRef = 48343FFB2465CE570034CF12 /* restaurant-membership-card-tool.png */; };
@@ -543,7 +561,8 @@
 		4CC1720122677EF9009A1B80 /* test_banner.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CC1720022677EF8009A1B80 /* test_banner.png */; };
 		4CC1720322677FA5009A1B80 /* LandingActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC1720222677FA5009A1B80 /* LandingActivity.swift */; };
 		4CC17206226781DF009A1B80 /* NewsObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC17205226781DF009A1B80 /* NewsObject.swift */; };
-		6D7B0B638FBC317FE5CDBC9E /* Pods_DoubleXP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 09E7E0F729FB0D9061A49A71 /* Pods_DoubleXP.framework */; };
+		C39D8763A41E646A4D6F0139 /* Pods_DoubleXPUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0880923415C5D948C990345A /* Pods_DoubleXPUITests.framework */; };
+		FD127F44A1CA45F830B6136D /* Pods_DoubleXP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4365F938650F2C5FCEC0B3E /* Pods_DoubleXP.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -577,13 +596,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		05853CEF740DA8C9EB9D8081 /* Pods-DoubleXP-DoubleXPUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXP-DoubleXPUITests.debug.xcconfig"; path = "Target Support Files/Pods-DoubleXP-DoubleXPUITests/Pods-DoubleXP-DoubleXPUITests.debug.xcconfig"; sourceTree = "<group>"; };
-		09E7E0F729FB0D9061A49A71 /* Pods_DoubleXP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DoubleXP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		1B7BF829B5B8265BC48CDA6D /* Pods_DoubleXPUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DoubleXPUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0880923415C5D948C990345A /* Pods_DoubleXPUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DoubleXPUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		2AF2988A2F72FF3F0C930F97 /* Pods-DoubleXPUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXPUITests.release.xcconfig"; path = "Target Support Files/Pods-DoubleXPUITests/Pods-DoubleXPUITests.release.xcconfig"; sourceTree = "<group>"; };
 		2DE540DB246495930053C57A /* TwitterHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwitterHelper.swift; sourceTree = "<group>"; };
 		300201B8256483B400859CE6 /* AdCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdCell.swift; sourceTree = "<group>"; };
 		300201BC256485E700859CE6 /* AdObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdObject.swift; sourceTree = "<group>"; };
 		300201C02564B39200859CE6 /* AdCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdCollectionCell.swift; sourceTree = "<group>"; };
+		3005677A25EAD943006CF888 /* LookingForHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LookingForHeader.swift; sourceTree = "<group>"; };
 		3008EE772267F89800E0D9ED /* NewsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsCell.swift; sourceTree = "<group>"; };
 		300F37ED2588285C0050C21D /* test_hero.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = test_hero.jpg; sourceTree = "<group>"; };
 		300F37F125882B430050C21D /* test_hero_dark.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = test_hero_dark.jpg; sourceTree = "<group>"; };
@@ -630,6 +649,11 @@
 		304E17FC2430E1CF009BE1C0 /* two.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = two.png; sourceTree = "<group>"; };
 		304E17FE2430F098009BE1C0 /* lf30_editor_ISR839.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = lf30_editor_ISR839.json; sourceTree = "<group>"; };
 		304E1800243107C1009BE1C0 /* GCRegisterTemp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCRegisterTemp.swift; sourceTree = "<group>"; };
+		30528CE525E743C0004166B0 /* InstagramConnectedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramConnectedCell.swift; sourceTree = "<group>"; };
+		30528CE925E743EC004166B0 /* TwitchConnectedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchConnectedCell.swift; sourceTree = "<group>"; };
+		30528CED25E743FC004166B0 /* ConnectCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectCell.swift; sourceTree = "<group>"; };
+		30528D3725EAA9C8004166B0 /* LookingOptionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LookingOptionCell.swift; sourceTree = "<group>"; };
+		30528D3B25EAC20F004166B0 /* LookingFor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LookingFor.swift; sourceTree = "<group>"; };
 		3052E193253B100900EE5BB3 /* MenuUpgradeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuUpgradeCell.swift; sourceTree = "<group>"; };
 		3052E197253B8D8800EE5BB3 /* TestSegue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSegue.swift; sourceTree = "<group>"; };
 		3052E19B253B9C5300EE5BB3 /* Upgrade.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Upgrade.swift; sourceTree = "<group>"; };
@@ -770,7 +794,6 @@
 		3068D4AE254E1E1500580FB3 /* edit-button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "edit-button.png"; sourceTree = "<group>"; };
 		306DF5F325867CB60078DB95 /* we_did_it.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = we_did_it.jpg; sourceTree = "<group>"; };
 		306DF5F725867EBC0078DB95 /* white_guy.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = white_guy.jpg; sourceTree = "<group>"; };
-		306E5C4C25633A9D00B4FE3D /* splash.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = splash.mov; sourceTree = "<group>"; };
 		306E5C5025633ACC00B4FE3D /* newlogo2xp_transparent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = newlogo2xp_transparent.png; sourceTree = "<group>"; };
 		306E5C5425633BBF00B4FE3D /* gamespot_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = gamespot_white.png; sourceTree = "<group>"; };
 		306E5C9825634F5D00B4FE3D /* EditProfilePreferredTagCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfilePreferredTagCell.swift; sourceTree = "<group>"; };
@@ -787,6 +810,16 @@
 		3071171223E1019F005F6355 /* TwitchDescCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchDescCell.swift; sourceTree = "<group>"; };
 		3071171423E137A4005F6355 /* splash.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = splash.png; sourceTree = "<group>"; };
 		3071171623E13864005F6355 /* TwitterDescCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitterDescCell.swift; sourceTree = "<group>"; };
+		3076920625EADCA70072A156 /* LookingForOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LookingForOptions.swift; sourceTree = "<group>"; };
+		3076958F25EB0FD80072A156 /* BaseLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseLayout.swift; sourceTree = "<group>"; };
+		3076959325EB100B0072A156 /* ContentAlignableLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentAlignableLayout.swift; sourceTree = "<group>"; };
+		3076959725EB10320072A156 /* TagsLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagsLayout.swift; sourceTree = "<group>"; };
+		3077FFE225ED851D00FFB524 /* VerticallyCenteredTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticallyCenteredTextView.swift; sourceTree = "<group>"; };
+		3077FFE625EE8EF800FFB524 /* DynamicHeightCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicHeightCollectionView.swift; sourceTree = "<group>"; };
+		3077FFEA25EEAABF00FFB524 /* ProfileSocialListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSocialListItem.swift; sourceTree = "<group>"; };
+		3077FFEE25EEAE9F00FFB524 /* discord.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = discord.png; sourceTree = "<group>"; };
+		3077FFF225EEAEA800FFB524 /* instagram.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = instagram.png; sourceTree = "<group>"; };
+		3077FFF625EEEF8800FFB524 /* SelfSizingTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelfSizingTableView.swift; sourceTree = "<group>"; };
 		30781C8E24270E0400C5D886 /* FAResultsFoldingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FAResultsFoldingCell.swift; sourceTree = "<group>"; };
 		30781C90242813F700C5D886 /* InviteFrag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteFrag.swift; sourceTree = "<group>"; };
 		30781C92242820F100C5D886 /* sms.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sms.png; sourceTree = "<group>"; };
@@ -938,6 +971,7 @@
 		309264E82568816000BC4EBA /* OnlineObj.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineObj.swift; sourceTree = "<group>"; };
 		3092E67A2516969D00E8FE08 /* GCRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCRegistration.swift; sourceTree = "<group>"; };
 		3092E67C2516985200E8FE08 /* 18353-confetti-celebration.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "18353-confetti-celebration.json"; sourceTree = "<group>"; };
+		3092ECF925D562B8003BA8B9 /* splash.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = splash.mov; sourceTree = "<group>"; };
 		3095CBCC2455F2BC001C19E7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		309A38B4244EA15000B4FF35 /* division_new_logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = division_new_logo.png; sourceTree = "<group>"; };
 		309A38B6244EA3CD00B4FF35 /* division_new_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = division_new_dark.png; sourceTree = "<group>"; };
@@ -1048,6 +1082,9 @@
 		30D57CC525721599004024A7 /* star (9).png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "star (9).png"; sourceTree = "<group>"; };
 		30D57CC925733092004024A7 /* Basic_green_dot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Basic_green_dot.png; sourceTree = "<group>"; };
 		30D60CE0251C07E500C914EF /* GCGameController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCGameController.swift; sourceTree = "<group>"; };
+		30DB087C25EC221F00746AAE /* SocialConnectModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialConnectModal.swift; sourceTree = "<group>"; };
+		30DB088025EC28DA00746AAE /* DiscordConnectedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscordConnectedCell.swift; sourceTree = "<group>"; };
+		30DB088425EC7DFC00746AAE /* ProfileLookingForCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileLookingForCell.swift; sourceTree = "<group>"; };
 		30E0B1D4249588CE007F0B9B /* QuizOptionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizOptionCell.swift; sourceTree = "<group>"; };
 		30E0B1D624958FF3007F0B9B /* QuizOptionPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizOptionPage.swift; sourceTree = "<group>"; };
 		30E0B1D82495AC04007F0B9B /* AnswerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerCell.swift; sourceTree = "<group>"; };
@@ -1121,14 +1158,13 @@
 		4CC1720022677EF8009A1B80 /* test_banner.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = test_banner.png; sourceTree = "<group>"; };
 		4CC1720222677FA5009A1B80 /* LandingActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingActivity.swift; sourceTree = "<group>"; };
 		4CC17205226781DF009A1B80 /* NewsObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsObject.swift; sourceTree = "<group>"; };
-		598D7D36F87EC06EBE670B2A /* Pods-DoubleXPTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXPTests.debug.xcconfig"; path = "Target Support Files/Pods-DoubleXPTests/Pods-DoubleXPTests.debug.xcconfig"; sourceTree = "<group>"; };
-		609C098C47EE24F3E230CA55 /* Pods_DoubleXPTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DoubleXPTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		67827A7F41E3C1749D933912 /* Pods-DoubleXP.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXP.release.xcconfig"; path = "Target Support Files/Pods-DoubleXP/Pods-DoubleXP.release.xcconfig"; sourceTree = "<group>"; };
-		6DA7CACC50C7A3F948E16DB2 /* Pods-DoubleXP-DoubleXPUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXP-DoubleXPUITests.release.xcconfig"; path = "Target Support Files/Pods-DoubleXP-DoubleXPUITests/Pods-DoubleXP-DoubleXPUITests.release.xcconfig"; sourceTree = "<group>"; };
-		6E03CA40D159A0E28E87C94F /* Pods-DoubleXP.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXP.debug.xcconfig"; path = "Target Support Files/Pods-DoubleXP/Pods-DoubleXP.debug.xcconfig"; sourceTree = "<group>"; };
-		984DCF812FDC534816B6F633 /* Pods-DoubleXPTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXPTests.release.xcconfig"; path = "Target Support Files/Pods-DoubleXPTests/Pods-DoubleXPTests.release.xcconfig"; sourceTree = "<group>"; };
-		A1DC7160C788F41DE7E12E07 /* Pods-DoubleXPUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXPUITests.debug.xcconfig"; path = "Target Support Files/Pods-DoubleXPUITests/Pods-DoubleXPUITests.debug.xcconfig"; sourceTree = "<group>"; };
-		CCE6FC77ED2DA6FB67642F78 /* Pods-DoubleXPUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXPUITests.release.xcconfig"; path = "Target Support Files/Pods-DoubleXPUITests/Pods-DoubleXPUITests.release.xcconfig"; sourceTree = "<group>"; };
+		6F115694967F1E381C243552 /* Pods-DoubleXPUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXPUITests.debug.xcconfig"; path = "Target Support Files/Pods-DoubleXPUITests/Pods-DoubleXPUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		781DB9AF3BD41F2F4677998D /* Pods-DoubleXPTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXPTests.debug.xcconfig"; path = "Target Support Files/Pods-DoubleXPTests/Pods-DoubleXPTests.debug.xcconfig"; sourceTree = "<group>"; };
+		867CAA9A15B5C5A466257EAE /* Pods-DoubleXP.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXP.debug.xcconfig"; path = "Target Support Files/Pods-DoubleXP/Pods-DoubleXP.debug.xcconfig"; sourceTree = "<group>"; };
+		BB14DCEAA91C1113A93075A4 /* Pods_DoubleXPTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DoubleXPTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CFA920A62417DB18EB6BC29A /* Pods-DoubleXP.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXP.release.xcconfig"; path = "Target Support Files/Pods-DoubleXP/Pods-DoubleXP.release.xcconfig"; sourceTree = "<group>"; };
+		D4365F938650F2C5FCEC0B3E /* Pods_DoubleXP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DoubleXP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA43E62EB7C51B94F94F34D2 /* Pods-DoubleXPTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DoubleXPTests.release.xcconfig"; path = "Target Support Files/Pods-DoubleXPTests/Pods-DoubleXPTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1136,7 +1172,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6D7B0B638FBC317FE5CDBC9E /* Pods_DoubleXP.framework in Frameworks */,
+				FD127F44A1CA45F830B6136D /* Pods_DoubleXP.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1144,7 +1180,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				398E99D7454D231296D6F804 /* Pods_DoubleXPTests.framework in Frameworks */,
+				13FDB2B588429E86A21FD897 /* Pods_DoubleXPTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1152,23 +1188,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4675893BBCBADB61687F5863 /* Pods_DoubleXPUITests.framework in Frameworks */,
+				C39D8763A41E646A4D6F0139 /* Pods_DoubleXPUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		07350CACB98919027D381245 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				09E7E0F729FB0D9061A49A71 /* Pods_DoubleXP.framework */,
-				609C098C47EE24F3E230CA55 /* Pods_DoubleXPTests.framework */,
-				1B7BF829B5B8265BC48CDA6D /* Pods_DoubleXPUITests.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		304E17F1242FF250009BE1C0 /* Json */ = {
 			isa = PBXGroup;
 			children = (
@@ -1209,6 +1235,7 @@
 		30A60D92236689FC004B2150 /* SubViews */ = {
 			isa = PBXGroup;
 			children = (
+				30528D3B25EAC20F004166B0 /* LookingFor.swift */,
 				30A84DD72373B88E007BEAA5 /* PlayerProfile.swift */,
 				30A84DE52380A6DC007BEAA5 /* GamerConnectSearch.swift */,
 				30A84DEB2381DED0007BEAA5 /* Requests.swift */,
@@ -1249,6 +1276,7 @@
 				30D57CAB25702609004024A7 /* Feed.swift */,
 				307EC0F825992623004B9D36 /* Recommended.swift */,
 				307EC148259D54EF004B9D36 /* AlertsDrawer.swift */,
+				30DB087C25EC221F00746AAE /* SocialConnectModal.swift */,
 			);
 			path = SubViews;
 			sourceTree = "<group>";
@@ -1440,6 +1468,21 @@
 				307EC126259BA87C004B9D36 /* RecommendUsersCell.swift */,
 				307EC150259D5A4A004B9D36 /* AlertCell.swift */,
 				306ED664259F910C00F60751 /* RecommendGameCell.swift */,
+				30528CE525E743C0004166B0 /* InstagramConnectedCell.swift */,
+				30528CE925E743EC004166B0 /* TwitchConnectedCell.swift */,
+				30528CED25E743FC004166B0 /* ConnectCell.swift */,
+				30528D3725EAA9C8004166B0 /* LookingOptionCell.swift */,
+				3005677A25EAD943006CF888 /* LookingForHeader.swift */,
+				3076920625EADCA70072A156 /* LookingForOptions.swift */,
+				3076958F25EB0FD80072A156 /* BaseLayout.swift */,
+				3076959325EB100B0072A156 /* ContentAlignableLayout.swift */,
+				3076959725EB10320072A156 /* TagsLayout.swift */,
+				30DB088025EC28DA00746AAE /* DiscordConnectedCell.swift */,
+				30DB088425EC7DFC00746AAE /* ProfileLookingForCell.swift */,
+				3077FFE225ED851D00FFB524 /* VerticallyCenteredTextView.swift */,
+				3077FFE625EE8EF800FFB524 /* DynamicHeightCollectionView.swift */,
+				3077FFEA25EEAABF00FFB524 /* ProfileSocialListItem.swift */,
+				3077FFF625EEEF8800FFB524 /* SelfSizingTableView.swift */,
 			);
 			path = CustomView;
 			sourceTree = "<group>";
@@ -1452,7 +1495,7 @@
 				4C4D88452205F33300AD7090 /* DoubleXPUITests */,
 				4C4D88212205F32900AD7090 /* Products */,
 				EA0A069EB519AB84D180FC9F /* Pods */,
-				07350CACB98919027D381245 /* Frameworks */,
+				A0177CBFB6C9E229DFCDF914 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1487,10 +1530,10 @@
 				4C4D882A2205F32900AD7090 /* DoubleXP.xcdatamodeld */,
 				4C790E892266B85500FDA550 /* AdminActivity.swift */,
 				30BD4FF5244E6D1E00822EE6 /* basketball.mov */,
-				306E5C4C25633A9D00B4FE3D /* splash.mov */,
 				30BD4FF7244E6FFC00822EE6 /* null.png */,
 				4CC1720222677FA5009A1B80 /* LandingActivity.swift */,
 				30B583CC2347B9D000736733 /* PreSplashActivity.swift */,
+				3092ECF925D562B8003BA8B9 /* splash.mov */,
 				30B583D0234FC50B00736733 /* LoginController.swift */,
 				30B583E123529B2500736733 /* RegisterActivity.swift */,
 				30B583E723537EEA00736733 /* GamerConnectRegisterActivity.swift */,
@@ -1527,6 +1570,8 @@
 		4CB84C432205F74800183D28 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				3077FFF225EEAEA800FFB524 /* instagram.png */,
+				3077FFEE25EEAE9F00FFB524 /* discord.png */,
 				306ED67625A224F000F60751 /* uncommon.png */,
 				306ED67025A209D300F60751 /* epic.png */,
 				306ED66C25A10AE000F60751 /* crown.png */,
@@ -1806,17 +1851,25 @@
 			path = Object;
 			sourceTree = "<group>";
 		};
+		A0177CBFB6C9E229DFCDF914 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D4365F938650F2C5FCEC0B3E /* Pods_DoubleXP.framework */,
+				BB14DCEAA91C1113A93075A4 /* Pods_DoubleXPTests.framework */,
+				0880923415C5D948C990345A /* Pods_DoubleXPUITests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		EA0A069EB519AB84D180FC9F /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				6E03CA40D159A0E28E87C94F /* Pods-DoubleXP.debug.xcconfig */,
-				67827A7F41E3C1749D933912 /* Pods-DoubleXP.release.xcconfig */,
-				598D7D36F87EC06EBE670B2A /* Pods-DoubleXPTests.debug.xcconfig */,
-				984DCF812FDC534816B6F633 /* Pods-DoubleXPTests.release.xcconfig */,
-				A1DC7160C788F41DE7E12E07 /* Pods-DoubleXPUITests.debug.xcconfig */,
-				CCE6FC77ED2DA6FB67642F78 /* Pods-DoubleXPUITests.release.xcconfig */,
-				05853CEF740DA8C9EB9D8081 /* Pods-DoubleXP-DoubleXPUITests.debug.xcconfig */,
-				6DA7CACC50C7A3F948E16DB2 /* Pods-DoubleXP-DoubleXPUITests.release.xcconfig */,
+				867CAA9A15B5C5A466257EAE /* Pods-DoubleXP.debug.xcconfig */,
+				CFA920A62417DB18EB6BC29A /* Pods-DoubleXP.release.xcconfig */,
+				781DB9AF3BD41F2F4677998D /* Pods-DoubleXPTests.debug.xcconfig */,
+				DA43E62EB7C51B94F94F34D2 /* Pods-DoubleXPTests.release.xcconfig */,
+				6F115694967F1E381C243552 /* Pods-DoubleXPUITests.debug.xcconfig */,
+				2AF2988A2F72FF3F0C930F97 /* Pods-DoubleXPUITests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -1828,14 +1881,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4C4D884B2205F33300AD7090 /* Build configuration list for PBXNativeTarget "DoubleXP" */;
 			buildPhases = (
-				5066E1702B0465B7DA7014DA /* [CP] Check Pods Manifest.lock */,
+				FAFE42BC4350FAB939AFC07D /* [CP] Check Pods Manifest.lock */,
 				4BD3C01DDE62542405848F23 /* [CP] Prepare Artifacts */,
 				4C4D881C2205F32900AD7090 /* Sources */,
 				4C4D881D2205F32900AD7090 /* Frameworks */,
 				4C4D881E2205F32900AD7090 /* Resources */,
 				2D10C867246331FC00AFB350 /* Embed Frameworks */,
-				C6079FACD8838ECC0486654F /* [CP] Embed Pods Frameworks */,
-				91CAD62F3B1C3754B1DFFAFE /* [CP] Copy Pods Resources */,
+				1EF03E6D815BDBEBCC610B15 /* [CP] Embed Pods Frameworks */,
+				318BB9F7162D4AC3F46B1807 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1850,7 +1903,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4C4D884E2205F33300AD7090 /* Build configuration list for PBXNativeTarget "DoubleXPTests" */;
 			buildPhases = (
-				0B5636DDA4F998748C0E8424 /* [CP] Check Pods Manifest.lock */,
+				DC16B642FADBAB122433B809 /* [CP] Check Pods Manifest.lock */,
 				4C4D88332205F33200AD7090 /* Sources */,
 				4C4D88342205F33200AD7090 /* Frameworks */,
 				4C4D88352205F33200AD7090 /* Resources */,
@@ -1869,7 +1922,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4C4D88512205F33300AD7090 /* Build configuration list for PBXNativeTarget "DoubleXPUITests" */;
 			buildPhases = (
-				24632683EFCB17192A55A74C /* [CP] Check Pods Manifest.lock */,
+				AD5F018EC9044A24AFA2B4DE /* [CP] Check Pods Manifest.lock */,
 				4C4D883E2205F33300AD7090 /* Sources */,
 				4C4D883F2205F33300AD7090 /* Frameworks */,
 				4C4D88402205F33300AD7090 /* Resources */,
@@ -1939,7 +1992,9 @@
 				30B6E1A123ADBD8C00B69F00 /* game_over_PNG15.png in Resources */,
 				306793D5244B373B005158B2 /* game-controller.png in Resources */,
 				306429932516D19E0023F38D /* boom.json in Resources */,
+				3077FFF325EEAEA800FFB524 /* instagram.png in Resources */,
 				305B520D2415D76F0064B605 /* expand_black.png in Resources */,
+				3092ECFA25D562B8003BA8B9 /* splash.mov in Resources */,
 				30781C972428261D00C5D886 /* email (1).png in Resources */,
 				3063C6D02508666D00DBB22C /* dxp_disc_light_boom.png in Resources */,
 				30C4EDB32267C1890046B615 /* doublexp_white.png in Resources */,
@@ -1996,6 +2051,7 @@
 				3080B40023BBCEBB00638B22 /* sand-clock.png in Resources */,
 				306ED66D25A10AE200F60751 /* crown.png in Resources */,
 				302B0D49256EAC42004B2709 /* best.png in Resources */,
+				3077FFEF25EEAE9F00FFB524 /* discord.png in Resources */,
 				3085BF0A256B7B39009DC7BB /* star (3).png in Resources */,
 				3085BED6256B3B68009DC7BB /* test_mobile_img.jpg in Resources */,
 				3080B3E223B7FAA700638B22 /* request.png in Resources */,
@@ -2070,7 +2126,6 @@
 				3068D483254A5D5800580FB3 /* searching_white_ios.json in Resources */,
 				30F1E05B256DBA1200261574 /* thumbs-up.png in Resources */,
 				308810F8244BD12700C2BEC7 /* warn.png in Resources */,
-				306E5C4D25633A9D00B4FE3D /* splash.mov in Resources */,
 				3085BF06256B7A6E009DC7BB /* black-star-silhouette (1).png in Resources */,
 				308C0A7E24E067FC00C2027C /* live_inactive.png in Resources */,
 				307EC0FD259A86C2004B9D36 /* test_recommend_bac.jpg in Resources */,
@@ -2210,29 +2265,58 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0B5636DDA4F998748C0E8424 /* [CP] Check Pods Manifest.lock */ = {
+		1EF03E6D815BDBEBCC610B15 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
+			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-DoubleXPTests-checkManifestLockResult.txt",
+				"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		24632683EFCB17192A55A74C /* [CP] Check Pods Manifest.lock */ = {
+		318BB9F7162D4AC3F46B1807 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		4BD3C01DDE62542405848F23 /* [CP] Prepare Artifacts */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-artifacts-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Prepare Artifacts";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-artifacts-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-artifacts.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		AD5F018EC9044A24AFA2B4DE /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -2254,24 +2338,29 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		4BD3C01DDE62542405848F23 /* [CP] Prepare Artifacts */ = {
+		DC16B642FADBAB122433B809 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-artifacts-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			name = "[CP] Prepare Artifacts";
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-artifacts-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-DoubleXPTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-artifacts.sh\"\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		5066E1702B0465B7DA7014DA /* [CP] Check Pods Manifest.lock */ = {
+		FAFE42BC4350FAB939AFC07D /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -2293,40 +2382,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		91CAD62F3B1C3754B1DFFAFE /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		C6079FACD8838ECC0486654F /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DoubleXP/Pods-DoubleXP-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -2335,6 +2390,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				30A84DF42381EA97007BEAA5 /* RequestHeader.swift in Sources */,
+				30DB088525EC7DFC00746AAE /* ProfileLookingForCell.swift in Sources */,
 				30B583DA23500EF900736733 /* User.swift in Sources */,
 				30582412239C589D00FDEA7D /* ChatObject.swift in Sources */,
 				30A84DDA237649C3007BEAA5 /* NotificationProtocols.swift in Sources */,
@@ -2354,16 +2410,19 @@
 				305B52112416B6580064B605 /* ArticleHeaderCell.swift in Sources */,
 				303F2D4223728D09004B68E1 /* EMPageViewController.swift in Sources */,
 				306E6B5923DE23220069F426 /* TwitchStreamObject.swift in Sources */,
+				30528CEE25E743FC004166B0 /* ConnectCell.swift in Sources */,
 				30578C2B2552255B007BDC67 /* EditProfileGamesCell.swift in Sources */,
 				304E17EA242EB934009BE1C0 /* GCElongCell.swift in Sources */,
 				308810EC244B3ECC00C2BEC7 /* CompetitionCell.swift in Sources */,
 				308BD021238B4AC90034822B /* TeamDashboard.swift in Sources */,
 				308C0A7C24DF4D3D00C2027C /* AnnouncementManager.swift in Sources */,
 				30E0B1D724958FF3007F0B9B /* QuizOptionPage.swift in Sources */,
+				30DB087D25EC221F00746AAE /* SocialConnectModal.swift in Sources */,
 				30634D692406084B00FEAD40 /* ContributorCell.swift in Sources */,
 				3058131D23973FEB001BCE30 /* TeamBuildFAResults.swift in Sources */,
 				30B57BBA25392DFE001E8277 /* ConsoleSelectionTableviewCell.swift in Sources */,
 				307EC0F925992623004B9D36 /* Recommended.swift in Sources */,
+				3077FFF725EEEF8800FFB524 /* SelfSizingTableView.swift in Sources */,
 				3091E38F24E6FFB000468557 /* OrderedDictionary.swift in Sources */,
 				30A84DD82373B88E007BEAA5 /* PlayerProfile.swift in Sources */,
 				30B6E18523A09F1400B69F00 /* ViewTeams.swift in Sources */,
@@ -2378,6 +2437,7 @@
 				308BD034238F5BE90034822B /* FriendObject.swift in Sources */,
 				307CE35723EC99B900DCB12A /* SlantedView.swift in Sources */,
 				3071171323E1019F005F6355 /* TwitchDescCell.swift in Sources */,
+				3077FFE725EE8EF800FFB524 /* DynamicHeightCollectionView.swift in Sources */,
 				30582410239C3E4100FDEA7D /* MessagingFrag.swift in Sources */,
 				30B6E19F23ADB81600B69F00 /* OptionCell.swift in Sources */,
 				30B583D1234FC50B00736733 /* LoginController.swift in Sources */,
@@ -2411,7 +2471,9 @@
 				306E5C9D2563510A00B4FE3D /* EditProfileTagCell.swift in Sources */,
 				3080B3E023B7C4F500638B22 /* ParentVC.swift in Sources */,
 				309BFA5E254291650079A6A1 /* FilterOption.swift in Sources */,
+				3076959825EB10320072A156 /* TagsLayout.swift in Sources */,
 				30D57CB425702872004024A7 /* FeedDiscoverCell.swift in Sources */,
+				30DB088125EC28DA00746AAE /* DiscordConnectedCell.swift in Sources */,
 				308BD0362391DB9C0034822B /* TeammateObject.swift in Sources */,
 				30634D632405C27000FEAD40 /* MediaManager.swift in Sources */,
 				3078E5802544B4F500E34A8E /* FilterCategory.swift in Sources */,
@@ -2456,12 +2518,14 @@
 				305FD948251AE0CC00D6B565 /* SpinnerCell.swift in Sources */,
 				30A5199F240A007300DCFC77 /* AGVideoPlayerView.swift in Sources */,
 				30B6E18923A33A6300B69F00 /* TeamSearchGameCell.swift in Sources */,
+				3076959425EB100B0072A156 /* ContentAlignableLayout.swift in Sources */,
 				305B51F9240C78600064B605 /* ProfileGameSelectionCell.swift in Sources */,
 				302B0D4D256EC86D004B2709 /* ProfanityFilter.swift in Sources */,
 				305B51FF240DF2610064B605 /* ProfileManager.swift in Sources */,
 				303F2D402372883E004B68E1 /* NavigationPageController.swift in Sources */,
 				3080B3F623BA579000638B22 /* GradientButton.swift in Sources */,
 				30634D612405AE6900FEAD40 /* TestCollection.swift in Sources */,
+				30528CE625E743C0004166B0 /* InstagramConnectedCell.swift in Sources */,
 				3085BEF8256B7470009DC7BB /* DiscoveryCategoryFrag.swift in Sources */,
 				30A84DEE2381E622007BEAA5 /* TeamInviteObject.swift in Sources */,
 				3008EE782267F89800E0D9ED /* NewsCell.swift in Sources */,
@@ -2474,16 +2538,19 @@
 				3085BEE6256B3DEE009DC7BB /* DiscoverFrag.swift in Sources */,
 				307B01D923E773D2006A5F1F /* AnimatingView.swift in Sources */,
 				30EBC40223DB632E009CFAB2 /* SocialMediaManager.swift in Sources */,
+				30528CEA25E743EC004166B0 /* TwitchConnectedCell.swift in Sources */,
 				306ED665259F910C00F60751 /* RecommendGameCell.swift in Sources */,
 				30D57CA425700500004024A7 /* BadgeObj.swift in Sources */,
 				2DE540DC246495930053C57A /* TwitterHelper.swift in Sources */,
 				30F798A0241EA42800740966 /* TwitchChannelCell.swift in Sources */,
 				308759B8242512BD002C19CC /* FADashFoldingCell.swift in Sources */,
 				3078E5842544BA4B00E34A8E /* SearchManager.swift in Sources */,
+				30528D3C25EAC20F004166B0 /* LookingFor.swift in Sources */,
 				30D57CAC25702609004024A7 /* Feed.swift in Sources */,
 				30B583DE2350168B00736733 /* TeamObject.swift in Sources */,
 				30578C2F25522587007BDC67 /* EditProfileStatsCell.swift in Sources */,
 				308BD030238ED1370034822B /* DashFriendInviteCell.swift in Sources */,
+				30528D3825EAA9C8004166B0 /* LookingOptionCell.swift in Sources */,
 				3063C6CA25083B1B00DBB22C /* EpisodeCell.swift in Sources */,
 				307CE35323EC452600DCB12A /* TestCell.swift in Sources */,
 				307CE34B23EA0BDE00DCB12A /* ExpandedTVCell.swift in Sources */,
@@ -2497,6 +2564,7 @@
 				30A60D962367CCEF004B2150 /* RecommendedUsersCell.swift in Sources */,
 				308810F2244B5D6800C2BEC7 /* CompetitorObj.swift in Sources */,
 				3059E6372432C7790052E46F /* SettingsFrag.swift in Sources */,
+				3005677B25EAD943006CF888 /* LookingForHeader.swift in Sources */,
 				3085BF2A256C325B009DC7BB /* DiscoverQuickReviewCell.swift in Sources */,
 				30F6FCBE23CC07A20051813D /* GenericRequestObject.swift in Sources */,
 				305F5993253691B4002AB8FE /* ResultsButtonCell.swift in Sources */,
@@ -2554,6 +2622,7 @@
 				30578C13255118C1007BDC67 /* ProfileExtraCell.swift in Sources */,
 				30E4BE9425182B0C00754921 /* NewRegGameCell.swift in Sources */,
 				306E6B5D23DE4E4D0069F426 /* TwitchStreamCell.swift in Sources */,
+				3076920725EADCA70072A156 /* LookingForOptions.swift in Sources */,
 				30E0B1D92495AC04007F0B9B /* AnswerCell.swift in Sources */,
 				30F1E03D256D815B00261574 /* DiscoverGameDopeCell.swift in Sources */,
 				308810F0244B48A300C2BEC7 /* RecommendedUser.swift in Sources */,
@@ -2570,12 +2639,14 @@
 				30D60CE1251C07E500C914EF /* GCGameController.swift in Sources */,
 				3052E19C253B9C5300EE5BB3 /* Upgrade.swift in Sources */,
 				3085BEEA256B3EFB009DC7BB /* DiscoverCategory.swift in Sources */,
+				3077FFEB25EEAABF00FFB524 /* ProfileSocialListItem.swift in Sources */,
 				308C0A7824DF26C700C2027C /* AnnouncementCell.swift in Sources */,
 				30A60D9123666716004B2150 /* UserCell.swift in Sources */,
 				307CE35523EC508600DCB12A /* InsetLabel.swift in Sources */,
 				3030E0222423A532008B775E /* EmptyCollectionViewCell.swift in Sources */,
 				30D57CB0257027AC004024A7 /* FeedHeaderCell.swift in Sources */,
 				3071171723E13864005F6355 /* TwitterDescCell.swift in Sources */,
+				3076959025EB0FD80072A156 /* BaseLayout.swift in Sources */,
 				30A84DE2237F80CE007BEAA5 /* StatsCell.swift in Sources */,
 				303F2D442373AC1B004B68E1 /* homeGCCell.swift in Sources */,
 				30634D5F24059E6800FEAD40 /* NewsArticleCell.swift in Sources */,
@@ -2583,6 +2654,7 @@
 				30B6E1AB23B14F4400B69F00 /* FAQuizComplete.swift in Sources */,
 				30B6E19B23AC17EA00B69F00 /* FAQuizCover.swift in Sources */,
 				303504E225327B3A00E7F88E /* GameSelectionV2Cell.swift in Sources */,
+				3077FFE325ED851D00FFB524 /* VerticallyCenteredTextView.swift in Sources */,
 				30E8CC87248ABE8300B1BE98 /* StatsEmptyCell.swift in Sources */,
 				30D57CBC2571216C004024A7 /* ProfileBadgeCell.swift in Sources */,
 				3078E57C2544AAC700E34A8E /* GCSearchFilters.swift in Sources */,
@@ -2781,12 +2853,12 @@
 		};
 		4C4D884C2205F33300AD7090 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6E03CA40D159A0E28E87C94F /* Pods-DoubleXP.debug.xcconfig */;
+			baseConfigurationReference = 867CAA9A15B5C5A466257EAE /* Pods-DoubleXP.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = DoubleXP/DoubleXP.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Toussaint Peterson (R2T8274FN3)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 61;
 				DEVELOPMENT_TEAM = GU6KL76XP4;
@@ -2799,7 +2871,7 @@
 				MARKETING_VERSION = 1.5.9;
 				PRODUCT_BUNDLE_IDENTIFIER = Encrypted.DoubleXP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = DXP2;
+				PROVISIONING_PROFILE_SPECIFIER = DXP3;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -2808,12 +2880,12 @@
 		};
 		4C4D884D2205F33300AD7090 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 67827A7F41E3C1749D933912 /* Pods-DoubleXP.release.xcconfig */;
+			baseConfigurationReference = CFA920A62417DB18EB6BC29A /* Pods-DoubleXP.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = DoubleXP/DoubleXP.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Toussaint Peterson (R2T8274FN3)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 61;
 				DEVELOPMENT_TEAM = GU6KL76XP4;
@@ -2826,7 +2898,7 @@
 				MARKETING_VERSION = 1.5.9;
 				PRODUCT_BUNDLE_IDENTIFIER = Encrypted.DoubleXP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = DXP2;
+				PROVISIONING_PROFILE_SPECIFIER = DXP3;
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -2834,7 +2906,7 @@
 		};
 		4C4D884F2205F33300AD7090 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 598D7D36F87EC06EBE670B2A /* Pods-DoubleXPTests.debug.xcconfig */;
+			baseConfigurationReference = 781DB9AF3BD41F2F4677998D /* Pods-DoubleXPTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -2858,7 +2930,7 @@
 		};
 		4C4D88502205F33300AD7090 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 984DCF812FDC534816B6F633 /* Pods-DoubleXPTests.release.xcconfig */;
+			baseConfigurationReference = DA43E62EB7C51B94F94F34D2 /* Pods-DoubleXPTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -2882,7 +2954,7 @@
 		};
 		4C4D88522205F33300AD7090 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A1DC7160C788F41DE7E12E07 /* Pods-DoubleXPUITests.debug.xcconfig */;
+			baseConfigurationReference = 6F115694967F1E381C243552 /* Pods-DoubleXPUITests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -2907,7 +2979,7 @@
 		};
 		4C4D88532205F33300AD7090 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = CCE6FC77ED2DA6FB67642F78 /* Pods-DoubleXPUITests.release.xcconfig */;
+			baseConfigurationReference = 2AF2988A2F72FF3F0C930F97 /* Pods-DoubleXPUITests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";

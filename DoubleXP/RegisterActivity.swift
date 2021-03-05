@@ -1247,6 +1247,17 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                     }
                 }
                 
+                var lookingForArray = [LookingForSelection]()
+                if(snapshot.hasChild("lookingFor")){
+                    let lookingFor = snapshot.childSnapshot(forPath: "lookingFor")
+                    for lookingForChild in lookingFor.children {
+                        let newSelection = LookingForSelection()
+                        newSelection.gameName = (lookingForChild as? DataSnapshot)?.key ?? ""
+                        newSelection.choices = (lookingForChild as? DataSnapshot)?.value as? [String] ?? [String]()
+                        lookingForArray.append(newSelection)
+                    }
+                }
+                
                 let consoleArray = snapshot.childSnapshot(forPath: "consoles")
                 let dict = consoleArray.value as? [String: Bool]
                 let nintendo = dict?["nintendo"] ?? false
@@ -1286,6 +1297,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                 user.restrictList = Array(restrictList.keys)
                 user.badges = badges
                 user.reviews = reviews
+                user.userLookingFor = lookingForArray
                 
                 DispatchQueue.main.async {
                     let delegate = UIApplication.shared.delegate as! AppDelegate

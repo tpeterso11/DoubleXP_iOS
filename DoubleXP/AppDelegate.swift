@@ -56,6 +56,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var heroLightUrl = ""
     var heroDarkUrl = ""
     var cachedUidForMessaging = ""
+    var generalLookingFor = [String]()
     var currentRegisterActivity: RegisterActivity?
     var currentLoginActivity: LoginController?
     

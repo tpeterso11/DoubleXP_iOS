@@ -211,6 +211,16 @@ class GamerConnectGame: NSObject, NSCoding {
         }
     }
     
+    var _lookingFor = [String]()
+    var lookingFor: [String] {
+        get {
+            return (_lookingFor)
+        }
+        set (newVal) {
+            _lookingFor = newVal
+        }
+    }
+    
     var _categoryFilters = [String]()
     var categoryFilters: [String] {
         get {
@@ -325,6 +335,7 @@ class GamerConnectGame: NSObject, NSCoding {
         self.available = (decoder.decodeObject(forKey: "available") as! String)
         self.availablebConsoles = (decoder.decodeObject(forKey: "availableConsoles") as! [String])
         self.categoryFilters = (decoder.decodeObject(forKey: "categoryFilters") as! [String])
+        self.lookingFor = (decoder.decodeObject(forKey: "lookingFor") as! [String])
         self.releaseDate = (decoder.decodeObject(forKey: "releaseDate") as! String)
         self.gameDescription = (decoder.decodeObject(forKey: "gameDescription") as! String)
         self.ideal = (decoder.decodeObject(forKey: "ideal") as! String)
@@ -361,5 +372,6 @@ class GamerConnectGame: NSObject, NSCoding {
         coder.encode(self.ratings, forKey: "ratings")
         coder.encode(self.quickReviews, forKey: "quickReviews")
         coder.encode(self.alternateImageUrl, forKey: "alternateImageUrl")
+        coder.encode(self.lookingFor, forKey: "lookingFor")
     }
 }

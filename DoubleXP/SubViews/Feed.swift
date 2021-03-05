@@ -61,6 +61,9 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
             let delegate = UIApplication.shared.delegate as! AppDelegate
             delegate.currentLanding?.hideScoob()
         }
+        
+        self.feedTable.estimatedRowHeight = 250
+        self.feedTable.rowHeight = UITableView.automaticDimension
     }
     
     @objc func dismissKeyboard() {
@@ -311,7 +314,7 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
         self.present(currentViewController, animated: true, completion: nil)
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    /*func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if(tableView == self.feedTable){
             let current = payload[indexPath.item]
             if(current == "header"){
@@ -324,7 +327,7 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
         } else {
             return 80.0;
         }
-    }
+    }*/
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if(tableView == feedTable){
