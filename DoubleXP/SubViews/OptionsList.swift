@@ -181,7 +181,7 @@ class OptionsList: UIViewController, UITableViewDelegate, UITableViewDataSource,
         })
     }
     
-    func updateCell(indexPath: IndexPath) {
+    func updateCell() {
     }
     
     func showQuizClicked(questions: [[String]]) {
@@ -196,10 +196,10 @@ class OptionsList: UIViewController, UITableViewDelegate, UITableViewDataSource,
     func rivalRequestFail() {
     }
     
-    func rivalResponseAccepted(indexPath: IndexPath) {
+    func rivalResponseAccepted() {
     }
     
-    func rivalResponseRejected(indexPath: IndexPath) {
+    func rivalResponseRejected() {
     }
     
     func rivalResponseFailed() {

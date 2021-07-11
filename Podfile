@@ -30,10 +30,6 @@ target 'DoubleXP' do
   pod 'GoogleSignIn'
   pod 'SwiftDate'
   pod 'Swifter', :git => 'https://github.com/mattdonnelly/Swifter.git'
-  pod 'CollectionViewSlantedLayout'
-  pod 'OrderedDictionary'
-  pod 'AnimatedCollectionViewLayout'
-  pod 'CountdownLabel'
   pod 'CollectionPickerView'
   pod 'SPStorkController'
   pod 'Google-Mobile-Ads-SDK'
@@ -42,6 +38,11 @@ target 'DoubleXP' do
   pod "LinearProgressBar"
   pod 'Cosmos', '~> 23.0'
   pod "FlagPhoneNumber"
+  pod 'MultilineTextField'
+  pod 'YoutubePlayerView'
+  pod 'YoutubeKit'
+  pod 'youtube-ios-player-helper'
+  pod 'collection-view-layouts/InstagramLayout'
   
   # Pods for DoubleXP
 

@@ -29,6 +29,18 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     @IBOutlet weak var overBox: UIView!
     @IBOutlet weak var overCover: UIView!
     
+    @IBOutlet weak var locationAnimationLight: AnimationView!
+    @IBOutlet weak var five: UILabel!
+    @IBOutlet weak var four: UILabel!
+    @IBOutlet weak var three: UILabel!
+    @IBOutlet weak var two: UILabel!
+    @IBOutlet weak var one: UILabel!
+    @IBOutlet weak var zero: UILabel!
+    @IBOutlet weak var experienceSlider: UISlider!
+    @IBOutlet weak var experienceBox: UIView!
+    @IBOutlet weak var experienceOption: UILabel!
+    @IBOutlet weak var experienceSub: UILabel!
+    @IBOutlet weak var experienceView: UIView!
     @IBOutlet weak var genderSkipCover: UIView!
     @IBOutlet weak var otherGenderCover: UIView!
     @IBOutlet weak var transgenderCover: UIView!
@@ -70,6 +82,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     var secondLanguage = [String]()
     var locationLat = 0.0
     var locationLong = 0.0
+    var experienceVal = 0.0
     var req: LocationRequest?
     
     //location
@@ -78,9 +91,11 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.celebrateAnimation.animationSpeed = 0.6
-        self.celebrateAnimation.loopMode = .playOnce
-        self.celebrateAnimation.play()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            self.celebrateAnimation.animationSpeed = 0.6
+            self.celebrateAnimation.loopMode = .playOnce
+            self.celebrateAnimation.play()
+        }
         
         self.startProfileButton.addTarget(self, action: #selector(startButtonClicked), for: .touchUpInside)
         
@@ -154,8 +169,85 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         skipGenderTap.gender = "unidentified"
         genderSkip.isUserInteractionEnabled = true
         genderSkip.addGestureRecognizer(skipGenderTap)
+        
+        self.experienceOption.text = "no experience"
+        self.experienceSub.text = "all of this is new to me. i am NOT a gamer. lol"
+        self.experienceSlider.value = 0
+        self.one.alpha = 0.05
+        
+        self.experienceSlider.addTarget(self, action: #selector(onExperienceChange), for: UIControl.Event.valueChanged)
     
         availableGames = list
+    }
+    
+    @objc private func onExperienceChange(){
+        self.experienceVal = Double(self.experienceSlider.value)
+        if(self.experienceVal < 1){
+            self.experienceOption.text = "no experience"
+            self.experienceSub.text = "all of this is new to me. i am NOT a gamer. lol"
+            UIView.animate(withDuration: 0.3, animations: {
+                self.zero.alpha = 0
+                self.one.alpha = 0.05
+                self.two.alpha = 0
+                self.three.alpha = 0
+                self.four.alpha = 0
+                self.five.alpha = 0
+            }, completion: nil)
+        } else if(self.experienceVal >= 1 && self.experienceVal <= 2){
+            self.experienceOption.text = "a little bit"
+            self.experienceSub.text = "i'll own you in mario kart!"
+            UIView.animate(withDuration: 0.3, animations: {
+                self.zero.alpha = 0
+                self.one.alpha = 0
+                self.two.alpha = 0.05
+                self.three.alpha = 0
+                self.four.alpha = 0
+                self.five.alpha = 0
+            }, completion: nil)
+        } else if(self.experienceVal > 2 && self.experienceVal < 3){
+            self.experienceOption.text = "some experience"
+            self.experienceSub.text = "i have games that i play, but i'm not really a gamer."
+            UIView.animate(withDuration: 0.3, animations: {
+                self.zero.alpha = 0
+                self.one.alpha = 0
+                self.two.alpha = 0
+                self.three.alpha = 0.05
+                self.four.alpha = 0
+                self.five.alpha = 0
+            }, completion: nil)
+        } else if(self.experienceVal >= 3 && self.experienceVal < 5){
+            self.experienceOption.text = "basically a gamer"
+            self.experienceSub.text = "you just don't wanna admit it."
+            UIView.animate(withDuration: 0.3, animations: {
+                self.zero.alpha = 0
+                self.one.alpha = 0
+                self.two.alpha = 0
+                self.three.alpha = 0
+                self.four.alpha = 0.05
+                self.five.alpha = 0
+            }, completion: nil)
+        } else {
+            self.experienceOption.text = "gamer"
+            self.experienceSub.text = "i've been gaming for years."
+            UIView.animate(withDuration: 0.3, animations: {
+                self.zero.alpha = 0
+                self.one.alpha = 0
+                self.two.alpha = 0
+                self.three.alpha = 0
+                self.four.alpha = 0
+                self.five.alpha = 0.05
+            }, completion: nil)
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        self.experienceBox.layer.shadowColor = UIColor.black.cgColor
+        self.experienceBox.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+        self.experienceBox.layer.shadowRadius = 2.0
+        self.experienceBox.layer.shadowOpacity = 0.5
+        self.experienceBox.layer.masksToBounds = false
+        self.experienceBox.layer.shadowPath = UIBezierPath(roundedRect: self.experienceBox.layer.bounds, cornerRadius: self.experienceBox.layer.cornerRadius).cgPath
+        super.viewWillAppear(animated)
     }
     
     @objc private func genderClicked(sender: GenderTapGesture){
@@ -292,15 +384,11 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     @objc private func transitionToAge(){
         self.gcContinueButton.removeTarget(self, action: #selector(self.transitionToAge), for: .touchUpInside)
         self.updateGCContinueAge()
-        let layoutAnim = CGAffineTransform(translationX: -50, y: 0)
-        let layoutAnim2 = CGAffineTransform(translationX: -50, y: 0)
         UIView.animate(withDuration: 0.5, animations: {
             self.genderLayout.alpha = 0
-            self.genderLayout.transform = layoutAnim
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                UIView.animate(withDuration: 0.5, animations: {
                    self.ageLayout.alpha = 1
-                   self.ageLayout.transform = layoutAnim2
                     self.genderLayout.isUserInteractionEnabled = false
                     self.ageLayout.isUserInteractionEnabled = true
                     UIView.animate(withDuration: 0.5, delay: 0.5, options: [], animations: {
@@ -447,14 +535,16 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     
     @objc private func advanceToLanguage(){
         self.selectedPrimaryLanguage = "english"
+        self.genderLayout.alpha = 0
         
         updateContinueGCPrimaryLang()
         UIView.animate(withDuration: 0.5, animations: {
             self.ageLayout.alpha = 0
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 self.ageLayout.alpha = 0
-                UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                UIView.animate(withDuration: 0.5, animations: {
                     self.languageLayout.alpha = 1
+                    self.ageLayout.alpha = 0
                     self.ageLayout.isUserInteractionEnabled = false
                     self.languageLayout.isUserInteractionEnabled = true
                 }, completion: nil)
@@ -465,6 +555,25 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     @objc private func startButtonClicked(){
         UIView.animate(withDuration: 0.5, animations: {
             self.startLayout.alpha = 0
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                    self.experienceView.alpha = 1
+                    self.startLayout.isUserInteractionEnabled = false
+                    self.experienceView.isUserInteractionEnabled = true
+                    UIView.animate(withDuration: 0.5, delay: 0.5, options: [], animations: {
+                        let cntSlide = CGAffineTransform(translationX: 0, y: -100)
+                        self.gcContinueButton.alpha = 1.0
+                        self.gcContinueButton.addTarget(self, action: #selector(self.experienceNextButtonClicked), for: .touchUpInside)
+                        self.gcContinueButton.transform = cntSlide
+                    }, completion: nil)
+                }, completion: nil)
+            }
+        }, completion: nil)
+    }
+    
+    @objc private func experienceNextButtonClicked(){
+        UIView.animate(withDuration: 0.5, animations: {
+            self.experienceView.alpha = 0
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
                    self.genderLayout.alpha = 1
@@ -530,9 +639,9 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     
     func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
         if(pickerView == self.primaryPicker){
-            return NSAttributedString(string: languageList[row], attributes: [NSAttributedString.Key.foregroundColor: UIColor.white])
+            return NSAttributedString(string: languageList[row], attributes: [NSAttributedString.Key.foregroundColor: UIColor.init(named: "darkToWhite")!])
         } else {
-            return NSAttributedString(string: secondLanguage[row], attributes: [NSAttributedString.Key.foregroundColor: UIColor.white])
+            return NSAttributedString(string: secondLanguage[row], attributes: [NSAttributedString.Key.foregroundColor: UIColor.init(named: "darkToWhite")!])
         }
     }
     
@@ -595,20 +704,26 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     }
     
     @objc private func advanceToLocation(){
-        let layoutOut = CGAffineTransform(translationX: -50, y: 0)
         let cntSlide = CGAffineTransform(translationX: 0, y: -100)
         UIView.animate(withDuration: 0.5, animations: {
             self.languageLayout.alpha = 0
-            self.languageLayout.transform = layoutOut
             self.gcContinueButton.alpha = 0
             self.gcContinueButton.isUserInteractionEnabled = false
             self.gcContinueButton.transform = cntSlide
             UIView.animate(withDuration: 0.5, animations: {
                self.locationLayout.alpha = 1
-               self.locationLayout.transform = layoutOut
                 self.languageLayout.isUserInteractionEnabled = false
                 self.locationLayout.isUserInteractionEnabled = true
-                self.locationAnimation.play()
+                
+                if self.traitCollection.userInterfaceStyle == .dark {
+                    self.locationAnimation.alpha = 1
+                    self.locationAnimationLight.alpha = 0
+                    self.locationAnimation.play()
+                } else {
+                    self.locationAnimation.alpha = 0
+                    self.locationAnimationLight.alpha = 1
+                    self.locationAnimationLight.play()           // User Interface is Light
+                }
                 
                 self.allowLocation.addTarget(self, action: #selector(self.requestLocation), for: .touchUpInside)
                 self.refuseLocation.addTarget(self, action: #selector(self.advanceToGames), for: .touchUpInside)
@@ -625,6 +740,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         ref.child("secondaryLanguage").setValue(self.selectedSecondaryLanguage)
         ref.child("selectedAge").setValue(self.selectedAge)
         ref.child("gender").setValue(self.currendSelectedGender)
+        ref.child("gamingExperience").setValue(String(self.experienceVal))
         
         if(self.locationLat != 0.0){
             currentUser!.userLat = self.locationLat

@@ -116,7 +116,7 @@ class ProfileFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSourc
         }
         
         for game in appDelegate.gcGames {
-            if(game.hasQuiz && games.contains(game.gameName)){
+            if(!game.quizUrl.isEmpty && games.contains(game.gameName)){
                 self.quizAvailable = true
                 break
             }

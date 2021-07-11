@@ -39,7 +39,7 @@ class FreeAgentFront: ParentVC, UICollectionViewDataSource, UICollectionViewDele
         games = list
         
         for game in games {
-            if(!game.hasQuiz){
+            if(game.quizUrl.isEmpty){
                 games.remove(at: games.index(of: game)!)
             }
         }

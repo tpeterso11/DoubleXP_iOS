@@ -8,6 +8,8 @@
 
 import Foundation
 import UIKit
+import WebKit
+import youtube_ios_player_helper
 
 class ProfileHeaderCell: UITableViewCell, UITableViewDataSource, UITableViewDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     @IBOutlet weak var more: UIImageView!
@@ -17,8 +19,25 @@ class ProfileHeaderCell: UITableViewCell, UITableViewDataSource, UITableViewDele
     @IBOutlet weak var onlineDot: UIImageView!
     @IBOutlet weak var editProfileTag: UILabel!
     @IBOutlet weak var socialList: UITableView!
+    @IBOutlet weak var headerYoutube: UIView!
+    @IBOutlet weak var collapse: UIImageView!
+    @IBOutlet weak var gtBaseView: UIView!
+    @IBOutlet weak var gtBlurView: UIVisualEffectView!
+    @IBOutlet weak var videoDrawerBlur: UIVisualEffectView!
+    @IBOutlet weak var videoDrawerBase: UIView!
+    @IBOutlet weak var channelLoadingBlur: UIVisualEffectView!
+    @IBOutlet weak var expand: UIImageView!
+    @IBOutlet weak var downVoteButton: UIImageView!
+    @IBOutlet weak var upVoteButton: UIImageView!
+    @IBOutlet weak var upVoteCount: UILabel!
+    @IBOutlet weak var downVoteCount: UILabel!
+    @IBOutlet weak var videoCover: UIView!
+    @IBOutlet weak var logo: UIImageView!
+    @IBOutlet weak var height: NSLayoutConstraint!
+    @IBOutlet weak var playingTag: UILabel!
     var payload = [String]()
     var socialPayload = [Any]()
+    var collapsed = false
     
     
     func setConsoles(consoles: [String]){
@@ -29,11 +48,10 @@ class ProfileHeaderCell: UITableViewCell, UITableViewDataSource, UITableViewDele
     
     func setSocial(list: [Any], set: Bool){
         self.socialPayload = list
-        
         self.socialList.estimatedRowHeight = 30
         self.socialList.rowHeight = UITableView.automaticDimension
         
-        if(!set){
+        if(!list.isEmpty){
             self.socialList.delegate = self
             self.socialList.dataSource = self
         }
@@ -55,7 +73,18 @@ class ProfileHeaderCell: UITableViewCell, UITableViewDataSource, UITableViewDele
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "console", for: indexPath) as! ProfileConsoleCell
         let current = self.payload[indexPath.item]
-        cell.console.text = current
+        
+        if(current == "ps"){
+            cell.consoleImg.image = UIImage.init(named: "ps_logo")
+        } else if(current == "xbox"){
+            cell.consoleImg.image = UIImage.init(named: "xbox_logo")
+        } else if(current == "pc"){
+            cell.consoleImg.image = UIImage.init(named: "pc_logo")
+        } else if(current == "nintendo"){
+            cell.consoleImg.image = UIImage.init(named: "nintendo_logo")
+        } else {
+            cell.consoleImg.image = UIImage.init(named: "mobile_logo")
+        }
         
         cell.contentView.layer.cornerRadius = 5.0
         cell.contentView.layer.borderWidth = 1.0
@@ -68,7 +97,7 @@ class ProfileHeaderCell: UITableViewCell, UITableViewDataSource, UITableViewDele
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: CGFloat(80), height: CGFloat(30))
+        return CGSize(width: CGFloat(30), height: CGFloat(30))
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

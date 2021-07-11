@@ -177,7 +177,7 @@ class RequestsFoldingCell: FoldingCell{
             let delegate = UIApplication.shared.delegate as! AppDelegate
             
             if(self.currentRequest is FriendRequestObject){
-                manager.acceptFriendFromRequests(position: self.indexPath, otherUserRequest: (self.currentRequest as! FriendRequestObject), currentUserUid: delegate.currentUser!.uId, callbacks: self.callbacks)
+                manager.acceptFriendFromRequests(otherUserRequest: (self.currentRequest as! FriendRequestObject), currentUserUid: delegate.currentUser!.uId, callbacks: self.callbacks)
             }
             else if(self.currentRequest is RequestObject){
                 var currentTeam: EasyTeamObj? = nil
@@ -198,7 +198,7 @@ class RequestsFoldingCell: FoldingCell{
                 }
             }
             else if(self.currentRequest is RivalObj){
-                manager.acceptPlayRequest(position: self.indexPath, rival: (self.currentRequest as! RivalObj), callbacks: self.callbacks)
+                manager.acceptPlayRequest(rival: (self.currentRequest as! RivalObj), callbacks: self.callbacks)
             }
             else{
                 let teamManager = TeamManager()
@@ -230,7 +230,7 @@ class RequestsFoldingCell: FoldingCell{
             let manager = FriendsManager()
             let delegate = UIApplication.shared.delegate as! AppDelegate
             if(self.currentRequest is FriendRequestObject){
-            manager.declineRequest(position: self.indexPath, otherUserRequest: (self.currentRequest as! FriendRequestObject), currentUserUid: delegate.currentUser!.uId, callbacks: self.callbacks)
+            manager.declineRequest(otherUserRequest: (self.currentRequest as! FriendRequestObject), currentUserUid: delegate.currentUser!.uId, callbacks: self.callbacks)
             }
             else if(self.currentRequest is RequestObject){
                 let manager = TeamManager()
@@ -249,7 +249,7 @@ class RequestsFoldingCell: FoldingCell{
                 }
             }
             else if(self.currentRequest is RivalObj){
-                manager.rejectPlayRequest(position: self.indexPath, rival: (self.currentRequest as! RivalObj), callbacks: self.callbacks)
+                manager.rejectPlayRequest(rival: (self.currentRequest as! RivalObj), callbacks: self.callbacks)
             }
             else{
                 let teamManager = TeamManager()

@@ -156,7 +156,7 @@ class FAQuizPage: UIViewController, UICollectionViewDataSource, UICollectionView
     }
     
     private func handleCounter(answerNumber: Int){
-        if(answerNumber > Int(question!.maxOptions) ?? 0){
+        if(answerNumber > Int(question!.maxOptions) ?? 1){
             return
         }
         self.counterText.text = String(answerNumber) + "/" + question!.maxOptions
@@ -214,15 +214,18 @@ class FAQuizPage: UIViewController, UICollectionViewDataSource, UICollectionView
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! OptionCell
             cell.answer.text = current as! String
+            cell.coverLabel.text = current as! String
             
             let index = indexPath.item
             if index >= 0 && index < self.optionDescriptions.count {
                 cell.answerDesc.text = self.optionDescriptions[index]
+                cell.coverDesc.text = self.optionDescriptions[index]
             } else {
                 cell.answerDesc.alpha = 0
+                cell.coverDesc.alpha = 0
             }
             
-            cell.contentView.layer.cornerRadius = 20.0
+            cell.contentView.layer.cornerRadius = 10.0
             cell.contentView.layer.borderWidth = 1.0
             cell.contentView.layer.borderColor = UIColor.white.cgColor
             cell.contentView.layer.masksToBounds = true
@@ -294,10 +297,7 @@ class FAQuizPage: UIViewController, UICollectionViewDataSource, UICollectionView
         let current = self.options[indexPath.item]
         
         if(current is String){
-            let flowayout = collectionViewLayout as? UICollectionViewFlowLayout
-            let space: CGFloat = (flowayout?.minimumInteritemSpacing ?? 0.0) + (flowayout?.sectionInset.left ?? 0.0) + (flowayout?.sectionInset.right ?? 0.0)
-            let size:CGFloat = (collectionView.frame.size.width - space) / 2.0
-            return CGSize(width: size, height: size)
+            return CGSize(width: collectionView.bounds.width - 20, height: CGFloat(110))
         } else {
             return CGSize(width: collectionView.bounds.width, height: CGFloat(50))
         }

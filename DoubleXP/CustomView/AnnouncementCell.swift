@@ -8,9 +8,8 @@
 
 import Foundation
 import UIKit
-import CollectionViewSlantedLayout
 
-class AnnouncementCell: CollectionViewSlantedCell {
+class AnnouncementCell: UICollectionViewCell {
     @IBOutlet weak var announcementTitle: UILabel!
     @IBOutlet weak var announcementGame: UILabel!
     @IBOutlet weak var extraInfo: UILabel!

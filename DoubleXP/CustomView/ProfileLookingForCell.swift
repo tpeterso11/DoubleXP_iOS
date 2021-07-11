@@ -15,9 +15,12 @@ class ProfileLookingForCell : UITableViewCell, UICollectionViewDelegate, UIColle
     var collectionViewObserver: NSKeyValueObservation?
 
     
-    func setCollection(list: [LookingForSelection], completion: (() -> Void)?){
-        self.payload = createPayload(list: list)
+    func setCollection(list: [String], completion: (() -> Void)?){
+        self.payload = list
         
+        let alignedFlowLayout = AlignedCollectionViewFlowLayout(horizontalAlignment: .left, verticalAlignment: .top)
+        alignedFlowLayout.estimatedItemSize = .init(width: 100, height: 40)
+        self.lookingForCollection.collectionViewLayout = alignedFlowLayout
         self.lookingForCollection.delegate = self
         self.lookingForCollection.dataSource = self
         self.lookingForCollection.reloadData()
@@ -34,14 +37,6 @@ class ProfileLookingForCell : UITableViewCell, UICollectionViewDelegate, UIColle
         return CGSize(width: self.lookingForCollection.contentSize.width, height: self.lookingForCollection.contentSize.height + 80)
     }
     
-    private func createPayload(list: [LookingForSelection]) -> [String] {
-        var payload = [String]()
-        for selection in list {
-            payload.append(contentsOf: selection.choices)
-        }
-        return payload
-    }
-    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.payload.count
     }
@@ -53,12 +48,4 @@ class ProfileLookingForCell : UITableViewCell, UICollectionViewDelegate, UIColle
         
         return cell
     }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-            return 8.0
-        }
-        
-        func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-            return 8.0
-        }
 }

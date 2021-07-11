@@ -71,16 +71,6 @@ class GamerConnectGame: NSObject, NSCoding {
         }
     }
     
-    var _hasQuiz: Bool = false
-    var hasQuiz:Bool {
-        get {
-            return (_hasQuiz)
-        }
-        set (newVal) {
-            _hasQuiz = newVal
-        }
-    }
-    
     var _twitterHandle:String? = nil
     var twitterHandle:String {
         get {
@@ -281,6 +271,16 @@ class GamerConnectGame: NSObject, NSCoding {
         }
     }
     
+    var _quizUrl:String = ""
+    var quizUrl:String {
+        get {
+            return (_quizUrl)
+        }
+        set (newVal) {
+            _quizUrl = newVal
+        }
+    }
+    
     var _timeCommitment:String = ""
     var timeCommitment:String {
         get {
@@ -330,7 +330,6 @@ class GamerConnectGame: NSObject, NSCoding {
         self.twitterHandle = (decoder.decodeObject(forKey: "twitterHandle") as! String)
         self.twitchHandle = (decoder.decodeObject(forKey: "twitchHandle") as! String)
         self.twitchGameId = (decoder.decodeObject(forKey: "twitchGameId") as! String)
-        self.hasQuiz = (decoder.decodeObject(forKey: "hasQuiz") as! Bool)
         self.mobileGame = (decoder.decodeObject(forKey: "mobileGame") as! String)
         self.available = (decoder.decodeObject(forKey: "available") as! String)
         self.availablebConsoles = (decoder.decodeObject(forKey: "availableConsoles") as! [String])
@@ -344,6 +343,7 @@ class GamerConnectGame: NSObject, NSCoding {
         self.ratings = (decoder.decodeObject(forKey: "ratings") as! [[String: String]])
         self.quickReviews = (decoder.decodeObject(forKey: "quickReviews") as! [[String: String]])
         self.alternateImageUrl = (decoder.decodeObject(forKey: "alternateImageUrl") as! String)
+        self.quizUrl = (decoder.decodeObject(forKey: "quizUrl") as! String)
     }
     
     func encode(with coder: NSCoder) {
@@ -358,7 +358,6 @@ class GamerConnectGame: NSObject, NSCoding {
         coder.encode(self.twitterHandle, forKey: "twitterHandle")
         coder.encode(self.twitchHandle, forKey: "twitchHandle")
         coder.encode(self.twitchGameId, forKey: "twitchGameId")
-        coder.encode(self.hasQuiz, forKey: "hasQuiz")
         coder.encode(self.mobileGame, forKey: "mobileGame")
         coder.encode(self.available, forKey: "available")
         coder.encode(self.availablebConsoles, forKey: "avaliableConsoles")
@@ -373,5 +372,6 @@ class GamerConnectGame: NSObject, NSCoding {
         coder.encode(self.quickReviews, forKey: "quickReviews")
         coder.encode(self.alternateImageUrl, forKey: "alternateImageUrl")
         coder.encode(self.lookingFor, forKey: "lookingFor")
+        coder.encode(self.quizUrl, forKey: "quizUrl")
     }
 }

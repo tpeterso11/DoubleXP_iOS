@@ -54,18 +54,20 @@ class SocialConnectModal : UIViewController, UITextFieldDelegate {
                 let ref = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId)
                 if(thingType == "twitch"){
                     ref.child("twitchConnect").setValue(socialEntry.text!)
-                    appDelegate.currentUser!.twitchConnect = socialEntry.text!
+                    appDelegate.currentProfileFrag?.userForProfile?.twitchConnect = socialEntry.text!
                 }
                 if(thingType == "discord"){
                     ref.child("discordConnect").setValue(socialEntry.text!)
-                    appDelegate.currentUser!.discordConnect = socialEntry.text!
+                    appDelegate.currentProfileFrag?.userForProfile?.discordConnect = socialEntry.text!
                 }
                 if(thingType == "instagram"){
                     ref.child("instagramConnect").setValue(socialEntry.text!)
-                    appDelegate.currentUser!.instagramConnect = socialEntry.text!
+                    appDelegate.currentProfileFrag?.userForProfile?.instagramConnect = socialEntry.text!
                 }
-                appDelegate.currentProfileFrag?.dismissModal()
-                self.dismiss(animated: true, completion: nil)
+                self.dismiss(animated: true, completion: {
+                    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                    appDelegate.currentProfileFrag?.dismissModal()
+                })
             }
         }
     }
@@ -76,13 +78,14 @@ class SocialConnectModal : UIViewController, UITextFieldDelegate {
     }
     
     @objc func closeIt(){
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        appDelegate.currentProfileFrag?.dismissModal()
-        self.dismiss(animated: true, completion: nil)
+        self.dismiss(animated: true, completion: {
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            appDelegate.currentProfileFrag?.dismissModal()
+        })
     }
     
     @objc func textFieldDidChange(_ textField: UITextField) {
-        if(self.socialEntry.text!.count > 3){
+        if(self.socialEntry.text!.count > 2){
             self.socialSubmit.alpha = 1
             self.socialSubmit.addTarget(self, action: #selector(sendPayload), for: .touchUpInside)
             self.socialSubmit.isUserInteractionEnabled = true

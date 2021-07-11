@@ -32,7 +32,7 @@ class DiscoverManager {
                             var twitterHandle = ""
                             var twitchHandle = ""
                             var available = "true"
-                            var hasQuiz = false
+                            var quizUrl = ""
                             var mobileGame = ""
                             var gameType = ""
                             var releaseDate = ""
@@ -62,6 +62,7 @@ class DiscoverManager {
                                 categoryFilters = (gameDict).value(forKey: "categoryFilters") as? [String] ?? [String]()
                                 twitterHandle = (gameDict).value(forKey: "twitterHandle") as? String ?? ""
                                 twitchHandle = (gameDict).value(forKey: "twitchHandle") as? String ?? ""
+                                quizUrl = (gameDict).value(forKey: "quizUrl") as? String ?? ""
                                 mobileGame = (gameDict).value(forKey: "mobileGame") as? String ?? "false"
                                 available = (gameDict).value(forKey: "available") as? String ?? "true"
                                 availableConsoles = (gameDict.value(forKey: "availableConsoles") as? [String]) ?? [String]()
@@ -72,18 +73,10 @@ class DiscoverManager {
                                 ratings = (gameDict).value(forKey: "ratings") as? [[String: String]] ?? [[String: String]]()
                                 quickReviews = (gameDict).value(forKey: "quickReviews") as? [[String: String]] ?? [[String: String]]()
                                 
-                                let quiz = (gameDict).value(forKey: "quiz") as? String ?? ""
-                                if(quiz == "true"){
-                                    hasQuiz = true
-                                } else {
-                                    hasQuiz = false
-                                }
-                                
                                 let newGame  = GamerConnectGame(imageUrl: imageUrl, gameName: gameName, developer: developer, hook: hook, statsAvailable: statsAvailable, teamNeeds: teamNeeds,
                                                                 twitterHandle: twitterHandle, twitchHandle: twitchHandle, available: available)
                                 newGame.secondaryName = secondaryName
                                 newGame.gameModes = gameModes
-                                newGame.hasQuiz = hasQuiz
                                 newGame.mobileGame = mobileGame
                                 newGame.availablebConsoles = availableConsoles
                                 newGame.categoryFilters = categoryFilters
@@ -95,6 +88,7 @@ class DiscoverManager {
                                 newGame.timeCommitment = timeCommitment
                                 newGame.complexity = complexity
                                 newGame.quickReviews = quickReviews
+                                newGame.quizUrl = quizUrl
                                 
                                 if(gameDict.value(forKey: "filterQuestions") != nil){
                                     //let test = gameDict["filterQuestions"] as? [[String: Any]] ?? [[String: Any]]()

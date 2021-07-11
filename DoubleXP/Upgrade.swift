@@ -12,13 +12,19 @@ import PopupDialog
 import FirebaseDatabase
 import SwiftNotificationCenter
 import SPStorkController
+import Lottie
 
 class Upgrade: UIViewController, UITableViewDelegate, UITableViewDataSource, StatsManagerCallbacks, SPStorkControllerDelegate {
     var extra = ""
     var payload = [GamerConnectGame: GamerProfile]()
     @IBOutlet weak var table: UITableView!
     @IBOutlet weak var header: UILabel!
-    @IBOutlet weak var sub: UILabel!
+    //@IBOutlet weak var sub: UILabel!
+    @IBOutlet weak var lookingForButton: UIButton!
+    @IBOutlet weak var animation: AnimationView!
+    @IBOutlet weak var updateButton: UIButton!
+    @IBOutlet weak var quizQuestion: UIImageView!
+    @IBOutlet weak var addGamesButton: UIButton!
     var currentGameName = ""
     
     override func viewDidLoad() {
@@ -27,7 +33,30 @@ class Upgrade: UIViewController, UITableViewDelegate, UITableViewDataSource, Sta
         }
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.currentUpgradeController = self
-        if(extra == "stats"){
+        self.updateButton.addTarget(self, action: #selector(launchUpdate), for: .touchUpInside)
+        self.lookingForButton.addTarget(self, action: #selector(launchLookingFor), for: .touchUpInside)
+        self.addGamesButton.addTarget(self, action: #selector(launchGames), for: .touchUpInside)
+        
+        if(delegate.currentUser!.userLookingFor.isEmpty){
+            self.lookingForButton.setTitle("tell us what you're looking for", for: .normal)
+            self.lookingForButton.borderColor = UIColor.init(named: "greenToDarker")
+        } else {
+            self.lookingForButton.setTitle("update what you're looking for", for: .normal)
+            self.lookingForButton.borderColor = UIColor.init(named: "dark")
+        }
+        
+        if(delegate.currentUser!.userAbout.isEmpty){
+            self.updateButton.setTitle("tell us about you", for: .normal)
+            self.updateButton.borderColor = UIColor.init(named: "greenToDarker")
+        } else {
+            self.updateButton.setTitle("update us about you", for: .normal)
+            self.updateButton.borderColor = UIColor.init(named: "dark")
+        }
+        
+        let whyTap = UITapGestureRecognizer(target: self, action: #selector(self.showWhyQuiz))
+        self.quizQuestion.isUserInteractionEnabled = true
+        self.quizQuestion.addGestureRecognizer(whyTap)
+        /*if(extra == "stats"){
             let profiles = delegate.currentUser!.gamerTags
             for profile in profiles {
                 for game in delegate.gcGames {
@@ -36,33 +65,155 @@ class Upgrade: UIViewController, UITableViewDelegate, UITableViewDataSource, Sta
                     }
                 }
             }
+            let aniation = Animation.named("stats_ios")
+            self.animation.animation = aniation
+            self.animation.loopMode = .playOnce
+            
             self.header.text = "import stats"
             self.sub.text = "import your stats from the games below and let everyone know good you are."
-        }
+        }*/
         if(extra == "quiz"){
             let profiles = delegate.currentUser!.gamerTags
             for profile in profiles {
                 for game in delegate.gcGames {
-                    if(game.hasQuiz && profile.game == game.gameName){
+                    if(!game.quizUrl.isEmpty && profile.game == game.gameName){
                         payload[game] = profile
                     }
                 }
             }
-            self.header.text = "free agent quiz"
-            self.sub.text = "take a quick quiz about your playstlye so you can find a perfect match."
+            self.header.text = "build your gamer profile"
+            //self.sub.text = "everybody is different."
+            animation.loopMode = .loop
         }
         table.delegate = self
         table.dataSource = self
         table.reloadData()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.showView()
+        }
+    }
+    
+    private func showView(){
+        animation.play()
+        let top = CGAffineTransform(translationX: 0, y: 20)
+        UIView.animate(withDuration: 0.5, animations: {
+            self.table.transform = top
+            self.table.alpha = 1
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, delay: 0.3, options: [], animations: {
+                if self.traitCollection.userInterfaceStyle == .light {
+                    self.animation.alpha = 0.4
+                    } else {
+                        self.animation.alpha = 0.2
+                    }
+                self.animation.transform = top
+            }, completion: nil)
+        })
     }
     
     func dismissModal(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        self.payload = [GamerConnectGame: GamerProfile]()
+        let profiles = delegate.currentUser!.gamerTags
+        for profile in profiles {
+            for game in delegate.gcGames {
+                if(!game.quizUrl.isEmpty && profile.game == game.gameName){
+                    payload[game] = profile
+                }
+            }
+        }
+        
         self.table.reloadData()
     }
     
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return payload.count
+    }
+    
+    @objc private func launchGames(){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "gameSelection") as! GameSelection
+        currentViewController.returning = true
+        currentViewController.modalPopped = true
+        currentViewController.upgradeFrag = self
+        
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+    }
+    
+    @objc private func showWhyQuiz(){
+        let title = "the gameplay quiz"
+        let message = "we use the answers you provide to help other users find you, and to help us develop more and more ways to connect you to other users.\n\n not seeing the game you want to take a quiz for?\n\n we use the games you add to your profile to determine which ones to show. just add it to your games!"
+
+        let popup = PopupDialog(title: title, message: message)
+        let buttonOne = CancelButton(title: "ohhhhhhhh.") {
+            print("dang it.")
+        }
+        let dialogAppearance = PopupDialogDefaultView.appearance()
+        dialogAppearance.titleTextAlignment = .center
+        dialogAppearance.titleFont = .boldSystemFont(ofSize: 22)
+        dialogAppearance.messageTextAlignment = .center
+
+        popup.addButtons([buttonOne])//, buttonTwo, buttonThree])
+        self.present(popup, animated: true, completion: nil)
+    }
+    
+    @objc private func launchUpdate(){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "aboutYou") as! AboutYouDrawer
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        currentViewController.usersSelected = delegate.currentUser!.userAbout
+        currentViewController.upgrade = self
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+    }
+    
+    @objc private func launchLookingFor(){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "looking") as! LookingFor
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        currentViewController.usersSelected = delegate.currentUser!.userLookingFor
+        currentViewController.upgrade = self
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+    }
+    
+    func updateButtons(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        if(delegate.currentUser!.userLookingFor.isEmpty){
+            self.lookingForButton.setTitle("tell us what you're looking for", for: .normal)
+            self.lookingForButton.borderColor = UIColor.init(named: "greenToDarker")
+        } else {
+            self.lookingForButton.setTitle("update what you're looking for", for: .normal)
+            self.lookingForButton.borderColor = UIColor.init(named: "dark")
+        }
+        
+        if(delegate.currentUser!.userAbout.isEmpty){
+            self.updateButton.setTitle("tell us about you", for: .normal)
+            self.updateButton.borderColor = UIColor.init(named: "greenToDarker")
+        } else {
+            self.updateButton.titleLabel?.text = "update us about you"
+            self.updateButton.borderColor = UIColor.init(named: "dark")
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -205,10 +356,32 @@ class Upgrade: UIViewController, UITableViewDelegate, UITableViewDataSource, Sta
     }
     
     @objc func didDismissStorkBySwipe(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        self.payload = [GamerConnectGame: GamerProfile]()
+        let profiles = delegate.currentUser!.gamerTags
+        for profile in profiles {
+            for game in delegate.gcGames {
+                if(!game.quizUrl.isEmpty && profile.game == game.gameName){
+                    payload[game] = profile
+                }
+            }
+        }
+        
         self.table.reloadData()
     }
     
     @objc func didDismissStorkByTap() {
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        self.payload = [GamerConnectGame: GamerProfile]()
+        let profiles = delegate.currentUser!.gamerTags
+        for profile in profiles {
+            for game in delegate.gcGames {
+                if(!game.quizUrl.isEmpty && profile.game == game.gameName){
+                    payload[game] = profile
+                }
+            }
+        }
+        
         self.table.reloadData()
     }
     
@@ -308,11 +481,33 @@ class Upgrade: UIViewController, UITableViewDelegate, UITableViewDataSource, Sta
     }
     
     func onSuccess(gameName: String) {
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        self.payload = [GamerConnectGame: GamerProfile]()
+        let profiles = delegate.currentUser!.gamerTags
+        for profile in profiles {
+            for game in delegate.gcGames {
+                if(!game.quizUrl.isEmpty && profile.game == game.gameName){
+                    payload[game] = profile
+                }
+            }
+        }
+        
         self.table.reloadData()
     }
     
     func onFailure(gameName: String) {
         showError(gameName: gameName)
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        self.payload = [GamerConnectGame: GamerProfile]()
+        let profiles = delegate.currentUser!.gamerTags
+        for profile in profiles {
+            for game in delegate.gcGames {
+                if(!game.quizUrl.isEmpty && profile.game == game.gameName){
+                    payload[game] = profile
+                }
+            }
+        }
+        
         self.table.reloadData()
     }
     

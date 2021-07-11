@@ -35,8 +35,12 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>FacebookAdvertiserIDCollectionEnabled</key>
+	<string>NO</string>
 	<key>FacebookAppID</key>
 	<string>289127408651992</string>
+	<key>FacebookAutoLogAppEventsEnabled</key>
+	<string>NO</string>
 	<key>FacebookDisplayName</key>
 	<string>DoubleXP</string>
 	<key>GADApplicationIdentifier</key>

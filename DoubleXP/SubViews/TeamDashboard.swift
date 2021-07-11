@@ -413,4 +413,13 @@ class TeamDashboard: ParentVC, UICollectionViewDataSource, UICollectionViewDeleg
     
     func updateNavColor(color: UIColor) {
     }
+    
+    func onYoutubeFail() {
+    }
+    
+    func onYoutubeSuccessful(videos: [YoutubeVideoObj]) {
+    }
+    
+    func onMutliYoutube(channels: [YoutubeMultiChannelSelection]) {
+    }
 }

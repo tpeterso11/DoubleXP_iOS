@@ -14,6 +14,7 @@ import GoogleSignIn
 import FirebaseMessaging
 import GoogleMobileAds
 import SwiftNotificationCenter
+import AVKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
@@ -34,6 +35,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var currentRequests: Requests?
     var currentFeedFrag: Feed?
     var currentFrag: String = ""
+    var currentCta: CTAObject?
+    var feedFeaturedGame = ""
     var interviewManager = InterviewManager()
     var recommendedUsersManager = RecommnededUsersManager()
     var mediaManager = MediaManager()
@@ -102,7 +105,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         let notificationCenter = NotificationCenter.default
             notificationCenter.addObserver(self, selector: #selector(appMovedToBackground), name: UIApplication.willResignActiveNotification, object: nil)
             notificationCenter.addObserver(self, selector: #selector(appCameToForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
-
+        
+        do {
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback, mode: AVAudioSession.Mode.default, options: [.mixWithOthers, .allowAirPlay])
+                print("Playback OK")
+            try AVAudioSession.sharedInstance().setActive(true)
+                print("Session is Active")
+            } catch {
+                print(error)
+            }
         return true
     }
     

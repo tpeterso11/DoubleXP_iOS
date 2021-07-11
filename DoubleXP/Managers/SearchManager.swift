@@ -21,6 +21,7 @@ class SearchManager {
     var questionMatches = [String]()
     var timezoneFilter = false
     var locationFilter = "none"
+    var searchLookingFor = [String]()
     
     func resetFilters(){
         timezoneFilter = false
@@ -29,6 +30,7 @@ class SearchManager {
         advancedFilters = [[String: String]]()
         questionMatches = [String]()
         ageFilters = [String]()
+        searchLookingFor = [String]()
     }
     
     func searchWithLocation(callbacks: SearchManagerCallbacks){
@@ -199,7 +201,16 @@ class SearchManager {
                             }
                         }
                         
-                        if(ageMatch && languageMatch && advancedMatch && timezoneMatch){
+                        var lookingForMatch = self.searchLookingFor.isEmpty
+                        let aboutMe = value?["aboutMe"] as? [String] ?? [String]()
+                        for currentAboutMe in aboutMe {
+                            if(self.searchLookingFor.contains(currentAboutMe)){
+                                lookingForMatch = true
+                                break
+                            }
+                        }
+                        
+                        if(ageMatch && languageMatch && advancedMatch && timezoneMatch && lookingForMatch){
                             let uId = snapshot.childSnapshot(forPath: uid).key
                             let bio = value?["bio"] as? String ?? ""
                             let sentRequests = value?["sentRequests"] as? [FriendRequestObject] ?? [FriendRequestObject]()
@@ -274,11 +285,12 @@ class SearchManager {
     }
     
     func searchWithFilters(callbacks: SearchManagerCallbacks){
+        var test = [String]()
         self.returnedUsers = [User]()
         let ref = Database.database().reference().child("Users")
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             // Get user value
-            for user in snapshot.children{
+            for user in snapshot.children {
                 let value = (user as! DataSnapshot).value as? NSDictionary
                 
                 let search = value?["search"] as? String ?? "true"
@@ -302,22 +314,18 @@ class SearchManager {
                 
                 var containedProfile = false
                 var gamerTag = ""
-                if(snapshot.hasChild("gamerTag")){
-                    gamerTag = snapshot.childSnapshot(forPath: "gamerTag").value as? String ?? ""
-                }
-                if(gamerTag.isEmpty){
-                    for tag in gamerTags {
-                        if(!tag.gamerTag.isEmpty){
-                            if(tag.game == self.currentGameSearch){
-                                if(self.currentSelectedConsoles.contains(tag.console)){
-                                    containedProfile = true
-                                    gamerTag = tag.gamerTag
-                                    break
-                                }
+                for tag in gamerTags {
+                    if(!tag.gamerTag.isEmpty){
+                        if(tag.game == self.currentGameSearch){
+                            if(self.currentSelectedConsoles.contains(tag.console)){
+                                containedProfile = true
+                                gamerTag = tag.gamerTag
+                                break
                             }
                         }
                     }
                 }
+            
                 if(!containedProfile){
                     //legacy users
                     let games = value?["games"] as? [String] ?? [String]()
@@ -346,6 +354,8 @@ class SearchManager {
                 
                 //make users that did not enter a gamertag are not searchable BARE MINIMUM
                 if(search == "true" && containedProfile && !gamerTag.isEmpty){
+                    print(gamerTag)
+                    test.append(gamerTag)
                     //basic filters
                     let ageFiltersAvailable = !self.ageFilters.isEmpty // if not empty, we have something to look at.
                     var ageMatch = self.ageFilters.isEmpty //if false, then we need to look and update.
@@ -417,7 +427,16 @@ class SearchManager {
                         }
                     }
                     
-                    if(ageMatch && languageMatch && advancedMatch && timezoneMatch){
+                    var lookingForMatch = self.searchLookingFor.isEmpty
+                    let aboutMe = value?["aboutMe"] as? [String] ?? [String]()
+                    for currentAboutMe in aboutMe {
+                        if(self.searchLookingFor.contains(currentAboutMe)){
+                            lookingForMatch = true
+                            break
+                        }
+                    }
+                    
+                    if(ageMatch && languageMatch && advancedMatch && timezoneMatch && lookingForMatch){
                         let uId = (user as! DataSnapshot).key
                         let bio = value?["bio"] as? String ?? ""
                         var onlineStatus = value?["onlineStatus"] as? String ?? ""

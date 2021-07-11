@@ -17,12 +17,16 @@ class LookingForOptions: UITableViewCell, UICollectionViewDelegate, UICollection
     var currentSelection: LookingForSelection?
     var currentLookingFor: LookingFor?
     var currentSelectedCount = 0
+    var set = false
     
     func setLayout(list: [String], selection: LookingForSelection, lookingFor: LookingFor){
         payload = list
         self.currentSelection = selection
         self.currentLookingFor = lookingFor
 
+        //let alignedFlowLayout = AlignedCollectionViewFlowLayout(horizontalAlignment: .left, verticalAlignment: .top)
+       // alignedFlowLayout.estimatedItemSize = .init(width: 100, height: 40)
+        //self.lookingForOptionCollection.collectionViewLayout = alignedFlowLayout
         lookingForOptionCollection.delegate = self
         lookingForOptionCollection.dataSource = self
         lookingForOptionCollection.reloadData()
@@ -43,12 +47,23 @@ class LookingForOptions: UITableViewCell, UICollectionViewDelegate, UICollection
         cell.lookingLabel.text = current
         cell.coverLabel.text = current
         
-        if(self.currentLookingFor!.selectionHasBeenSelected(option: current, current: self.currentSelection!)){
+        if(self.currentLookingFor!.usersSelected.contains(current)){
             cell.cover.alpha = 1
+            cell.lookingLabel.alpha = 0
         } else {
             cell.cover.alpha = 0
+            cell.lookingLabel.alpha = 1
         }
         
         return cell
+    }
+    
+    override func systemLayoutSizeFitting(_ targetSize: CGSize, withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority, verticalFittingPriority: UILayoutPriority) -> CGSize {
+            // `collectionView.contentSize` has a wrong width because in this nested example, the sizing pass occurs before the layout pass,
+            // so we need to force a layout pass with the correct width.
+            self.contentView.frame = self.bounds
+            self.contentView.layoutIfNeeded()
+            // Returns `collectionView.contentSize` in order to set the UITableVieweCell height a value greater than 0.
+        return CGSize(width: self.lookingForOptionCollection.contentSize.width, height: self.lookingForOptionCollection.contentSize.height + 80)
     }
 }

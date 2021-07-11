@@ -114,15 +114,15 @@ class ProfileMyGamesCell: UITableViewCell, UITableViewDelegate, UITableViewDataS
         cell.statsAvailable.isHidden = true
         cell.statsAvailableContainer.isHidden = true
         
-        var contained = ""
+        /*var contained = ""
         for stat in appDelegate.currentProfileFrag!.userForProfile!.stats{
             if(stat.gameName == current.gameName){
                 contained = stat.gameName
                 break
             }
-        }
+        }*/
         
-        if(!contained.isEmpty){
+        /*if(!contained.isEmpty){
             cell.statsAvailable.isHidden = false
             cell.statsAvailableContainer.isHidden = false
             
@@ -130,7 +130,7 @@ class ProfileMyGamesCell: UITableViewCell, UITableViewDelegate, UITableViewDataS
         } else {
             cell.statsAvailable.isHidden = true
             cell.statsAvailableContainer.isHidden = true
-        }
+        }*/
         
         cell.layoutMargins = UIEdgeInsets.zero
         cell.separatorInset = UIEdgeInsets.zero
@@ -142,7 +142,7 @@ class ProfileMyGamesCell: UITableViewCell, UITableViewDelegate, UITableViewDataS
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let current = self.payload[indexPath.item]
         
-        if(delegate.currentProfileFrag!.gamesWithStats.contains(current.gameName) || delegate.currentProfileFrag!.gamesWithQuiz.contains(current.gameName)){
+        if(delegate.currentProfileFrag!.gamesWithQuiz.contains(current.gameName)){
             delegate.currentProfileFrag?.showStatsOverlay(gameName: current.gameName, game: current)
         }
     }

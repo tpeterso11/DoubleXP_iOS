@@ -11,5 +11,6 @@ import UIKit
 
 class ProfileConsoleCell: UICollectionViewCell {
     
+    @IBOutlet weak var consoleImg: UIImageView!
     @IBOutlet weak var console: UILabel!
 }

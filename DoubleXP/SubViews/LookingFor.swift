@@ -17,8 +17,9 @@ class LookingFor: UIViewController, UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var doneButton: UIButton!
     
     var payload = [Any]() // String or [String]
-    var usersSelected = [LookingForSelection]()
+    var usersSelected = [String]()
     var currentSelectedCount = 0
+    var upgrade: Upgrade?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,6 +27,8 @@ class LookingFor: UIViewController, UITableViewDelegate, UITableViewDataSource {
         buildPayload()
         
         self.doneButton.addTarget(self, action: #selector(sendPayload), for: .touchUpInside)
+        self.lookingTable.estimatedRowHeight = 350
+        self.lookingTable.rowHeight = UITableView.automaticDimension
     }
     
     private func buildPayload(){
@@ -53,7 +56,9 @@ class LookingFor: UIViewController, UITableViewDelegate, UITableViewDataSource {
             }
         }
         if(!payload.isEmpty){
-            usersSelected = appDelegate.currentUser!.userLookingFor
+            if(appDelegate.currentUser!.userLookingFor != nil){
+                self.usersSelected = appDelegate.currentUser!.userLookingFor
+            }
             updateCount()
             self.lookingTable.delegate = self
             self.lookingTable.dataSource = self
@@ -63,10 +68,7 @@ class LookingFor: UIViewController, UITableViewDelegate, UITableViewDataSource {
     }
     
     func updateCount(){
-        var count = 0
-        for selection in usersSelected {
-            count += selection.choices.count
-        }
+        let count = self.usersSelected.count
         currentCountLabel.text = String(count)
         self.currentSelectedCount = count
     }
@@ -89,81 +91,34 @@ class LookingFor: UIViewController, UITableViewDelegate, UITableViewDataSource {
         }
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let current = self.payload[indexPath.item]
-        if(current is String){
-            return 40
-        }
-        else {
-            return 200
-        }
-    }
-    
     func reloadData(){
         lookingTable.reloadData()
     }
     
     func addRemoveChoice(selected: String, choice: LookingForSelection){
-        if(usersSelected.isEmpty){
-            let newChoice = LookingForSelection()
-            newChoice.gameName = choice.gameName
-            newChoice.choices.append(selected)
-            usersSelected.append(newChoice)
+        if(self.usersSelected.contains(selected)){
+            self.usersSelected.remove(at: self.usersSelected.index(of: selected)!)
             self.lookingTable.reloadData()
             self.updateCount()
         } else {
-            for selection in usersSelected {
-                if(selection.gameName == choice.gameName){
-                    var selections = selection.choices
-                    if(selections.contains(selected)){
-                        if(selections.count == 1){
-                            usersSelected.remove(at: usersSelected.index(of: selection)!)
-                        } else {
-                            selections.remove(at: selections.index(of: selected)!)
-                            selection.choices = selections
-                        }
-                        self.lookingTable.reloadData()
-                        self.updateCount()
-                    } else {
-                        if(self.currentSelectedCount < 8){
-                            selections.append(selected)
-                            selection.choices = selections
-                            self.lookingTable.reloadData()
-                            self.updateCount()
-                        }
-                    }
-                } else {
-                    if(self.currentSelectedCount < 8){
-                        let newChoice = LookingForSelection()
-                        newChoice.gameName = choice.gameName
-                        newChoice.choices.append(selected)
-                        usersSelected.append(newChoice)
-                        self.lookingTable.reloadData()
-                        self.updateCount()
-                    }
+            if(self.usersSelected.count < 8){
+                self.usersSelected.append(selected)
+                self.lookingTable.reloadData()
+                self.updateCount()
+                
+                if(self.usersSelected.count == 8){
+                    self.currentCountLabel.textColor = #colorLiteral(red: 0.6423664689, green: 0, blue: 0.04794860631, alpha: 1)
                 }
             }
         }
     }
     
-    func selectionHasBeenSelected(option: String, current: LookingForSelection) -> Bool {
-        var contained = false
-        for selection in self.usersSelected {
-            if(selection.gameName == current.gameName && selection.choices.contains(option)){
-                contained = true
-                break
-            }
-        }
-        return contained
-    }
-    
     @objc func sendPayload(){
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let ref = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId)
-        for selection in self.usersSelected {
-            ref.child("lookingFor").child(selection.gameName!).setValue(selection.choices)
-        }
-        appDelegate.currentUser!.userLookingFor = usersSelected
+        ref.child("lookingFor").setValue(self.usersSelected)
+        appDelegate.currentUser!.userLookingFor = self.usersSelected
+        upgrade?.updateButtons()
         self.dismiss(animated: true, completion: nil)
     }
 }

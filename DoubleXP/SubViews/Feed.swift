@@ -12,6 +12,7 @@ import SPStorkController
 import WebKit
 import Lottie
 import FirebaseDatabase
+import FBSDKCoreKit
 
 class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkControllerDelegate, LandingUICallbacks {
     @IBOutlet weak var feedTable: UITableView!
@@ -43,6 +44,7 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
     var onlineAnnouncements = [OnlineObj]()
     var announcementsAvailable = false
     var dataSet = false
+    var currentFeaturedGame: GamerConnectGame?
     
     override func viewDidLoad() {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -64,6 +66,12 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
         
         self.feedTable.estimatedRowHeight = 250
         self.feedTable.rowHeight = UITableView.automaticDimension
+        
+        if self.traitCollection.userInterfaceStyle == .dark {
+            AppEvents.logEvent(AppEvents.Name(rawValue: "Feed - User in Dark Mode"))
+        } else {
+            AppEvents.logEvent(AppEvents.Name(rawValue: "Feed - User in Light Mode"))
+        }
     }
     
     @objc func dismissKeyboard() {
@@ -74,7 +82,22 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
     private func buildTablePayload(){
         payload = [String]()
         
+        
         payload.append("header")
+        
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        for game in delegate.gcGames {
+            if(game.gameName == delegate.feedFeaturedGame){
+                self.currentFeaturedGame = game
+                break
+            }
+        }
+        if((delegate.currentUser!.userAbout.isEmpty || delegate.currentUser!.userLookingFor.isEmpty) && delegate.currentCta != nil) {
+            payload.append("cta")
+        }
+        if(self.currentFeaturedGame != nil){
+            payload.append("discoverExpanded")
+        }
         payload.append("discover")
         payload.append("feed")
         
@@ -199,11 +222,13 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
     
     
     func requestsClicked(){
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Feed - Requests Launched"))
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.currentLanding?.requestButtonClicked(self)
     }
     
     func alertsClicked(){
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Feed - Alerts launched"))
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.currentLanding?.navigateToAlerts()
     }
@@ -258,6 +283,103 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
                 let cell = tableView.dequeueReusableCell(withIdentifier: "header", for: indexPath) as! FeedHeaderCell
                 cell.setLayout(feed: self, loaded: self.recommededLoaded)
                 return cell
+            } else if(current == "cta"){
+                let cell = tableView.dequeueReusableCell(withIdentifier: "cta", for: indexPath) as! CTACell
+                
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                let cache = appDelegate.imageCache
+                
+                if self.traitCollection.userInterfaceStyle == .dark {
+                    if(cache.object(forKey: appDelegate.currentCta!.imgUrlDark as NSString) != nil){
+                        cell.backgroundImg.image = cache.object(forKey: appDelegate.currentCta!.imgUrlDark as NSString)
+                    } else {
+                        cell.backgroundImg.image = Utility.Image.placeholder
+                        cell.backgroundImg.moa.onSuccess = { image in
+                            cell.backgroundImg.image = image
+                            appDelegate.imageCache.setObject(image, forKey: appDelegate.currentCta!.imgUrlDark as NSString)
+                            return image
+                        }
+                        cell.backgroundImg.moa.url = appDelegate.currentCta!.imgUrlDark
+                    }
+                } else {
+                    if(cache.object(forKey: appDelegate.currentCta!.imgUrlLight as NSString) != nil){
+                        cell.backgroundImg.image = cache.object(forKey: appDelegate.currentCta!.imgUrlLight as NSString)
+                    } else {
+                        cell.backgroundImg.image = Utility.Image.placeholder
+                        cell.backgroundImg.moa.onSuccess = { image in
+                            cell.backgroundImg.image = image
+                            appDelegate.imageCache.setObject(image, forKey: appDelegate.currentCta!.imgUrlLight as NSString)
+                            return image
+                        }
+                        cell.backgroundImg.moa.url = appDelegate.currentCta!.imgUrlLight
+                    }
+                }
+                cell.backgroundImg.contentMode = .scaleAspectFill
+                cell.backgroundImg.clipsToBounds = true
+                
+                cell.ctaButton.setTitle(appDelegate.currentCta!.buttonText, for: .normal)
+                
+                cell.shell.layer.shadowColor = UIColor.black.cgColor
+                cell.shell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+                cell.shell.layer.shadowRadius = 2.0
+                cell.shell.layer.shadowOpacity = 0.5
+                cell.shell.layer.masksToBounds = false
+                cell.shell.layer.shadowPath = UIBezierPath(roundedRect: cell.shell.bounds, cornerRadius: cell.shell.layer.cornerRadius).cgPath
+                
+                let backTap = UITapGestureRecognizer(target: self, action: #selector(self.ctaClicked))
+                cell.shell.isUserInteractionEnabled = true
+                cell.shell.addGestureRecognizer(backTap)
+                
+                return cell
+            } else if(current == "discoverExpanded"){
+                let cell = tableView.dequeueReusableCell(withIdentifier: "discoverExpanded", for: indexPath) as! DiscoverExpandedCell
+                
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                let cache = appDelegate.imageCache
+                
+                if(!self.currentFeaturedGame!.alternateImageUrl.isEmpty){
+                    if(cache.object(forKey: self.currentFeaturedGame!.alternateImageUrl as NSString) != nil){
+                        cell.gameBack.image = cache.object(forKey: self.currentFeaturedGame!.alternateImageUrl as NSString)
+                    } else {
+                        cell.gameBack.image = Utility.Image.placeholder
+                        cell.gameBack.moa.onSuccess = { image in
+                            cell.gameBack.image = image
+                            appDelegate.imageCache.setObject(image, forKey: self.currentFeaturedGame!.alternateImageUrl as NSString)
+                            return image
+                        }
+                        cell.gameBack.moa.url = self.currentFeaturedGame!.alternateImageUrl
+                    }
+                } else {
+                    if(cache.object(forKey: self.currentFeaturedGame!.imageUrl as NSString) != nil){
+                        cell.gameBack.image = cache.object(forKey: self.currentFeaturedGame!.imageUrl as NSString)
+                    } else {
+                        cell.gameBack.image = Utility.Image.placeholder
+                        cell.gameBack.moa.onSuccess = { image in
+                            cell.gameBack.image = image
+                            appDelegate.imageCache.setObject(image, forKey: self.currentFeaturedGame!.imageUrl as NSString)
+                            return image
+                        }
+                        cell.gameBack.moa.url = self.currentFeaturedGame!.imageUrl
+                    }
+                }
+                
+                cell.gameBack.contentMode = .scaleAspectFill
+                cell.gameBack.clipsToBounds = true
+                
+                cell.shell.layer.shadowColor = UIColor.black.cgColor
+                cell.shell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+                cell.shell.layer.shadowRadius = 2.0
+                cell.shell.layer.shadowOpacity = 0.5
+                cell.shell.layer.masksToBounds = false
+                cell.shell.layer.shadowPath = UIBezierPath(roundedRect: cell.shell.bounds, cornerRadius: cell.shell.layer.cornerRadius).cgPath
+                
+                let backTap = UITapGestureRecognizer(target: self, action: #selector(self.featuredGameClicked))
+                cell.shell.isUserInteractionEnabled = true
+                cell.shell.addGestureRecognizer(backTap)
+                
+                cell.gameName.text = self.currentFeaturedGame!.gameName
+                
+                return cell
             } else if(current == "discover"){
                 let cell = tableView.dequeueReusableCell(withIdentifier: "discover", for: indexPath) as! FeedDiscoverCell
                 
@@ -288,7 +410,40 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
         }
     }
     
+    @objc func ctaClicked(){
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Feed - CTA clicked"))
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "upgrade") as! Upgrade
+        currentViewController.extra = "quiz"
+        
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+    }
+    
+    @objc func featuredGameClicked(){
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Feed - Featured Game clicked"))
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "discoverGame") as! DiscoverGamePage
+        currentViewController.game = self.currentFeaturedGame!
+        
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+    }
+    
     @objc func discoverClicked(){
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Feed - Discover clicked"))
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "discover") as! DiscoverFrag
         let transitionDelegate = SPStorkTransitioningDelegate()
         currentViewController.transitioningDelegate = transitionDelegate
@@ -302,6 +457,7 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
     }
     
     @objc func hookupClicked(){
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Feed - Recommendations clicked"))
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "recommend") as! Recommeded
         let transitionDelegate = SPStorkTransitioningDelegate()
         currentViewController.transitioningDelegate = transitionDelegate
@@ -433,7 +589,22 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
     }
     
     func showUpcomingGameInfo(upcomingGame: UpcomingGame){
-        self.upcomingBoxGame.text = upcomingGame.game
+        AppEvents.logEvent(AppEvents.Name(rawValue: "Feed - Upcoming Game clicked - " + upcomingGame.game))
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "upcomingDrawer") as! UpcomingGameDrawer
+        currentViewController.upcomingGame = upcomingGame
+        
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.customHeight = 650
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+        
+        /*self.upcomingBoxGame.text = upcomingGame.game
         self.upcomingBoxDesc.text = upcomingGame.gameDesc
         self.upcomingBoxDesc.layer.cornerRadius = 15
         
@@ -514,7 +685,7 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
                 self.upcomingGameBox.layer.masksToBounds = false
                 self.upcomingGameBox.layer.shadowPath = UIBezierPath(roundedRect: self.upcomingGameBox.bounds, cornerRadius: self.upcomingGameBox.layer.cornerRadius).cgPath
             }, completion: nil)
-        })
+        })*/
     }
     
     func navigateToSearch(game: GamerConnectGame){

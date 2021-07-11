@@ -81,7 +81,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                         let uId = authResult?.user.uid ?? ""
                         if(!uId.isEmpty){
                             if(authResult != nil){
-                                self.downloadDBRef(uid: uId, registrationType: "facebook")
+                                self.downloadDBRef(uid: uId, registrationType: "facebook", accessToken: nil, userId: nil)
                             }
                             else{
                                 let checkRef = Database.database().reference().child("Users").child(uId)
@@ -277,7 +277,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                 var code = ""
                 if (success) {
                     let userID = Auth.auth().currentUser!.uid
-                    self.downloadDBRef(uid: userID, registrationType: "email")
+                    self.downloadDBRef(uid: userID, registrationType: "email", accessToken: nil, userId: nil)
                     
                     UserDefaults.standard.set(userID, forKey: "userId")
                     //self.performSegue(withIdentifier: "loginSuccessful", sender: nil)
@@ -322,6 +322,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
         self.selectedSocial = "google"
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             GIDSignIn.sharedInstance()?.presentingViewController = self
+            GIDSignIn.sharedInstance()?.scopes = ["email", "https://www.googleapis.com/auth/youtube.readonly"]
             GIDSignIn.sharedInstance().signIn()
         }
     }
@@ -394,7 +395,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                 if(authResult != nil){
                     let uId = authResult?.user.uid ?? ""
                     UserDefaults.standard.set(uId, forKey: "userId")
-                    self.downloadDBRef(uid: uId, registrationType: "apple")
+                    self.downloadDBRef(uid: uId, registrationType: "apple", accessToken: nil, userId: nil)
                 }
                 else{
                     //need to redo this. AuthResult is null, so then uId will be empty.
@@ -402,7 +403,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                     if(!uId.isEmpty){
                         UserDefaults.standard.set(uId, forKey: "userId")
                         if(authResult != nil){
-                            self.downloadDBRef(uid: uId, registrationType: "apple")
+                            self.downloadDBRef(uid: uId, registrationType: "apple", accessToken: nil, userId: nil)
                         }
                         else{
                             let checkRef = Database.database().reference().child("Users").child(uId)
@@ -426,11 +427,17 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
       }
     }
     
-    private func downloadDBRef(uid: String, registrationType: String){
+    private func downloadDBRef(uid: String, registrationType: String, accessToken: String?, userId: String?){
         let ref = Database.database().reference().child("Users").child(uid)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
                 // Get user value
             if(snapshot.exists()){
+                if(accessToken != nil && !accessToken!.isEmpty){
+                    ref.child("googleAccessToken").setValue(accessToken)
+                }
+                if(userId != nil && !userId!.isEmpty){
+                    ref.child("googleUserId").setValue(userId)
+                }
                 let value = snapshot.value as? NSDictionary
                 let uId = snapshot.key
                 let gamerTag = value?["gamerTag"] as? String ?? ""
@@ -441,8 +448,9 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                 let userLong = value?["userLong"] as? Double ?? 0.0
                 let blockList = value?["blockList"] as? [String: String] ?? [String: String]()
                 let restrictList = value?["restrictList"] as? [String: String] ?? [String: String]()
-                
+                let aboutMe = value?["aboutMe"] as? [String] ?? [String]()
                 let search = value?["search"] as? String ?? ""
+                let gamingExperience = value?["gamingExperience"] as? String ?? "5"
                 if(search.isEmpty){
                     ref.child("search").setValue("true")
                 }
@@ -513,17 +521,6 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                         
                         let badge = BadgeObj(badge: name, badgeDesc: desc)
                         badges.append(badge)
-                    }
-                }
-                
-                var lookingForArray = [LookingForSelection]()
-                if(snapshot.hasChild("lookingFor")){
-                    let lookingFor = snapshot.childSnapshot(forPath: "lookingFor")
-                    for lookingForChild in lookingFor.children {
-                        let newSelection = LookingForSelection()
-                        newSelection.gameName = (lookingForChild as? DataSnapshot)?.key ?? ""
-                        newSelection.choices = (lookingForChild as? DataSnapshot)?.value as? [String] ?? [String]()
-                        lookingForArray.append(newSelection)
                     }
                 }
                 
@@ -1034,7 +1031,8 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                 user.restrictList = Array(restrictList.keys)
                 user.badges = badges
                 user.reviews = reviews
-                user.userLookingFor = lookingForArray
+                user.userAbout = aboutMe
+                user.gamingExperience = gamingExperience
                 
                 DispatchQueue.main.async {
                     let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -1330,7 +1328,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
         let checkRef = Database.database().reference().child("Users").child((uid))
         checkRef.observeSingleEvent(of: .value, with: { (snapshot) in
             if(snapshot.exists()){
-                self.downloadDBRef(uid: uid, registrationType: "phone")
+                self.downloadDBRef(uid: uid, registrationType: "phone", accessToken: nil, userId: nil)
             }
             else{
                     let user = User(uId: uid)
@@ -1391,14 +1389,22 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                    if(authResult != nil){
                        let uId = authResult?.user.uid ?? ""
                     UserDefaults.standard.set(uId, forKey: "userId")
-                    self.downloadDBRef(uid: uId, registrationType: "google")
+                    var userId = ""
+                    if(user.userID != nil && !user.userID.isEmpty){
+                        userId = user.userID
+                    }
+                    if (GIDSignIn.sharedInstance().currentUser != nil) {
+                        let accessToken = GIDSignIn.sharedInstance().currentUser.authentication.accessToken
+                        // Use accessToken in your URL Requests Header
+                        self.downloadDBRef(uid: uId, registrationType: "google", accessToken: accessToken, userId: userId)
+                    }
                 }
                else{
                 let uId = authResult?.user.uid ?? ""
                 if(!uId.isEmpty){
                     if(authResult != nil){
                         UserDefaults.standard.set(uId, forKey: "userId")
-                        self.downloadDBRef(uid: uId, registrationType: "google")
+                        self.downloadDBRef(uid: uId, registrationType: "google", accessToken: nil, userId: nil)
                     }
                     else{
                         let checkRef = Database.database().reference().child("Users").child(uId)

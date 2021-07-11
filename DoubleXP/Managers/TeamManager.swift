@@ -813,7 +813,7 @@ class TeamManager{
                     }
                 }
                 
-                callbacks.updateCell(indexPath: indexPath)
+                callbacks.updateCell()
             }
             
         }) { (error) in
@@ -940,7 +940,7 @@ class TeamManager{
                 self.removeInvite(teamInvite: teamInvite)
                 self.updateUserTeams(teamInvite: teamInvite, easyTeam: easyTeam, callbacks: callbacks, indexPath: indexPath)
                 
-                callbacks.updateCell(indexPath: indexPath)
+                callbacks.updateCell()
             }
         }) { (error) in
             print(error.localizedDescription)
@@ -1065,7 +1065,7 @@ class TeamManager{
             }
                
             self.removeInvite(teamInvite: inviteObj)
-            callbacks.updateCell(indexPath: indexPath)
+            callbacks.updateCell()
         }
            
        }) { (error) in
@@ -1090,7 +1090,7 @@ class TeamManager{
                 }
                 
                 self.removeInvite(teamInvite: teamInvite)
-                callbacks.updateCell(indexPath: indexPath)
+                callbacks.updateCell()
             }
             
         }) { (error) in

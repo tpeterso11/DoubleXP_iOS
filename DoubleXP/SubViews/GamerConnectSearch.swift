@@ -14,8 +14,12 @@ import MSPeekCollectionViewDelegateImplementation
 import FBSDKCoreKit
 import SPStorkController
 import Lottie
+import SwiftLocation
+import PopupDialog
+import CoreLocation
+import GeoFire
 
-class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,  UICollectionViewDelegateFlowLayout, SearchCallbacks, SPStorkControllerDelegate, SearchManagerCallbacks {
+class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,  UICollectionViewDelegateFlowLayout, SearchCallbacks, SPStorkControllerDelegate, SearchManagerCallbacks, UITableViewDelegate, UITableViewDataSource, CLLocationManagerDelegate {
     
     var game: GamerConnectGame? = nil
     
@@ -26,7 +30,9 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
     var searchPC = false
     var searchMobile = false
     var set = false
+    var frontSearchPayload = [Any]()
     
+    @IBOutlet weak var searchBlur: UIVisualEffectView!
     @IBOutlet weak var filterButton: UIImageView!
     @IBOutlet weak var gameHeaderImage: UIImageView!
     @IBOutlet weak var gamerConnectResults: UICollectionView!
@@ -45,8 +51,27 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
     @IBOutlet weak var nintendoLabel: UILabel!
     @IBOutlet weak var mobileLabel: UILabel!
     @IBOutlet weak var mobileSwitch: UISwitch!
+    @IBOutlet weak var searchTable: UITableView!
+    var basicFilterList = [filterCell]()
+    var locationCell: filterCell?
+    var popup: PopupDialog?
+    var currentManager: SearchManager!
+    var currentLocationActivationCell: FilterActivateCell?
     
     var currentUser: User!
+    var locationManager: CLLocationManager?
+    var req: LocationRequest?
+    var currentLocationIndexPath: IndexPath?
+    var usersSelectedTags = [String]()
+    
+    override func viewWillAppear(_ animated: Bool) {
+        if self.traitCollection.userInterfaceStyle == .dark {
+            self.searchBlur.effect = UIBlurEffect(style: .dark)
+                } else {
+                    self.searchBlur.effect = UIBlurEffect(style: .light)
+                }
+        super.viewWillAppear(animated)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -347,6 +372,12 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
             
             checkRivals()
             FriendsManager().checkOnlineAnnouncements()
+            
+            self.searchTable.estimatedRowHeight = 250
+            self.searchTable.rowHeight = UITableView.automaticDimension
+            self.frontSearchPayload.append("")
+            self.searchTable.delegate = self
+            self.searchTable.dataSource = self
         }
     }
     
@@ -361,17 +392,28 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
     }
     
     private func hideLoading(){
-        if(self.loadingView.alpha == 1){
-            self.searchAnimation.pause()
-            
-            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+        if(self.searchBlur.alpha == 1){
+            UIView.animate(withDuration: 0.5, animations: {
                 self.loadingView.alpha = 0
-            }, completion: nil)
+            }, completion: { (finished: Bool) in
+                UIView.animate(withDuration: 0.5, delay: 0.5, options: [], animations: {
+                    self.searchBlur.alpha = 0
+                }, completion: nil)
+            })
+        } else {
+            if(self.loadingView.alpha == 1){
+                self.searchAnimation.pause()
+                
+                UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                    self.loadingView.alpha = 0
+                }, completion: nil)
+            }
         }
     }
     
     func dismissModal(){
-        let delegate = UIApplication.shared.delegate as! AppDelegate
+        self.searchTable.reloadData()
+        /*let delegate = UIApplication.shared.delegate as! AppDelegate
         showLoading()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             if(delegate.currentUser!.userLat != 0.0){
@@ -379,12 +421,13 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
             } else {
                 delegate.searchManager.searchWithFilters(callbacks: self)
             }
-        }
+        }*/
     }
     
     @objc func didDismissStorkBySwipe(){
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        delegate.searchManager.searchWithFilters(callbacks: self)
+        self.searchTable.reloadData()
+        /*let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.searchManager.searchWithFilters(callbacks: self)*/
     }
     
     private func checkRivals(){
@@ -397,13 +440,27 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             let delegate = UIApplication.shared.delegate as! AppDelegate
             let manager = delegate.searchManager
-            manager.searchWithFilters(callbacks: self)
+            //manager.searchWithFilters(callbacks: self)
+            
+            self.currentManager = delegate.searchManager
+            
+            if(delegate.currentUser!.userLat != 0.0){
+                self.updateLocation()
+            } else {
+                self.buildFilterList()
+            }
         }
-        
     }
     
     @objc private func showFilters(){
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        UIView.animate(withDuration: 0.5, animations: {
+            self.searchBlur.alpha = 1
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, delay: 0.3, options: [], animations: {
+                self.searchTable.alpha = 1
+            }, completion: nil)
+        })
+        /*let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "filters") as! GCSearchFilters
         if(self.game != nil){
             currentViewController.gcGame = game
@@ -418,7 +475,7 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
             transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
             transitionDelegate.storkDelegate = self
             self.present(currentViewController, animated: true, completion: nil)
-        }
+        }*/
     }
     
     func stringToDate(_ str: String)->Date{
@@ -1076,6 +1133,563 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
         self.searchEmpty.alpha = 1
         self.searchEmptySub.text = "please change a search filter or try again later."
     }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return self.basicFilterList.count
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if(self.basicFilterList[section].opened == true){
+            return self.basicFilterList[section].options.count + 1
+        } else {
+            return 1
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if(indexPath.row == 0){
+            if(self.basicFilterList[indexPath.section].header == true){
+                if(self.basicFilterList[indexPath.section].mainHeader == true){
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "searchHeader", for: indexPath) as! SearchHeader
+                    
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    let searchManager = delegate.searchManager
+                    if(searchManager.searchLookingFor.isEmpty && (searchManager.locationFilter.isEmpty || searchManager.locationFilter == "none") && searchManager.ageFilters.isEmpty){
+                        if(cell.searchButton.title(for: .normal) != "quick search"){
+                            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                                cell.searchButton.setTitle("quick search", for: .normal)
+                                cell.searchButton.addTarget(self, action: #selector(self.quickSearch), for: UIControl.Event.touchUpInside)
+                                cell.searchSub.text = "just show me what you've got"
+                            }, completion: nil)
+                        } else {
+                            cell.searchButton.setTitle("quick search", for: .normal)
+                            cell.searchButton.addTarget(self, action: #selector(self.quickSearch), for: UIControl.Event.touchUpInside)
+                            cell.searchSub.text = "just show me what you've got"
+                        }
+                    } else if(searchManager.searchLookingFor.isEmpty && searchManager.ageFilters.isEmpty && (!searchManager.locationFilter.isEmpty && searchManager.locationFilter != "none")){
+                        if(cell.searchButton.title(for: .normal) != "location search"){
+                            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                                cell.searchButton.setTitle("location search", for: .normal)
+                                cell.searchSub.text = "we're getting warmer..."
+                                cell.searchButton.addTarget(self, action: #selector(self.quickSearch), for: UIControl.Event.touchUpInside)
+                            }, completion: nil)
+                        } else {
+                            cell.searchButton.setTitle("location search", for: .normal)
+                            cell.searchSub.text = "we're getting warmer..."
+                            cell.searchButton.addTarget(self, action: #selector(self.quickSearch), for: UIControl.Event.touchUpInside)
+                        }
+                    } else {
+                        if(cell.searchButton.title(for: .normal) != "quick search"){
+                            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                                cell.searchButton.setTitle("filter search", for: .normal)
+                                cell.searchSub.text = "ok, so you know what you're looking for."
+                                cell.searchButton.addTarget(self, action: #selector(self.quickSearch), for: UIControl.Event.touchUpInside)
+                            }, completion: nil)
+                        } else {
+                            cell.searchButton.setTitle("filter search", for: .normal)
+                            cell.searchSub.text = "ok, so you know what you're looking for."
+                            cell.searchButton.addTarget(self, action: #selector(self.quickSearch), for: UIControl.Event.touchUpInside)
+                        }
+                    }
+                    
+                    return cell
+                }
+                else if(self.basicFilterList[indexPath.section].type == "activate"){
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "activate", for: indexPath) as! FilterActivateCell
+                    cell.actionButton.setTitle(self.basicFilterList[indexPath.section].title, for: .normal)
+                    
+                    if(self.basicFilterList[indexPath.section].title == "location"){
+                        self.currentLocationActivationCell = cell
+                        let delegate = UIApplication.shared.delegate as! AppDelegate
+                        if(delegate.currentUser!.userLat != 0.0){
+                            cell.switch.isOn = true
+                            cell.actionButton.borderColor = #colorLiteral(red: 0.1667544842, green: 0.6060172915, blue: 0.279296875, alpha: 1)
+                        } else {
+                            cell.switch.isOn = false
+                            cell.actionButton.borderColor = UIColor.init(named: "darkToWhite")
+                        }
+                        cell.actionButton.addTarget(self, action: #selector(locationButtonTriggered), for: UIControl.Event.touchUpInside)
+                        cell.switch.addTarget(self, action: #selector(locationSwitchTriggered), for: UIControl.Event.valueChanged)
+                    }
+                    return cell
+                } else if(self.basicFilterList[indexPath.section].type == "lookingFor"){
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "lookingFor", for: indexPath) as! SearchLookingForCell
+                    cell.setPayload(payload: self.game!.lookingFor, search: self)
+                    return cell
+                } else {
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "category", for: indexPath) as! FilterCategory
+                    cell.title.text = self.basicFilterList[indexPath.section].title
+                    return cell
+                }
+            } else {
+                let cell = tableView.dequeueReusableCell(withIdentifier: "header", for: indexPath) as! FilterHeader
+                cell.headerAction.setTitle(self.basicFilterList[indexPath.section].title, for: .normal)
+                
+                if(self.basicFilterList[indexPath.section].title == "age range"){
+                    cell.headerSwitch.alpha = 1
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    let searchManager = delegate.searchManager
+                    if(searchManager.ageFilters.isEmpty){
+                        cell.headerSwitch.isOn = false
+                        cell.headerAction.borderColor = #colorLiteral(red: 0.6666666865, green: 0.6666666865, blue: 0.6666666865, alpha: 1)
+                    } else {
+                        cell.headerSwitch.isOn = true
+                        cell.headerAction.borderColor = #colorLiteral(red: 0.1667544842, green: 0.6060172915, blue: 0.279296875, alpha: 1)
+                    }
+                } else {
+                    cell.headerSwitch.alpha = 0
+                }
+                
+                let headerTap = HeaderGesture(target: self, action: #selector(headerTriggered))
+                headerTap.question = self.basicFilterList[indexPath.section].title
+                headerTap.payload = self.basicFilterList[indexPath.section].choices
+                cell.headerAction.addGestureRecognizer(headerTap)
+                
+                cell.headerSwitch.isUserInteractionEnabled = false
+                return cell
+            }
+        } else {
+            if(self.basicFilterList[indexPath.section].header == true){
+                if(self.basicFilterList[indexPath.section].title == "location"){
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "distance", for: indexPath) as! DistanceCell
+                    
+                    let fiftyTap = DistanceGesture(target: self, action: #selector(distanceChosen))
+                    fiftyTap.tag = "fifty_miles"
+                    fiftyTap.section = indexPath.section
+                    cell.fifty.isUserInteractionEnabled = true
+                    cell.fifty.addGestureRecognizer(fiftyTap)
+                    
+                    if(self.currentManager.locationFilter == "fifty_miles"){
+                        cell.fiftyCover.alpha = 1
+                    } else {
+                        cell.fiftyCover.alpha = 0
+                    }
+                    
+                    let hundredTap = DistanceGesture(target: self, action: #selector(distanceChosen))
+                    hundredTap.tag = "hundred_miles"
+                    hundredTap.section = indexPath.section
+                    cell.hundred.isUserInteractionEnabled = true
+                    cell.hundred.addGestureRecognizer(hundredTap)
+                    
+                    if(self.currentManager.locationFilter == "hundred_miles"){
+                        cell.hundredCover.alpha = 1
+                    } else {
+                        cell.hundredCover.alpha = 0
+                    }
+                    
+                    let timezoneTap = DistanceGesture(target: self, action: #selector(distanceChosen))
+                    timezoneTap.tag = "timezone"
+                    timezoneTap.section = indexPath.section
+                    cell.timezoneButton.isUserInteractionEnabled = true
+                    cell.timezoneButton.addGestureRecognizer(timezoneTap)
+                    
+                    if(self.currentManager.locationFilter == "timezone"){
+                        cell.timezoneCover.alpha = 1
+                    } else {
+                        cell.timezoneCover.alpha = 0
+                    }
+                    
+                    let noneTap = DistanceGesture(target: self, action: #selector(distanceChosen))
+                    noneTap.tag = "none"
+                    noneTap.section = indexPath.section
+                    cell.globalButton.isUserInteractionEnabled = true
+                    cell.globalButton.addGestureRecognizer(noneTap)
+                    
+                    if(self.currentManager.locationFilter == "none"){
+                        cell.globalCover.alpha = 1
+                    } else {
+                        cell.globalCover.alpha = 0
+                    }
+                    
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    if(delegate.currentUser!.userLat != 0.0){
+                        cell.cover.alpha = 0
+                        cell.howFar.alpha = 1
+                    } else {
+                        cell.cover.alpha = 1
+                        cell.howFar.alpha = 0
+                        
+                        if self.traitCollection.userInterfaceStyle == .dark {
+                            cell.lottie.animation = Animation.named("search_location_light")
+                            cell.lottie.contentMode = .scaleAspectFit
+                            cell.lottie.loopMode = .playOnce
+                            cell.lottie.play()
+                        } else {
+                            cell.lottie.animation = Animation.named("search_location_dark")
+                            cell.lottie.contentMode = .scaleAspectFit
+                            cell.lottie.loopMode = .playOnce
+                            cell.lottie.play()
+                        }
+                    }
+                    
+                    return cell
+                } else {
+                    let cell = tableView.dequeueReusableCell(withIdentifier: "empty", for: indexPath) as! EmptyCell
+                    return cell
+                }
+            }
+            else {
+                let cell = tableView.dequeueReusableCell(withIdentifier: "option", for: indexPath) as! FilterOption
+                let current = self.basicFilterList[indexPath.section].options[indexPath.row - 1] as? [String: String]
+                let key = Array(current!.keys)[0]
+                
+                let currentFilter = self.basicFilterList[indexPath.section]
+                if(currentFilter.type != "advanced"){
+                    cell.option.text = key
+                    cell.coverLabel.text = key
+                    
+                    if(self.currentManager.ageFilters.contains(current![key] ?? "") || self.currentManager.langaugeFilters.contains(current![key] ?? "")){
+                        cell.cover.alpha = 1
+                    } else {
+                        cell.cover.alpha = 0
+                    }
+                } else {
+                    cell.option.text = current![key]
+                    cell.coverLabel.text = current![key]
+                    
+                    var contained = false
+                    for option in self.currentManager.advancedFilters {
+                        let thisKey = Array(option.keys)[0]
+                        let thisValue = option[thisKey]
+                        if(key == thisKey && thisValue == current![key]){
+                            contained = true
+                            break
+                        }
+                    }
+                    if(contained){
+                        cell.cover.alpha = 1
+                    } else {
+                        cell.cover.alpha = 0
+                    }
+                }
+                return cell
+            }
+        }
+    }
+    
+    @objc private func locationButtonTriggered(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        if(delegate.currentUser!.userLat != 0.0){
+            self.currentLocationActivationCell?.switch.setOn(false, animated: true)
+            delegate.currentUser!.userLat = 0.0
+            delegate.currentUser!.userLong = 0.0
+            self.sendLocationInfo()
+            self.searchTable.reloadData()
+        } else {
+            self.currentLocationActivationCell?.switch.setOn(true, animated: true)
+            locationManager = CLLocationManager()
+            locationManager?.delegate = self
+            if #available(iOS 14.0, *) {
+                locationManager?.desiredAccuracy = kCLLocationAccuracyReduced
+            } else {
+                locationManager?.desiredAccuracy = 5000
+            }
+            locationManager?.requestWhenInUseAuthorization()
+        }
+    }
+    
+    @objc private func distanceChosen(sender: DistanceGesture){
+        self.currentManager.locationFilter = sender.tag
+        self.searchTable.reloadData()
+    }
+    
+    @objc private func quickSearch(){
+        UIView.animate(withDuration: 0.5, animations: {
+            self.searchTable.alpha = 0
+        }, completion: { (finished: Bool) in
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            delegate.searchManager.searchWithFilters(callbacks: self)
+        })
+    }
+    
+    @objc private func filterSearch(){
+        UIView.animate(withDuration: 0.5, animations: {
+            self.searchTable.alpha = 0
+        }, completion: { (finished: Bool) in
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            if(delegate.currentUser!.userLat != 0.0){
+                delegate.searchManager.searchWithLocation(callbacks: self)
+            } else {
+                delegate.searchManager.searchWithFilters(callbacks: self)
+            }
+        })
+    }
+    
+    @objc private func headerTriggered(sender: HeaderGesture) {
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "filterOptionDrawer") as! FilterOptionDrawer
+        currentViewController.questionText = sender.question
+        currentViewController.payload = sender.payload
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.customHeight = 500
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+    }
+    
+    @objc private func locationSwitchTriggered(sender: UISwitch) {
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        if(delegate.currentUser!.userLat != 0.0){
+            delegate.currentUser!.userLat = 0.0
+            delegate.currentUser!.userLong = 0.0
+            self.sendLocationInfo()
+            self.searchTable.reloadData()
+        } else {
+            locationManager = CLLocationManager()
+            locationManager?.delegate = self
+            if #available(iOS 14.0, *) {
+                locationManager?.desiredAccuracy = kCLLocationAccuracyReduced
+            } else {
+                locationManager?.desiredAccuracy = 5000
+            }
+            locationManager?.requestWhenInUseAuthorization()
+        }
+    }
+    
+    private func updateLocation(){
+        locationManager = CLLocationManager()
+        locationManager?.delegate = self
+        if #available(iOS 14.0, *) {
+            locationManager?.desiredAccuracy = kCLLocationAccuracyReduced
+        } else {
+            locationManager?.desiredAccuracy = 5000
+        }
+        locationManager?.requestWhenInUseAuthorization()
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        if status == .authorizedWhenInUse {
+            //manager.startUpdatingLocation()
+            self.req = LocationManager.shared.locateFromGPS(.continous, accuracy: .city) { result in
+              switch result {
+                case .failure(let error):
+                  debugPrint("Received error: \(error)")
+                    self.popup?.dismiss()
+                    self.searchTable.reloadData()
+                case .success(let location):
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    delegate.currentUser!.userLat = location.coordinate.latitude
+                    delegate.currentUser!.userLong = location.coordinate.longitude
+                    
+                    var localTimeZoneAbbreviation: String { return TimeZone.current.abbreviation() ?? "" }
+                    delegate.currentUser!.timezone = localTimeZoneAbbreviation
+                    
+                    self.sendLocationInfo()
+                    self.popup?.dismiss()
+                    
+                    if(self.locationCell != nil){
+                        self.locationCell?.opened = true
+                        self.searchTable.reloadData()
+                    } else {
+                        self.buildFilterList()
+                    }
+                    //self.searchTable.reloadData()
+              }
+            }
+            self.req?.start()
+        } else if(status == .denied){
+            showLocationDialog()
+        } else if(status == .notDetermined){
+            //if(self.currentSelectedSender != nil){
+                //locationSwitchTriggered(sender: 0)
+            //}
+        }
+    }
+    
+    private func sendLocationInfo(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let ref = Database.database().reference().child("Users").child(delegate.currentUser!.uId)
+        ref.child("userLat").setValue(delegate.currentUser!.userLat)
+        ref.child("userLong").setValue(delegate.currentUser!.userLong)
+        ref.child("timezone").setValue(delegate.currentUser!.timezone)
+        
+        if(delegate.currentUser!.userLat != 0.0){
+            let geofireRef = Database.database().reference().child("geofire")
+            let geoFire = GeoFire(firebaseRef: geofireRef)
+            geoFire.setLocation(CLLocation(latitude: delegate.currentUser!.userLat, longitude: delegate.currentUser!.userLong), forKey: delegate.currentUser!.uId)
+            self.req?.stop()
+        }
+    }
+    
+    private func showLocationDialog(){
+        let title = "DoubleXP needs your permission."
+        let message = "we only use your location to find users near you."
+
+        popup = PopupDialog(title: title, message: message)
+        let buttonOne = CancelButton(title: "cancel.") {
+            print("dang it.")
+            self.searchTable.reloadData()
+        }
+
+        // This button will not the dismiss the dialog
+        let buttonTwo = DefaultButton(title: "go to settings.", dismissOnTap: false) {
+            guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
+                        return
+            }
+            if UIApplication.shared.canOpenURL(settingsUrl) {
+                UIApplication.shared.open(settingsUrl, completionHandler: { (success) in })
+            }
+        }
+        popup!.addButtons([buttonOne, buttonTwo])//, buttonTwo, buttonThree])
+        self.present(popup!, animated: true, completion: nil)
+    }
+    
+    private func buildFilterList(){
+        self.basicFilterList = [filterCell]()
+        
+        var mainHeader = filterCell()
+        mainHeader.header = true
+        mainHeader.mainHeader = true
+        mainHeader.opened = false
+        mainHeader.options = [["": ""]]
+        self.basicFilterList.append(mainHeader)
+        
+        var advancedHeader = filterCell()
+        advancedHeader.header = true
+        advancedHeader.title = "apply filters"
+        advancedHeader.opened = false
+        advancedHeader.options = [["": ""]]
+        self.basicFilterList.append(advancedHeader)
+        
+        locationCell = filterCell()
+        locationCell?.header = true
+        locationCell?.title = "location"
+        locationCell?.type = "activate"
+        locationCell?.opened = true
+        locationCell?.options = [["": ""]]
+        self.basicFilterList.append(locationCell!)
+        
+        /*var empty = filterCell()
+        empty.header = true
+        empty.title = ""
+        empty.options = [["": ""]]
+        self.basicFilterList.append(empty)*/
+        /*let english = ["english": "english"]
+        let spanish = ["spanish": "spanish"]
+        let french = ["french": "french"]
+        let chinese = ["chinese": "chinese"]
+        let languageChoices = [english, spanish, french, chinese]
+        opened = !self.currentManager.langaugeFilters.isEmpty
+        let language = filterCell(opened: opened, title: "language", options: languageChoices, type: "language")
+        self.basicFilterList.append(language)*/
+        
+        if(!self.game!.filterQuestions.isEmpty){
+            let baby = ["12 - 16": "12_16"]
+            let young = ["17 - 24": "17_24"]
+            let mid = ["25 - 31": "25_31"]
+            let grown = ["32 +": "32_over"]
+            let ageChoices = [baby, young, mid, grown]
+            var opened = !self.currentManager.ageFilters.isEmpty
+            var age = filterCell(opened: opened, title: "age range", options: ageChoices, type: "age")
+            age.choices = [String]()
+            age.choices.append("12 - 16")
+            age.choices.append("17 - 24")
+            age.choices.append("25 - 31")
+            age.choices.append("32 +")
+            self.basicFilterList.append(age)
+            
+            var lookingHeader = filterCell()
+            lookingHeader.header = true
+            lookingHeader.type = "lookingFor"
+            lookingHeader.opened = false
+            lookingHeader.options = [["": ""]]
+            self.basicFilterList.append(lookingHeader)
+            /*/for question in self.game!.filterQuestions {
+                let key = Array(question.keys)[0]
+                var options = [[String: String]]()
+                let answers = question[key] as? [[String: String]]
+                for answer in answers! {
+                    let answerKey = Array(answer.keys)[0]
+                    let option = [key: answer[answerKey]!]
+                    options.append(option)
+                }
+                let filter = filterCell(opened: false, title: key, options: options, type: "advanced")
+                self.basicFilterList.append(filter)
+            }*/
+        }
+        
+        self.searchTable.dataSource = self
+        self.searchTable.delegate = self
+        self.searchTable.reloadData()
+    }
+    
+    func addRemoveChoice(selected: String){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        if(delegate.searchManager.searchLookingFor.contains(selected)){
+            delegate.searchManager.searchLookingFor.remove(at: delegate.searchManager.searchLookingFor.index(of: selected)!)
+            self.searchTable.reloadData()
+        } else {
+            delegate.searchManager.searchLookingFor.append(selected)
+            self.searchTable.reloadData()
+        }
+    }
+    
+    /*func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if(indexPath.row == 0){
+            let type = self.basicFilterList[indexPath.section].type
+            if(self.basicFilterList[indexPath.section].header != true){
+                if(self.basicFilterList[indexPath.section].opened == true){
+                    self.basicFilterList[indexPath.section].opened = false
+                    let sections = IndexSet.init(integer: indexPath.section)
+                    tableView.reloadSections(sections, with: .none)
+                } else {
+                    self.basicFilterList[indexPath.section].opened = true
+                    let sections = IndexSet.init(integer: indexPath.section)
+                    tableView.reloadSections(sections, with: .none)
+                }
+            }
+        } else {
+            let currentFilter = self.basicFilterList[indexPath.section]
+            if(currentFilter.type != "advanced"){
+                let current = self.basicFilterList[indexPath.section].options[indexPath.row - 1] as? [String: String]
+                let key = Array(current!.keys)[0]
+                if(currentFilter.type == "age"){
+                    let value = current![key]!
+                    if(self.currentManager.ageFilters.contains(value)){
+                        self.currentManager.ageFilters.remove(at: self.currentManager.ageFilters.index(of: value)!)
+                    } else {
+                        self.currentManager.ageFilters.append(value)
+                    }
+                } else {
+                    let value = current![key] ?? ""
+                    if(self.currentManager.langaugeFilters.contains(value)){
+                        self.currentManager.langaugeFilters.remove(at: self.currentManager.langaugeFilters.index(of:value)!)
+                    } else {
+                        if(!value.isEmpty){
+                            self.currentManager.langaugeFilters.append(value)
+                        }
+                    }
+                }
+                //checkClearButton()
+                self.searchTable.reloadData()
+            } else {
+                let current = self.basicFilterList[indexPath.section].options[indexPath.row - 1] as? [String: String]
+                let selectedKey = Array(current!.keys)[0]
+                var contained = false
+                
+                for array in self.currentManager.advancedFilters {
+                    let arrayKey = Array(array.keys)[0]
+                    let value = array[arrayKey]
+                    if(arrayKey == selectedKey && value == current![selectedKey]){
+                        self.currentManager.advancedFilters.remove(at: self.currentManager.advancedFilters.index(of: array)!)
+                        contained = true
+                        break
+                    }
+                }
+                
+                if(!contained){
+                    self.currentManager.advancedFilters.append(current!)
+                }
+                
+                //checkClearButton()
+                self.searchTable.reloadData()
+            }
+        }
+    }*/
 }
 
 extension Int {

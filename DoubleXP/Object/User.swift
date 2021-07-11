@@ -281,6 +281,46 @@ class User: NSObject, NSCoding {
         }
     }
     
+    var _gamingExperience = ""
+    var gamingExperience: String {
+        get {
+            return (_gamingExperience)
+        }
+        set (newVal) {
+            _gamingExperience = newVal
+        }
+    }
+    
+    var _googleApiAccessToken = ""
+    var googleApiAccessToken: String {
+        get {
+            return (_googleApiAccessToken)
+        }
+        set (newVal) {
+            _googleApiAccessToken = newVal
+        }
+    }
+    
+    var _googleApiRefreshToken = ""
+    var googleApiRefreshToken: String {
+        get {
+            return (_googleApiRefreshToken)
+        }
+        set (newVal) {
+            _googleApiRefreshToken = newVal
+        }
+    }
+    
+    var _googleUserId = ""
+    var googleUserId: String {
+        get {
+            return (_googleUserId)
+        }
+        set (newVal) {
+            _googleUserId = newVal
+        }
+    }
+    
     var _timezone = "timezone"
     var timezone: String {
         get {
@@ -321,13 +361,23 @@ class User: NSObject, NSCoding {
         }
     }
     
-    var _userLookingFor = [LookingForSelection]()
-    var userLookingFor: [LookingForSelection] {
+    var _userLookingFor = [String]()
+    var userLookingFor: [String] {
         get {
             return (_userLookingFor)
         }
         set (newVal) {
             _userLookingFor = newVal
+        }
+    }
+    
+    var _userAbout = [String]()
+    var userAbout: [String] {
+        get {
+            return (_userAbout)
+        }
+        set (newVal) {
+            _userAbout = newVal
         }
     }
     
@@ -513,6 +563,16 @@ class User: NSObject, NSCoding {
         }
     }
     
+    var _youtubeVideos = [YoutubeVideoObj]()
+    var youtubeVideos : [YoutubeVideoObj] {
+        get {
+            return (_youtubeVideos)
+        }
+        set (newVal) {
+            _youtubeVideos = newVal
+        }
+    }
+    
     var _currentOnlineAnnounement: OnlineObj?
     var currentOnlineAnnounement: OnlineObj? {
         get {
@@ -614,18 +674,22 @@ class User: NSObject, NSCoding {
         self.twitchConnect = (decoder.decodeObject(forKey: "twitchConnect") as! String)
         self.instagramConnect = (decoder.decodeObject(forKey: "instagramConnect") as! String)
         self.viewedAnnouncements = (decoder.decodeObject(forKey: "viewedAnnouncements") as! [String])
-        self.userLookingFor = (decoder.decodeObject(forKey: "userLookingFor") as! [LookingForSelection])
+        self.userLookingFor = (decoder.decodeObject(forKey: "userLookingFor") as! [String])
         self.selectedAge = (decoder.decodeObject(forKey: "selectedAge") as! String)
         self.primaryLanguage = (decoder.decodeObject(forKey: "primaryLanguage") as! String)
         self.secondaryLanguage = (decoder.decodeObject(forKey: "secondaryLanguage") as! String)
         self.blockList = (decoder.decodeObject(forKey: "blockList") as! [String])
         self.restrictList = (decoder.decodeObject(forKey: "restrictList") as! [String])
         self.onlineStatus = (decoder.decodeObject(forKey: "onlineStatus") as! String)
+        self.googleApiAccessToken = (decoder.decodeObject(forKey: "googleApiAccessToken") as! String)
+        self.googleApiRefreshToken = (decoder.decodeObject(forKey: "googleApiRefreshToken") as! String)
+        self.gamingExperience = (decoder.decodeObject(forKey: "gamingExperience") as! String)
         self.discordConnect = (decoder.decodeObject(forKey: "discordConnect") as! String)
         self.currentOnlineAnnounement = (decoder.decodeObject(forKey: "currentOnlineAnnounement") as! OnlineObj)
         self.reviews = (decoder.decodeObject(forKey: "reviews") as! [String])
         self.cachedRecommendedUids = (decoder.decodeObject(forKey: "cachedRecommendedUids") as! [String])
         self.receivedAnnouncements = (decoder.decodeObject(forKey: "receivedAnnouncements") as! [String])
+        self.userAbout = (decoder.decodeObject(forKey: "userAbout") as! [String])
         self.recommendedGames = (decoder.decodeObject(forKey: "recommendedGames") as! [String])
         self.badges = (decoder.decodeObject(forKey: "badges") as! [BadgeObj])
     }
@@ -670,6 +734,10 @@ class User: NSObject, NSCoding {
         coder.encode(self.instagramConnect, forKey: "instagramConnect")
         coder.encode(self.userLookingFor, forKey: "userLookingFor")
         coder.encode(self.discordConnect, forKey: "discordConnect")
+        coder.encode(self.userAbout, forKey: "userAbout")
+        coder.encode(self.gamingExperience, forKey: "gamingExperience")
+        coder.encode(self.googleApiRefreshToken, forKey: "googleApiRefreshToken")
+        coder.encode(self.googleApiAccessToken, forKey: "googleApiAccessToken")
     }
     
     struct Post: Hashable, Equatable {

@@ -11,6 +11,6 @@ import UIKit
 
 class FilterHeader: UITableViewCell {
     
-    @IBOutlet weak var arrow: UIImageView!
-    @IBOutlet weak var header: UILabel!
+    @IBOutlet weak var headerSwitch: UISwitch!
+    @IBOutlet weak var headerAction: UIButton!
 }

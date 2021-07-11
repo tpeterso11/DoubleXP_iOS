@@ -11,6 +11,7 @@ import UIKit
 import SwiftHTTP
 import Firebase
 import FBSDKLoginKit
+import GoogleSignIn
 
 class SocialMediaManager{
     var token = ""
@@ -40,10 +41,10 @@ class SocialMediaManager{
                 return
             }
             else{
-                if let jsonObj = try! JSONSerialization.jsonObject(with: response.data, options: JSONSerialization.ReadingOptions()) as? [String: Any] {
+                if let jsonObj = try? JSONSerialization.jsonObject(with: response.data, options: JSONSerialization.ReadingOptions()) as? [String: Any] {
                     
                     DispatchQueue.main.async {
-                        let token = jsonObj["access_token"] as! String
+                        let token = jsonObj?["access_token"] as! String
                         let appDelegate = UIApplication.shared.delegate as! AppDelegate
                         let manager = appDelegate.socialMediaManager
                         manager.setToken(token: token)
@@ -458,6 +459,127 @@ class SocialMediaManager{
                 callbacks.onTweetsLoaded(tweets: tweets)
             } else {
                 callbacks.onTweetsLoaded(tweets: [])
+            }
+        }
+    }
+    
+    func getYoutubeAccess(accessToken: String, callbacks: SocialMediaManagerCallback, currentUser: User, tryRefresh: Bool){
+        let params = ["Authorization": "Bearer " + accessToken] as [String : Any]
+        HTTP.GET("https://www.googleapis.com/youtube/v3/channels?part=id&mine=true&max_results=5&key=AIzaSyAyjFRqU4u2fx7_Ik5dEiDuNbXb9F0Ykjc&access_token=" + accessToken, parameters: params) { response in
+            if let err = response.error {
+                if(tryRefresh){
+                    self.attemptTokenRefresh(refreshToken: currentUser.googleApiRefreshToken, accessToken: currentUser.googleApiAccessToken, callbacks: callbacks, currentUser: currentUser)
+                } else {
+                    callbacks.onYoutubeFail()
+                }
+                return //also notify app of failure as needed
+            }
+            else{
+                if let jsonObj = try? JSONSerialization.jsonObject(with: response.data, options: .allowFragments) as? NSDictionary {
+                    if let resultArray = jsonObj!.value(forKey: "items") as? NSArray {
+                        var channelIds = [String]()
+                        var channels = [YoutubeMultiChannelSelection]()
+                        for channel in resultArray{
+                            if let gameDict = channel as? NSDictionary {
+                                let id = (gameDict.value(forKey: "id") as? String ?? "")
+                                let title = (gameDict.value(forKey: "title") as? String ?? "")
+                                if(!id.isEmpty){
+                                    channelIds.append(id)
+                                    if(!title.isEmpty){
+                                        let youtube = YoutubeMultiChannelSelection()
+                                        youtube.channelId = id
+                                        youtube.channelName = title
+                                        channels.append(youtube)
+                                    }
+                                }
+                            }
+                        }
+                        if(channelIds.count > 1){
+                            callbacks.onChannelsLoaded(channels: channels)
+                        } else if(!channelIds.isEmpty){
+                            self.attemptYoutubeVideos(channelId: channelIds[0], accessToken: accessToken, callbacks: callbacks, currentUser: currentUser)
+                        } else {
+                            callbacks.onYoutubeFail()
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    
+    func attemptTokenRefresh(refreshToken: String, accessToken: String, callbacks: SocialMediaManagerCallback, currentUser: User){
+        HTTP.POST("https://oauth2.googleapis.com/token?client_id=582166005754-t8kcglj0t0oqgsr4p43052rpf00vnkvg.apps.googleusercontent.com&client_secret=&refresh_token=" + refreshToken + "&grant_type=refresh_token") { response in
+            if let err = response.error {
+               print("error: \(err.localizedDescription)")
+               callbacks.onYoutubeFail()
+                
+               return //also notify app of failure as needed
+            }
+            else{
+                if let jsonObj = try? JSONSerialization.jsonObject(with: response.data, options: .allowFragments) as? NSDictionary {
+                    if(jsonObj!.value(forKey: "access_token") != nil){
+                        let token = jsonObj!.value(forKey: "access_token") as? String ?? ""
+                        Database.database().reference().child("Users").child(currentUser.uId).child("googleApiAccessToken").setValue(token)
+                        self.getYoutubeAccess(accessToken: token, callbacks: callbacks, currentUser: currentUser, tryRefresh: false)
+                    } else {
+                        callbacks.onYoutubeFail()
+                    }
+                } else {
+                    callbacks.onYoutubeFail()
+                }
+            }
+        }
+    }
+    
+    func attemptYoutubeVideos(channelId: String, accessToken: String, callbacks: SocialMediaManagerCallback, currentUser: User){
+        let params = ["Authorization": "Bearer " + accessToken] as [String : Any]
+        HTTP.GET("https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=" + channelId + "&key=AIzaSyAyjFRqU4u2fx7_Ik5dEiDuNbXb9F0Ykjc" + "&maxResults=50", parameters: params) { response in
+            if let err = response.error {
+                print("error: \(err.localizedDescription)")
+                if(!currentUser.googleApiRefreshToken.isEmpty && accessToken != currentUser.googleApiRefreshToken){
+                    self.attemptYoutubeVideos(channelId: channelId, accessToken: currentUser.googleApiRefreshToken, callbacks: callbacks, currentUser: currentUser)
+                } else {
+                    callbacks.onYoutubeFail()
+                }
+                return //also notify app of failure as needed
+            }
+            else{
+                if let jsonObj = try? JSONSerialization.jsonObject(with: response.data, options: .allowFragments) as? NSDictionary {
+                    var videoArray = [YoutubeVideoObj]()
+                    if let resultArray = jsonObj!.value(forKey: "items") as? NSArray {
+                        for video in resultArray{
+                            if let videoDict = video as? NSDictionary {
+                                var id = ""
+                                var title = ""
+                                var date = ""
+                                var imgUrl = ""
+                                
+                                if let idDict = videoDict.value(forKey: "id") as? NSDictionary {
+                                    id = (idDict.value(forKey: "videoId") as? String ?? "")
+                                }
+                                
+                                if let snippetDict = videoDict.value(forKey: "snippet") as? NSDictionary {
+                                    date = (snippetDict.value(forKey: "publishedAt") as? String ?? "")
+                                    title = (snippetDict.value(forKey: "title") as? String ?? "")
+                                    
+                                    if let imgDict = snippetDict.value(forKey: "thumbnails") as? NSDictionary {
+                                        if let mediumDict = imgDict.value(forKey: "default") as? NSDictionary {
+                                            imgUrl = (mediumDict.value(forKey: "url") as? String ?? "")
+                                        }
+                                    }
+                                }
+                                
+                                if(!id.isEmpty && !title.isEmpty && !date.isEmpty){
+                                    videoArray.append(YoutubeVideoObj(title: title, videoOwnerGamerTag: currentUser.gamerTag, videoOwnerUid: currentUser.uId, youtubeFavorite: "false", date: date, youtubeId: id, imgUrl: imgUrl))
+                                }
+                            }
+                        }
+                    }
+                    callbacks.onYoutubeSuccessful(videos: videoArray)
+                } else {
+                    callbacks.onYoutubeFail()
+                }
             }
         }
     }

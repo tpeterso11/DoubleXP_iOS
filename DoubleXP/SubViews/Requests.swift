@@ -13,10 +13,8 @@ import PopupDialog
 import MSPeekCollectionViewDelegateImplementation
 import SPStorkController
 
-class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUpdate, SPStorkControllerDelegate {
-
+class Requests: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, RequestsUpdate, SPStorkControllerDelegate {
     var userRequests = [Any]()
-    var cellHeights: [CGFloat] = []
     
     @IBOutlet weak var divider: UIView!
     @IBOutlet weak var quizTable: UITableView!
@@ -25,14 +23,7 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
     @IBOutlet weak var blurBack: UIVisualEffectView!
     @IBOutlet weak var quizCollection: UICollectionView!
     @IBOutlet weak var emptyLayout: UIView!
-    @IBOutlet weak var requestList: UITableView!
-    enum Const {
-           static let closeCellHeight: CGFloat = 83
-           static let openCellHeight: CGFloat = 205
-           static let rowsCount = 1
-    }
-    
-    var questionPayload = [[String]]()
+    @IBOutlet weak var veetooRequests: UICollectionView!
     
     var quizSet = false
     var dataSet = false
@@ -45,19 +36,17 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.currentRequests = self
         checkRivals()
-        //self.pageName = "Requests"
-        //appDelegate.addToNavStack(vc: self)
     }
     
     private func animateView(){
         self.dataSet = true
-        requestList.delegate = self
-        requestList.dataSource = self
+        veetooRequests.delegate = self
+        veetooRequests.dataSource = self
         
-        let top = CGAffineTransform(translationX: 0, y: 30)
+        let top = CGAffineTransform(translationX: 0, y: -30)
         UIView.animate(withDuration: 0.8, animations: {
-            self.requestList.alpha = 1
-            self.requestList.transform = top
+            self.veetooRequests.alpha = 1
+            self.veetooRequests.transform = top
         }, completion: nil)
     }
     
@@ -83,7 +72,7 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
             }
         }
         
-        if(!user.teamInviteRequests.isEmpty){
+        /*if(!user.teamInviteRequests.isEmpty){
             for request in user.teamInviteRequests{
                 self.userRequests.append(request)
             }
@@ -93,20 +82,10 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
             for request in user.teamInvites{
                 self.userRequests.append(request)
             }
-        }
-        
-        cellHeights = Array(repeating: Const.closeCellHeight, count: self.userRequests.count)
+        }*/
         
         if(!dataSet){
             if(!userRequests.isEmpty){
-                requestList.estimatedRowHeight = Const.closeCellHeight
-                requestList.rowHeight = UITableView.automaticDimension
-                
-                if #available(iOS 10.0, *) {
-                    requestList.refreshControl = UIRefreshControl()
-                    requestList.refreshControl?.addTarget(self, action: #selector(refreshHandler), for: .valueChanged)
-                }
-                
                 animateView()
             } else{
                 let top = CGAffineTransform(translationX: 0, y: -10)
@@ -123,7 +102,7 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
                     self.emptyLayout.transform = top
                 }, completion: nil)
             } else {
-                self.requestList.reloadData()
+                self.veetooRequests.reloadData()
             }
         }
     }
@@ -140,10 +119,11 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let currentUser = delegate.currentUser
         
-        let top = CGAffineTransform(translationX: 0, y: 30)
+        let top = CGAffineTransform(translationX: 0, y: -30)
         UIView.animate(withDuration: 0.8, delay: 0.3, options:[], animations: {
             self.requestsHeader.alpha = 1
             self.requestsHeader.transform = top
+            self.requestsSub.alpha = 1
             
             if(currentUser != nil){
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
@@ -181,186 +161,24 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
         self.present(currentViewController, animated: true, completion: nil)
     }
     
-    @objc func refreshHandler() {
-        let deadlineTime = DispatchTime.now() + .seconds(1)
-        DispatchQueue.main.asyncAfter(deadline: deadlineTime, execute: { [weak self] in
-            if #available(iOS 10.0, *) {
-                self?.requestList.refreshControl?.endRefreshing()
-            }
-            self?.requestList.reloadData()
-        })
-    }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if(tableView == self.requestList){
-            return cellHeights[indexPath.row]
-        }
-        else{
-            return CGFloat(100)
-        }
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if(tableView == self.requestList){
-            return self.userRequests.count
-        }
-        else{
-            return self.questionPayload.count
-        }
-    }
-    
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if(tableView == self.requestList){
-            guard case let cell as RequestsFoldingCell = cell else {
-                return
-            }
-
-            cell.backgroundColor = .clear
-
-            if cellHeights[indexPath.row] == Const.closeCellHeight {
-                cell.unfold(false, animated: false, completion: nil)
-            } else {
-                cell.unfold(true, animated: false, completion: nil)
-            }
-
-            //cell.number = indexPath.row
-        }
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if(tableView == self.requestList){
-            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! RequestsFoldingCell
-            
-            let current = userRequests[indexPath.item]
-            
-            if(current is FriendRequestObject){
-                cell.setUI(friendRequest: (current as! FriendRequestObject), team: nil, request: nil, rival: nil, indexPath: indexPath, currentTableView: self.requestList, callbacks: self, requests: self)
-            }
-            else if(current is RequestObject){
-                cell.setUI(friendRequest: nil, team: nil, request: (current as! RequestObject), rival: nil, indexPath: indexPath, currentTableView: self.requestList, callbacks: self, requests: self)
-            }
-            else if(current is RivalObj){
-                cell.setUI(friendRequest: nil, team: nil, request: nil, rival: (current as! RivalObj), indexPath: indexPath, currentTableView: self.requestList, callbacks: self, requests: self)
-            }
-            else{
-                cell.setUI(friendRequest: nil, team: (current as! TeamInviteObject), request: nil, rival: nil, indexPath: indexPath, currentTableView: self.requestList, callbacks: self, requests: self)
-            }
-            
-            cell.layoutMargins = UIEdgeInsets.zero
-            cell.separatorInset = UIEdgeInsets.zero
-            
-            return cell
-        }
-        else{
-            let cell = tableView.dequeueReusableCell(withIdentifier: "question", for: indexPath) as! RequestsQuizQuestionCell
-            
-            let current = self.questionPayload[indexPath.item]
-            cell.question.text = current[0]
-            cell.answer.text = current[1]
-            
-            return cell
-        }
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if(tableView == self.requestList){
-            let cell = tableView.cellForRow(at: indexPath) as! RequestsFoldingCell
-
-            if cell.isAnimating() {
-                return
-            }
-
-            var duration = 0.0
-            let cellIsCollapsed = cellHeights[indexPath.row] == Const.closeCellHeight
-            if cellIsCollapsed {
-                cellHeights[indexPath.row] = Const.openCellHeight
-                cell.unfold(true, animated: true, completion: nil)
-                duration = 0.6
-            } else {
-                cellHeights[indexPath.row] = Const.closeCellHeight
-                cell.unfold(false, animated: true, completion: nil)
-                duration = 0.3
-            }
-
-            UIView.animate(withDuration: duration, delay: 0, options: .curveEaseOut, animations: { () -> Void in
-                tableView.beginUpdates()
-                tableView.endUpdates()
-                
-                // fix https://github.com/Ramotion/folding-cell/issues/169
-                if cell.frame.maxY > tableView.frame.maxY {
-                    tableView.scrollToRow(at: indexPath, at: UITableView.ScrollPosition.bottom, animated: true)
-                }
-            }, completion: nil)
-        }
-    }
     
     //later, add "accepted" and "invited" array to user. This way. when they are invited or accepted, we can observe this in the DB and open a nice little overlay that says "you've been accepted, chat or check out the team". We cannot do this just by observing teams because if they create a team themselves, we do not want this overlay showing.
     
-    func updateCell(indexPath: IndexPath) {
-        let delegate = UIApplication.shared.delegate as! AppDelegate
+    func updateCell() {
+        /*let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.currentFeedFrag?.checkOnlineAnnouncements()
         
         if indexPath.item >= 0 && indexPath.item < self.userRequests.count {
             self.userRequests.remove(at: indexPath.item)
-            self.requestList.deleteRows(at: [indexPath], with: .automatic)
+            //self.veetooRequests.deleteRows(at: [indexPath], with: .automatic)
             
             if(self.userRequests.isEmpty){
                 UIView.animate(withDuration: 0.8, animations: {
                     self.emptyLayout.alpha = 1
                 }, completion: nil)
             }
-        }
-    }
-    
-    func showQuiz(questions: [[String]]){
-        self.questionPayload = [[String]]()
-        self.questionPayload.append(contentsOf: questions)
-        
-        let closeTap = UITapGestureRecognizer(target: self, action: #selector(hideQuiz))
-        self.closeView.isUserInteractionEnabled = true
-        self.closeView.addGestureRecognizer(closeTap)
-        
-        if(!quizSet){
-            quizTable.delegate = self
-            quizTable.dataSource = self
-            self.reload(tableView: self.quizTable)
-        }
-        else{
-            quizCollection.reloadData()
-        }
-        
-        let top = CGAffineTransform(translationX: -340, y: 0)
-        UIView.animate(withDuration: 0.5, animations: {
-            self.blurBack.alpha = 1
-        }, completion: { (finished: Bool) in
-            UIView.animate(withDuration: 0.5, delay: 0.3, options: [], animations: {
-                self.quizView.transform = top
-            }, completion: nil)
-        })
-    }
-    
-    @objc func hideQuiz(){
-        let top = CGAffineTransform(translationX: 0, y: 0)
-        UIView.animate(withDuration: 0.5, animations: {
-            self.quizView.transform = top
-        }, completion: { (finished: Bool) in
-            UIView.animate(withDuration: 0.5, delay: 0.3, options: [], animations: {
-                self.blurBack.alpha = 0
-            }, completion: nil)
-        })
-    }
-    
-    func showQuizClicked(questions: [[String]]){
-        showQuiz(questions: questions)
-    }
-    
-    func reload(tableView: UITableView) {
-        if(tableView == quizTable){
-            let contentOffset = tableView.contentOffset
-            tableView.reloadData()
-            tableView.layoutIfNeeded()
-            tableView.setContentOffset(contentOffset, animated: false)
-        }
+        }*/
     }
     
     func rivalRequestAlready() {
@@ -372,13 +190,13 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
     func rivalRequestFail() {
     }
     
-    func rivalResponseAccepted(indexPath: IndexPath) {
-        updateCell(indexPath: indexPath)
+    func rivalResponseAccepted() {
+        updateCell()
         showConfirmation()
     }
     
-    func rivalResponseRejected(indexPath: IndexPath) {
-        updateCell(indexPath: indexPath)
+    func rivalResponseRejected() {
+        updateCell()
     }
     
     func rivalResponseFailed() {
@@ -431,6 +249,138 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
         self.present(popup, animated: true, completion: nil)
     }
     
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return userRequests.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let current = self.userRequests[indexPath.item]
+        if(current is FriendRequestObject){
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "friend", for: indexPath) as! RequestsCellV2
+            if((current as! FriendRequestObject).youtubeConnect.isEmpty){
+                cell.youtubeLogo.alpha = 0.3
+            } else {
+                cell.youtubeLogo.alpha = 1.0
+            }
+            if((current as! FriendRequestObject).instagramConnect.isEmpty){
+                cell.instagramLogo.alpha = 0.3
+            } else {
+                cell.instagramLogo.alpha = 1.0
+            }
+            if((current as! FriendRequestObject).discordConnect.isEmpty){
+                cell.discordLogo.alpha = 0.3
+            } else {
+                cell.discordLogo.alpha = 1.0
+            }
+            if((current as! FriendRequestObject).youtubeConnect.isEmpty){
+                cell.youtubeLogo.alpha = 0.3
+            } else {
+                cell.youtubeLogo.alpha = 1.0
+            }
+            
+            cell.gamerTag.text = (current as! FriendRequestObject).gamerTag
+            
+            cell.contentView.layer.cornerRadius = 10.0
+            cell.contentView.layer.borderWidth = 1.0
+            cell.contentView.layer.borderColor = UIColor.clear.cgColor
+            cell.contentView.layer.masksToBounds = true
+            
+            cell.layer.shadowColor = UIColor.black.cgColor
+            cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+            cell.layer.shadowRadius = 2.0
+            cell.layer.shadowOpacity = 0.8
+            cell.layer.masksToBounds = false
+            cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
+            return cell
+        } else {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "play", for: indexPath) as! RequestsPlayCellV2
+            cell.gamertag.text = (current as! RivalObj).gamerTag
+            
+            cell.contentView.layer.cornerRadius = 10.0
+            cell.contentView.layer.borderWidth = 1.0
+            cell.contentView.layer.borderColor = UIColor.clear.cgColor
+            cell.contentView.layer.masksToBounds = true
+            
+            cell.layer.shadowColor = UIColor.black.cgColor
+            cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+            cell.layer.shadowRadius = 2.0
+            cell.layer.shadowOpacity = 0.8
+            cell.layer.masksToBounds = false
+            cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
+            return cell
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let current = self.userRequests[indexPath.item]
+        if(current is FriendRequestObject){
+            return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(150))
+        } else {
+            return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(130))
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let current = self.userRequests[indexPath.item]
+        if(current is FriendRequestObject){
+            //let current = (self.userRequests[indexPath.item] as! FriendRequestObject)
+            var buttons = [PopupDialogButton]()
+            let title = "you got a request from " + (current as! FriendRequestObject).gamerTag
+            let message = "what do you wanna do?"
+            let manager = FriendsManager()
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            
+            let buttonOne = DefaultButton(title: "view profile") { [weak self] in
+                self?.launchProfile(uid: (current as! FriendRequestObject).uid)
+            }
+            buttons.append(buttonOne)
+            
+            let buttonTwo = CancelButton(title: "accept request") { [weak self] in
+                manager.acceptFriendFromRequests(otherUserRequest: (current as! FriendRequestObject), currentUserUid: appDelegate.currentUser!.uId, callbacks: self as! RequestsUpdate)
+            }
+            buttons.append(buttonTwo)
+            
+            let buttonThree = DestructiveButton(title: "reject request") { [weak self] in
+                manager.declineRequest(otherUserRequest: (current as! FriendRequestObject), currentUserUid: appDelegate.currentUser!.uId, callbacks: self as! RequestsUpdate)
+            }
+            buttons.append(buttonThree)
+            
+            let popup = PopupDialog(title: title, message: message)
+            popup.addButtons(buttons)
+
+            // Present dialog
+            self.present(popup, animated: true, completion: nil)
+        } else if(current is RivalObj){
+            var buttons = [PopupDialogButton]()
+            let title = (current as! RivalObj).gamerTag + " wants to play " + (current as! RivalObj).game + "!"
+            let message = "what do you wanna do?"
+            let manager = FriendsManager()
+            
+            let buttonOne = DefaultButton(title: "view profile") { [weak self] in
+                self?.launchProfile(uid: (current as! RivalObj).uid)
+            }
+            buttons.append(buttonOne)
+            
+            let buttonTwo = CancelButton(title: "i'm ready to play") { [weak self] in
+                manager.acceptPlayRequest(rival: (current as! RivalObj), callbacks: self as! RequestsUpdate)
+            }
+            buttons.append(buttonTwo)
+            
+            let buttonThree = DestructiveButton(title: "not right now") { [weak self] in
+                manager.rejectPlayRequest(rival: (current as! RivalObj), callbacks: self as! RequestsUpdate)
+            }
+            buttons.append(buttonThree)
+            
+            let popup = PopupDialog(title: title, message: message)
+            popup.addButtons(buttons)
+
+            // Present dialog
+            self.present(popup, animated: true, completion: nil)
+        }
+    }
+    
     struct Section {
         var name: String
         var items: [Any]
@@ -444,4 +394,5 @@ class Requests: ParentVC, UITableViewDelegate, UITableViewDataSource, RequestsUp
             return items.count
         }
     }
+        
 }

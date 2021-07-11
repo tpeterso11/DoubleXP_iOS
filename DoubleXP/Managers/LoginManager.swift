@@ -13,7 +13,64 @@ import FirebaseDatabase
 class LoginHelper{
     
     func getFeedInfo(uid: String?, activity: PreSplashActivity) {
-        self.getCompetitions(uid: uid, activity: activity)
+        self.getFeaturedGame(uid: uid, activity: activity)
+    }
+    
+    func getFeaturedGame(uid: String?, activity: PreSplashActivity){
+        let ref = Database.database().reference().child("Feed")
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                if(snapshot.hasChild("featuredGame")){
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    delegate.feedFeaturedGame = snapshot.childSnapshot(forPath: "featuredGame").value as? String ?? ""
+                    self.getFeedCta(uid: uid, activity: activity)
+                } else {
+                    self.getFeedCta(uid: uid, activity: activity)
+                }
+            } else {
+                self.getFeedCta(uid: uid, activity: activity)
+            }
+        })
+    }
+    
+    func getFeedCta(uid: String?, activity: PreSplashActivity){
+        let ref = Database.database().reference().child("Feed")
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                if(snapshot.hasChild("cta")){
+                    var title = ""
+                    var sub = ""
+                    var imgDark = ""
+                    var buttonText = ""
+                    var imgLight = ""
+                    let cta = snapshot.childSnapshot(forPath: "cta")
+                    if(cta.hasChild("title")){
+                        title = cta.childSnapshot(forPath: "title").value as? String ?? ""
+                    }
+                    if(cta.hasChild("sub")){
+                        sub = cta.childSnapshot(forPath: "sub").value as? String ?? ""
+                    }
+                    if(cta.hasChild("buttonText")){
+                        buttonText = cta.childSnapshot(forPath: "buttonText").value as? String ?? ""
+                    }
+                    if(cta.hasChild("imgDarkXXHDPI")){
+                        imgDark = cta.childSnapshot(forPath: "imgDarkXXHDPI").value as? String ?? ""
+                    }
+                    if(cta.hasChild("imgLightXXHDPI")){
+                        imgLight = cta.childSnapshot(forPath: "imgLightXXHDPI").value as? String ?? ""
+                    }
+                    if(!title.isEmpty && !sub.isEmpty && !imgDark.isEmpty && !imgLight.isEmpty && !buttonText.isEmpty){
+                        let delegate = UIApplication.shared.delegate as! AppDelegate
+                        delegate.currentCta = CTAObject(title: title, sub: sub, lightUrl: imgLight, darkUrl: imgDark, buttonText: buttonText)
+                    }
+                    self.getCompetitions(uid: uid, activity: activity)
+                } else {
+                    self.getCompetitions(uid: uid, activity: activity)
+                }
+            } else {
+                self.getCompetitions(uid: uid, activity: activity)
+            }
+        })
     }
     
     func getCompetitions(uid: String?, activity: PreSplashActivity){
@@ -163,6 +220,12 @@ class LoginHelper{
                 delegate.announcementManager.announcments.append(contentsOf: announcements)
                 
                 self.getUpcomingGames(uid: uid, activity: activity)
+            } else {
+                let announcements = [AnnouncementObj]()
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                delegate.announcementManager.announcments.append(contentsOf: announcements)
+                
+                self.getUpcomingGames(uid: uid, activity: activity)
             }
             
         }) { (error) in
@@ -199,6 +262,12 @@ class LoginHelper{
                 delegate.episodes = displayEpisodes
                 
                 activity.onFeedCompleted(uid: uid ?? "")
+            } else {
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                let displayEpisodes = [EpisodeObj]()
+                delegate.episodes = displayEpisodes
+                
+                activity.onFeedCompleted(uid: uid ?? "")
             }
         }) { (error) in
             print(error.localizedDescription)
@@ -222,6 +291,7 @@ class LoginHelper{
                     var releaseDateMillis = ""
                     var description = ""
                     var releaseDateProper = ""
+                    var consoles = [String]()
                     
                     let current = upGame as! DataSnapshot
                     id = current.key
@@ -262,13 +332,24 @@ class LoginHelper{
                         releaseDateProper = current.childSnapshot(forPath: "releaseDateProp").value as! String
                     }
                     
+                    if(current.hasChild("consoles")){
+                        consoles = current.childSnapshot(forPath: "consoles").value as? [String] ?? [String]()
+                    }
+                    
                     if(!game.isEmpty && !gameImageUrl.isEmpty && !developer.isEmpty){
                         let upcomingGame = UpcomingGame(id: id, game: game, blurb: blurb, releaseDateMillis: releaseDateMillis, releaseDate: releaseDate, trailerUrls: trailerUrls, gameImageUrl: gameImageUrl, gameDesc: description, releaseDateProper: releaseDateProper)
-                        
+                        upcomingGame.consoles = consoles
+                        upcomingGame.developer = developer
                         upcoming.append(upcomingGame)
                     }
                 }
                 
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                delegate.upcomingGames.append(contentsOf: upcoming)
+                
+                self.getEpisodes(uid: uid, activity: activity)
+            } else {
+                let upcoming = [UpcomingGame]()
                 let delegate = UIApplication.shared.delegate as! AppDelegate
                 delegate.upcomingGames.append(contentsOf: upcoming)
                 

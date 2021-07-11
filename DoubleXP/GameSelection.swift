@@ -41,6 +41,18 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @IBOutlet weak var keyboardNext: UIButton!
     @IBOutlet weak var updateBlur: UIVisualEffectView!
     @IBOutlet weak var updateAnimation: AnimationView!
+    @IBOutlet weak var allGamesButton: UIView!
+    @IBOutlet weak var allGamesCover: UIView!
+    @IBOutlet weak var popularButton: UIView!
+    @IBOutlet weak var consoleButton: UIView!
+    @IBOutlet weak var consoleCover: UIView!
+    @IBOutlet weak var popularCover: UIView!
+    @IBOutlet weak var pcGamesButton: UIView!
+    @IBOutlet weak var pcCover: UIView!
+    @IBOutlet weak var mobileButton: UIView!
+    @IBOutlet weak var mobileCover: UIView!
+    @IBOutlet weak var tableButton: UIView!
+    @IBOutlet weak var tableCover: UIView!
     var currentSelectedConsoles = [String]()
     var currentSelectedGamerTags = [String]()
     var currentSelectedGame = ""
@@ -57,6 +69,7 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
     var keyboardOpen = false
     var returning = false
     var modalPopped = false
+    var upgradeFrag: Upgrade?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -73,6 +86,30 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
         } else {
             continueButton.addTarget(self, action: #selector(self.advanceToResults), for: .touchUpInside)
         }
+        
+        let allTap = UITapGestureRecognizer(target: self, action: #selector(self.allClicked))
+        self.allGamesButton.isUserInteractionEnabled = true
+        self.allGamesButton.addGestureRecognizer(allTap)
+        
+        let popularTap = UITapGestureRecognizer(target: self, action: #selector(self.popularClicked))
+        self.popularButton.isUserInteractionEnabled = true
+        self.popularButton.addGestureRecognizer(popularTap)
+        
+        let consoleTap = UITapGestureRecognizer(target: self, action: #selector(self.consoleClicked))
+        self.consoleButton.isUserInteractionEnabled = true
+        self.consoleButton.addGestureRecognizer(consoleTap)
+        
+        let pcTap = UITapGestureRecognizer(target: self, action: #selector(self.pcClicked))
+        self.pcGamesButton.isUserInteractionEnabled = true
+        self.pcGamesButton.addGestureRecognizer(pcTap)
+        
+        let tableTap = UITapGestureRecognizer(target: self, action: #selector(self.tabletopClicked))
+        self.tableButton.isUserInteractionEnabled = true
+        self.tableButton.addGestureRecognizer(tableTap)
+        
+        let mobileTap = UITapGestureRecognizer(target: self, action: #selector(self.mobileClicked))
+        self.mobileButton.isUserInteractionEnabled = true
+        self.mobileButton.addGestureRecognizer(mobileTap)
         
         gameTable.delegate = self
         gameTable.dataSource = self
@@ -103,6 +140,139 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
         //view.addGestureRecognizer(tap)
         
         search.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+    }
+    
+    @objc func allClicked(){
+        handleButtons(selected: "all")
+    }
+    @objc func pcClicked(){
+        handleButtons(selected: "pc")
+    }
+    @objc func mobileClicked(){
+        handleButtons(selected: "mobile")
+    }
+    @objc func consoleClicked(){
+        handleButtons(selected: "console")
+    }
+    @objc func popularClicked(){
+        handleButtons(selected: "popular")
+    }
+    @objc func tabletopClicked(){
+        handleButtons(selected: "tabletop")
+    }
+    
+    private func handleButtons(selected: String){
+        if(selected == "all"){
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            let list = delegate.gcGames
+            let sorted = list!.sorted(by: { $0.gameName < $1.gameName })
+            gameList = sorted
+            
+            self.gameTable.reloadData()
+            
+            self.allGamesCover.alpha = 1
+            self.popularCover.alpha = 0
+            self.pcCover.alpha = 0
+            self.tableCover.alpha = 0
+            self.mobileCover.alpha = 0
+            self.consoleCover.alpha = 0
+        } else if(selected == "pc"){
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            let list = delegate.gcGames
+            let sorted = list!.sorted(by: { $0.gameName < $1.gameName })
+            gameList = sorted
+            
+            for game in gameList {
+                if(!game.availablebConsoles.contains("pc")){
+                    gameList.remove(at: gameList.index(of: game)!)
+                }
+            }
+            self.gameTable.reloadData()
+            
+            self.allGamesCover.alpha = 0
+            self.popularCover.alpha = 0
+            self.pcCover.alpha = 1
+            self.tableCover.alpha = 0
+            self.mobileCover.alpha = 0
+            self.consoleCover.alpha = 0
+        } else if(selected == "mobile"){
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            let list = delegate.gcGames
+            let sorted = list!.sorted(by: { $0.gameName < $1.gameName })
+            gameList = sorted
+            
+            for game in gameList {
+                if(game.mobileGame != "true"){
+                    gameList.remove(at: gameList.index(of: game)!)
+                }
+            }
+            self.gameTable.reloadData()
+            
+            self.allGamesCover.alpha = 0
+            self.popularCover.alpha = 0
+            self.pcCover.alpha = 0
+            self.tableCover.alpha = 0
+            self.mobileCover.alpha = 1
+            self.consoleCover.alpha = 0
+        } else if(selected == "console"){
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            let list = delegate.gcGames
+            let sorted = list!.sorted(by: { $0.gameName < $1.gameName })
+            gameList = sorted
+            
+            for game in gameList {
+                if(!game.availablebConsoles.contains("ps") && !game.availablebConsoles.contains("xbox")
+                && !game.availablebConsoles.contains("nintendo")){
+                    gameList.remove(at: gameList.index(of: game)!)
+                }
+            }
+            self.gameTable.reloadData()
+            
+            self.allGamesCover.alpha = 0
+            self.popularCover.alpha = 0
+            self.pcCover.alpha = 0
+            self.tableCover.alpha = 0
+            self.mobileCover.alpha = 0
+            self.consoleCover.alpha = 1
+        } else if(selected == "tabletop"){
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            let list = delegate.gcGames
+            let sorted = list!.sorted(by: { $0.gameName < $1.gameName })
+            gameList = sorted
+            
+            for game in gameList {
+                if(!game.availablebConsoles.contains("tabletop")){
+                    gameList.remove(at: gameList.index(of: game)!)
+                }
+            }
+            self.gameTable.reloadData()
+            
+            self.allGamesCover.alpha = 0
+            self.popularCover.alpha = 0
+            self.pcCover.alpha = 0
+            self.tableCover.alpha = 1
+            self.mobileCover.alpha = 0
+            self.consoleCover.alpha = 0
+        } else if(selected == "popular"){
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            let list = delegate.gcGames
+            let sorted = list!.sorted(by: { $0.gameName < $1.gameName })
+            gameList = sorted
+            
+            for game in gameList {
+                if(!game.categoryFilters.contains("popular")){
+                    gameList.remove(at: gameList.index(of: game)!)
+                }
+            }
+            self.gameTable.reloadData()
+            
+            self.allGamesCover.alpha = 0
+            self.popularCover.alpha = 1
+            self.pcCover.alpha = 0
+            self.tableCover.alpha = 0
+            self.mobileCover.alpha = 0
+            self.consoleCover.alpha = 0
+        }
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -645,6 +815,7 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
         
         if(self.modalPopped){
+            self.upgradeFrag?.dismissModal()
             self.dismiss(animated: true) {
                 let delegate = UIApplication.shared.delegate as! AppDelegate
                 delegate.currentFeedFrag?.checkOnlineAnnouncements()
@@ -709,6 +880,7 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
             self.buildUserCache()
         } else {
             if(self.modalPopped){
+                upgradeFrag?.dismissModal()
                 self.dismiss(animated: true) {
                     let delegate = UIApplication.shared.delegate as! AppDelegate
                     delegate.currentFeedFrag?.checkOnlineAnnouncements()
@@ -881,14 +1053,14 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
                                 }
                             }
                         }
-                        
-                        if(gameMatch && languageMatch){
+                        let tag = (user as! DataSnapshot).childSnapshot(forPath: "gamerTag").value as? String ?? ""
+                        if(gameMatch && languageMatch && !tag.isEmpty){
                             perfectMatches.append(self.quickCreateUser(snapshot: user as! DataSnapshot))
                         }
-                        if(gameMatch){
+                        if(gameMatch && !tag.isEmpty){
                             gamesMatches.append(self.quickCreateUser(snapshot: user as! DataSnapshot))
                         }
-                        if(languageMatch){
+                        if(languageMatch && !tag.isEmpty){
                             languageMatches.append(self.quickCreateUser(snapshot: user as! DataSnapshot))
                         }
                         
@@ -965,34 +1137,39 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
             consoles.append("select a console")
         }
         if(currentConsoles.contains("ps")){
-            consoles.append("PlayStation")
+            consoles.append("playstation")
         }
         if(currentConsoles.contains("xbox")){
-            consoles.append("xBox")
+            consoles.append("xbox")
         }
         if(currentConsoles.contains("nintendo")){
-            consoles.append("Nintendo")
+            consoles.append("nintendo")
         }
         if(currentConsoles.contains("pc")){
-            consoles.append("PC")
+            consoles.append("pc")
         }
         if(currentConsoles.contains("mobile")){
-            consoles.append("Mobile")
+            consoles.append("mobile")
+        }
+        if(currentConsoles.contains("tabletop")){
+            consoles.append("tabletop")
         }
         return consoles
     }
     
     private func mapConsoleForDisplay(console: String) -> String {
         if(console == "ps"){
-            return "PlayStation"
+            return "playstation"
         } else if(console == "xbox"){
-            return "xBox"
+            return "xbox"
         } else if(console == "nintendo"){
-            return "Nintendo"
+            return "nintendo"
         } else if(console == "pc"){
-            return "PC"
+            return "pc"
+        } else if(console == "tabletop"){
+            return "tabletop"
         } else {
-            return "Mobile"
+            return "mobile"
         }
     }
     

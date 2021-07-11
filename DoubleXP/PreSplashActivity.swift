@@ -25,7 +25,7 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        guard let videoPath = Bundle.main.path(forResource: "splash", ofType: "mov"),
+        guard let videoPath = Bundle.main.path(forResource: "newSplash0421", ofType: "mov"),
         let imagePath = Bundle.main.path(forResource: "null", ofType: "png") else{
             games = [GamerConnectGame]()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -218,7 +218,6 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
                             var twitterHandle = ""
                             var twitchHandle = ""
                             var available = "true"
-                            var hasQuiz = false
                             var mobileGame = ""
                             var gameType = ""
                             var releaseDate = ""
@@ -227,6 +226,7 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
                             var timeCommitment = ""
                             var complexity = ""
                             var alternateImageUrl = ""
+                            var quizUrl = ""
                             var ratings = [[String: String]]()
                             var quickReviews = [[String: String]]()
                             var gameModes = [String]()
@@ -256,24 +256,17 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
                                 lookingFor = (gameDict.value(forKey: "lookingFor") as? [String]) ?? [String]()
                                 gameDescription = (gameDict).value(forKey: "gameDescription") as? String ?? ""
                                 ideal = (gameDict).value(forKey: "ideal") as? String ?? ""
+                                quizUrl = (gameDict).value(forKey: "quizUrl") as? String ?? ""
                                 timeCommitment = (gameDict).value(forKey: "timeCommitment") as? String ?? ""
                                 alternateImageUrl = (gameDict).value(forKey: "alternateImageUrlXXHDPI") as? String ?? ""
                                 complexity = (gameDict).value(forKey: "complexity") as? String ?? ""
                                 ratings = (gameDict).value(forKey: "ratings") as? [[String: String]] ?? [[String: String]]()
                                 quickReviews = (gameDict).value(forKey: "quickReviews") as? [[String: String]] ?? [[String: String]]()
                                 
-                                let quiz = (gameDict).value(forKey: "quiz") as? String ?? ""
-                                if(quiz == "true"){
-                                    hasQuiz = true
-                                } else {
-                                    hasQuiz = false
-                                }
-                                
                                 let newGame  = GamerConnectGame(imageUrl: imageUrl, gameName: gameName, developer: developer, hook: hook, statsAvailable: statsAvailable, teamNeeds: teamNeeds,
                                                                 twitterHandle: twitterHandle, twitchHandle: twitchHandle, available: available)
                                 newGame.secondaryName = secondaryName
                                 newGame.gameModes = gameModes
-                                newGame.hasQuiz = hasQuiz
                                 newGame.mobileGame = mobileGame
                                 newGame.availablebConsoles = availableConsoles
                                 newGame.categoryFilters = categoryFilters
@@ -287,6 +280,7 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
                                 newGame.quickReviews = quickReviews
                                 newGame.alternateImageUrl = alternateImageUrl
                                 newGame.lookingFor = lookingFor
+                                newGame.quizUrl = quizUrl
                                 
                                 if(gameDict.value(forKey: "filterQuestions") != nil){
                                     //let test = gameDict["filterQuestions"] as? [[String: Any]] ?? [[String: Any]]()
@@ -373,6 +367,8 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
             let restrictList = value?["restrictList"] as? [String: String] ?? [String: String]()
             let cachedRecommendedUids = value?["cachedRecommendedUids"] as? [String] ?? [String]()
             let dailyCheck = value?["dailyCheck"] as? String ?? ""
+            let googleApiRefreshToken = value?["googleApiRefreshToken"] as? String ?? ""
+            let gamingExperience = value?["gamingExperience"] as? String ?? "5"
             var receivedAnnouncements = value?["receivedAnnouncements"] as? [String] ?? [String]()
             let search = value?["search"] as? String ?? ""
             if(search.isEmpty){
@@ -393,6 +389,7 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
             }
             
             let viewedAnnouncements = value?["viewedAnnouncements"] as? [String] ?? [String]()
+            let aboutMe = value?["aboutMe"] as? [String] ?? [String]()
             let reviews = value?["reviews"] as? [String] ?? [String]()
             
             var sentRequests = [FriendRequestObject]()
@@ -672,17 +669,6 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
                         let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
                         friends.append(newFriend)
                     }
-                }
-            }
-            
-            var lookingForArray = [LookingForSelection]()
-            if(snapshot.hasChild("lookingFor")){
-                let lookingFor = snapshot.childSnapshot(forPath: "lookingFor")
-                for lookingForChild in lookingFor.children {
-                    let newSelection = LookingForSelection()
-                    newSelection.gameName = (lookingForChild as? DataSnapshot)?.key ?? ""
-                    newSelection.choices = (lookingForChild as? DataSnapshot)?.value as? [String] ?? [String]()
-                    lookingForArray.append(newSelection)
                 }
             }
             
@@ -983,9 +969,11 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
             user.reviews = reviews
             user.badges = badges
             user.dailyCheck = dailyCheck
+            user.userAbout = aboutMe
             user.cachedRecommendedUids = cachedRecommendedUids
             user.receivedAnnouncements = receivedAnnouncements
-            user.userLookingFor = lookingForArray
+            user.gamingExperience = gamingExperience
+            user.googleApiRefreshToken = googleApiRefreshToken
             
             DispatchQueue.main.async {
                 let delegate = UIApplication.shared.delegate as! AppDelegate

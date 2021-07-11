@@ -604,7 +604,7 @@ class FriendsManager{
         return contained
     }
     
-    func acceptFriendFromRequests(position: IndexPath, otherUserRequest: FriendRequestObject, currentUserUid: String, callbacks: RequestsUpdate){
+    func acceptFriendFromRequests(otherUserRequest: FriendRequestObject, currentUserUid: String, callbacks: RequestsUpdate){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let currentUser = delegate.currentUser
         let manager = GamerProfileManager()
@@ -688,7 +688,7 @@ class FriendsManager{
                 
                 ref.child("friends").setValue(sendList)
                 
-                self.updateCurrentUser(otherUserRequest: otherUserRequest, currentUserUid: currentUserUid, callbacks: callbacks, position: position)
+                self.updateCurrentUser(otherUserRequest: otherUserRequest, currentUserUid: currentUserUid, callbacks: callbacks)
             }
             
         }) { (error) in
@@ -696,7 +696,7 @@ class FriendsManager{
         }
     }
     
-    private func updateCurrentUser(otherUserRequest: FriendRequestObject, currentUserUid: String, callbacks: RequestsUpdate, position: IndexPath){
+    private func updateCurrentUser(otherUserRequest: FriendRequestObject, currentUserUid: String, callbacks: RequestsUpdate){
         //Now Current User
         //First, lets remove the sent request
         let ref = Database.database().reference().child("Users").child(currentUserUid)
@@ -792,7 +792,7 @@ class FriendsManager{
                     ref.child("friends").setValue(friends)
                 }
                 
-                callbacks.updateCell(indexPath: position)
+                callbacks.updateCell()
             }
             
         }) { (error) in
@@ -800,7 +800,7 @@ class FriendsManager{
         }
     }
     
-    func declineRequest(position: IndexPath, otherUserRequest: FriendRequestObject, currentUserUid: String, callbacks: RequestsUpdate){
+    func declineRequest(otherUserRequest: FriendRequestObject, currentUserUid: String, callbacks: RequestsUpdate){
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let currentUser = delegate.currentUser
@@ -856,7 +856,7 @@ class FriendsManager{
                 }
                 
                 
-                self.updateCurrentUserRemove(otherUserRequest: otherUserRequest, currentUserUid: currentUserUid, callbacks: callbacks, position: position)
+                self.updateCurrentUserRemove(otherUserRequest: otherUserRequest, currentUserUid: currentUserUid, callbacks: callbacks)
             }
             
         }) { (error) in
@@ -864,7 +864,7 @@ class FriendsManager{
         }
     }
     
-    private func updateCurrentUserRemove(otherUserRequest: FriendRequestObject, currentUserUid: String, callbacks: RequestsUpdate, position: IndexPath){
+    private func updateCurrentUserRemove(otherUserRequest: FriendRequestObject, currentUserUid: String, callbacks: RequestsUpdate){
         
         let ref = Database.database().reference().child("Users").child(currentUserUid)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
@@ -894,7 +894,7 @@ class FriendsManager{
                 ref.child("sent_requests").setValue(sendList)
                 currentUser!.sentRequests = sentRequests
                 
-                callbacks.updateCell(indexPath: position)
+                callbacks.updateCell()
             }
             
         }) { (error) in
@@ -1152,7 +1152,7 @@ class FriendsManager{
         }
     }
     
-    func acceptPlayRequest(position: IndexPath, rival: RivalObj, callbacks: RequestsUpdate){
+    func acceptPlayRequest(rival: RivalObj, callbacks: RequestsUpdate){
         //update other user
         let ref = Database.database().reference().child("Users").child(rival.uid)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
@@ -1228,7 +1228,7 @@ class FriendsManager{
                 
                 ref.child("acceptedTempRivals").setValue(sendList)
                 
-                self.updateAcceptRejectCurrentUser(position: position, rival: rival, callbacks: callbacks, accepted: true)
+                self.updateAcceptRejectCurrentUser(rival: rival, callbacks: callbacks, accepted: true)
             }
             
         }) { (error) in
@@ -1237,7 +1237,7 @@ class FriendsManager{
         }
     }
     
-    func rejectPlayRequest(position: IndexPath, rival: RivalObj, callbacks: RequestsUpdate){
+    func rejectPlayRequest(rival: RivalObj, callbacks: RequestsUpdate){
         //update other user
         let ref = Database.database().reference().child("Users").child(rival.uid)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
@@ -1313,7 +1313,7 @@ class FriendsManager{
                 
                 ref.child("rejectedTempRivals").setValue(sendList)
                 
-                self.updateAcceptRejectCurrentUser(position: position, rival: rival, callbacks: callbacks, accepted: false)
+                self.updateAcceptRejectCurrentUser(rival: rival, callbacks: callbacks, accepted: false)
             }
             
         }) { (error) in
@@ -1322,7 +1322,7 @@ class FriendsManager{
         }
     }
     
-    private func updateAcceptRejectCurrentUser(position: IndexPath, rival: RivalObj, callbacks: RequestsUpdate, accepted: Bool){
+    private func updateAcceptRejectCurrentUser(rival: RivalObj, callbacks: RequestsUpdate, accepted: Bool){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let currentUser = delegate.currentUser!
         
@@ -1407,10 +1407,10 @@ class FriendsManager{
                 }
                 
                 if(accepted){
-                    callbacks.rivalResponseAccepted(indexPath: position)
+                    callbacks.rivalResponseAccepted()
                 }
                 else{
-                    callbacks.rivalResponseRejected(indexPath: position)
+                    callbacks.rivalResponseRejected()
                 }
             }
             

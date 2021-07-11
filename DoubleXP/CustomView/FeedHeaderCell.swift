@@ -95,7 +95,7 @@ class FeedHeaderCell : UITableViewCell, UICollectionViewDelegate, UICollectionVi
         hero.layer.shadowOpacity = 0.5
         hero.layer.masksToBounds = false*/
         
-        let testBounds = CGRect(x: hero.bounds.minX, y: hero.bounds.minY, width: self.bounds.width, height: hero.bounds.height)
+        let testBounds = CGRect(x: hero.bounds.minX, y: hero.bounds.minY, width: feed.view.bounds.width, height: hero.bounds.height)
         //hero.layer.shadowPath = UIBezierPath(roundedRect: testBounds, cornerRadius: hero.layer.cornerRadius).cgPath
         
         let maskLayer = CAGradientLayer(layer: self.hero.layer)

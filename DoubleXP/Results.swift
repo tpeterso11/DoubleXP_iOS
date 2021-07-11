@@ -10,8 +10,9 @@ import Foundation
 import UIKit
 import SPStorkController
 import SwiftNotificationCenter
+import SPStorkController
 
-class Results: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class Results: UIViewController, UITableViewDataSource, UITableViewDelegate, SPStorkControllerDelegate {
     var payload = [Any]()
     var returning = false
     var userUid = ""
@@ -48,25 +49,26 @@ class Results: UIViewController, UITableViewDataSource, UITableViewDelegate {
         let games = currentUser.games
         
         for game in delegate.gcGames {
-            if((game.hasQuiz && games.contains(game.gameName)) || (game.statsAvailable && games.contains(game.gameName))){
+            //if((game.hasQuiz && games.contains(game.gameName)) || (game.statsAvailable && games.contains(game.gameName))){
+            if((!game.quizUrl.isEmpty && games.contains(game.gameName))){
                 payload.append("toolsHeader")
                 break
             }
         }
         //quizzes
         for game in delegate.gcGames {
-            if(game.hasQuiz && games.contains(game.gameName)){
+            if(!game.quizUrl.isEmpty && games.contains(game.gameName)){
                 payload.append(0)
                 break
             }
         }
         //stats
-        for game in delegate.gcGames {
+        /*for game in delegate.gcGames {
             if(game.statsAvailable && games.contains(game.gameName)){
                 payload.append(1)
                 break
             }
-        }
+        }*/
         payload.append(false)
         
         self.resultTable.delegate = self
@@ -124,7 +126,7 @@ class Results: UIViewController, UITableViewDataSource, UITableViewDelegate {
             return cell
         }
         if(current is Int){
-            if((current as! Int) == 0){
+            //if((current as! Int) == 0){
                 let cell = tableView.dequeueReusableCell(withIdentifier: "upgrade", for: indexPath) as! ResultsUpgradeCell
                 cell.header.text = "take a free agent quiz"
                 cell.sub.text = "let them know how you play."
@@ -134,7 +136,7 @@ class Results: UIViewController, UITableViewDataSource, UITableViewDelegate {
                 cell.isUserInteractionEnabled = true
                 cell.contentView.addGestureRecognizer(cellTap)
                 return cell
-            } else {
+            /*} else {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "upgrade", for: indexPath) as! ResultsUpgradeCell
                 cell.header.text = "import stats"
                 cell.sub.text = "let them know how good you are."
@@ -144,7 +146,7 @@ class Results: UIViewController, UITableViewDataSource, UITableViewDelegate {
                 cell.isUserInteractionEnabled = true
                 cell.contentView.addGestureRecognizer(cellTap)
                 return cell
-            }
+            }*/
         }
         if(current is Bool){
             let cell = tableView.dequeueReusableCell(withIdentifier: "button", for: indexPath) as! ResultsButtonCell
@@ -174,9 +176,9 @@ class Results: UIViewController, UITableViewDataSource, UITableViewDelegate {
         let current = payload[sender.tag] as? Int ?? -1
         if(current == 0){
             currentUpgradeChoice = "quiz"
-        } else {
+        } /*else {
             currentUpgradeChoice = "stats"
-        }
+        }*/
         performSegue(withIdentifier: "upgrade", sender: self)
     }
     
@@ -190,7 +192,19 @@ class Results: UIViewController, UITableViewDataSource, UITableViewDelegate {
     func proceedToProfile(userUid: String){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.cachedTest = userUid
-        performSegue(withIdentifier: "profile", sender: self)
+        
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "playerProfile") as! PlayerProfile
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        currentViewController.editMode = false
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+        //performSegue(withIdentifier: "profile", sender: self)
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -206,7 +220,7 @@ class Results: UIViewController, UITableViewDataSource, UITableViewDelegate {
             return CGFloat(570)
         }
         if(current is Int){
-            return CGFloat(80)
+            return CGFloat(125)
         }
         if(current is Bool){
             return CGFloat(180)
@@ -215,7 +229,7 @@ class Results: UIViewController, UITableViewDataSource, UITableViewDelegate {
     }
     
     private func createDefaultList() -> [User]{
-        let userOne = User(uId: "DihWEjaTfVNbo7zvqTDoycIvDiv2")
+        let userOne = User(uId: "EeahIsrgvlQzeSNMA5L8uxlBSkk1")
         userOne.gamerTag = "allthesaint011"
         
         let userTwo = User(uId: "N1k1BqmvEvdOXrbmi2p91kTNLOo1")

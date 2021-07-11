@@ -12,5 +12,6 @@ class ConnectCell: UITableViewCell {
     @IBOutlet weak var connectLabel: UILabel!
     @IBOutlet weak var connectLogo: UIImageView!
     @IBOutlet weak var disconnectButton: UIImageView!
+    @IBOutlet weak var connectStatus: UILabel!
     
 }

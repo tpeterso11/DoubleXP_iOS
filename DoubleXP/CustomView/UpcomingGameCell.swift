@@ -8,10 +8,8 @@
 
 import Foundation
 import UIKit
-import CountdownLabel
-import CollectionViewSlantedLayout
 
-class UpcomingGameCell: CollectionViewSlantedCell {
+class UpcomingGameCell: UICollectionViewCell {
     @IBOutlet weak var gameName: UILabel!
     @IBOutlet weak var gameBack: UIImageView!
     @IBOutlet weak var closeClickArea: UIView!

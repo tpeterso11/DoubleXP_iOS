@@ -100,6 +100,26 @@ class UpcomingGame: NSObject, NSCoding {
         }
     }
     
+    var _developer = ""
+    var developer: String {
+        get {
+            return (_developer)
+        }
+        set (newVal) {
+            _developer = newVal
+        }
+    }
+    
+    var _consoles = [String]()
+       var consoles: [String] {
+           get {
+               return (_consoles)
+           }
+           set (newVal) {
+               _consoles = newVal
+           }
+    }
+    
     init(id: String, game: String, blurb: String, releaseDateMillis: String, releaseDate: String, trailerUrls: [String: String],
          gameImageUrl: String, gameDesc: String, releaseDateProper: String)
     {
@@ -127,6 +147,8 @@ class UpcomingGame: NSObject, NSCoding {
         self.gameImageUrl = (decoder.decodeObject(forKey: "gameImageUrl") as! String)
         self.gameDesc = (decoder.decodeObject(forKey: "gameDesc") as! String)
         self.releaseDateProper = (decoder.decodeObject(forKey: "releaseDateProper") as! String)
+        self.consoles = (decoder.decodeObject(forKey: "consoles") as! [String])
+        self.developer = (decoder.decodeObject(forKey: "developer") as! String)
     }
     
     func encode(with coder: NSCoder) {
@@ -139,6 +161,8 @@ class UpcomingGame: NSObject, NSCoding {
         coder.encode(self.gameImageUrl, forKey: "gameImageUrl")
         coder.encode(self.gameDesc, forKey: "gameDesc")
         coder.encode(self.releaseDateProper, forKey: "releaseDateProper")
+        coder.encode(self.consoles, forKey: "consoles")
+        coder.encode(self.developer, forKey: "developer")
     }
     
 }

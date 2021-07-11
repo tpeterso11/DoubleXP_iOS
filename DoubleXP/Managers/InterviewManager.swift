@@ -69,40 +69,46 @@ class InterviewManager{
     }
     
     func updateAnswer(answer: String?, answerArray: [String]?, question: FAQuestion){
-        if(currentQuestionIndex == 0 && !question.question1SetURL.isEmpty){
-            updateQuestions(answer: answer, answerArray: answerArray, faQuestion: question)
-            
-            getQuiz(url: question.question1SetURL, secondary: true, gameName: self.currentGCGame.gameName, callbacks: nil)
-        }
-        else{
-            updateQuestions(answer: answer, answerArray: answerArray, faQuestion: question)
-            
-            if((currentQuestionIndex + 1) != self.questions.count){
-                showNextQuestion()
+        let urls = Array(question.urlTree.keys)
+        if(answer != nil){
+            let urlAvailable = urls.contains(answer!)
+            if(currentQuestionIndex == 0 && urlAvailable){
+                self.updateQuestions(answer: answer, answerArray: answerArray, faQuestion: question)
+                let url = question.urlTree[answer!]
+                if(!url!.isEmpty){
+                    self.getQuiz(url: url!, secondary: true, gameName: self.currentGCGame.gameName, callbacks: nil)
+                }
             }
             else{
-                if(currentGCGame.availablebConsoles.count == 1){
-                    setConsoles(console: currentGCGame.availablebConsoles[0])
-                    return
-                }
+                updateQuestions(answer: answer, answerArray: answerArray, faQuestion: question)
                 
-                let delegate = UIApplication.shared.delegate as! AppDelegate
-                let currentUser = delegate.currentUser!
-                var console = ""
-                var consoleTwo = ""
-                for profile in currentUser.gamerTags {
-                    if(profile.game == currentGCGame.gameName){
-                        if(console.isEmpty){
-                            console = profile.console
-                        } else {
-                            consoleTwo = profile.console
+                if((currentQuestionIndex + 1) != self.questions.count){
+                    showNextQuestion()
+                }
+                else{
+                    if(currentGCGame.availablebConsoles.count == 1){
+                        setConsoles(console: currentGCGame.availablebConsoles[0])
+                        return
+                    }
+                    
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    let currentUser = delegate.currentUser!
+                    var console = ""
+                    var consoleTwo = ""
+                    for profile in currentUser.gamerTags {
+                        if(profile.game == currentGCGame.gameName){
+                            if(console.isEmpty){
+                                console = profile.console
+                            } else {
+                                consoleTwo = profile.console
+                            }
                         }
                     }
-                }
-                if(!console.isEmpty && consoleTwo.isEmpty){
-                    setConsoles(console: console)
-                } else {
-                    showConsoles()
+                    if(!console.isEmpty && consoleTwo.isEmpty){
+                        setConsoles(console: console)
+                    } else {
+                        showConsoles()
+                    }
                 }
             }
         }
@@ -281,24 +287,40 @@ class InterviewManager{
                                 }
                             }
                         }
+                        var urlTree = [String: String]()
                         let faQuestion = FAQuestion(question: question)
                         faQuestion.questionNumber = questionNumber
                         faQuestion.question = question
                         faQuestion.option1 = option1
                         faQuestion.option1Description = option1Description
                         faQuestion.question1SetURL = question1SetURL
+                        if(!question1SetURL.isEmpty){
+                            urlTree[option1] = question1SetURL
+                        }
                         faQuestion.option2 = option2
                         faQuestion.option2Description = option2Description
                         faQuestion.question2SetURL = question2SetURL
+                        if(!question2SetURL.isEmpty){
+                            urlTree[option2] = question2SetURL
+                        }
                         faQuestion.option3 = option3
                         faQuestion.option3Description = option3Description
                         faQuestion.question3SetURL = question3SetURL
+                        if(!question3SetURL.isEmpty){
+                            urlTree[option3] = question3SetURL
+                        }
                         faQuestion.option4 = option4
                         faQuestion.option4Description = option4Description
                         faQuestion.question4SetURL = question4SetURL
+                        if(!question4SetURL.isEmpty){
+                            urlTree[option4] = question4SetURL
+                        }
                         faQuestion.option5 = option5
                         faQuestion.option5Description = option5Description
                         faQuestion.question5SetURL = question5SetURL
+                        if(!question5SetURL.isEmpty){
+                            urlTree[option5] = question5SetURL
+                        }
                         faQuestion.option6 = option6
                         faQuestion.option6Description = option6Description
                         faQuestion.option7 = option7
@@ -315,6 +337,7 @@ class InterviewManager{
                         faQuestion.teamNeedQuestion = teamNeedQuestion
                         faQuestion.optionsUrl = optionsURL
                         faQuestion.maxOptions = maxOptions
+                        faQuestion.urlTree = urlTree
                         if(!optionsURL.isEmpty){
                             self.getOptions(url: optionsURL, gameName: gameName)
                         }

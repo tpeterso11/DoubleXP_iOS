@@ -18,8 +18,10 @@ struct filterCell {
     var opened = true
     var title: String!
     var options: [[String: String]]!
+    var choices: [String]!
     var header = false
     var type: String!
+    var mainHeader = false
     //question: answer/db_value
 }
 
@@ -38,6 +40,7 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
     var locationShowing = false
     var locationCell: filterCell?
     var currentSelectedSender: DistanceGesture?
+    var currentLocationActivationCell: FilterActivateCell?
     
     
     override func viewDidLoad() {
@@ -74,6 +77,7 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
         header.header = true
         header.title = "basic"
         header.options = [["": ""]]
+        header.choices = [String]()
         self.basicFilterList.append(header)
         
         locationCell = filterCell()
@@ -81,6 +85,7 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
         locationCell?.title = "location"
         locationCell?.type = "activate"
         locationCell?.opened = true
+        locationCell?.choices = [String]()
         locationCell?.options = [["": ""]]
         self.basicFilterList.append(locationCell!)
         
@@ -90,7 +95,12 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
         let grown = ["32 +": "32_over"]
         let ageChoices = [baby, young, mid, grown]
         var opened = !self.currentManager.ageFilters.isEmpty
-        let age = filterCell(opened: opened, title: "age range", options: ageChoices, type: "age")
+        var age = filterCell(opened: opened, title: "age range", options: ageChoices, type: "age")
+        age.choices = [String]()
+        age.choices.append("12 - 16")
+        age.choices.append("17 - 24")
+        age.choices.append("25 - 31")
+        age.choices.append("32 +")
         self.basicFilterList.append(age)
         
         /*let english = ["english": "english"]
@@ -112,10 +122,12 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
             for question in gcGame.filterQuestions {
                 let key = Array(question.keys)[0]
                 var options = [[String: String]]()
+                var choices = [String]()
                 let answers = question[key] as? [[String: String]]
                 for answer in answers! {
                     let answerKey = Array(answer.keys)[0]
                     let option = [key: answer[answerKey]!]
+                    choices.append(answer[answerKey]!)
                     options.append(option)
                 }
                 let filter = filterCell(opened: false, title: key, options: options, type: "advanced")
@@ -145,15 +157,17 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
             if(self.basicFilterList[indexPath.section].header == true){
                 if(self.basicFilterList[indexPath.section].type == "activate"){
                     let cell = tableView.dequeueReusableCell(withIdentifier: "activate", for: indexPath) as! FilterActivateCell
-                    cell.label.text = self.basicFilterList[indexPath.section].title
+                    cell.actionButton.setTitle(self.basicFilterList[indexPath.section].title, for: .normal)
                     
                     if(self.basicFilterList[indexPath.section].title == "location"){
                         let delegate = UIApplication.shared.delegate as! AppDelegate
+                        self.currentLocationActivationCell = cell
                         if(delegate.currentUser!.userLat != 0.0){
                             cell.switch.isOn = true
                         } else {
                             cell.switch.isOn = false
                         }
+                        cell.actionButton.addTarget(self, action: #selector(locationButtonTriggered), for: UIControl.Event.touchUpInside)
                         cell.switch.addTarget(self, action: #selector(locationSwitchTriggered), for: UIControl.Event.valueChanged)
                     }
                     return cell
@@ -164,13 +178,12 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
                 }
             } else {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "header", for: indexPath) as! FilterHeader
-                cell.header.text = self.basicFilterList[indexPath.section].title
+                cell.headerAction.setTitle(self.basicFilterList[indexPath.section].title, for: .normal)
                 
-                if(self.basicFilterList[indexPath.section].opened == true){
-                    cell.arrow.transform = CGAffineTransform(rotationAngle: CGFloat(Double.pi));
-                } else {
-                    cell.arrow.transform = CGAffineTransform(rotationAngle: CGFloat(0));
-                }
+                let headerTap = HeaderGesture(target: self, action: #selector(headerTriggered))
+                headerTap.payload = self.basicFilterList[indexPath.section].choices
+                cell.headerAction.addGestureRecognizer(headerTap)
+                
                 return cell
             }
         } else {
@@ -381,6 +394,31 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
         self.table.reloadData()
     }
     
+    @objc private func headerTriggered(sender: HeaderGesture){
+        
+    }
+    
+    @objc private func locationButtonTriggered(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        if(delegate.currentUser!.userLat != 0.0){
+            self.currentLocationActivationCell?.switch.setOn(false, animated: true)
+            delegate.currentUser!.userLat = 0.0
+            delegate.currentUser!.userLong = 0.0
+            self.sendLocationInfo()
+            self.table.reloadData()
+        } else {
+            self.currentLocationActivationCell?.switch.setOn(false, animated: true)
+            locationManager = CLLocationManager()
+            locationManager?.delegate = self
+            if #available(iOS 14.0, *) {
+                locationManager?.desiredAccuracy = kCLLocationAccuracyReduced
+            } else {
+                locationManager?.desiredAccuracy = 5000
+            }
+            locationManager?.requestWhenInUseAuthorization()
+        }
+    }
+    
     @objc private func locationSwitchTriggered(sender: UISwitch) {
         let delegate = UIApplication.shared.delegate as! AppDelegate
         if(delegate.currentUser!.userLat != 0.0){
@@ -485,4 +523,9 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
 class DistanceGesture: UITapGestureRecognizer {
     var tag: String!
     var section: Int!
+}
+
+class HeaderGesture: UITapGestureRecognizer {
+    var question: String!
+    var payload: [String]!
 }

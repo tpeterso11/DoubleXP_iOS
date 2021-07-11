@@ -10,5 +10,6 @@ import Foundation
 import UIKit
 
 class FeedDiscoverCell : UITableViewCell {
+    @IBOutlet weak var discoverImg: UIImageView!
     @IBOutlet weak var discoverLayout: UIView!
 }

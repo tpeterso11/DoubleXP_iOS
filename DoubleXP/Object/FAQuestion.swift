@@ -434,6 +434,16 @@ class FAQuestion: NSObject, NSCoding {
         }
     }
     
+    var _urlTree = [String: String]()
+    var urlTree: [String: String] {
+        get {
+            return (_urlTree)
+        }
+        set (newVal) {
+            _urlTree = newVal
+        }
+    }
+    
     init(question: String)
     {
         super.init()
@@ -468,6 +478,7 @@ class FAQuestion: NSObject, NSCoding {
         self.optionsUrl = (decoder.decodeObject(forKey: "optionsUrl") as! String)
         self.maxOptions = (decoder.decodeObject(forKey: "maxOptions") as! String)
         self.answerArray = (decoder.decodeObject(forKey: "answerArray") as! [String])
+        self.urlTree = (decoder.decodeObject(forKey: "urlTree") as! [String: String])
     }
 
     func encode(with coder: NSCoder) {
@@ -496,5 +507,6 @@ class FAQuestion: NSObject, NSCoding {
         coder.encode(self.optionsUrl, forKey: "optionsUrl")
         coder.encode(self.maxOptions, forKey: "maxOptions")
         coder.encode(self.answerArray, forKey: "answerArray")
+        coder.encode(self.urlTree, forKey: "urlTree")
     }
 }

@@ -12,6 +12,7 @@ import moa
 import SwiftHTTP
 import SwiftNotificationCenter
 import FBSDKCoreKit
+import Lottie
 
 class FAQuizCover: ParentVC, FreeAgentQuizNav{
     
@@ -21,15 +22,8 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
     var interviewManager: InterviewManager?
     var currentUrl = ""
     
-    @IBOutlet weak var topView: UIView!
+    @IBOutlet weak var lottie: AnimationView!
     @IBOutlet weak var bottomView: UIView!
-    @IBOutlet weak var gameImage: UIImageView!
-    @IBOutlet weak var gameName: UILabel!
-    @IBOutlet weak var dashButton: UIButton!
-    @IBOutlet weak var startButton: UIButton!
-    @IBOutlet weak var empty: UIView!
-    @IBOutlet weak var emptyText: UILabel!
-    @IBOutlet weak var emptyFAButton: UIButton!
     var maxProfiles = 0
     
     
@@ -39,36 +33,31 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        setImage()
-        
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        
-        getQuestions()
-        
-        startButton.alpha = 0.4
+        lottie.loopMode = .loop
+        lottie.play()
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
         interviewManager = delegate.interviewManager
-        gameName.text = interviewManager?.currentGCGame?.gameName
         
-        startButton.addTarget(self, action: #selector(doneButtonClicked), for: .touchUpInside)
-        
-        startButton.layer.shadowColor = UIColor.black.cgColor
-        startButton.layer.shadowOffset = CGSize(width: 0, height: 2.0)
-        startButton.layer.shadowRadius = 2.0
-        startButton.layer.shadowOpacity = 0.5
-        startButton.layer.masksToBounds = false
-        startButton.layer.shadowPath = UIBezierPath(roundedRect: startButton.bounds, cornerRadius: startButton.cornerRadius).cgPath
-        
-        navDictionary = ["state": "backOnly"]
-        
-        appDelegate.currentLanding?.updateNavigation(currentFrag: self)
-        
-        self.pageName = "FA Quiz Front"
-        appDelegate.addToNavStack(vc: self)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
+            self.getQuestions()
+        }
         
         AppEvents.logEvent(AppEvents.Name(rawValue: "FA Quiz Front"))
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        self.bottomView.layer.cornerRadius = 10.0
+        self.bottomView.layer.borderWidth = 1.0
+        self.bottomView.layer.borderColor = UIColor.clear.cgColor
+        self.bottomView.layer.masksToBounds = true
+        
+        self.bottomView.layer.shadowColor = UIColor.black.cgColor
+        self.bottomView.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+        self.bottomView.layer.shadowRadius = 2.0
+        self.bottomView.layer.shadowOpacity = 0.5
+        self.bottomView.layer.masksToBounds = false
+        self.bottomView.layer.shadowPath = UIBezierPath(roundedRect: self.bottomView.layer.bounds, cornerRadius: self.bottomView.layer.cornerRadius).cgPath
     }
     
     @objc func startButtonClicked(_ sender: AnyObject?) {
@@ -77,9 +66,6 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
     }
     
     func showEmpty() {
-        empty.isHidden = false
-        
-        
         //dashButton.addTarget(self, action: #selector(dashButtonClicked), for: .touchUpInside)
     }
     
@@ -96,33 +82,13 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
     private func setImage(){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         interviewManager = delegate.interviewManager
-        gameImage.image = Utility.Image.placeholder
-        gameImage.moa.url = interviewManager?.currentGCGame?.imageUrl
-        gameImage.contentMode = .scaleAspectFill
-        gameImage.clipsToBounds = true
     }
     
     func getQuestions(){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         interviewManager = delegate.interviewManager
         
-        let ref = Database.database().reference().child("Games").child(interviewManager!.currentGCGame.gameName)
-        ref.observeSingleEvent(of: .value, with: { (snapshot) in
-            if(snapshot.exists()){
-                let value = snapshot.value as? NSDictionary
-                self.currentUrl = value?["url"] as? String ?? ""
-            }
-            
-            if(self.currentUrl.isEmpty){
-                //ordinary generic questions
-                self.currentUrl = "https://firebasestorage.googleapis.com/v0/b/gameterminal-767f7.appspot.com/o/esports%2Fcompetition_questions%2Fgeneric_shooter_questions.json?alt=media&token=42895bf2-5881-4143-8eae-0099b7a8702d"
-            }
-            
-            self.interviewManager?.getQuiz(url: self.currentUrl, secondary: false, gameName: (self.interviewManager?.currentGCGame!.gameName)!, callbacks: self)
-        }) { (error) in
-            AppEvents.logEvent(AppEvents.Name(rawValue: "FA Quiz Front - Error Loading Quiz"))
-            print(error.localizedDescription)
-        }
+        self.interviewManager?.getQuiz(url: (self.interviewManager?.currentGCGame!.quizUrl)!, secondary: false, gameName: (self.interviewManager?.currentGCGame!.gameName)!, callbacks: self)
     }
     
     func addQuestion(question: FAQuestion, interviewManager: InterviewManager) {
@@ -150,9 +116,10 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
     }
     
     func onInitialQuizLoaded() {
-        let startTap = UITapGestureRecognizer(target: self, action: #selector(self.startButtonClicked))
-        self.startButton.alpha = 1
-        self.startButton.isUserInteractionEnabled = true
-        self.startButton.addGestureRecognizer(startTap)
+        UIView.animate(withDuration: 0.5, animations: {
+            self.bottomView.alpha = 0
+        }, completion: { (finished: Bool) in
+            self.interviewManager?.showFirstQuestion()
+        })
     }
 }

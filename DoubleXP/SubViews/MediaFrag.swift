@@ -15,11 +15,11 @@ import SwiftNotificationCenter
 import WebKit
 import SwiftRichString
 import FBSDKCoreKit
-import AnimatedCollectionViewLayout
 import Lottie
 import UnderLineTextField
+import SPStorkController
 
-class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITableViewDelegate, UITableViewDataSource, MediaCallbacks, SocialMediaManagerCallback, LandingUICallbacks, SearchCallbacks, UITextFieldDelegate, UIScrollViewDelegate {
+class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITableViewDelegate, UITableViewDataSource, MediaCallbacks, SocialMediaManagerCallback, LandingUICallbacks, SearchCallbacks, UITextFieldDelegate, UIScrollViewDelegate, SPStorkControllerDelegate {
     
     @IBOutlet weak var authorCell: UIView!
     @IBOutlet weak var articleVideoView: UIView!
@@ -1056,11 +1056,11 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
             
             if(!self.newsSet){
                 
-               let layout = AnimatedCollectionViewLayout()
-               layout.animator = LinearCardAttributesAnimator()
-                layout.scrollDirection = .horizontal
+               //let layout = AnimatedCollectionViewLayout()
+               //layout.animator = LinearCardAttributesAnimator()
+               // layout.scrollDirection = .horizontal
 
-                self.news?.collectionViewLayout = layout
+               // self.news?.collectionViewLayout = layout
                 
                 self.news.delegate = self
                 self.news.dataSource = self
@@ -1079,11 +1079,11 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
                 })
             }
             else{
-                let layout = AnimatedCollectionViewLayout()
-                layout.animator = LinearCardAttributesAnimator()
-                layout.scrollDirection = .horizontal
+                //let layout = AnimatedCollectionViewLayout()
+                //layout.animator = LinearCardAttributesAnimator()
+                //layout.scrollDirection = .horizontal
 
-                self.news?.collectionViewLayout = layout
+                //self.news?.collectionViewLayout = layout
                 self.news?.reloadData()
                 self.news.setContentOffset(CGPoint(x:0,y:0), animated: true)
                 
@@ -1192,20 +1192,29 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     
     @objc func navigateToConnect(){
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        delegate.currentLanding?.updateNavColor(color: UIColor(named: "darker")!)
         var currentGame: GamerConnectGame? = nil
-        
         for game in delegate.gcGames{
             if(game.gameName == self.selectedChannel.gcGameName){
                 currentGame = game
+                break
             }
         }
         
         if(currentGame != nil){
-            delegate.currentLanding?.navigateToSearch(game: currentGame!)
-        }
-        else{
-            delegate.currentLanding?.navigateToHome()
+            AppEvents.logEvent(AppEvents.Name(rawValue: "Media - Navigate To Search"))
+            
+            let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "gamerConnectSearch") as! GamerConnectSearch
+            currentViewController.game = currentGame!
+            
+            let transitionDelegate = SPStorkTransitioningDelegate()
+            currentViewController.transitioningDelegate = transitionDelegate
+            currentViewController.modalPresentationStyle = .custom
+            currentViewController.modalPresentationCapturesStatusBarAppearance = true
+            transitionDelegate.showIndicator = true
+            transitionDelegate.swipeToDismissEnabled = true
+            transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+            transitionDelegate.storkDelegate = self
+            self.present(currentViewController, animated: true, completion: nil)
         }
     }
         
@@ -1580,6 +1589,13 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
     func updateNavColor(color: UIColor) {
     }
     
+    func onYoutubeFail() {
+    }
+    func onYoutubeSuccessful(videos: [YoutubeVideoObj]) {
+    }
+    func onMutliYoutube(channels: [YoutubeMultiChannelSelection]) {
+    }
+    
     func searchSubmitted(searchString: String) {
         UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
             self.loadingView.alpha = 1
@@ -1689,6 +1705,7 @@ class MediaFrag: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,
             })
         }
     }
+
     
 }
 extension String {

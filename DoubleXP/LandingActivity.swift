@@ -83,6 +83,8 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     @IBOutlet weak var dismissBody: UILabel!
     @IBOutlet weak var newMenuBlur: UIView!
     @IBOutlet weak var menuDrawer: UIVisualEffectView!
+    @IBOutlet weak var bottomLogo: UIImageView!
+    @IBOutlet weak var popularClickArea: UIView!
     var menuShowing = false
     var mainNavShowing = false
     var bannerShowing = false
@@ -139,6 +141,12 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.currentLanding = self
         appDelegate.registerUserOnlineStatus()
+        
+        if self.traitCollection.userInterfaceStyle == .dark {
+            self.bottomLogo.alpha = 0.1
+        } else {
+            self.bottomLogo.alpha = 0.3
+        }
         
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(backButtonClicked))
         bottomNavBack.isUserInteractionEnabled = true
@@ -222,7 +230,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             let theCalendar     = Calendar.current
             let nextDate        = theCalendar.date(byAdding: dayComponent, to: currentCheck)
             if(nextDate != nil){
-                if(nextDate!.isTomorrow && !appDelegate.currentUser!.cachedRecommendedUids.isEmpty){
+                if(nextDate!.isTomorrow){
                     appDelegate.recommendedUsersManager.getCachedUsers(uid: appDelegate.currentUser!.uId, callbacks: self)
                 } else {
                     let date = Date()
@@ -1448,6 +1456,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         currentViewController.transitioningDelegate = transitionDelegate
         currentViewController.modalPresentationStyle = .custom
         currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        currentViewController.editMode = appDelegate.currentUser!.uId == uid
         transitionDelegate.showIndicator = true
         transitionDelegate.swipeToDismissEnabled = true
         transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
@@ -1550,10 +1559,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                 UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
                     self.restoreBottomNav()
                 }, completion: { (finished: Bool) in
-                    let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "profile") as! ProfileFrag
-                    let delegate = UIApplication.shared.delegate as! AppDelegate
-                    currentViewController.cachedUidFromProfile = delegate.currentUser!.uId
-                    
+                    let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "playerProfile") as! PlayerProfile
                     let transitionDelegate = SPStorkTransitioningDelegate()
                     currentViewController.transitioningDelegate = transitionDelegate
                     currentViewController.modalPresentationStyle = .custom
@@ -1856,9 +1862,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                 self.newMenuBlur.alpha = 0.0
             }, completion: { (finished: Bool) in
                 UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
-                    let delegate = UIApplication.shared.delegate as! AppDelegate
-                    delegate.cachedTest = uId
-                    self.performSegue(withIdentifier: "profile", sender: nil)
+                    self.navigateToProfile(uid: uId)
                 }, completion: nil)
             })
         })
@@ -2203,6 +2207,10 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         self.myProfileClickArea.isUserInteractionEnabled = true
         self.myProfileClickArea.addGestureRecognizer(singleTapProfile)
         
+        let singleTapPopular = UITapGestureRecognizer(target: self, action: #selector(popularButtonClicked))
+        self.popularClickArea.isUserInteractionEnabled = true
+        self.popularClickArea.addGestureRecognizer(singleTapPopular)
+        
         bottomNav.isHidden = false
         bottomNav.isUserInteractionEnabled = true
     }
@@ -2255,6 +2263,19 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     @objc func didDismissStorkBySwipe(){
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    }
+    
+    @objc func popularButtonClicked(_ sender: AnyObject?) {
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "popular") as! PopularPage
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
     }
     
     @objc func profileButtonClicked(){

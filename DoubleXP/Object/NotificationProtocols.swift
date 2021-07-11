@@ -67,13 +67,12 @@ protocol NavigateToProfile: class {
 }
 
 protocol RequestsUpdate: class{
-    func updateCell(indexPath: IndexPath)
-    func showQuizClicked(questions: [[String]])
+    func updateCell()
     func rivalRequestAlready()
     func rivalRequestSuccess()
     func rivalRequestFail()
-    func rivalResponseAccepted(indexPath: IndexPath)
-    func rivalResponseRejected(indexPath: IndexPath)
+    func rivalResponseAccepted()
+    func rivalResponseRejected()
     func rivalResponseFailed()
     func friendRemoved()
     func friendRemoveFail()
@@ -147,6 +146,9 @@ protocol SocialMediaManagerCallback: class {
     func onTweetsLoaded(tweets: [TweetObject])
     func onStreamsLoaded(streams: [TwitchStreamObject])
     func onChannelsLoaded(channels: [Any])
+    func onYoutubeSuccessful(videos: [YoutubeVideoObj])
+    func onYoutubeFail()
+    func onMutliYoutube(channels: [YoutubeMultiChannelSelection])
 }
 
 protocol LandingMenuCallbacks: class{

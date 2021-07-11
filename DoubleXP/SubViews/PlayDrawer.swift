@@ -238,7 +238,7 @@ class PlayDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource, 
     
     @objc private func doneClicked(){
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        appDelegate.currentProfileFrag?.dismissModal()
+        appDelegate.currentProfileFrag?.dismissModalPlaySuccess()
         self.dismiss(animated: true, completion: nil)
     }
     
@@ -367,7 +367,7 @@ class PlayDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource, 
         return 50
     }
     
-    func updateCell(indexPath: IndexPath) {
+    func updateCell() {
     }
     
     func showQuizClicked(questions: [[String]]) {
@@ -393,10 +393,10 @@ class PlayDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource, 
         self.transitionToDone()
     }
     
-    func rivalResponseAccepted(indexPath: IndexPath) {
+    func rivalResponseAccepted() {
     }
     
-    func rivalResponseRejected(indexPath: IndexPath) {
+    func rivalResponseRejected() {
     }
     
     func rivalResponseFailed() {
