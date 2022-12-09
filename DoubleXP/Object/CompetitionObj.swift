@@ -31,6 +31,16 @@ class CompetitionObj: NSObject, NSCoding {
         }
     }
     
+    var _compDescription: String = ""
+    var compDescription: String {
+        get {
+            return (_compDescription)
+        }
+        set (newVal) {
+            _compDescription = newVal
+        }
+    }
+    
     var _emergencyShowLiveStream: String = ""
     var emergencyShowLiveStream: String {
         get {
@@ -88,6 +98,16 @@ class CompetitionObj: NSObject, NSCoding {
         }
         set (newVal) {
             _topPrize = newVal
+        }
+    }
+    
+    var _topPrizeType: String = ""
+    var topPrizeType: String {
+        get {
+            return (_topPrizeType)
+        }
+        set (newVal) {
+            _topPrizeType = newVal
         }
     }
     
@@ -240,6 +260,66 @@ class CompetitionObj: NSObject, NSCoding {
             _isTeamCompetition = newVal
         }
     }
+    
+    var _headerImgUrl: String = ""
+    var headerImgUrl: String {
+        get {
+            return (_headerImgUrl)
+        }
+        set (newVal) {
+            _headerImgUrl = newVal
+        }
+    }
+    
+    var _promoImgUrl: String = ""
+    var promoImgUrl: String {
+        get {
+            return (_promoImgUrl)
+        }
+        set (newVal) {
+            _promoImgUrl = newVal
+        }
+    }
+    
+    var _competitionTopic: String = ""
+    var competitionTopic: String {
+        get {
+            return (_competitionTopic)
+        }
+        set (newVal) {
+            _competitionTopic = newVal
+        }
+    }
+    
+    var _rundown: [String] = [String]()
+    var rundown: [String] {
+        get {
+            return (_rundown)
+        }
+        set (newVal) {
+            _rundown = newVal
+        }
+    }
+    
+    var _sponsorUrl:String? = ""
+    var sponsorUrl:String {
+        get {
+            return (_sponsorUrl)!
+        }
+        set (newVal) {
+            _sponsorUrl = newVal
+        }
+    }
+    
+    var _rulesUrl:String? = ""
+    var rulesUrl:String {
+        get {
+            return (_rulesUrl)!
+        }
+        set (newVal) {
+            _rulesUrl = newVal
+        }
+    }
 
     init(competitionName: String, competitionId: String, gameName: String, mainSponsor: String)
     {
@@ -261,6 +341,7 @@ class CompetitionObj: NSObject, NSCoding {
         self.emergencyShowLiveStream = (decoder.decodeObject(forKey: "emergencyShowLiveStream") as! String)
         self.emergencyShowRegistrationOver = (decoder.decodeObject(forKey: "emergencyShowRegistrationOver") as! String)
         self.topPrize = (decoder.decodeObject(forKey: "topPrize") as! String)
+        self.topPrizeType = (decoder.decodeObject(forKey: "topPrizeType") as! String)
         self.twitchChannelId = (decoder.decodeObject(forKey: "twitchChannelId") as! String)
         self.competitionStartMillis = (decoder.decodeObject(forKey: "competitionStartMillis") as! String)
         self.secondPrize = (decoder.decodeObject(forKey: "secondPrize") as! String)
@@ -268,7 +349,13 @@ class CompetitionObj: NSObject, NSCoding {
         self.competitionDateString = (decoder.decodeObject(forKey: "competitionDateString") as! String)
         self.competitionAirDate = (decoder.decodeObject(forKey: "competitionAirDate") as! String)
         self.registrationDeadlineMillis = (decoder.decodeObject(forKey: "registrationDeadlineMillis") as! String)
-        
+        self.headerImgUrl = (decoder.decodeObject(forKey: "headerImgUrl") as! String)
+        self.promoImgUrl = (decoder.decodeObject(forKey: "promoImgUrl") as! String)
+        self.competitionTopic = (decoder.decodeObject(forKey: "competitionTopic") as! String)
+        self.compDescription = (decoder.decodeObject(forKey: "compDescription") as! String)
+        self.rundown = (decoder.decodeObject(forKey: "rundown") as! [String])
+        self.rulesUrl = (decoder.decodeObject(forKey: "rulesUrl") as! String)
+        self.sponsorUrl = (decoder.decodeObject(forKey: "sponsorUrl") as! String)
     }
 
     func encode(with coder: NSCoder) {
@@ -280,6 +367,7 @@ class CompetitionObj: NSObject, NSCoding {
         coder.encode(self.emergencyShowLiveStream, forKey: "emergencyShowLiveStream")
         coder.encode(self.emergencyShowRegistrationOver, forKey: "emergencyShowRegistrationOver")
         coder.encode(self.topPrize, forKey: "topPrize")
+        coder.encode(self.topPrizeType, forKey: "topPrizeType")
         coder.encode(self.twitchChannelId, forKey: "twitchChannelId")
         coder.encode(self.competitionStartMillis, forKey: "competitionStartMillis")
         coder.encode(self.secondPrize, forKey: "secondPrize")
@@ -288,6 +376,13 @@ class CompetitionObj: NSObject, NSCoding {
         coder.encode(self.competitionAirDate, forKey: "competitionAirDate")
         coder.encode(self.competitionAirDateString, forKey: "competitionAirDateString")
         coder.encode(self.registrationDeadlineMillis, forKey: "registrationDeadlineMillis")
+        coder.encode(self.headerImgUrl, forKey: "headerImgUrl")
+        coder.encode(self.promoImgUrl, forKey: "promoImgUrl")
+        coder.encode(self.competitionTopic, forKey: "competitionTopic")
+        coder.encode(self.compDescription, forKey: "compDescription")
+        coder.encode(self.rundown, forKey: "rundown")
+        coder.encode(self.rulesUrl, forKey: "rulesUrl")
+        coder.encode(self.sponsorUrl, forKey: "sponsorUrl")
     }
 }
 

@@ -86,8 +86,11 @@ class LoginHelper{
                     let competitonName = dict?["competitionName"] as? String ?? ""
                     let competitionId = dict?["competitionId"] as? String ?? ""
                     let gameName = dict?["gameName"] as? String ?? ""
-                    let mainSponsor = dict?["mainSponsor"] as? String ?? ""
+                    let mainSponsor = dict?["sponsor"] as? String ?? ""
+                    let sponsorUrl = dict?["sponsorUrl"] as? String ?? ""
+                    let rulesUrl = dict?["rulesUrl"] as? String ?? ""
                     let topPrize = dict?["topPrize"] as? String ?? ""
+                    let topPrizeType = dict?["topPrizeType"] as? String ?? ""
                     let expired = dict?["expired"] as? String ?? ""
                     let secondPrize = dict?["secondPrize"] as? String ?? ""
                     let thirdPrize = dict?["thirdPrize"] as? String ?? ""
@@ -101,6 +104,11 @@ class LoginHelper{
                     let twitchChannelId = dict?["twitchChannelId"] as? String ?? ""
                     let gcName = dict?["gcName"] as? String ?? ""
                     let subscriptionId = dict?["subscriptionId"] as? String ?? ""
+                    let promoImg = dict?["promoUrlxxhdpi"] as? String ?? ""
+                    let headerImg = dict?["headerImageUrlXXHDPI"] as? String ?? ""
+                    let compTopic = dict?["competitionTopic"] as? String ?? ""
+                    let compDescription = dict?["description"] as? String ?? ""
+                    let rundown = dict?["rundown"] as? [String] ?? [String]()
                     
                     /*var competitors = [CompetitorObj]()
                     let competitorArray = competition.childSnapshot(forPath: "competitors")
@@ -129,6 +137,14 @@ class LoginHelper{
                     newCompetition.emergencyShowLiveStream = emergencyShowLiveStream
                     newCompetition.emergencyShowRegistrationOver = emergencyShowRegistrationOver
                     newCompetition.expired = expired
+                    newCompetition.promoImgUrl = promoImg
+                    newCompetition.headerImgUrl = headerImg
+                    newCompetition.competitionTopic = compTopic
+                    newCompetition.topPrizeType = topPrizeType
+                    newCompetition.compDescription = compDescription
+                    newCompetition.rundown = rundown
+                    newCompetition.sponsorUrl = sponsorUrl
+                    newCompetition.rulesUrl = rulesUrl
                     
                     if(expired != "true"){
                         displayCompetitions.append(newCompetition)

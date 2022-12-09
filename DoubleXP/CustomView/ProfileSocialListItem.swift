@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class ProfileSocialListItem: UITableViewCell {
+class ProfileSocialListItem: UICollectionViewCell {
     @IBOutlet weak var socialIcon: UIImageView!
     @IBOutlet weak var socialLabel: UILabel!
     

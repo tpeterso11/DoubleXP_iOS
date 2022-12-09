@@ -179,7 +179,7 @@ class DiscoveryCategoryFrag : UIViewController, UICollectionViewDelegate, UIColl
         self.present(currentViewController, animated: true, completion: nil)
     }
     
-    @objc func dismissKeyboard() {
+    @objc override func dismissKeyboard() {
         //Causes the view (or one of its embedded text fields) to resign the first responder status.
         view.endEditing(true)
     }

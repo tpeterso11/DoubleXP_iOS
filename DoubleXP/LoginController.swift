@@ -341,6 +341,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
         self.performSegue(withIdentifier: "register", sender: nil) // noraml
         //self.performSegue(withIdentifier: "test", sender: nil) // game selection
         //self.performSegue(withIdentifier: "newReg", sender: nil) //registration
+    
     }
     
     private func display(alertController: UIAlertController){
@@ -1039,7 +1040,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                     delegate.currentUser = user
                     
                     AppEvents.logEvent(AppEvents.Name(rawValue: "Successful Login"))
-                    
+                    //self.performSegue(withIdentifier: "results", sender: nil) //results
                     self.performSegue(withIdentifier: "loginSuccessful", sender: nil)
                 }
             }

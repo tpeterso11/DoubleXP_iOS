@@ -65,7 +65,7 @@ class FeedFeedCell : UITableViewCell, UICollectionViewDataSource, UICollectionVi
         }
         
         //episodes
-        let ignoredEpisodes = defaults.stringArray(forKey: "ignoredEpisodes") ?? [String]()
+        /*let ignoredEpisodes = defaults.stringArray(forKey: "ignoredEpisodes") ?? [String]()
         for episode in appDelegate.episodes {
             if(!ignoredEpisodes.contains(episode.mediaId)){
                 if(currentIndex.isMultiple(of: 5) && currentIndex != 0){
@@ -77,7 +77,7 @@ class FeedFeedCell : UITableViewCell, UICollectionViewDataSource, UICollectionVi
             }
         }
 
-        secondaryPayload.append(contentsOf: appDelegate.competitions)
+        secondaryPayload.append(contentsOf: appDelegate.competitions)*/
     
         if(!dataSet){
             self.feedCollection.delegate = self

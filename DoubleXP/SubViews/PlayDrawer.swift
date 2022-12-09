@@ -237,9 +237,10 @@ class PlayDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource, 
     }
     
     @objc private func doneClicked(){
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        appDelegate.currentProfileFrag?.dismissModalPlaySuccess()
-        self.dismiss(animated: true, completion: nil)
+        self.dismiss(animated: true, completion: {
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            appDelegate.currentProfileFrag?.dismissModalPlaySuccess()
+        })
     }
     
     private func transitionToDone(){
@@ -407,5 +408,12 @@ class PlayDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource, 
     
     func friendRemoveFail() {
         
+    }
+    func onFollowBackSuccess() {
+    
+    }
+    
+    func onFollowSuccess() {
+    
     }
 }

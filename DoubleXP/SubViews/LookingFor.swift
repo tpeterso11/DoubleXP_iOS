@@ -119,6 +119,7 @@ class LookingFor: UIViewController, UITableViewDelegate, UITableViewDataSource {
         ref.child("lookingFor").setValue(self.usersSelected)
         appDelegate.currentUser!.userLookingFor = self.usersSelected
         upgrade?.updateButtons()
+        appDelegate.currentResultsFrag?.onModalReturn()
         self.dismiss(animated: true, completion: nil)
     }
 }

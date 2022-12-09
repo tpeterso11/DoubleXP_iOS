@@ -69,7 +69,7 @@ class OptionsList: UIViewController, UITableViewDelegate, UITableViewDataSource,
         if(current == "block"){
             cell.label.textColor = #colorLiteral(red: 0.8078431487, green: 0.02745098062, blue: 0.3333333433, alpha: 1)
         } else {
-            cell.label.textColor = UIColor.init(named: "stayWhite")
+            cell.label.textColor = UIColor.init(named: "darkToWhite")
         }
         return cell
     }
@@ -209,6 +209,14 @@ class OptionsList: UIViewController, UITableViewDelegate, UITableViewDataSource,
     }
     
     func onlineAnnounceSent() {
+    }
+    
+    func onFollowBackSuccess() {
+    
+    }
+    
+    func onFollowSuccess() {
+    
     }
     
     private func showSuccess(status: String){

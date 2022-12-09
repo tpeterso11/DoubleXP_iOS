@@ -23,10 +23,10 @@ class FriendsManager{
         return contained
     }
     
-    func isPendingRequest(user: User, currentUser: User) -> Bool{
+    func isAFollower(user: User, currentUser: User) -> Bool{
         var contained = false
         
-        for friend in currentUser.pendingRequests {
+        for friend in currentUser.followers {
             if(friend.uid == user.uId){
                 contained = true
             }
@@ -43,11 +43,23 @@ class FriendsManager{
         }
     }
     
-    func isSentRequest(user: User, currentUser: User) -> Bool{
+    func isFollowing(user: User, currentUser: User) -> Bool{
         var contained = false
         
-        for friend in currentUser.sentRequests {
-            if(friend.uid == user.uId){
+        for friend in user.following {
+            if(friend.uid == currentUser.uId){
+                contained = true
+            }
+        }
+        
+        return contained
+    }
+    
+    func isFollower(user: User, currentUser: User) -> Bool{
+        var contained = false
+        
+        for friend in user.followers {
+            if(friend.uid == currentUser.uId){
                 contained = true
             }
         }
@@ -1073,6 +1085,94 @@ class FriendsManager{
         }
     }
     
+    func createStreamingAnnouncement(friends: [String], callbacks: RequestsUpdate){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser!
+        let announcementId = createTempId()
+        //send request
+        let ref = Database.database().reference().child("Users")
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                var tokens = [String]()
+                for friend in friends {
+                    let currentSnapshot = snapshot.childSnapshot(forPath: friend)
+                    if(currentSnapshot != nil){
+                        if(currentSnapshot.hasChild("fcmToken")){
+                            let tag = currentSnapshot.childSnapshot(forPath: "fcmToken").value as? String ?? ""
+                            if(!tokens.contains(tag)){
+                                tokens.append(currentSnapshot.childSnapshot(forPath: "fcmToken").value as? String ?? "")
+                            }
+                        }
+                        if(currentSnapshot.hasChild("receivedAnnouncements")){
+                            var array = currentSnapshot.childSnapshot(forPath: "receivedAnnouncements").value as? [String] ?? [String]()
+                            if(!array.contains(currentUser.uId)){
+                                array.append(currentUser.uId)
+                                ref.child(currentSnapshot.key).child("receivedAnnouncements").setValue(array)
+                            }
+                        } else {
+                            var array = [String]()
+                            array.append(currentUser.uId)
+                            ref.child(currentSnapshot.key).child("receivedAnnouncements").setValue(array)
+                        }
+                    }
+                }
+                
+                let currentUserSnapshot = snapshot.childSnapshot(forPath: currentUser.uId)
+                var announcements = [OnlineObj]()
+                if(currentUserSnapshot.hasChild("onlineAnnouncements")){
+                    let onlineAnnouncements = currentUserSnapshot.childSnapshot(forPath: "onlineAnnouncements")
+                    for announce in onlineAnnouncements.children{
+                        let currentObj = announce as! DataSnapshot
+                        let dict = currentObj.value as? [String: Any]
+                        let date = dict?["date"] as? String ?? ""
+                        let tag = dict?["tag"] as? String ?? ""
+                        let id = dict?["id"] as? String ?? ""
+                        let friends = dict?["friends"] as? [String] ?? [String]()
+                        
+                        let request = OnlineObj(tag: tag, friends: friends, date: date, id: id)
+                        
+                        let dbDate = self.stringToDate(date)
+                        
+                        if(dbDate != nil){
+                            let now = NSDate()
+                            let formatter = DateFormatter()
+                            formatter.timeZone = TimeZone(abbreviation: "UTC")
+                            formatter.dateFormat="MM-dd-yyyy HH:mm zzz"
+                            let future = formatter.string(from: now as Date)
+                            let dbFuture = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
+                            
+                            let validAnnouncement = dbDate.compare(.isEarlier(than: dbFuture))
+                            
+                            if(dbFuture != nil){
+                                if(validAnnouncement){
+                                    announcements.append(request)
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                if(announcements.isEmpty){
+                    let date = Date()
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "MM-dd-yyyy HH:mm zzz"
+                    formatter.timeZone = TimeZone(abbreviation: "UTC")
+                    let result = formatter.string(from: date)
+                    
+                    let newObj = ["tag": currentUser.gamerTag, "friends": tokens, "id": announcementId, "date": result] as [String : Any]
+                    let ref = Database.database().reference().child("Users").child(currentUser.uId)
+                    ref.child("onlineAnnouncements").child(announcementId).setValue(newObj)
+                    
+                    callbacks.onlineAnnounceSent()
+                }
+            }
+            
+        }) { (error) in
+            print(error.localizedDescription)
+            callbacks.onlineAnnounceFail()
+        }
+    }
+    
     private func createTempId() -> String {
         let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         return String((0..<8).map{ _ in letters.randomElement()! })
@@ -1565,6 +1665,37 @@ class FriendsManager{
         })
     }
     
+    func cleanFollowers(uid: String, callbacks: TodayCallbacks){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser!
+        
+        let ref = Database.database().reference().child("Users").child(currentUser.uId)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                if(snapshot.hasChild("followerAnnouncements")){
+                    let announcements = snapshot.childSnapshot(forPath: "followerAnnouncements")
+                    for follower in announcements.children {
+                        let current = (follower as! DataSnapshot)
+                        if(current.hasChild("uid")){
+                            let currentId = current.childSnapshot(forPath: "uid").value as? String ?? ""
+                            if(uid == currentId){
+                                ref.child("followerAnnouncements").child(current.key).removeValue()
+                                
+                                for followerObj in currentUser.followerAnnouncements {
+                                    if(followerObj.uid == uid){
+                                        delegate.currentUser!.followerAnnouncements.remove(at: delegate.currentUser!.followerAnnouncements.index(of: followerObj)!)
+                                        break
+                                    }
+                                }
+                            }
+                            callbacks.onSuccess()
+                        }
+                    }
+                }
+            }
+        })
+    }
+    
     func userListHasUid(list: [User], uid: String) -> Bool {
         var contained = false
         for user in list {
@@ -1635,6 +1766,410 @@ class FriendsManager{
         })
     }
     
+    func followUser(otherUserId: String, otherUserTag: String, currentUser: User, callbacks: RequestsUpdate){
+        //add current user to other user's followers first.
+        let ref = Database.database().reference().child("Users").child(otherUserId)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.hasChild("followers")){
+                var friends = [String: FriendObject]()
+                var contained = false
+                for friend in snapshot.childSnapshot(forPath: "followers").children{
+                    let newFriend = FriendObject(gamerTag: (friend as! DataSnapshot).childSnapshot(forPath: "gamerTag").value as? String ?? "", date: (friend as! DataSnapshot).childSnapshot(forPath: "date").value as? String ?? "", uid: (friend as! DataSnapshot).childSnapshot(forPath: "uid").value as? String ?? "")
+                    
+                    if(newFriend.uid == currentUser.uId){
+                        contained = true
+                        break
+                    } else {
+                        friends[newFriend.uid] = newFriend
+                    }
+                }
+                
+                if(!contained){
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "MM-dd-yyyy"
+                    let now = Date()
+                    let dateString = formatter.string(from:now)
+                    friends[currentUser.uId] = FriendObject(gamerTag: currentUser.gamerTag, date: dateString, uid: currentUser.uId)
+                    
+                    var sendList = [[String: Any]]()
+                    for teammate in friends {
+                        let current = ["gamerTag": teammate.value.gamerTag, "date": teammate.value.date, "uid": teammate.value.uid] as [String : String]
+                        sendList.append(current)
+                    }
+                    ref.child("followers").setValue(sendList)
+                }
+                
+                if(snapshot.hasChild("followerAnnouncements")){
+                    var followers = [String: FriendObject]()
+                    var contained = false
+                    for friend in snapshot.childSnapshot(forPath: "followerAnnouncements").children{
+                        let newFriend = FriendObject(gamerTag: (friend as! DataSnapshot).childSnapshot(forPath: "gamerTag").value as? String ?? "", date: (friend as! DataSnapshot).childSnapshot(forPath: "date").value as? String ?? "", uid: (friend as! DataSnapshot).childSnapshot(forPath: "uid").value as? String ?? "")
+                        
+                        if(newFriend.uid == currentUser.uId){
+                            contained = true
+                            break
+                        } else {
+                            followers[newFriend.uid] = newFriend
+                        }
+                    }
+                    
+                    if(!contained){
+                        let formatter = DateFormatter()
+                        formatter.dateFormat = "MM-dd-yyyy"
+                        let now = Date()
+                        let dateString = formatter.string(from:now)
+                        followers[currentUser.uId] = FriendObject(gamerTag: currentUser.gamerTag, date: dateString, uid: currentUser.uId)
+                        
+                        var sendList = [[String: Any]]()
+                        for teammate in followers {
+                            let current = ["gamerTag": teammate.value.gamerTag, "date": teammate.value.date, "uid": teammate.value.uid] as [String : String]
+                            sendList.append(current)
+                        }
+                        ref.child("followerAnnouncements").setValue(sendList)
+                    }
+                    self.finishFollowing(otherUserId: otherUserId, otherUserTag: otherUserTag, currentUser: currentUser, callbacks: callbacks)
+                } else {
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "MM-dd-yyyy"
+                    let now = Date()
+                    let dateString = formatter.string(from:now)
+                    let followers = [currentUser.uId: FriendObject(gamerTag: currentUser.gamerTag, date: dateString, uid: currentUser.uId)]
+                    var sendList = [[String: Any]]()
+                    for teammate in followers {
+                        let current = ["gamerTag": teammate.value.gamerTag, "date": teammate.value.date, "uid": teammate.value.uid] as [String : String]
+                        sendList.append(current)
+                    }
+                    ref.child("followerAnnouncements").setValue(sendList)
+                    self.finishFollowing(otherUserId: otherUserId, otherUserTag: otherUserTag, currentUser: currentUser, callbacks: callbacks)
+                }
+            } else {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "MM-dd-yyyy"
+                let now = Date()
+                let dateString = formatter.string(from:now)
+                let followers = [currentUser.uId: FriendObject(gamerTag: currentUser.gamerTag, date: dateString, uid: currentUser.uId)]
+                var sendList = [[String: Any]]()
+                for teammate in followers {
+                    let current = ["gamerTag": teammate.value.gamerTag, "date": teammate.value.date, "uid": teammate.value.uid] as [String : String]
+                    sendList.append(current)
+                }
+                ref.child("followers").setValue(sendList)
+                
+                if(snapshot.hasChild("followerAnnouncements")){
+                    var followers = [String: FriendObject]()
+                    var contained = false
+                    for friend in snapshot.childSnapshot(forPath: "followerAnnouncements").children{
+                        let newFriend = FriendObject(gamerTag: (friend as! DataSnapshot).childSnapshot(forPath: "gamerTag").value as? String ?? "", date: (friend as! DataSnapshot).childSnapshot(forPath: "date").value as? String ?? "", uid: (friend as! DataSnapshot).childSnapshot(forPath: "uid").value as? String ?? "")
+                        
+                        if(newFriend.uid == currentUser.uId){
+                            contained = true
+                            break
+                        } else {
+                            followers[newFriend.uid] = newFriend
+                        }
+                    }
+                    
+                    if(!contained){
+                        let formatter = DateFormatter()
+                        formatter.dateFormat = "MM-dd-yyyy"
+                        let now = Date()
+                        let dateString = formatter.string(from:now)
+                        followers[currentUser.uId] = FriendObject(gamerTag: currentUser.gamerTag, date: dateString, uid: currentUser.uId)
+                        
+                        var sendList = [[String: Any]]()
+                        for teammate in followers {
+                            let current = ["gamerTag": teammate.value.gamerTag, "date": teammate.value.date, "uid": teammate.value.uid] as [String : String]
+                            sendList.append(current)
+                        }
+                        ref.child("followerAnnouncements").setValue(sendList)
+                    }
+                    self.finishFollowing(otherUserId: otherUserId, otherUserTag: otherUserTag, currentUser: currentUser, callbacks: callbacks)
+                } else {
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "MM-dd-yyyy"
+                    let now = Date()
+                    let dateString = formatter.string(from:now)
+                    let followers = [currentUser.uId: FriendObject(gamerTag: currentUser.gamerTag, date: dateString, uid: currentUser.uId)]
+                    var sendList = [[String: Any]]()
+                    for teammate in followers {
+                        let current = ["gamerTag": teammate.value.gamerTag, "date": teammate.value.date, "uid": teammate.value.uid] as [String : String]
+                        sendList.append(current)
+                    }
+                    ref.child("followerAnnouncements").setValue(sendList)
+                    self.finishFollowing(otherUserId: otherUserId, otherUserTag: otherUserTag, currentUser: currentUser, callbacks: callbacks)
+                }
+            }
+        })
+    }
+    
+    func finishFollowing(otherUserId: String, otherUserTag: String, currentUser: User, callbacks: RequestsUpdate){
+        //finish by editing the current user's following
+        let ref = Database.database().reference().child("Users").child(currentUser.uId)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.hasChild("following")){
+                var following = [String: FriendObject]()
+                var simpleFollowingList = [FriendObject]()
+                var contained = false
+                for friend in snapshot.childSnapshot(forPath: "following").children {
+                    let newFriend = FriendObject(gamerTag: (friend as! DataSnapshot).childSnapshot(forPath: "gamerTag").value as? String ?? "", date: (friend as! DataSnapshot).childSnapshot(forPath: "date").value as? String ?? "", uid: (friend as! DataSnapshot).childSnapshot(forPath: "uid").value as? String ?? "")
+                    
+                    if(newFriend.uid == currentUser.uId){
+                        contained = true
+                        break
+                    } else {
+                        following[newFriend.uid] = newFriend
+                        simpleFollowingList.append(newFriend)
+                    }
+                }
+                
+                if(!contained){
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "MM-dd-yyyy"
+                    let now = Date()
+                    let dateString = formatter.string(from:now)
+                    following[currentUser.uId] = FriendObject(gamerTag: otherUserTag, date: dateString, uid: otherUserId)
+                    simpleFollowingList.append(FriendObject(gamerTag: otherUserTag, date: dateString, uid: otherUserId))
+                    
+                    var sendList = [[String: Any]]()
+                    for teammate in following {
+                        let current = ["gamerTag": teammate.value.gamerTag, "date": teammate.value.date, "uid": teammate.value.uid] as [String : String]
+                        sendList.append(current)
+                    }
+                    ref.child("following").setValue(sendList)
+                    
+                    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                    let currentUser = appDelegate.currentUser!
+                    currentUser.following = simpleFollowingList
+                    callbacks.onFollowSuccess()
+                }
+            } else {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "MM-dd-yyyy"
+                let now = Date()
+                let dateString = formatter.string(from:now)
+                let following = [currentUser.uId: FriendObject(gamerTag: otherUserTag, date: dateString, uid: otherUserId)]
+                var sendList = [[String: Any]]()
+                for teammate in following {
+                    let current = ["gamerTag": teammate.value.gamerTag, "date": teammate.value.date, "uid": teammate.value.uid] as [String : String]
+                    sendList.append(current)
+                }
+                ref.child("following").setValue(sendList)
+                
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                let currentUser = appDelegate.currentUser!
+                currentUser.following = [FriendObject(gamerTag: otherUserTag, date: dateString, uid: otherUserId)]
+                
+                callbacks.onFollowSuccess()
+            }
+        })
+    }
+    
+    
+    
+    func followBack(otherUserId: String, otherUserTag: String, currentUser: User, callbacks: RequestsUpdate){
+        //add current user to other user's followers first.
+        let ref = Database.database().reference().child("Users").child(otherUserId)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.hasChild("followers")){
+                var friends = [String: FriendObject]()
+                var contained = false
+                for friend in snapshot.childSnapshot(forPath: "followers").children {
+                    let newFriend = FriendObject(gamerTag: (friend as! DataSnapshot).childSnapshot(forPath: "gamerTag").value as? String ?? "", date: (friend as! DataSnapshot).childSnapshot(forPath: "date").value as? String ?? "", uid: (friend as! DataSnapshot).childSnapshot(forPath: "uid").value as? String ?? "")
+                    
+                    if(newFriend.uid == currentUser.uId){
+                        contained = true
+                        break
+                    } else {
+                        friends[newFriend.uid] = newFriend
+                    }
+                }
+                
+                if(!contained){
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "MM-dd-yyyy"
+                    let now = Date()
+                    let dateString = formatter.string(from:now)
+                    friends[currentUser.uId] = FriendObject(gamerTag: currentUser.gamerTag, date: dateString, uid: currentUser.uId)
+                    
+                    var sendList = [[String: Any]]()
+                    for teammate in friends {
+                        let current = ["gamerTag": teammate.value.gamerTag, "date": teammate.value.date, "uid": teammate.value.uid] as [String : String]
+                        sendList.append(current)
+                    }
+                    ref.child("followers").setValue(sendList)
+                }
+            } else {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "MM-dd-yyyy"
+                let now = Date()
+                let dateString = formatter.string(from:now)
+                let followers = [currentUser.uId: FriendObject(gamerTag: currentUser.gamerTag, date: dateString, uid: currentUser.uId)]
+                var sendList = [[String: Any]]()
+                for teammate in followers {
+                    let current = ["gamerTag": teammate.value.gamerTag, "date": teammate.value.date, "uid": teammate.value.uid] as [String : String]
+                    sendList.append(current)
+                }
+                ref.child("followers").setValue(sendList)
+            }
+            
+            
+            if(snapshot.hasChild("friends")){
+                var friends = [String: FriendObject]()
+                var contained = false
+                for friend in snapshot.childSnapshot(forPath: "friends").children {
+                    let newFriend = FriendObject(gamerTag: (friend as! DataSnapshot).childSnapshot(forPath: "gamerTag").value as? String ?? "", date: (friend as! DataSnapshot).childSnapshot(forPath: "date").value as? String ?? "", uid: (friend as! DataSnapshot).childSnapshot(forPath: "uid").value as? String ?? "")
+                    
+                    if(newFriend.uid == currentUser.uId){
+                        contained = true
+                        break
+                    } else {
+                        friends[newFriend.uid] = newFriend
+                    }
+                }
+                
+                if(!contained){
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "MM-dd-yyyy"
+                    let now = Date()
+                    let dateString = formatter.string(from:now)
+                    friends[currentUser.uId] = FriendObject(gamerTag: currentUser.gamerTag, date: dateString, uid: currentUser.uId)
+                    
+                    var sendList = [[String: Any]]()
+                    for teammate in friends {
+                        let current = ["gamerTag": teammate.value.gamerTag, "date": teammate.value.date, "uid": teammate.value.uid] as [String : String]
+                        sendList.append(current)
+                    }
+                    ref.child("friends").setValue(sendList)
+                    self.finishFollowBack(otherUserId: otherUserId, otherUserTag: otherUserTag, currentUser: currentUser, callbacks: callbacks)
+                }
+            } else {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "MM-dd-yyyy"
+                let now = Date()
+                let dateString = formatter.string(from:now)
+                let followers = [currentUser.uId: FriendObject(gamerTag: currentUser.gamerTag, date: dateString, uid: currentUser.uId)]
+                var sendList = [[String: Any]]()
+                for teammate in followers {
+                    let current = ["gamerTag": teammate.value.gamerTag, "date": teammate.value.date, "uid": teammate.value.uid] as [String : String]
+                    sendList.append(current)
+                }
+                ref.child("friends").setValue(sendList)
+                self.finishFollowBack(otherUserId: otherUserId, otherUserTag: otherUserTag, currentUser: currentUser, callbacks: callbacks)
+            }
+            
+        })
+    }
+    
+    private func finishFollowBack(otherUserId: String, otherUserTag: String, currentUser: User, callbacks: RequestsUpdate){
+        let ref = Database.database().reference().child("Users").child(currentUser.uId)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.hasChild("following")){
+                var following = [String: FriendObject]()
+                var simpleFollowingList = [FriendObject]()
+                var contained = false
+                for friend in snapshot.childSnapshot(forPath: "following").children {
+                    let newFriend = FriendObject(gamerTag: (friend as! DataSnapshot).childSnapshot(forPath: "gamerTag").value as? String ?? "", date: (friend as! DataSnapshot).childSnapshot(forPath: "date").value as? String ?? "", uid: (friend as! DataSnapshot).childSnapshot(forPath: "uid").value as? String ?? "")
+                    
+                    if(newFriend.uid == currentUser.uId){
+                        contained = true
+                        break
+                    } else {
+                        following[newFriend.uid] = newFriend
+                        simpleFollowingList.append(newFriend)
+                    }
+                }
+                
+                if(!contained){
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "MM-dd-yyyy"
+                    let now = Date()
+                    let dateString = formatter.string(from:now)
+                    following[currentUser.uId] = FriendObject(gamerTag: otherUserTag, date: dateString, uid: otherUserId)
+                    simpleFollowingList.append(FriendObject(gamerTag: otherUserTag, date: dateString, uid: otherUserId))
+                    
+                    var sendList = [[String: Any]]()
+                    for teammate in following {
+                        let current = ["gamerTag": teammate.value.gamerTag, "date": teammate.value.date, "uid": teammate.value.uid] as [String : String]
+                        sendList.append(current)
+                    }
+                    ref.child("following").setValue(sendList)
+                    
+                    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                    let currentUser = appDelegate.currentUser!
+                    currentUser.following = simpleFollowingList
+                    callbacks.onFollowSuccess()
+                }
+            } else {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "MM-dd-yyyy"
+                let now = Date()
+                let dateString = formatter.string(from:now)
+                let following = [currentUser.uId: FriendObject(gamerTag: otherUserTag, date: dateString, uid: otherUserId)]
+                var sendList = [[String: Any]]()
+                for teammate in following {
+                    let current = ["gamerTag": teammate.value.gamerTag, "date": teammate.value.date, "uid": teammate.value.uid] as [String : String]
+                    sendList.append(current)
+                }
+                ref.child("following").setValue(sendList)
+                
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                let currentUser = appDelegate.currentUser!
+                currentUser.following = [FriendObject(gamerTag: otherUserTag, date: dateString, uid: otherUserId)]
+            }
+            if(snapshot.hasChild("friends")){
+                var friends = [String: FriendObject]()
+                var simpleFriendsList = [FriendObject]()
+                var contained = false
+                for friend in snapshot.childSnapshot(forPath: "friends").children {
+                    let newFriend = FriendObject(gamerTag: (friend as! DataSnapshot).childSnapshot(forPath: "gamerTag").value as? String ?? "", date: (friend as! DataSnapshot).childSnapshot(forPath: "date").value as? String ?? "", uid: (friend as! DataSnapshot).childSnapshot(forPath: "uid").value as? String ?? "")
+                    
+                    if(newFriend.uid == otherUserId){
+                        contained = true
+                        break
+                    } else {
+                        friends[newFriend.uid] = newFriend
+                        simpleFriendsList.append(newFriend)
+                    }
+                }
+                if(!contained){
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "MM-dd-yyyy"
+                    let now = Date()
+                    let dateString = formatter.string(from:now)
+                    simpleFriendsList.append(FriendObject(gamerTag: otherUserTag, date: dateString, uid: otherUserId))
+                    friends[currentUser.uId] = FriendObject(gamerTag: otherUserTag, date: dateString, uid: otherUserId)
+                    
+                    var sendList = [[String: Any]]()
+                    for teammate in friends {
+                        let current = ["gamerTag": teammate.value.gamerTag, "date": teammate.value.date, "uid": teammate.value.uid] as [String : String]
+                        sendList.append(current)
+                    }
+                    ref.child("friends").setValue(sendList)
+                    callbacks.onFollowBackSuccess()
+                }
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                let currentUser = appDelegate.currentUser!
+                currentUser.friends = simpleFriendsList
+            } else {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "MM-dd-yyyy"
+                let now = Date()
+                let dateString = formatter.string(from:now)
+                let followers = [currentUser.uId: FriendObject(gamerTag: otherUserTag, date: dateString, uid: otherUserId)]
+                var sendList = [[String: Any]]()
+                for teammate in followers {
+                    let current = ["gamerTag": teammate.value.gamerTag, "date": teammate.value.date, "uid": teammate.value.uid] as [String : String]
+                    sendList.append(current)
+                }
+                ref.child("friends").setValue(sendList)
+                
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                let currentUser = appDelegate.currentUser!
+                currentUser.friends.append(FriendObject(gamerTag: otherUserTag, date: dateString, uid: otherUserId))
+                callbacks.onFollowBackSuccess()
+            }
+        })
+    }
 }
 
 extension Date {

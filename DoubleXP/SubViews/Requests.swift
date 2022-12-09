@@ -215,6 +215,12 @@ class Requests: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource, 
     func onlineAnnounceSent() {
     }
     
+    func onFollowBackSuccess() {
+    }
+    
+    func onFollowSuccess() {
+    }
+    
     func showConfirmation(){
         var buttons = [PopupDialogButton]()
         let title = "you accepted, we sent it."

@@ -31,6 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var currentMediaFrag: MediaFrag?
     var currentProfileFrag: PlayerProfile?
     var currentDiscoverGamePage: DiscoverGamePage?
+    var currentGameSelection: GameSelection?
     var currentTeamFrag: TeamFrag?
     var currentRequests: Requests?
     var currentFeedFrag: Feed?
@@ -62,9 +63,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var generalLookingFor = [String]()
     var currentRegisterActivity: RegisterActivity?
     var currentLoginActivity: LoginController?
+    var playHeaderUrl = ""
+    var playHeaderCompId = ""
     
     var currentDiscoverFrag: DiscoverFrag?
     var currentDiscoverCat: DiscoveryCategoryFrag?
+    var currentFeedSearchModal: FeedSearchModal?
+    var currentCompetitionPage: CompetitionPageV2?
+    var currentResultsFrag: Results?
     
     private var apnsToken: String = ""
     private var fcmToken: String = ""

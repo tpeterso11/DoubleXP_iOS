@@ -9,9 +9,10 @@
 import Foundation
 import UIKit
 
-class GameSelectionV2Cell: UITableViewCell {
-    @IBOutlet weak var coverblur: UIVisualEffectView!
+class GameSelectionV2Cell: UICollectionViewCell {
     @IBOutlet weak var gameback: UIImageView!
     @IBOutlet weak var developer: UILabel!
     @IBOutlet weak var gamename: UILabel!
+    @IBOutlet weak var selectedCover: UIView!
+    @IBOutlet weak var testCheck: UIImageView!
 }

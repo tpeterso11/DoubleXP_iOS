@@ -11,6 +11,7 @@ import UIKit
 
 class AlertCell: UITableViewCell {
     
+    @IBOutlet weak var clickArea: UIView!
     @IBOutlet weak var clearAlert: UIImageView!
     @IBOutlet weak var acceptedIcon: UIView!
     @IBOutlet weak var rejectedIcon: UIView!

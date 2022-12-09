@@ -25,11 +25,14 @@ class YoutubeConnect: UIViewController, GIDSignInDelegate, SocialMediaManagerCal
     @IBOutlet weak var googleBlur: UIVisualEffectView!
     @IBOutlet weak var loading: UIVisualEffectView!
     @IBOutlet weak var loadingAnimation: AnimationView!
+    @IBOutlet weak var youtubeHeader: UILabel!
+    @IBOutlet weak var youtubeSub: UILabel!
+    @IBOutlet weak var youtubeInstructions: UILabel!
     var videoPayload = [YoutubeVideoObj]()
     var selectedPayload = [YoutubeVideoObj]()
     var selectedIds = [String]()
     var profileUser: User!
-    
+    var competitionId: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -154,13 +157,15 @@ class YoutubeConnect: UIViewController, GIDSignInDelegate, SocialMediaManagerCal
     
     func handleSelection(position: Int){
         let selectedVideo = self.videoPayload[position]
-        if(selectedVideo.youtubeFavorite == "false" && !self.selectedIds.contains(selectedVideo.youtubeId) && self.selectedIds.count < 5){
+        if(self.competitionId != nil && self.selectedIds.count < 1){
+            self.selectedIds.append(selectedVideo.youtubeId)
+            self.selectedPayload.append(selectedVideo)
+        } else if(self.competitionId == nil && selectedVideo.youtubeFavorite == "false" && !self.selectedIds.contains(selectedVideo.youtubeId) && self.selectedIds.count < 5){
             self.selectedIds.append(selectedVideo.youtubeId)
             self.selectedPayload.append(selectedVideo)
         } else if(selectedVideo.youtubeFavorite == "true"){
             selectedVideo.youtubeFavorite = "false"
-        }
-        else {
+        } else {
             if(self.selectedIds.contains(selectedVideo.youtubeId)){
                 self.selectedIds.remove(at: self.selectedIds.index(of: selectedVideo.youtubeId)!)
             }
@@ -170,6 +175,17 @@ class YoutubeConnect: UIViewController, GIDSignInDelegate, SocialMediaManagerCal
                     break
                 }
             }
+        }
+        
+        if(self.doneButton.alpha == 0.3 && !self.selectedPayload.isEmpty){
+            self.doneButton.alpha = 1
+            self.doneButton.isUserInteractionEnabled = true
+        } else if(self.selectedPayload.isEmpty && self.competitionId != nil){
+            self.doneButton.alpha = 0.3
+            self.doneButton.isUserInteractionEnabled = false
+        } else {
+            self.doneButton.alpha = 1
+            self.doneButton.isUserInteractionEnabled = true
         }
         self.videoTabel.reloadData()
     }
@@ -189,10 +205,17 @@ class YoutubeConnect: UIViewController, GIDSignInDelegate, SocialMediaManagerCal
     }
     
     @objc func dismissModal(){
-        self.dismiss(animated: true, completion: {
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            appDelegate.currentProfileFrag?.dismissModal()
-        })
+        if(self.competitionId != nil){
+            self.dismiss(animated: true, completion: {
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                appDelegate.currentCompetitionPage!.checkEntryEligiblity()
+            })
+        } else {
+            self.dismiss(animated: true, completion: {
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                appDelegate.currentProfileFrag?.dismissModal()
+            })
+        }
     }
     
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error?) {
@@ -230,6 +253,8 @@ class YoutubeConnect: UIViewController, GIDSignInDelegate, SocialMediaManagerCal
             let ref = Database.database().reference().child("Users").child(delegate.currentUser!.uId)
             ref.child("googleUserId").setValue(user.userID)
             if(!authentication.accessToken.isEmpty){
+                delegate.currentUser!.googleApiAccessToken = authentication.accessToken
+                delegate.currentUser!.googleApiRefreshToken = authentication.refreshToken
                 ref.child("googleApiAccessToken").setValue(authentication.accessToken)
                 ref.child("googleApiRefreshToken").setValue(authentication.refreshToken)
                 SocialMediaManager().getYoutubeAccess(accessToken: authentication.accessToken, callbacks: self, currentUser: self.profileUser, tryRefresh: true)
@@ -310,7 +335,7 @@ class YoutubeConnect: UIViewController, GIDSignInDelegate, SocialMediaManagerCal
         cell.title.text = current.title
         cell.videoDate.text = current.date
         
-        if(current.youtubeFavorite == "true"){
+        if(current.youtubeFavorite == "true" && self.competitionId == nil){
             cell.baseColorLayer.backgroundColor = #colorLiteral(red: 1, green: 0.758044064, blue: 0, alpha: 0.6969980736)
             cell.baseColorLayer.alpha = 0.6
             cell.selectedBlur.alpha = 0
@@ -349,28 +374,40 @@ class YoutubeConnect: UIViewController, GIDSignInDelegate, SocialMediaManagerCal
     }
     
     @objc func sendPayload(){
-        UIView.animate(withDuration: 0.5, animations: {
-            self.loading.alpha = 1
-            self.loadingAnimation.alpha = 1
-            self.loadingAnimation.play()
-        }, completion: { (finished: Bool) in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                var sendUp = [[String: Any]]()
-                let appDelegate = UIApplication.shared.delegate as! AppDelegate
-                let currentUser = appDelegate.currentUser!
-                currentUser.youtubeVideos = self.selectedPayload
-                for video in self.selectedPayload {
-                    let newVid = ["title": video.title, "date": video.date, "videoOwnerGamerTag" : currentUser.gamerTag, "videoOwnerUid": currentUser.uId,
-                                  "youtubeId": video.youtubeId, "youtubeImg": video.youtubeImg, "youtubeFavorite": video.youtubeFavorite, "downVotes": video.downVotes, "upVotes": video.upVotes] as [String : Any]
-                    sendUp.append(newVid)
+        if(self.selectedPayload.isEmpty){
+            UIView.animate(withDuration: 0.5, animations: {
+                self.loading.alpha = 1
+                self.loadingAnimation.alpha = 1
+                self.loadingAnimation.play()
+            }, completion: { (finished: Bool) in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    var sendUp = [[String: Any]]()
+                    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                    let currentUser = appDelegate.currentUser!
+                    
+                    if(self.competitionId != nil){
+                        for video in self.selectedPayload {
+                            let newVid = ["compId": self.competitionId!, "imgUrl": video.youtubeImg, "uid" : currentUser.uId, "voteCount": 1,
+                                          "youtubeId": video.youtubeId, "voterUids": [currentUser.uId], "gamerTag": currentUser.gamerTag, "currentPosition": -1, "lastPosition": -1] as [String : Any]
+                            sendUp.append(newVid)
+                        }
+                        Database.database().reference().child("Entries").child(self.competitionId!).child(currentUser.uId).setValue(sendUp)
+                    } else {
+                        currentUser.youtubeVideos = self.selectedPayload
+                        for video in self.selectedPayload {
+                            let newVid = ["title": video.title, "date": video.date, "videoOwnerGamerTag" : currentUser.gamerTag, "videoOwnerUid": currentUser.uId,
+                                          "youtubeId": video.youtubeId, "youtubeImg": video.youtubeImg, "youtubeFavorite": video.youtubeFavorite, "downVotes": video.downVotes, "upVotes": video.upVotes] as [String : Any]
+                            sendUp.append(newVid)
+                        }
+                        
+                        Database.database().reference().child("Users").child(currentUser.uId).child("youtubeVideos").setValue(sendUp)
+                        Database.database().reference().child("YoutubeSubmissions").child(currentUser.uId).setValue(sendUp)
+                    }
+                    
+                    self.dismissModal()
                 }
-                
-                Database.database().reference().child("Users").child(currentUser.uId).child("youtubeVideos").setValue(sendUp)
-                Database.database().reference().child("YoutubeSubmissions").child(currentUser.uId).setValue(sendUp)
-                
-                self.dismissModal()
-            }
-        })
+            })
+        }
     }
     
     func onTweetsLoaded(tweets: [TweetObject]) {
@@ -424,6 +461,22 @@ class YoutubeConnect: UIViewController, GIDSignInDelegate, SocialMediaManagerCal
         self.doneButton.addTarget(self, action: #selector(self.sendPayload), for: .touchUpInside)
         self.clear.addTarget(self, action: #selector(self.clearClicked), for: .touchUpInside)
         
+        if(self.competitionId != nil){
+            self.youtubeHeader.text = "your most recent videos"
+            self.youtubeSub.text = ""
+            self.youtubeInstructions.text = "select which one of your recent youtube uploads you would like to submit."
+            self.doneButton.alpha = 0.3
+            self.doneButton.isUserInteractionEnabled = false
+            self.doneButton.setTitle("i choose this one", for: .normal)
+            
+            self.clear.setTitle("dismiss", for: .normal)
+            self.clear.addTarget(self, action: #selector(self.dismissModal), for: .touchUpInside)
+        } else {
+            self.youtubeHeader.text = "your most recent videos"
+            self.youtubeSub.text = "tap to select up to 5 videos to feature on your profile."
+            
+            self.doneButton.setTitle("done.", for: .normal)
+        }
         UIView.animate(withDuration: 0.5, delay: 0.5, options: [], animations: {
             self.loading.alpha = 0
             self.googleBlur.alpha = 0
@@ -439,52 +492,56 @@ class YoutubeConnect: UIViewController, GIDSignInDelegate, SocialMediaManagerCal
     }
     
     func updateVideos(list: [YoutubeVideoObj]){
-        let youtubeRef = Database.database().reference().child("YoutubeSubmissions")
-        youtubeRef.observeSingleEvent(of: .value, with: { (snapshot) in
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            for user in snapshot.children {
-                if((user as! DataSnapshot).key == appDelegate.currentUser!.uId){
-                    for dbVideo in (user as! DataSnapshot).children {
-                        var contained = false
-                        for youtubeVideo in list {
-                            let id = (dbVideo as! DataSnapshot).childSnapshot(forPath: "youtubeId").value as? String ?? ""
-                            if(id == youtubeVideo.youtubeId){
-                                contained = true
+        if(self.competitionId == nil){
+            let youtubeRef = Database.database().reference().child("YoutubeSubmissions")
+            youtubeRef.observeSingleEvent(of: .value, with: { (snapshot) in
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                for user in snapshot.children {
+                    if((user as! DataSnapshot).key == appDelegate.currentUser!.uId){
+                        for dbVideo in (user as! DataSnapshot).children {
+                            var contained = false
+                            for youtubeVideo in list {
+                                let id = (dbVideo as! DataSnapshot).childSnapshot(forPath: "youtubeId").value as? String ?? ""
+                                if(id == youtubeVideo.youtubeId){
+                                    contained = true
+                                    let youtubeFavorite = (dbVideo as! DataSnapshot).childSnapshot(forPath: "youtubeFavorite").value as? String ?? ""
+                                    let downVotes = (dbVideo as! DataSnapshot).childSnapshot(forPath: "downVotes").value as? [String] ?? [String]()
+                                    let upVotes = (dbVideo as! DataSnapshot).childSnapshot(forPath: "upVotes").value as? [String] ?? [String]()
+                                    youtubeVideo.youtubeFavorite = youtubeFavorite
+                                    youtubeVideo.downVotes = downVotes
+                                    youtubeVideo.upVotes = upVotes
+                                    
+                                    self.selectedPayload.append(youtubeVideo)
+                                    self.selectedIds.append(youtubeVideo.youtubeId)
+                                }
+                            }
+                            if(!contained){
+                                let id = (dbVideo as! DataSnapshot).childSnapshot(forPath: "youtubeId").value as? String ?? ""
                                 let youtubeFavorite = (dbVideo as! DataSnapshot).childSnapshot(forPath: "youtubeFavorite").value as? String ?? ""
                                 let downVotes = (dbVideo as! DataSnapshot).childSnapshot(forPath: "downVotes").value as? [String] ?? [String]()
                                 let upVotes = (dbVideo as! DataSnapshot).childSnapshot(forPath: "upVotes").value as? [String] ?? [String]()
-                                youtubeVideo.youtubeFavorite = youtubeFavorite
-                                youtubeVideo.downVotes = downVotes
-                                youtubeVideo.upVotes = upVotes
+                                let img = (dbVideo as! DataSnapshot).childSnapshot(forPath: "youtubeImg").value as? String ?? ""
+                                let title = (dbVideo as! DataSnapshot).childSnapshot(forPath: "title").value as? String ?? ""
+                                let gamertag = (dbVideo as! DataSnapshot).childSnapshot(forPath: "videoOwnerGamerTag").value as? String ?? ""
+                                let uid = (dbVideo as! DataSnapshot).childSnapshot(forPath: "videoOwnerUid").value as? String ?? ""
+                                let date = (dbVideo as! DataSnapshot).childSnapshot(forPath: "videoOwnerUid").value as? String ?? ""
                                 
-                                self.selectedPayload.append(youtubeVideo)
-                                self.selectedIds.append(youtubeVideo.youtubeId)
+                                let newVideo = YoutubeVideoObj(title: title, videoOwnerGamerTag: gamertag, videoOwnerUid: uid, youtubeFavorite: youtubeFavorite, date: date, youtubeId: id, imgUrl: img)
+                                newVideo.downVotes = downVotes
+                                newVideo.upVotes = upVotes
+                                
+                                self.selectedIds.append(id)
+                                self.selectedPayload.append(newVideo)
+                                self.videoPayload.append(newVideo)
                             }
-                        }
-                        if(!contained){
-                            let id = (dbVideo as! DataSnapshot).childSnapshot(forPath: "youtubeId").value as? String ?? ""
-                            let youtubeFavorite = (dbVideo as! DataSnapshot).childSnapshot(forPath: "youtubeFavorite").value as? String ?? ""
-                            let downVotes = (dbVideo as! DataSnapshot).childSnapshot(forPath: "downVotes").value as? [String] ?? [String]()
-                            let upVotes = (dbVideo as! DataSnapshot).childSnapshot(forPath: "upVotes").value as? [String] ?? [String]()
-                            let img = (dbVideo as! DataSnapshot).childSnapshot(forPath: "youtubeImg").value as? String ?? ""
-                            let title = (dbVideo as! DataSnapshot).childSnapshot(forPath: "title").value as? String ?? ""
-                            let gamertag = (dbVideo as! DataSnapshot).childSnapshot(forPath: "videoOwnerGamerTag").value as? String ?? ""
-                            let uid = (dbVideo as! DataSnapshot).childSnapshot(forPath: "videoOwnerUid").value as? String ?? ""
-                            let date = (dbVideo as! DataSnapshot).childSnapshot(forPath: "videoOwnerUid").value as? String ?? ""
-                            
-                            let newVideo = YoutubeVideoObj(title: title, videoOwnerGamerTag: gamertag, videoOwnerUid: uid, youtubeFavorite: youtubeFavorite, date: date, youtubeId: id, imgUrl: img)
-                            newVideo.downVotes = downVotes
-                            newVideo.upVotes = upVotes
-                            
-                            self.selectedIds.append(id)
-                            self.selectedPayload.append(newVideo)
-                            self.videoPayload.append(newVideo)
                         }
                     }
                 }
-            }
+                self.setYoutubeInfo()
+            })
+        } else {
             self.setYoutubeInfo()
-        })
+        }
     }
     
     func onYoutubeFail() {

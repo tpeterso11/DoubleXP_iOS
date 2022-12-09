@@ -584,6 +584,8 @@ class SocialMediaManager{
         }
     }
     
+    
+    
     /*func getTopStreams(){
         if(!token.isEmpty){
             var streams = [TwitchStreamObject]()

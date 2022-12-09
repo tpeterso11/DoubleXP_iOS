@@ -583,7 +583,78 @@ class User: NSObject, NSCoding {
         }
     }
     
+    var _followers = [FriendObject]()
+    var followers:[FriendObject] {
+        get {
+            return (_followers)
+        }
+        set (newVal) {
+            _followers = newVal
+        }
+    }
     
+    var _followerAnnouncements = [FriendObject]()
+    var followerAnnouncements:[FriendObject] {
+        get {
+            return (_followerAnnouncements)
+        }
+        set (newVal) {
+            _followerAnnouncements = newVal
+        }
+    }
+    
+    var _following = [FriendObject]()
+    var following:[FriendObject] {
+        get {
+            return (_following)
+        }
+        set (newVal) {
+            _following = newVal
+        }
+    }
+    
+    var _posts = [PostObject]()
+    var posts:[PostObject] {
+        get {
+            return (_posts)
+        }
+        set (newVal) {
+            _posts = newVal
+        }
+    }
+    
+    var _receivedPosts = [PostObject]()
+    var receivedPosts:[PostObject] {
+        get {
+            return (_receivedPosts)
+        }
+        set (newVal) {
+            _receivedPosts = newVal
+        }
+    }
+    
+    var _viewedPosts: [String]? = [String]()
+       var viewedPosts: [String] {
+           get {
+               return (_viewedPosts)!
+           }
+           set (newVal) {
+               _viewedPosts = newVal
+           }
+       }
+    
+    func getSocialsCount() -> Int {
+        var count = 0
+        if(!instagramConnect.isEmpty){
+            count += 1
+        }
+        if(!twitchConnect.isEmpty){
+            count += 1
+        }
+        
+        return count
+    }
+ 
     func getConsoleString() -> String{
         var buildString = ""
         if(self.ps){
@@ -692,6 +763,12 @@ class User: NSObject, NSCoding {
         self.userAbout = (decoder.decodeObject(forKey: "userAbout") as! [String])
         self.recommendedGames = (decoder.decodeObject(forKey: "recommendedGames") as! [String])
         self.badges = (decoder.decodeObject(forKey: "badges") as! [BadgeObj])
+        self.followers = (decoder.decodeObject(forKey: "followers") as! [FriendObject])
+        self.following = (decoder.decodeObject(forKey: "following") as! [FriendObject])
+        self.followerAnnouncements = (decoder.decodeObject(forKey: "followerAnnouncements") as! [FriendObject])
+        self.posts = (decoder.decodeObject(forKey: "posts") as! [PostObject])
+        self.receivedPosts = (decoder.decodeObject(forKey: "receivedPosts") as! [PostObject])
+        self.viewedPosts = (decoder.decodeObject(forKey: "viewedPosts") as! [String])
     }
     
     func encode(with coder: NSCoder) {
@@ -738,6 +815,12 @@ class User: NSObject, NSCoding {
         coder.encode(self.gamingExperience, forKey: "gamingExperience")
         coder.encode(self.googleApiRefreshToken, forKey: "googleApiRefreshToken")
         coder.encode(self.googleApiAccessToken, forKey: "googleApiAccessToken")
+        coder.encode(self.followers, forKey: "followers")
+        coder.encode(self.following, forKey: "following")
+        coder.encode(self.followerAnnouncements, forKey: "followerAnnouncements")
+        coder.encode(self.posts, forKey: "posts")
+        coder.encode(self.receivedPosts, forKey: "receivedPosts")
+        coder.encode(self.viewedPosts, forKey: "viewedPosts")
     }
     
     struct Post: Hashable, Equatable {

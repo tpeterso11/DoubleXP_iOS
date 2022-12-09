@@ -154,7 +154,7 @@ class MediaManager {
                                 isGame = true
                             }
                             
-                            if(isGame && videoPresent){
+                            if(isGame){
                                 add = true
                             }
                             

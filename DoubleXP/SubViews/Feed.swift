@@ -44,7 +44,9 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
     var onlineAnnouncements = [OnlineObj]()
     var announcementsAvailable = false
     var dataSet = false
+    var todayAnimated = false
     var currentFeaturedGame: GamerConnectGame?
+    var todayAnimating = false
     
     override func viewDidLoad() {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -74,7 +76,7 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
         }
     }
     
-    @objc func dismissKeyboard() {
+    @objc override func dismissKeyboard() {
         //Causes the view (or one of its embedded text fields) to resign the first responder status.
         view.endEditing(true)
     }
@@ -94,6 +96,18 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
         }
         if((delegate.currentUser!.userAbout.isEmpty || delegate.currentUser!.userLookingFor.isEmpty) && delegate.currentCta != nil) {
             payload.append("cta")
+        }
+        if(!delegate.currentUser!.receivedPosts.isEmpty){
+            var newPostsAvailable = false
+            for postObj in delegate.currentUser!.receivedPosts {
+                if(!delegate.currentUser!.viewedPosts.contains(postObj.postId)){
+                    newPostsAvailable = true
+                    break
+                }
+            }
+            if(newPostsAvailable){
+                payload.append("posts")
+            }
         }
         if(self.currentFeaturedGame != nil){
             payload.append("discoverExpanded")
@@ -119,6 +133,9 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
         self.checkOnlineAnnouncements()
     }
     
+    func didDismissStorkByTap() {
+        self.checkOnlineAnnouncements()
+    }
     func modalDismissed(){
         self.checkOnlineAnnouncements()
     }
@@ -171,7 +188,7 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
                         self.dataSet = true
                         self.feedTable.delegate = self
                         self.feedTable.dataSource = self
-                        self.feedTable.reloadData()
+                        //self.feedTable.reloadData()
                         
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                             let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -186,7 +203,7 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
                         self.dataSet = true
                         self.feedTable.delegate = self
                         self.feedTable.dataSource = self
-                        self.feedTable.reloadData()
+                        //self.feedTable.reloadData()
                         
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                             let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -258,6 +275,21 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
         self.present(currentViewController, animated: true, completion: nil)
     }
     
+    @objc func launchFeedSearch(){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "feedSearch") as! FeedSearchModal
+        currentViewController.currentFeed = self
+        
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+    }
+    
     override func viewDidDisappear(_ animated: Bool) {
         print("gone")
         NotificationCenter.default.removeObserver(NSNotification.Name.AVPlayerItemDidPlayToEndTime)
@@ -281,7 +313,13 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
             
             if(current == "header"){
                 let cell = tableView.dequeueReusableCell(withIdentifier: "header", for: indexPath) as! FeedHeaderCell
-                cell.setLayout(feed: self, loaded: self.recommededLoaded)
+                cell.setLayout(feed: self, loaded: self.recommededLoaded, todayAnimated: self.todayAnimated, todayAnimating: self.todayAnimating)
+                
+                let backTap = UITapGestureRecognizer(target: self, action: #selector(self.launchFeedSearch))
+                cell.startLayout.isUserInteractionEnabled = true
+                cell.startLayout.addGestureRecognizer(backTap)
+                
+                //cell.contentView
                 return cell
             } else if(current == "cta"){
                 let cell = tableView.dequeueReusableCell(withIdentifier: "cta", for: indexPath) as! CTACell
@@ -329,6 +367,12 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
                 let backTap = UITapGestureRecognizer(target: self, action: #selector(self.ctaClicked))
                 cell.shell.isUserInteractionEnabled = true
                 cell.shell.addGestureRecognizer(backTap)
+                
+                /*UIView.animate(withDuration: 0.8, delay: 4.0, options: [], animations: {
+                    cell.shell.alpha = 1
+                }, completion: { (finished: Bool) in
+
+                })*/
                 
                 return cell
             } else if(current == "discoverExpanded"){
@@ -393,6 +437,18 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
                 let backTap = UITapGestureRecognizer(target: self, action: #selector(self.discoverClicked))
                 cell.discoverLayout.isUserInteractionEnabled = true
                 cell.discoverLayout.addGestureRecognizer(backTap)
+                
+                return cell
+            } else if(current == "posts"){
+                let cell = tableView.dequeueReusableCell(withIdentifier: "posts", for: indexPath) as! FeedPostsCell
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                //let cache = appDelegate.imageCache
+                let receivedPosts = appDelegate.currentUser!.receivedPosts
+                
+                var list = [Any]()
+                list.append(contentsOf: receivedPosts)
+                list.append("view")
+                cell.setPosts(list: list)
                 
                 return cell
             } else {
@@ -522,6 +578,7 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
         }, completion: { (finished: Bool) in
             UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
                 self.announcementLayout.alpha = 0
+                self.announcementLayout.isHidden = true
             }, completion: nil)
         })
     }
@@ -539,6 +596,7 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
         }, completion: { (finished: Bool) in
             UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
                 self.announcementLayout.alpha = 0
+                self.announcementLayout.isHidden = true
             }, completion: nil)
         })
     }
@@ -561,6 +619,7 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
         self.announcementBox.layer.masksToBounds = false
         self.announcementBox.layer.shadowPath = UIBezierPath(roundedRect: self.announcementBox.bounds, cornerRadius: self.announcementBox.layer.cornerRadius).cgPath
         
+        self.announcementLayout.isHidden = false
         let top = CGAffineTransform(translationX: 0, y: 40)
         UIView.animate(withDuration: 0.8, animations: {
             self.announcementLayout.alpha = 1
@@ -686,6 +745,23 @@ class Feed : ParentVC, UITableViewDelegate, UITableViewDataSource, SPStorkContro
                 self.upcomingGameBox.layer.shadowPath = UIBezierPath(roundedRect: self.upcomingGameBox.bounds, cornerRadius: self.upcomingGameBox.layer.cornerRadius).cgPath
             }, completion: nil)
         })*/
+    }
+    
+    func launchVideoMessage(){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "videoMessage") as! VideoMessage
+        //currentViewController.newsObj = newsObj
+        //currentViewController.selectedImage = image
+        
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        transitionDelegate.customHeight = 500
+        self.present(currentViewController, animated: true, completion: nil)
     }
     
     func navigateToSearch(game: GamerConnectGame){

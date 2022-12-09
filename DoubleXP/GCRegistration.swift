@@ -91,7 +91,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.celebrateAnimation.animationSpeed = 0.6
             self.celebrateAnimation.loopMode = .playOnce
             self.celebrateAnimation.play()
@@ -740,7 +740,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         ref.child("secondaryLanguage").setValue(self.selectedSecondaryLanguage)
         ref.child("selectedAge").setValue(self.selectedAge)
         ref.child("gender").setValue(self.currendSelectedGender)
-        ref.child("gamingExperience").setValue(String(self.experienceVal))
+        ref.child("gamingExperience").setValue(String(Int(self.experienceVal)))
         
         if(self.locationLat != 0.0){
             currentUser!.userLat = self.locationLat

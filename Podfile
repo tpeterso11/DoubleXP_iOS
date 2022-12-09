@@ -43,6 +43,7 @@ target 'DoubleXP' do
   pod 'YoutubeKit'
   pod 'youtube-ios-player-helper'
   pod 'collection-view-layouts/InstagramLayout'
+  pod 'FRadioPlayer'
   
   # Pods for DoubleXP
 

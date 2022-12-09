@@ -41,7 +41,7 @@ class AlertsDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource
         } else {
             payLoad.append(contentsOf: currentUser.acceptedTempRivals)
             payLoad.append(contentsOf: currentUser.rejectedTempRivals)
-            
+            payLoad.append(contentsOf: currentUser.followerAnnouncements)
             if(self.payLoad.isEmpty){
                 self.alertsTable.alpha = 0
                 self.empty.alpha = 1
@@ -74,6 +74,9 @@ class AlertsDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource
                     self.payLoad.remove(at: position)
                     FriendsManager().cleanRivals(rivalId: onlineUid, callbacks: self)
                 }
+            } else if(optionType == "follower"){
+                self.payLoad.remove(at: position)
+                FriendsManager().cleanFollowers(uid: onlineUid, callbacks: self)
             } else {
                 if(!onlineUid.isEmpty){
                     self.payLoad.remove(at: position)
@@ -113,6 +116,7 @@ class AlertsDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource
             self.payLoad.append(contentsOf: users)
             self.payLoad.append(contentsOf: currentUser.acceptedTempRivals)
             self.payLoad.append(contentsOf: currentUser.rejectedTempRivals)
+            self.payLoad.append(contentsOf: currentUser.followerAnnouncements)
             
             if(self.payLoad.isEmpty){
                 self.alertsTable.alpha = 0
@@ -179,6 +183,35 @@ class AlertsDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource
             clearTap.position = indexPath.item
             cell.clearAlert.isUserInteractionEnabled = true
             cell.clearAlert.addGestureRecognizer(clearTap)
+            
+            let launchTap = LaunchGesture(target: self, action: #selector(launchProfile))
+            launchTap.uid = currentRivalObj.id
+            cell.clickArea.isUserInteractionEnabled = true
+            cell.clickArea.addGestureRecognizer(launchTap)
+        
+            return cell
+        } else if(current is FriendObject){
+            let cell = tableView.dequeueReusableCell(withIdentifier: "alert", for: indexPath) as! AlertCell
+            cell.backgroundColor = UIColor.clear
+            let currentFollower = (current as! FriendObject)
+            cell.senderTag.text = currentFollower.gamerTag
+            
+            cell.details.text = "is following you now!"
+            cell.onlineIcon.alpha = 0
+            cell.rejectedIcon.alpha = 0
+            cell.acceptedIcon.alpha = 1
+            
+            let clearTap = ClearGesture(target: self, action: #selector(clearClicked))
+            clearTap.onlineUid = currentFollower.uid
+            clearTap.optionType = "follower"
+            clearTap.position = indexPath.item
+            cell.clearAlert.isUserInteractionEnabled = true
+            cell.clearAlert.addGestureRecognizer(clearTap)
+            
+            let launchTap = LaunchGesture(target: self, action: #selector(launchProfile))
+            launchTap.uid = currentFollower.uid
+            cell.clickArea.isUserInteractionEnabled = true
+            cell.clickArea.addGestureRecognizer(launchTap)
         
             return cell
         } else {
@@ -195,6 +228,11 @@ class AlertsDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource
             cell.clearAlert.isUserInteractionEnabled = true
             cell.clearAlert.addGestureRecognizer(clearTap)
             
+            let launchTap = LaunchGesture(target: self, action: #selector(launchProfile))
+            launchTap.uid = currentUser.uId
+            cell.clickArea.isUserInteractionEnabled = true
+            cell.clickArea.addGestureRecognizer(launchTap)
+            
             cell.onlineIcon.alpha = 1
             cell.rejectedIcon.alpha = 0
             cell.acceptedIcon.alpha = 0
@@ -206,6 +244,23 @@ class AlertsDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource
         let current = self.payLoad[indexPath.item]
         if(current is RivalObj){
             let uid = (current as! RivalObj).uid
+            
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            appDelegate.cachedTest = uid
+            
+            let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "playerProfile") as! PlayerProfile
+            let transitionDelegate = SPStorkTransitioningDelegate()
+            currentViewController.transitioningDelegate = transitionDelegate
+            currentViewController.modalPresentationStyle = .custom
+            currentViewController.modalPresentationCapturesStatusBarAppearance = true
+            currentViewController.editMode = false
+            transitionDelegate.showIndicator = true
+            transitionDelegate.swipeToDismissEnabled = true
+            transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+            transitionDelegate.storkDelegate = self
+            self.present(currentViewController, animated: true, completion: nil)
+        } else if(current is FriendObject){ //new follower
+            let uid = (current as! FriendObject).uid
             
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             appDelegate.cachedTest = uid
@@ -241,8 +296,23 @@ class AlertsDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource
         }
     }
     
-    @objc private func launchProfile(){
+    @objc private func launchProfile(sender: LaunchGesture){
+        let uid = sender.uid
         
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.cachedTest = uid!
+        
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "playerProfile") as! PlayerProfile
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        currentViewController.editMode = false
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
     }
     
     @objc private func clearClicked(sender: ClearGesture){
@@ -304,5 +374,9 @@ class ClearGesture: UITapGestureRecognizer {
     var onlineUid: String!
     var position: Int!
     var optionType: String!
+}
+
+class LaunchGesture: UITapGestureRecognizer {
+    var uid: String!
 }
 

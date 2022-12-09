@@ -11,6 +11,7 @@ import UIKit
 
 class DiscoverGameBasicInfoCell: UITableViewCell {
     
+    @IBOutlet weak var addGameButton: UIButton!
     @IBOutlet weak var bottomDivider: UIView!
     @IBOutlet weak var gameName: UILabel!
     @IBOutlet weak var developer: UILabel!

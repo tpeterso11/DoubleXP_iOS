@@ -181,7 +181,9 @@ class DiscoverGamePage: UIViewController, UITableViewDelegate, UITableViewDataSo
         if(self.reviewModalActive){
             //for some reason, this does not fire after setting rating sometimes.
             self.reviewModalActive = false
-            reloadData()
+            self.reloadData()
+        } else {
+            self.reloadData()
         }
     }
     
@@ -388,6 +390,20 @@ class DiscoverGamePage: UIViewController, UITableViewDelegate, UITableViewDataSo
                 }
             }
             
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            if(delegate.currentUser!.games.contains(self.game.gameName)){
+                cell.addGameButton.backgroundColor = #colorLiteral(red: 0.2880555391, green: 0.2778990865, blue: 0.2911514342, alpha: 1)
+                cell.addGameButton.setTitle("you play this game.", for: .normal)
+                cell.addGameButton.alpha = 0.5
+                cell.addGameButton.isUserInteractionEnabled = false
+            } else {
+                cell.addGameButton.backgroundColor = #colorLiteral(red: 0.1667544842, green: 0.6060172915, blue: 0.279296875, alpha: 1)
+                cell.addGameButton.setTitle("add this game.", for: .normal)
+                cell.addGameButton.alpha = 1
+                cell.addGameButton.isUserInteractionEnabled = true
+                cell.addGameButton.addTarget(self, action: #selector(showQuickAddModal), for: UIControl.Event.touchUpInside)
+            }
+            
             if(game.categoryFilters.contains("dope")){
                 cell.bottomDivider.alpha = 1
             } else {
@@ -500,7 +516,7 @@ class DiscoverGamePage: UIViewController, UITableViewDelegate, UITableViewDataSo
         let current = self.payload[indexPath.item]
         let key = Array(current.keys)[0]
         if(key == "info"){
-            return CGFloat(150)
+            return CGFloat(200)
         }
         else if(key == "ideal"){
             return CGFloat(450)
@@ -518,6 +534,22 @@ class DiscoverGamePage: UIViewController, UITableViewDelegate, UITableViewDataSo
         else {
             return CGFloat(0)
         }
+    }
+    
+    @objc private func showQuickAddModal(){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "quickAddGame") as! QuickAddGameDrawer
+        currentViewController.gameName = game.gameName
+        
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.customHeight = 650
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
     }
     
     private func mapTimeString(input: CGFloat) -> String {

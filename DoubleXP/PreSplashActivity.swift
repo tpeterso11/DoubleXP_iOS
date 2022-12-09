@@ -17,6 +17,9 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
     private var data: [NewsObject]!
     private var games: [GamerConnectGame]!
     
+    @IBOutlet weak var adminBlur: UIView!
+    @IBOutlet weak var splashLogo: UIImageView!
+    @IBOutlet weak var videoBlur: UIVisualEffectView!
     @IBOutlet weak var videoBack: VideoBackground!
     struct Constants {
         static let secret = "uyvhqn68476njzzdvja9ulqsb8esn3"
@@ -47,11 +50,22 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
         view.insertSubview(videoView, at: 0)
         
         games = [GamerConnectGame]()
+
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.8) {
-            self.getArticles()
-            self.getFeedExtras()
-            self.loadLanguages()
-            self.getGeneralLookingFor()
+            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+                self.videoBlur.alpha = 1
+                //self.splashLogo.alpha = 0
+            }, completion: { (finished: Bool) in
+                self.getArticles()
+                self.getFeedExtras()
+                self.loadLanguages()
+                self.getGeneralLookingFor()
+            })
+            //self.getArticles()
+            //self.getFeedExtras()
+            //self.loadLanguages()
+            //self.getGeneralLookingFor()
             
             //let manager = StatsManager()
             //manager.getPubgStats(gamerTag: "superNayr")
@@ -78,6 +92,10 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
                 }
                 if(snapshot.hasChild("heroLightXXHDPI")){
                     appDelegate.heroDarkUrl = snapshot.childSnapshot(forPath: "heroDarkXXHDPI").value as? String ?? ""
+                }
+                if(snapshot.hasChild("competitionVideoUrl")){
+                    appDelegate.playHeaderUrl = snapshot.childSnapshot(forPath: "competitionVideoUrl").value as? String ?? ""
+                    appDelegate.playHeaderCompId = snapshot.childSnapshot(forPath: "competitionVideoCompId").value as? String ?? ""
                 }
             }
         })
@@ -361,18 +379,65 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
             let userLat = value?["userLat"] as? Double ?? 0.0
             let userLong = value?["userLong"] as? Double ?? 0.0
             let subscriptions = value?["subscriptions"] as? [String] ?? [String]()
+            let viewedPosts = value?["viewedPosts"] as? [String] ?? [String]()
             let competitions = value?["competitions"] as? [String] ?? [String]()
             let bio = value?["bio"] as? String ?? ""
             let blockList = value?["blockList"] as? [String: String] ?? [String: String]()
             let restrictList = value?["restrictList"] as? [String: String] ?? [String: String]()
             let cachedRecommendedUids = value?["cachedRecommendedUids"] as? [String] ?? [String]()
             let dailyCheck = value?["dailyCheck"] as? String ?? ""
+            let googleApiAccessToken = value?["googleApiAccessToken"] as? String ?? ""
             let googleApiRefreshToken = value?["googleApiRefreshToken"] as? String ?? ""
             let gamingExperience = value?["gamingExperience"] as? String ?? "5"
             var receivedAnnouncements = value?["receivedAnnouncements"] as? [String] ?? [String]()
             let search = value?["search"] as? String ?? ""
             if(search.isEmpty){
                 ref.child("search").setValue("true")
+            }
+            
+            var followers = [FriendObject]()
+            if(snapshot.hasChild("followers")){
+                let currentlyFollowing = snapshot.childSnapshot(forPath: "followers")
+                for friend in currentlyFollowing.children{
+                    let currentObj = friend as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    
+                    let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
+                    followers.append(newFriend)
+                }
+            }
+            
+            var followerAnnouncements = [FriendObject]()
+            if(snapshot.hasChild("followerAnnouncements")){
+                let currentlyFollowing = snapshot.childSnapshot(forPath: "followerAnnouncements")
+                for friend in currentlyFollowing.children{
+                    let currentObj = friend as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    
+                    let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
+                    followerAnnouncements.append(newFriend)
+                }
+            }
+            
+            var following = [FriendObject]()
+            if(snapshot.hasChild("following")){
+                let currentlyFollowing = snapshot.childSnapshot(forPath: "following")
+                for friend in currentlyFollowing.children{
+                    let currentObj = friend as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    
+                    let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
+                    following.append(newFriend)
+                }
             }
             
             let twitchToken = value?["twitchAppToken"] as? String ?? ""
@@ -928,6 +993,27 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
                 }
             }
             
+            var receivedPosts = [PostObject]()
+            if(snapshot.hasChild("receivedPosts")){
+                let posts = snapshot.childSnapshot(forPath: "receivedPosts")
+                for post in posts.children{
+                    let currentObj = post as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let date = dict?["date"] as? String ?? ""
+                    let postId = dict?["postId"] as? String ?? ""
+                    let videoOwnerGamerTag = dict?["videoOwnerGamerTag"] as? String ?? ""
+                    let game = dict?["game"] as? String ?? ""
+                    let videoOwnerUid = dict?["videoOwnerUid"] as? String ?? ""
+                    let youtubeId = dict?["youtubeId"] as? String ?? ""
+                    let youtubeImg = dict?["youtubeImg"] as? String ?? ""
+                    let publicPost = dict?["publicPost"] as? String ?? ""
+                    let postConsole = dict?["postConsole"] as? String ?? ""
+                    let title = dict?["title"] as? String ?? ""
+                    
+                    receivedPosts.append(PostObject(title: title, videoOwnerGamerTag: videoOwnerGamerTag, videoOwnerUid: videoOwnerUid, publicPost: publicPost, date: date, youtubeId: youtubeId, imgUrl: youtubeImg, postConsole: postConsole, game: game))
+                }
+            }
+            
             let consoleArray = snapshot.childSnapshot(forPath: "consoles")
             let dict = consoleArray.value as? [String: Bool]
             let nintendo = dict?["nintendo"] ?? false
@@ -974,11 +1060,19 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
             user.receivedAnnouncements = receivedAnnouncements
             user.gamingExperience = gamingExperience
             user.googleApiRefreshToken = googleApiRefreshToken
+            user.googleApiAccessToken = googleApiAccessToken
+            user.following = following
+            user.followers = followers
+            user.followerAnnouncements = followerAnnouncements
+            user.receivedPosts = receivedPosts
+            user.viewedPosts = viewedPosts
+            
             
             DispatchQueue.main.async {
                 let delegate = UIApplication.shared.delegate as! AppDelegate
                 delegate.currentUser = user
                 
+                //self.performSegue(withIdentifier: "results", sender: nil) //results
                 self.performSegue(withIdentifier: "homeTransition", sender: nil)
             }
             
@@ -1195,5 +1289,36 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
 
         // Get and return IDFA
         return ASIdentifierManager.shared().advertisingIdentifier.uuidString
+    }
+}
+
+extension UIView {
+
+    @IBInspectable var cornerRadius: CGFloat {
+        get {
+            return layer.cornerRadius
+        }
+        set {
+            layer.cornerRadius = newValue
+            layer.masksToBounds = newValue > 0
+        }
+    }
+
+    @IBInspectable var borderWidth: CGFloat {
+        get {
+            return layer.borderWidth
+        }
+        set {
+            layer.borderWidth = newValue
+        }
+    }
+
+    @IBInspectable var borderColor: UIColor? {
+        get {
+            return UIColor(cgColor: layer.borderColor!)
+        }
+        set {
+            layer.borderColor = newValue?.cgColor
+        }
     }
 }

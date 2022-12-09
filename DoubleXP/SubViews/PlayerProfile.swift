@@ -79,16 +79,38 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     @IBOutlet weak var sendGt: UIButton!
     @IBOutlet weak var dismissGtRegisterButton: UIButton!
     @IBOutlet weak var fullProfileTable: UITableView!
+    @IBOutlet weak var testYoutubeFullCover: UIView!
+    @IBOutlet weak var profileBlurDismiss: UIButton!
+    @IBOutlet weak var profileBlur: UIView!
+    @IBOutlet weak var profileBlurSpaceAnim: AnimationView!
+    @IBOutlet weak var introLine1: UILabel!
+    @IBOutlet weak var introLine2: UILabel!
+    @IBOutlet weak var profileBlurView1: UIView!
+    @IBOutlet weak var profileBlurView2: UIView!
+    @IBOutlet weak var blurView2Line2: UILabel!
+    @IBOutlet weak var profileHeaderLine1: UILabel!
+    @IBOutlet weak var profileHeaderLine2: UILabel!
+    @IBOutlet weak var profileView2Line1: UILabel!
+    @IBOutlet weak var profileBlurLayout3: UIView!
+    @IBOutlet weak var profileView2Line2: UILabel!
+    @IBOutlet weak var preferencesAnimation: AnimationView!
+    @IBOutlet weak var lookingForLayout: UIView!
+    @IBOutlet weak var quizLayout: UIView!
+    @IBOutlet weak var profileView2: UIView!
+    @IBOutlet weak var socialAnimation: AnimationView!
+    @IBOutlet weak var socialView1: UIView!
+    @IBOutlet weak var socialView2: UIView!
     
+    @IBOutlet weak var findFriendsAnimation: AnimationView!
     @IBOutlet weak var twitchConnectOverlay: UIVisualEffectView!
     @IBOutlet weak var successOverlay: UIView!
-    @IBOutlet weak var workBlur: UIVisualEffectView!
     @IBOutlet weak var workSpinner: AnimationView!
     @IBOutlet weak var twitchUserNameEntry: UnderLineTextField!
     @IBOutlet weak var twitchConnectNevermind: UIButton!
     @IBOutlet weak var twitchConnectButton: UIButton!
     @IBOutlet weak var twitchWorkLabel: UILabel!
     @IBOutlet weak var quizTable: UITableView!
+    @IBOutlet weak var workBlur: UIView!
     var localImageCache = NSCache<NSString, UIImage>()
     var currentTV: UITextField?
     
@@ -97,6 +119,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     var nav: NavigationPageController?
     var profilePayload = [FreeAgentObject]()
     var currentAddBioTag: UILabel?
+    var currentSearchModal: FeedSearchModal? = nil
     
     var rivalSelectedGame = ""
     var rivalSelectedType = ""
@@ -122,13 +145,34 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     var gamesWithStats = [String]()
     var gamesWithQuiz = [String]()
     var bioExpanded = false
-    var editMode = true
+    var editMode = false
     var videoPaused = false
     
      enum Const {
            static let closeCellHeight: CGFloat = 100
            static let openCellHeight: CGFloat = 280
            static let rowsCount = 1
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.fullProfileTable.reloadData()
+        
+        self.findFriendsAnimation.layer.shadowColor = UIColor.black.cgColor
+        self.findFriendsAnimation.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+        self.findFriendsAnimation.layer.shadowRadius = 2.0
+        self.findFriendsAnimation.layer.shadowOpacity = 0.5
+        self.findFriendsAnimation.layer.shadowPath = UIBezierPath(roundedRect: self.findFriendsAnimation.bounds, cornerRadius: self.findFriendsAnimation.layer.cornerRadius).cgPath
+        self.findFriendsAnimation.contentMode = .scaleAspectFill
+        
+        self.preferencesAnimation.contentMode = .scaleAspectFill
+        
+        self.profileBlurSpaceAnim.layer.shadowColor = UIColor.black.cgColor
+        self.profileBlurSpaceAnim.layer.shadowOffset = CGSize(width: 0, height: 2.0)
+        self.profileBlurSpaceAnim.layer.shadowRadius = 2.0
+        self.profileBlurSpaceAnim.layer.shadowOpacity = 0.5
+        self.profileBlurSpaceAnim.layer.shadowPath = UIBezierPath(roundedRect: self.profileBlurSpaceAnim.bounds, cornerRadius: self.profileBlurSpaceAnim.layer.cornerRadius).cgPath
+        self.profileBlurSpaceAnim.contentMode = .scaleAspectFill
     }
     
     override func viewDidLoad() {
@@ -144,14 +188,24 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             return
         }
         
-        getInfoForProfile()
+        let preferences = UserDefaults.standard
+
+        let currentLevelKey = "profileBlur"
+        if preferences.object(forKey: currentLevelKey) == nil && self.uid == appDelegate.currentUser!.uId{
+            showProfileBlur()
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                self.profileBlur.isHidden = true
+                self.getInfoForProfile()
+            }
+        }
         
         appDelegate.currentProfileFrag = self
         
         self.actionOverlay.effect = nil
         actionOverlay.isHidden = false
         
-        let tap = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
+        let tap = UITapGestureRecognizer(target: self, action: #selector(self.dismissKeyboard))
         tap.cancelsTouchesInView = false
         view.addGestureRecognizer(tap)
         
@@ -167,25 +221,203 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         self.fullProfileTable.rowHeight = UITableView.automaticDimension
     }
     
+    private func showProfileBlur(){
+        UIView.animate(withDuration: 0.8, delay: 1.5, options:[], animations: {
+            self.profileBlur.alpha = 1
+            self.profileBlur.isHidden = false
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, delay: 0.8, options:[], animations: {
+                self.profileBlurSpaceAnim.isHidden = false
+                self.profileBlurSpaceAnim.alpha = 1
+                self.profileBlurSpaceAnim.animationSpeed = 0.5
+                self.profileBlurSpaceAnim.loopMode = .repeat(3)
+                self.profileBlurSpaceAnim.play()
+            }, completion: { (finished: Bool) in
+                UIView.animate(withDuration: 0.8, delay: 1.0, options:[], animations: {
+                    self.profileHeaderLine1.alpha = 1
+                }, completion: { (finished: Bool) in
+                    UIView.animate(withDuration: 0.5, delay: 0.3, options:[], animations: {
+                        self.profileHeaderLine2.alpha = 1
+                    }, completion: { (finished: Bool) in
+                        UIView.animate(withDuration: 0.5, delay: 0.3, options:[], animations: {
+                            self.profileHeaderLine2.alpha = 1
+                        }, completion: { (finished: Bool) in
+                            UIView.animate(withDuration: 0.5, delay: 0.5, options:[], animations: {
+                                self.introLine1.alpha = 1
+                            }, completion: { (finished: Bool) in
+                                UIView.animate(withDuration: 0.5, delay: 0.3, options:[], animations: {
+                                    self.introLine2.alpha = 1
+                                }, completion: { (finished: Bool) in
+                                    UIView.animate(withDuration: 0.5, delay: 0.3, options:[], animations: {
+                                        self.profileBlurView1.alpha = 0
+                                        self.profileHeaderLine1.alpha = 0
+                                        self.profileHeaderLine2.alpha = 0
+                                    }, completion: { (finished: Bool) in
+                                        self.profileHeaderLine1.text = "build your profile, your time to shine."
+                                        self.profileHeaderLine2.text = "finding friends is easy."
+                                        UIView.animate(withDuration: 0.5, delay: 1.5, options:[], animations: {
+                                            self.profileHeaderLine1.alpha = 1
+                                            self.profileHeaderLine2.alpha = 1
+                                        }, completion: { (finished: Bool) in
+                                            UIView.animate(withDuration: 0.5, delay: 2.0, options:[], animations: {
+                                                self.profileHeaderLine1.alpha = 0
+                                                self.profileHeaderLine2.alpha = 0
+                                                self.profileBlurView2.alpha = 1
+                                            }, completion: { (finished: Bool) in
+                                                self.findFriendsAnimation.play(toFrame: 73)
+                                                UIView.animate(withDuration: 0.5, delay: 1.5, options:[], animations: {
+                                                    self.profileView2Line1.alpha = 1
+                                                    self.profileView2Line2.alpha = 1
+                                                }, completion: { (finished: Bool) in
+                                                    UIView.animate(withDuration: 0.5, delay: 1.5, options:[], animations: {
+                                                        self.profileBlurView2.alpha = 0
+                                                        self.profileHeaderLine1.alpha = 0
+                                                        self.profileHeaderLine2.alpha = 0
+                                                    }, completion: { (finished: Bool) in
+                                                        self.profileHeaderLine1.text = "complete your gamer profile, get better results."
+                                                        self.profileHeaderLine2.text = "dig even deeper."
+                                                        UIView.animate(withDuration: 0.5, delay: 1.5, options:[], animations: {
+                                                            self.profileHeaderLine1.alpha = 1
+                                                            self.profileHeaderLine2.alpha = 1
+                                                        }, completion: { (finished: Bool) in
+                                                            UIView.animate(withDuration: 0.5, delay: 1.5, options:[], animations: {
+                                                                self.profileHeaderLine1.alpha = 0
+                                                                self.profileHeaderLine2.alpha = 0
+                                                                self.profileBlurLayout3.alpha = 1
+                                                                self.preferencesAnimation.loopMode = .repeat(3)
+                                                                self.preferencesAnimation.play()
+                                                            }, completion: { (finished: Bool) in
+                                                                UIView.animate(withDuration: 0.5, delay: 1.5, options:[], animations: {
+                                                                    self.lookingForLayout.alpha = 1
+                                                                }, completion: { (finished: Bool) in
+                                                                    UIView.animate(withDuration: 0.5, delay: 2.5, options:[], animations: {
+                                                                        self.lookingForLayout.alpha = 0
+                                                                    }, completion: { (finished: Bool) in
+                                                                        UIView.animate(withDuration: 0.5, delay: 1.5, options:[], animations: {
+                                                                            self.quizLayout.alpha = 1
+                                                                        }, completion: { (finished: Bool) in
+                                                                            self.profileHeaderLine1.text = "don't forget to connect your socials."
+                                                                            self.profileHeaderLine2.text = "one last thing..."
+                                                                            UIView.animate(withDuration: 0.5, delay: 2.5, options:[], animations: {
+                                                                                self.profileBlurLayout3.alpha = 0
+                                                                            }, completion: { (finished: Bool) in
+                                                                                UIView.animate(withDuration: 0.5, delay: 1.5, options:[], animations: {
+                                                                                    self.profileHeaderLine1.alpha = 1
+                                                                                    self.profileHeaderLine2.alpha = 1
+                                                                                }, completion: { (finished: Bool) in
+                                                                                    UIView.animate(withDuration: 0.5, delay: 1.5, options:[], animations: {
+                                                                                        self.profileHeaderLine1.alpha = 0
+                                                                                        self.profileHeaderLine2.alpha = 0
+                                                                                        self.profileView2.alpha = 1
+                                                                                        self.socialView1.alpha = 1
+                                                                                        self.socialAnimation.loopMode = .repeat(4)
+                                                                                        self.socialAnimation.play()
+                                                                                    }, completion: { (finished: Bool) in
+                                                                                        UIView.animate(withDuration: 0.5, delay: 2.5, options:[], animations: {
+                                                                                            self.socialView1.alpha = 0
+                                                                                        }, completion: { (finished: Bool) in
+                                                                                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                                                                                               self.getInfoForProfile()
+                                                                                            }
+                                                                                            UIView.animate(withDuration: 0.5, delay: 0.8, options:[], animations: {
+                                                                                                self.socialView2.alpha = 1
+                                                                                            }, completion: { (finished: Bool) in
+                                                                                                UIView.animate(withDuration: 0.8, delay: 2.5, options:[], animations: {
+                                                                                                    self.profileBlur.alpha = 0
+                                                                                                }, completion: { (finished: Bool) in
+                                                                                                    let preferences = UserDefaults.standard
+                                                                                                    let currentLevelKey = "profileBlur"
+                                                                                                    preferences.set(true, forKey: currentLevelKey)
+                                                                                                })
+                                                                                            })
+                                                                                        })
+                                                                                    })
+                                                                                })
+                                                                            })
+                                                                        })
+                                                                    })
+                                                                })
+                                                            })
+                                                        })
+                                                    })
+                                                    
+                                                })
+                                            })
+                                            
+                                        })
+                                        
+                                    })
+                                    
+                                })
+                            })
+                            
+                        })
+                    })
+                })
+            })
+            /*UIView.animate(withDuration: 0.8, delay: 0.8, options:[], animations: {
+                self.introLine1.alpha = 1
+            }, completion: { (finished: Bool) in
+                UIView.animate(withDuration: 0.5, delay: 0.5, options:[], animations: {
+                    self.introLine2.alpha = 1
+                }, completion: { (finished: Bool) in
+                    UIView.animate(withDuration: 0.5, delay: 0.8, options:[], animations: {
+                        self.profileBlurView1.alpha = 0
+                        self.profileHeaderLine2.alpha = 0
+                    }, completion: { (finished: Bool) in
+                        UIView.animate(withDuration: 0.5, delay: 0.3, options:[], animations: {
+                            self.profileHeaderLine1.text = "finding new friends is easy"
+                            self.profileHeaderLine2.text = "the more you share, the easier they can find you."
+                            self.profileBlurView2.alpha = 1
+                        }, completion: { (finished: Bool) in
+                            UIView.animate(withDuration: 0.5, delay: 0.5, options:[], animations: {
+                                self.blurView2Line2.alpha = 1
+                                self.profileHeaderLine2.alpha = 1
+                            }, completion: { (finished: Bool) in
+                                
+                            })
+                        })
+                    })
+                })
+            })*/
+            //let backTap = UITapGestureRecognizer(target: self, action: #selector(self.dismissProfileBlur))
+            //self.profileBlur.isUserInteractionEnabled = true
+            //self.profileBlur.addGestureRecognizer(backTap)
+            
+            //self.profileBlurDismiss.addTarget(self, action: #selector(self.dismissProfileBlur), for: .touchUpInside)
+        })
+    }
+    
+    @objc private func dismissProfileBlur(){
+        UIView.animate(withDuration: 0.8, delay: 0.0, options:[], animations: {
+            self.profileBlur.alpha = 0
+        }, completion: { (finished: Bool) in
+            self.profileBlur.isHidden = true
+            let preferences = UserDefaults.standard
+            let currentLevelKey = "profileBlur"
+            preferences.set(true, forKey: currentLevelKey)
+        })
+    }
+    
     func getInfoForProfile(){
-        UIView.animate(withDuration: 0.8, animations: {
+        self.loadUserInfo(uid: self.uid)
+        /*UIView.animate(withDuration: 0.8, animations: {
             self.workBlur.alpha = 1
         }, completion: { (finished: Bool) in
-            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+            UIView.animate(withDuration: 0.5, delay: 0.5, options: [], animations: {
                 self.workSpinner.alpha = 1
                 self.workSpinner.loopMode = .loop
                 self.workSpinner.play()
             }, completion: { (finished: Bool) in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                     self.loadUserInfo(uid: self.uid)
                 }
             })
-        })
+        })*/
     }
     
     func changeChannel(selectedVideoId: String){
         UIView.animate(withDuration: 0.5, animations: {
-            self.currentHeaderCell?.channelLoadingBlur?.alpha = 1
             self.currentHeaderCell?.headerYoutube.alpha = 0.3
         }, completion: { (finished: Bool) in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
@@ -195,31 +427,33 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     }
     
     private func loadUserVideo(uid: String, selectedChannelId: String){
-        let ref = Database.database().reference().child("YoutubeSubmissions").child(uid)
+        let ref = Database.database().reference().child("Users").child(uid)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             if(snapshot.exists()){
-                for video in snapshot.children {
-                    let currentVideo = (video as! DataSnapshot)
-                    if(currentVideo.hasChild("youtubeId")){
-                        let id = currentVideo.childSnapshot(forPath: "youtubeId").value as? String ?? ""
-                        if(selectedChannelId == id){
-                            let dict = currentVideo.value as! [String: Any]
-                            let videoOwnerGt = dict["videoOwnerGamerTag"] as? String ?? ""
-                            let videoOwnerUid = dict["videoOwnerUid"] as? String ?? ""
-                            let youtubeFavorite = dict["youtubeFavorite"] as? String ?? ""
-                            let youtubeId = dict["youtubeId"] as? String ?? ""
-                            let youtubeImg = dict["youtubeImg"] as? String ?? ""
-                            let date = dict["date"] as? String ?? ""
-                            let downVotes = dict["downVotes"] as? [String] ?? [String]()
-                            let upVotes = dict["upVotes"] as? [String] ?? [String]()
-                            let title = dict["title"] as? String ?? ""
-                            
-                            let newVid = YoutubeVideoObj(title: title, videoOwnerGamerTag: videoOwnerGt, videoOwnerUid: videoOwnerUid, youtubeFavorite: youtubeFavorite, date: date, youtubeId: youtubeId, imgUrl: youtubeImg)
-                            newVid.downVotes = downVotes
-                            newVid.upVotes = upVotes
-                            
-                            self.currentVideoPlaying = newVid
-                            self.fullProfileTable.reloadData()
+                if(snapshot.hasChild("youtubeVideos")){
+                    for video in snapshot.childSnapshot(forPath: "youtubeVideos").children {
+                        let currentVideo = (video as! DataSnapshot)
+                        if(currentVideo.hasChild("youtubeId")){
+                            let id = currentVideo.childSnapshot(forPath: "youtubeId").value as? String ?? ""
+                            if(selectedChannelId == id){
+                                let dict = currentVideo.value as! [String: Any]
+                                let videoOwnerGt = dict["videoOwnerGamerTag"] as? String ?? ""
+                                let videoOwnerUid = dict["videoOwnerUid"] as? String ?? ""
+                                let youtubeFavorite = dict["youtubeFavorite"] as? String ?? ""
+                                let youtubeId = dict["youtubeId"] as? String ?? ""
+                                let youtubeImg = dict["youtubeImg"] as? String ?? ""
+                                let date = dict["date"] as? String ?? ""
+                                let downVotes = dict["downVotes"] as? [String] ?? [String]()
+                                let upVotes = dict["upVotes"] as? [String] ?? [String]()
+                                let title = dict["title"] as? String ?? ""
+                                
+                                let newVid = YoutubeVideoObj(title: title, videoOwnerGamerTag: videoOwnerGt, videoOwnerUid: videoOwnerUid, youtubeFavorite: youtubeFavorite, date: date, youtubeId: youtubeId, imgUrl: youtubeImg)
+                                newVid.downVotes = downVotes
+                                newVid.upVotes = upVotes
+                                
+                                self.currentVideoPlaying = newVid
+                                self.fullProfileTable.reloadData()
+                            }
                         }
                     }
                 }
@@ -234,6 +468,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     }
     
     private func showWork(){
+        self.workBlur.isHidden = false
         UIView.animate(withDuration: 0.5, animations: {
             self.workBlur.alpha = 1
         }, completion: { (finished: Bool) in
@@ -244,14 +479,16 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         })
     }
     
-    private func hideWork(){
-        UIView.animate(withDuration: 0.5, animations: {
+    private func hideWork() {
+        UIView.animate(withDuration: 1.0, delay: 0.8, options: [], animations: {
             self.workSpinner.pause()
             self.workSpinner.alpha = 0
         }, completion: { (finished: Bool) in
-            UIView.animate(withDuration: 0.3, animations: {
+            UIView.animate(withDuration: 0.8, animations: {
                 self.workBlur.alpha = 0
-            }, completion: nil)
+            }, completion: { (finished: Bool) in
+                self.workBlur.isHidden = true
+            })
         })
     }
     
@@ -367,6 +604,10 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 youtubeVideos.append(newVid)
             }
             
+            /*if(!youtubeVideos.isEmpty){
+                self.testSetVid(array: youtubeVideos)
+            }*/
+            
             var gamerTags = [GamerProfile]()
             let gamerTagsArray = snapshot.childSnapshot(forPath: "gamerTags")
             for gamerTagObj in gamerTagsArray.children {
@@ -406,6 +647,57 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                     
                     let badge = BadgeObj(badge: name, badgeDesc: desc)
                     badges.append(badge)
+                }
+            }
+            
+            var followers = [FriendObject]()
+            if(snapshot.hasChild("followers")){
+                let currentlyFollowing = snapshot.childSnapshot(forPath: "followers")
+                for friend in currentlyFollowing.children{
+                    let currentObj = friend as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    
+                    let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
+                    followers.append(newFriend)
+                }
+            }
+            
+            var following = [FriendObject]()
+            if(snapshot.hasChild("following")){
+                let currentlyFollowing = snapshot.childSnapshot(forPath: "following")
+                for friend in currentlyFollowing.children{
+                    let currentObj = friend as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    
+                    let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
+                    following.append(newFriend)
+                }
+            }
+            
+            var postsArray = [PostObject]()
+            if(snapshot.hasChild("videoPosts")){
+                let posts = snapshot.childSnapshot(forPath: "videoPosts")
+                for post in posts.children{
+                    let currentObj = post as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let date = dict?["date"] as? String ?? ""
+                    let tag = dict?["gamerTag"] as? String ?? ""
+                    let youtubeImg = dict?["youtubeImg"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    let id = dict?["youtubeId"] as? String ?? ""
+                    let isPublic = dict?["isPublic"] as? String ?? ""
+                    let title = dict?["title"] as? String ?? ""
+                    let console = dict?["postConsole"] as? String ?? ""
+                    let game = dict?["game"] as? String ?? ""
+                    
+                    let post = PostObject(title: title, videoOwnerGamerTag: tag, videoOwnerUid: uid, publicPost: isPublic, date: date, youtubeId: id, imgUrl: youtubeImg, postConsole: console, game: game)
+                    postsArray.append(post)
                 }
             }
             
@@ -556,6 +848,9 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             user.youtubeVideos = youtubeVideos
             user.googleApiAccessToken = googleApiAccessToken
             user.googleApiRefreshToken = googleApiRefreshToken
+            user.followers = followers
+            user.following = following
+            user.posts = postsArray
             if(!online.isEmpty){
                 user.currentOnlineAnnounement = online[0]
             } else {
@@ -785,102 +1080,50 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     }
     
     func setUI(user: User){
-        self.userForProfile = user
-        let manager = GamerProfileManager()
-        
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        if(delegate.currentUser!.blockList.contains(self.userForProfile!.uId) || self.userForProfile!.blockList.contains(delegate.currentUser!.uId)){
-            self.blockBlur.alpha = 1
-        }
-        
-        let friendsManager = FriendsManager()
-        let currentUser = delegate.currentUser
-        self.fullProfilePayload = [Any]()
-        var consoleArray = [String]()
-        for profile in user.gamerTags {
-            if(!consoleArray.contains(profile.console)){
-                consoleArray.append(profile.console)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.userForProfile = user
+            let manager = GamerProfileManager()
+            
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            if(delegate.currentUser!.blockList.contains(self.userForProfile!.uId) || self.userForProfile!.blockList.contains(delegate.currentUser!.uId)){
+                self.blockBlur.isHidden = false
             }
-        }
-        if(editMode){
-            self.fullProfilePayload.append([manager.getGamerTag(user: user): consoleArray]) //header
-            self.fullProfilePayload.append(friendsManager.isInFriendList(user: userForProfile!, currentUser: currentUser!))
-            self.fullProfilePayload.append(user.bio)
             
-        
-            let two = EditObject()
-            two.title = "build your gamer profile"
-            self.fullProfilePayload.append(two)
-            
-            /*let profiles = userForProfile!.gamerTags
-            var statsAvailable = false
-            for profile in profiles {
-                for game in delegate.gcGames {
-                    if(game.statsAvailable && profile.game == game.gameName){
-                        statsAvailable = true
-                    }
+            let friendsManager = FriendsManager()
+            let currentUser = delegate.currentUser
+            self.fullProfilePayload = [Any]()
+            var consoleArray = [String]()
+            for profile in user.gamerTags {
+                if(!consoleArray.contains(profile.console)){
+                    consoleArray.append(profile.console)
                 }
-            }*/
-            //if(statsAvailable){
-            //    let three = EditObject()
-            //    three.title = "add gameplay stats"
-             //   self.fullProfilePayload.append(three)
-            //}
-            let four = EditObject()
-            four.title = "add twitch"
-            self.fullProfilePayload.append(four)
-            
-            let thee = EditObject()
-            thee.title = "add discord"
-            self.fullProfilePayload.append(thee)
-            
-            let six = EditObject()
-            six.title = "add instagram"
-            self.fullProfilePayload.append(six)
-            
-            let seven = EditObject()
-            seven.title = "add youtube"
-            self.fullProfilePayload.append(seven)
-            
-            let five = EditObject()
-            five.title = "edit games"
-            self.fullProfilePayload.append(five)
-            self.fullProfilePayload.append("empty")
-            
-            checkOnlineAnnouncements()
-        } else {
+            }
             if(!self.userForProfile!.twitchConnect.isEmpty){
                 let appDelegate = UIApplication.shared.delegate as! AppDelegate
                 let manager = appDelegate.socialMediaManager
                 manager.checkTwitchStream(twitchId: self.userForProfile!.twitchConnect, callbacks: self)
             } else {
                 self.reloadUserPayload()
-                if(userForProfile!.uId != currentUser!.uId){
-                    checkRivals()
+                if(self.userForProfile!.uId != currentUser!.uId){
+                    self.checkRivals()
                 } else {
-                    if(!dataSet){
-                        self.fullProfileTable.delegate = self
-                        self.fullProfileTable.dataSource = self
-                        self.fullProfileTable.reloadData()
-                        self.dataSet = true
-                        
+                    //DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    if(!self.dataSet){
                         if(self.fullProfileTable.alpha == 0){
                             UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
                                 self.fullProfileTable.alpha = 1
+                                self.fullProfileTable.delegate = self
+                                self.fullProfileTable.dataSource = self
+                                self.fullProfileTable.reloadData()
+                                self.fullProfileTable.isHidden = false
                             }, completion: { (finished: Bool) in
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                    self.hideWork()
-                                }
+                                self.hideWork()
                             })
                         }
-                    } else {
+                    }
+                    else {
                         self.fullProfileTable.reloadData()
-                        
-                        if(self.workBlur.alpha == 1){
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                self.hideWork()
-                            }
-                        }
+                        self.hideWork()
                     }
                 }
             }
@@ -998,6 +1241,29 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         })
     }
     
+    private func testSetVid(array: [YoutubeVideoObj]){
+        self.player = YTSwiftyPlayer(frame: CGRect(x: -400, y: -600, width: self.view.bounds.width + 1200, height: self.view.bounds.height + 1200), playerVars: [
+                                        .mute(true),
+                                     .playsInline(true),
+                                     .videoID(array[1].youtubeId),
+                                     .loopVideo(true),
+                                        .disableKeyboardControl(true),
+                                        .autoplay(true),
+                                        .showLoadPolicy(false),
+                                        .showRelatedVideo(false),
+                                        .showInfo(false),
+                                        .showControls(VideoControlAppearance.hidden),
+                                        .showModestbranding(false)])
+        player.delegate = self
+        player.setPlaybackQuality(YTSwiftyVideoQuality.small)
+        player.mute()
+        player.loadPlayer()
+        player.autoplay = true
+        self.testYoutubeFullCover.addSubview(player)
+        player.pauseVideo()
+        player.playVideo()
+    }
+    
     @objc private func dismissTwitchConnectOverlay(register: Bool){
         if(register){
             AppEvents.logEvent(AppEvents.Name(rawValue: "User Profile - Hide Twitch Connect - Registered"))
@@ -1099,6 +1365,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     private func rebuildPayload(){
         UIView.animate(withDuration: 0.8, animations: {
             self.workBlur.alpha = 1
+            self.workBlur.isHidden = false
         }, completion: { (finished: Bool) in
             UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
                 self.workSpinner.alpha = 1
@@ -1257,26 +1524,31 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 }
                 
                 if(!editMode){
+                    if(!self.dataSet){
+                        cell.youtubeLoadingLottie.loopMode = .loop
+                        cell.youtubeLoadingLottie.play()
+                    } else {
+                        cell.youtubeLoadingBlur.isHidden = true
+                    }
+                    
                     let payload = self.buildSocialList(user: userForProfile!)
                     cell.setSocial(list: payload, set: self.socialSet)
                     self.socialSet = true
                     
                     cell.setConsoles(consoles: currentLib[key]!)
-                    cell.logo.alpha = 0.1
                     
                     if(!userForProfile!.youtubeVideos.isEmpty && twitchOnlineStatus != "online"){
-                        cell.height.constant = 320
+                        if(self.userForProfile!.getSocialsCount() == 1){
+                            cell.height.constant = 200
+                        } else if(self.userForProfile!.getSocialsCount() == 2){
+                            cell.height.constant = 230
+                        } else {
+                            cell.height.constant = 160
+                        }
                         cell.layoutIfNeeded()
                         var currentVid: YoutubeVideoObj? = nil
                         if(self.currentVideoPlaying != nil){
                             currentVid = self.currentVideoPlaying
-                            
-                            if(cell.channelLoadingBlur.alpha == 1){
-                                UIView.animate(withDuration: 0.8, delay: 0.8, options: [], animations: {
-                                    cell.channelLoadingBlur.alpha = 0
-                                    cell.headerYoutube.alpha = 1
-                                }, completion: nil)
-                            }
                         }
                         if(currentVid == nil){
                             for video in userForProfile!.youtubeVideos {
@@ -1290,68 +1562,70 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                             currentVid = userForProfile!.youtubeVideos[0]
                         }
                         
-                        self.createUpDownVoteListener()
-                        self.player = YTSwiftyPlayer(frame: CGRect(x: -75, y: -50, width: cell.headerYoutube.bounds.width + 150, height: cell.headerYoutube.bounds.height + 150), playerVars: [
-                                                        .mute(true),
-                                                     .playsInline(true),
-                                                     .videoID(currentVid!.youtubeId),
-                                                     .loopVideo(true),
-                                                        .disableKeyboardControl(true),
-                                                        .autoplay(true),
-                                                        .showLoadPolicy(false),
-                                                        .showRelatedVideo(false),
-                                                        .showInfo(false),
-                                                        .showControls(VideoControlAppearance.hidden),
-                                                        .showModestbranding(false)])
-                        player.delegate = self
-                        player.setPlaybackQuality(YTSwiftyVideoQuality.small)
-                        player.mute()
-                        player.loadPlayer()
-                        player.autoplay = true
-                        cell.headerYoutube.addSubview(player)
-                        player.pauseVideo()
-                        player.playVideo()
+                        if(!self.dataSet){
+                            self.player = YTSwiftyPlayer(frame: CGRect(x: -75, y: -50, width: cell.headerYoutube.bounds.width + 150, height: cell.headerYoutube.bounds.height + 150), playerVars: [
+                                .mute(true),
+                                .playsInline(true),
+                                .videoID(currentVid!.youtubeId),
+                                .loopVideo(true),
+                                .disableKeyboardControl(true),
+                                .autoplay(true),
+                                .showLoadPolicy(false),
+                                .showRelatedVideo(false),
+                                .showInfo(false),
+                                .showControls(VideoControlAppearance.hidden),
+                                .showModestbranding(false)])
+                            player.delegate = self
+                            player.setPlaybackQuality(YTSwiftyVideoQuality.small)
+                            player.mute()
+                            player.loadPlayer()
+                            player.autoplay = true
+                            cell.headerYoutube.addSubview(player)
                         
-                        if(cell.videoDrawerBlur.alpha == 1){
-                            let top = CGAffineTransform(translationX: 0, y: 80)
-                            UIView.animate(withDuration: 0.3, animations: {
-                                cell.videoDrawerBlur.transform = top
-                                cell.videoDrawerBase.transform = top
-                                cell.videoDrawerBlur.alpha = 0
-                                cell.videoDrawerBase.alpha = 0
-                            }, completion: { (finished: Bool) in
-                                UIView.animate(withDuration: 0.3, delay: 0.3, options: [], animations: {
-                                    self.updateYoutubeVotes(cell: cell, vid: currentVid!)
-                                    let back = CGAffineTransform(translationX: 0, y: 0)
-                                    cell.videoDrawerBlur.transform = back
-                                    cell.videoDrawerBase.transform = back
-                                    cell.videoDrawerBlur.alpha = 1
-                                    cell.videoDrawerBase.alpha = 1
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                                UIView.animate(withDuration: 0.8, animations: {
+                                    cell.youtubeLoadingBlur.alpha = 0
                                 }, completion: nil)
-                            })
+                            }
+                            self.dataSet = true
                         } else {
-                            updateYoutubeVotes(cell: cell, vid: currentVid!)
+                            cell.headerYoutube.addSubview(self.player)
+                            self.player.playVideo()
                         }
                         self.currentVideoPlaying = currentVid!
-                        
-                        let gesture = CollapseGesture(target: self, action: #selector(collapseClicked))
-                        gesture.currentVideoId = currentVid!.youtubeId
-                        gesture.currentHeaderCell = cell
-                        cell.collapse.isUserInteractionEnabled = true
-                        cell.collapse.addGestureRecognizer(gesture)
-                        
-                        let expandGesture = CollapseGesture(target: self, action: #selector(expandGTClicked))
-                        expandGesture.currentVideoId = currentVid!.youtubeId
-                        expandGesture.currentHeaderCell = cell
-                        cell.expand.isUserInteractionEnabled = true
-                        cell.expand.addGestureRecognizer(expandGesture)
                     } else {
-                        cell.height.constant = 50
+                        cell.height.constant = 180
                         cell.layoutIfNeeded()
                         
                         cell.headerYoutube.alpha = 0
-                        cell.collapse.alpha = 0
+                        self.dataSet = true
                     }
+                    
+                    let manager = FriendsManager()
+                    if(manager.isFollower(user: self.userForProfile!, currentUser: appDelegate.currentUser!)){
+                        cell.actionButton.borderColor = .gray
+                        cell.actionButton.setTitle("following", for: .normal)
+                        cell.actionButton.tintColor = .gray
+                        cell.actionButton.borderColor = .gray
+                        cell.actionButton.setTitleColor(.white, for: .normal)
+                        cell.actionButton.isUserInteractionEnabled = false
+                    } else if(self.userForProfile!.uId == appDelegate.currentUser!.uId){
+                        cell.actionButton.setTitle("edit my profile", for: .normal)
+                        cell.actionButton.tintColor = .white
+                        cell.actionButton.borderColor = .white
+                        cell.actionButton.setTitleColor(.white, for: .normal)
+                        cell.actionButton.isUserInteractionEnabled = false
+                        //cell.actionButton.addTarget(self, action: #selector(requestClicked), for: .touchUpInside)
+                    } else {
+                        cell.actionButton.borderColor = .green
+                        cell.actionButton.setTitle("follow", for: .normal)
+                        cell.actionButton.tintColor = .green
+                        cell.actionButton.borderColor = .green
+                        cell.actionButton.isUserInteractionEnabled = true
+                        cell.actionButton.setTitleColor(.green, for: .normal)
+                        cell.actionButton.addTarget(self, action: #selector(requestClicked), for: .touchUpInside)
+                    }
+                    
                 } else {
                     cell.height.constant = 50
                     cell.layoutIfNeeded()
@@ -1359,8 +1633,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                     cell.playingTag.alpha = 0
                     cell.consoleCollection.isHidden = true
                     cell.headerYoutube.alpha = 0
-                    cell.collapse.alpha = 0
-                    cell.logo.alpha = 0.0
+                    cell.hideButton.alpha = 0
                 }
             
                 if(currentUser.uId != self.userForProfile!.uId){
@@ -1378,13 +1651,19 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                     }
                 }
                 return cell
+            } else if(current is [PostObject]){
+                let cell = tableview.dequeueReusableCell(withIdentifier: "posts", for: indexPath) as! ProfilePostsCell
+                cell.setPosts(list: current as! [PostObject], currentProfile: self)
+                return cell
             } else if(current is [String]){
                 let cell = tableview.dequeueReusableCell(withIdentifier: "info", for: indexPath) as! ProfileUserInfoCell
                 let currentList = (current as! [String])
                 cell.selectionStyle = .none
-                cell.ageText.text = self.mapAgeFromDB(value: currentList[0])
-                cell.primaryText.text = currentList[1]
-                cell.secondaryText.text = currentList[2]
+                if(currentList.count == 3){
+                    cell.ageText.text = self.mapAgeFromDB(value: currentList[0])
+                    cell.primaryText.text = currentList[1]
+                    cell.secondaryText.text = currentList[2]
+                }
                 return cell
             } else if(current is [YoutubeVideoObj]){
                 let cell = tableview.dequeueReusableCell(withIdentifier: "youtube", for: indexPath) as! ProfileYoutubeCell
@@ -1483,29 +1762,71 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                     } else {
                         let manager = FriendsManager()
                         cell.currentUserCover.alpha = 0
-                        if(manager.isPendingRequest(user: self.userForProfile!, currentUser: appDelegate.currentUser!)){
-                            cell.pendingUserCover.alpha = 1
-                            cell.acceptButton.addTarget(self, action: #selector(acceptClicked), for: .touchUpInside)
-                            cell.declineButton.addTarget(self, action: #selector(declineClicked), for: .touchUpInside)
-                        } else if(manager.isSentRequest(user: self.userForProfile!, currentUser: appDelegate.currentUser!)){
+                        if(manager.isFollower(user: self.userForProfile!, currentUser: appDelegate.currentUser!)){
                             cell.requestButton.backgroundColor = #colorLiteral(red: 0.2880555391, green: 0.2778990865, blue: 0.2911514342, alpha: 0.8045537243)
                             cell.requestButton.alpha = 0.5
-                            cell.requestButton.setTitle( "request sent.", for: .normal)
+                            cell.requestButton.setTitle( "following.", for: .normal)
                             cell.requestButton.isUserInteractionEnabled = false
-                        } else {
-                            if(!currentUser.gamerTag.isEmpty){
+                            cell.requestTag.text = "you are following this user."
+                        } else if(manager.isFollowing(user: self.userForProfile!, currentUser: appDelegate.currentUser!)){
+                                cell.requestButton.backgroundColor = #colorLiteral(red: 0.1667544842, green: 0.6060172915, blue: 0.279296875, alpha: 1)
+                                cell.requestButton.alpha = 1.0
+                                cell.requestButton.setTitle( "follow back", for: .normal)
+                                cell.requestButton.isUserInteractionEnabled = false
+                                cell.requestTag.text = "this user is following you. follow them back!"
+                                cell.requestButton.isUserInteractionEnabled = true
                                 cell.requestButton.addTarget(self, action: #selector(requestClicked), for: .touchUpInside)
-                            } else {
+                        } else if(!currentUser.gamerTag.isEmpty){
+                                    cell.requestTag.text = "i triple dog dare you..."
+                                    cell.requestButton.backgroundColor = #colorLiteral(red: 0.1667544842, green: 0.6060172915, blue: 0.279296875, alpha: 1)
+                                    cell.requestButton.alpha = 1.0
+                                    cell.requestButton.setTitle( "follow", for: .normal)
+                                    cell.requestButton.isUserInteractionEnabled = true
+                                    cell.requestButton.addTarget(self, action: #selector(requestClicked), for: .touchUpInside)
+                        } else {
                                 cell.requestButton.setTitle("unavailable", for: .normal)
                                 cell.requestButton.backgroundColor = #colorLiteral(red: 0.2549019754, green: 0.2745098174, blue: 0.3019607961, alpha: 1)
                                 cell.alpha = 0.3
                                 cell.isUserInteractionEnabled = false
                             }
                         }
-                    }
                     return cell
                 }
             } else if(current is String){
+                if((current as! String) == "followers"){
+                    let cell = tableview.dequeueReusableCell(withIdentifier: "followers", for: indexPath) as! ProfileFollowersCell
+                    var followerCount = "00"
+                    if(self.userForProfile!.followers.count < 9){
+                        followerCount = "0" + String(self.userForProfile!.followers.count)
+                    } else {
+                        followerCount = String(self.userForProfile!.followers.count)
+                    }
+                    cell.followerCount.text = followerCount
+                    
+                    let gesture = FollowDrawerGesture(target: self, action: #selector(launchFollowerDrawer))
+                    gesture.userId = self.userForProfile!.uId
+                    gesture.payload = self.userForProfile!.followers
+                    gesture.type = "followers"
+                    cell.followersClickArea.isUserInteractionEnabled = true
+                    cell.followersClickArea.addGestureRecognizer(gesture)
+                    
+                    var followingCount = "00"
+                    if(self.userForProfile!.following.count < 9){
+                        followingCount = "0" + String(self.userForProfile!.following.count)
+                    } else {
+                        followingCount = String(self.userForProfile!.following.count)
+                    }
+                    cell.followingCount.text = followingCount
+                    
+                    let gesture2 = FollowDrawerGesture(target: self, action: #selector(launchFollowerDrawer))
+                    gesture2.userId = self.userForProfile!.uId
+                    gesture2.payload = self.userForProfile!.following
+                    gesture2.type = "following"
+                    cell.followingClickArea.isUserInteractionEnabled = true
+                    cell.followingClickArea.addGestureRecognizer(gesture2)
+                    
+                    return cell
+                }
                 if((current as! String) == "twitch"){
                     let cell = tableview.dequeueReusableCell(withIdentifier: "twitch", for: indexPath) as! ProfileTwitchCell
                     cell.selectionStyle = .none
@@ -1617,8 +1938,6 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                         self.adjustUITextViewHeight(arg: cell.bio, cell: cell)
                     } else {
                         cell.tapEditLabel.alpha = 0
-                        cell.myBio.alpha = 1
-                        cell.myBio.text = "my bio."
                         cell.addBioTag.alpha = 0
                         cell.bio.text = (current as? String) ?? "bio unavailable"
                         cell.bio.isUserInteractionEnabled = false
@@ -1737,10 +2056,11 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
 
     func tableView(_ tableview: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if(tableview == self.fullProfileTable){
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
             let cell = tableview.cellForRow(at: indexPath)
             if(cell is ProfileBioCell){
                 return 200
+            } else if(cell is ProfileHeaderCell){
+                return 180
             } else {
                 return self.fullProfileTable.rowHeight
             }
@@ -1754,6 +2074,23 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 return CGFloat(180)
             }
         }
+    }
+    
+    @objc private func launchFollowerDrawer(sender: FollowDrawerGesture){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "follower") as! MenuFollowerDrawer
+        currentViewController.payload = sender.payload
+        currentViewController.type = sender.type
+        currentViewController.userUid = sender.userId
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.customHeight = 600
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
     }
     
     @objc private func manageYoutube(){
@@ -1786,16 +2123,11 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         self.fullProfileTable.reloadData()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.fullProfileTable.reloadData()
-    }
-    
     @objc func enteredBackground(notification: Notification) {
         self.currentTwitchWV?.load(URLRequest(url: URL(string:"about:blank")!))
     }
     
-    @objc func dismissKeyboard() {
+    @objc override func dismissKeyboard() {
         //Causes the view (or one of its embedded text fields) to resign the first responder status.
         view.endEditing(true)
         if(self.currentBio != self.userForProfile!.bio && !self.currentBio.isEmpty){
@@ -1813,198 +2145,10 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         }
     }
     
-    private func updateYoutubeVotes(cell: ProfileHeaderCell, vid: YoutubeVideoObj){
-        let upVoteCount = vid.upVotes.count
-        if(upVoteCount < 9){
-            cell.upVoteCount.text = "0" + String(upVoteCount)
-        } else {
-            cell.upVoteCount.text = String(upVoteCount)
-        }
-        
-        let downVoteCount = vid.downVotes.count
-        if(downVoteCount < 9){
-            cell.downVoteCount.text = "0" + String(downVoteCount)
-        } else {
-            cell.downVoteCount.text = String(downVoteCount)
-        }
-        
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        let currentUser = delegate.currentUser
-        if(vid.upVotes.contains(currentUser?.uId ?? "nil")){
-            cell.upVoteButton.alpha = 0.3
-            cell.upVoteButton.isUserInteractionEnabled = false
-        } else {
-            cell.upVoteButton.alpha = 1.0
-            let gesture = VoteGesture(target: self, action: #selector(upDownVoteClicked))
-            gesture.currentVideoId = vid.youtubeId
-            gesture.currentHeaderCell = cell
-            gesture.upVote = true
-            cell.upVoteButton.isUserInteractionEnabled = true
-            cell.upVoteButton.addGestureRecognizer(gesture)
-        }
-    
-        if(vid.downVotes.contains(currentUser?.uId ?? "nil")){
-            cell.downVoteButton.alpha = 0.5
-            cell.downVoteButton.isUserInteractionEnabled = false
-        } else {
-            cell.downVoteButton.alpha = 1.0
-            let downGesture = VoteGesture(target: self, action: #selector(upDownVoteClicked))
-            downGesture.currentVideoId = vid.youtubeId
-            downGesture.currentHeaderCell = cell
-            downGesture.upVote = false
-            cell.downVoteButton.isUserInteractionEnabled = true
-            cell.downVoteButton.addGestureRecognizer(downGesture)
-        }
-    }
-    
     @objc private func expandVideosClicked(sender: ExpandVideosGesture){
         UIView.animate(withDuration: 0.3, animations: {
             self.fullProfileTable.performBatchUpdates(nil)
         }, completion: nil)
-    }
-    
-    @objc private func upDownVoteClicked(sender: VoteGesture){
-        var vid: YoutubeVideoObj? = nil
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        let currentUser = delegate.currentUser
-        
-        for video in userForProfile!.youtubeVideos {
-            if(sender.currentVideoId == video.youtubeId){
-                vid = video
-            }
-        }
-        if(vid == nil){
-            return
-        }
-        if(sender.upVote){
-            //master
-            var dbDownVotes = [String]()
-            var dbUpVotes = [String]()
-            var updatedDb = false
-            let masterYoutubeRef = Database.database().reference().child("YoutubeSubmissions").child(userForProfile!.uId)
-            masterYoutubeRef.observeSingleEvent(of: .value, with: { (snapshot) in
-                if(snapshot.exists()){
-                    for video in snapshot.children {
-                        if((video as! DataSnapshot).hasChild("youtubeId")){
-                            let id = (video as! DataSnapshot).childSnapshot(forPath: "youtubeId").value as? String ?? ""
-                            if(id == sender.currentVideoId){
-                                if(vid!.downVotes.contains(currentUser!.uId)){
-                                    dbDownVotes = (video as! DataSnapshot).childSnapshot(forPath: "downVotes").value as? [String] ?? [String]()
-                                    if(dbDownVotes.contains(currentUser!.uId)){
-                                        dbDownVotes.remove(at: dbDownVotes.index(of: currentUser!.uId)!)
-                                        vid!.downVotes = dbDownVotes
-                                        masterYoutubeRef.child((video as! DataSnapshot).key).child("downVotes").setValue(dbDownVotes)
-                                    }
-                                }
-                                if(!vid!.upVotes.contains(currentUser!.uId)){
-                                    dbUpVotes = (video as! DataSnapshot).childSnapshot(forPath: "upVotes").value as? [String] ?? [String]()
-                                    if(!dbUpVotes.contains(currentUser!.uId)){
-                                        dbUpVotes.append(currentUser!.uId)
-                                        vid!.upVotes = dbUpVotes
-                                        masterYoutubeRef.child((video as! DataSnapshot).key).child("upVotes").setValue(dbUpVotes)
-                                    }
-                                }
-                                self.updateYoutubeVotes(cell: sender.currentHeaderCell!, vid: vid!)
-                                updatedDb = true
-                                break
-                            }
-                        }
-                    }
-                }
-                
-                //handle user downvotes
-                if(updatedDb){
-                    let youtubeRef = Database.database().reference().child("Users").child(self.userForProfile!.uId)
-                    youtubeRef.observeSingleEvent(of: .value, with: { (snapshot) in
-                        if(snapshot.hasChild("youtubeVideos")){
-                            let vidArray = snapshot.childSnapshot(forPath: "youtubeVideos")
-                            for video in vidArray.children {
-                                if((video as! DataSnapshot).hasChild("youtubeId")){
-                                    let id = (video as! DataSnapshot).childSnapshot(forPath: "youtubeId").value as? String ?? ""
-                                    if(id == sender.currentVideoId){
-                                        youtubeRef.child("youtubeVideos").child((video as! DataSnapshot).key).child("downVotes").setValue(dbDownVotes)
-                                        youtubeRef.child("youtubeVideos").child((video as! DataSnapshot).key).child("upVotes").setValue(dbUpVotes)
-                                        break
-                                    }
-                                }
-                            }
-                        }
-                    })
-                }
-            })
-        } else {
-            //master
-            var updatedDb = false
-            var dbUpVotes = vid!.upVotes
-            var dbDownVotes = vid!.downVotes
-            let masterYoutubeRef = Database.database().reference().child("YoutubeSubmissions").child(userForProfile!.uId)
-            masterYoutubeRef.observeSingleEvent(of: .value, with: { (snapshot) in
-                if(snapshot.exists()){
-                    for video in snapshot.children {
-                        if((video as! DataSnapshot).hasChild("youtubeId")){
-                            let id = (video as! DataSnapshot).childSnapshot(forPath: "youtubeId").value as? String ?? ""
-                            if(id == sender.currentVideoId){
-                                if(vid!.upVotes.contains(currentUser!.uId)){
-                                    dbUpVotes = (video as! DataSnapshot).childSnapshot(forPath: "upVotes").value as? [String] ?? [String]()
-                                    if(dbUpVotes.contains(currentUser!.uId)){
-                                        dbUpVotes.remove(at: dbUpVotes.index(of: currentUser!.uId)!)
-                                        vid!.upVotes = dbUpVotes
-                                        masterYoutubeRef.child((video as! DataSnapshot).key).child("upVotes").setValue(dbUpVotes)
-                                    }
-                                }
-                                if(!vid!.downVotes.contains(currentUser!.uId)){
-                                    dbDownVotes = (video as! DataSnapshot).childSnapshot(forPath: "downVotes").value as? [String] ?? [String]()
-                                    if(!dbDownVotes.contains(currentUser!.uId)){
-                                        dbDownVotes.append(currentUser!.uId)
-                                        vid!.downVotes = dbDownVotes
-                                        masterYoutubeRef.child((video as! DataSnapshot).key).child("downVotes").setValue(dbDownVotes)
-                                    }
-                                }
-                                self.updateYoutubeVotes(cell: sender.currentHeaderCell!, vid: vid!)
-                                updatedDb = true
-                                break
-                            }
-                        }
-                    }
-                }
-                
-                if(updatedDb){
-                    let youtubeRef = Database.database().reference().child("Users").child(self.userForProfile!.uId)
-                    youtubeRef.observeSingleEvent(of: .value, with: { (snapshot) in
-                        if(snapshot.hasChild("youtubeVideos")){
-                            let vidArray = snapshot.childSnapshot(forPath: "youtubeVideos")
-                            for video in vidArray.children {
-                                if((video as! DataSnapshot).hasChild("youtubeId")){
-                                    let id = (video as! DataSnapshot).childSnapshot(forPath: "youtubeId").value as? String ?? ""
-                                    if(id == sender.currentVideoId){
-                                        youtubeRef.child("youtubeVideos").child((video as! DataSnapshot).key).child("upVotes").setValue(dbUpVotes)
-                                        youtubeRef.child("youtubeVideos").child((video as! DataSnapshot).key).child("downVotes").setValue(dbDownVotes)
-                                        break
-                                    }
-                                }
-                            }
-                        }
-                    })
-                }
-            })
-        }
-    }
-    
-    private func createUpDownVoteListener(){
-        let newFriendRef = Database.database().reference().child("YoutubeSubmissions").child(self.userForProfile!.uId)
-        newFriendRef.observe(.value, with: { (snapshot) in
-            if(snapshot.exists()){
-                for video in snapshot.children {
-                    for userVideo in self.userForProfile!.youtubeVideos {
-                        let currentDownVotes = (video as! DataSnapshot).childSnapshot(forPath: "downVotes").value as? [String] ?? [String]()
-                        let currentUpVotes = (video as! DataSnapshot).childSnapshot(forPath: "upVotes").value as? [String] ?? [String]()
-                        
-                        userVideo.upVotes = currentUpVotes
-                        userVideo.downVotes = currentDownVotes
-                    }
-                }
-            }
-        })
     }
     
     private func addDoneButtonOnKeyboard(tv: UITextField) {
@@ -2052,7 +2196,11 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             let delegate = UIApplication.shared.delegate as! AppDelegate
             let manager = FriendsManager()
-            manager.sendRequestFromProfile(currentUser: delegate.currentUser!, otherUser: self.userForProfile!, callbacks: self)
+            if(manager.isFollowing(user: self.userForProfile!, currentUser: delegate.currentUser!)){
+                manager.followBack(otherUserId: self.userForProfile!.uId, otherUserTag: self.userForProfile!.gamerTag, currentUser: delegate.currentUser!, callbacks: self)
+            } else {
+                manager.followUser(otherUserId: self.userForProfile!.uId, otherUserTag: self.userForProfile!.gamerTag, currentUser: delegate.currentUser!, callbacks: self)
+            }
         }
     }
     
@@ -2094,6 +2242,22 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         self.present(currentViewController, animated: true, completion: nil)
     }
     
+    @objc private func manageTwitchClicked(){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "manageTwitch") as! ManageTwitchModal
+        
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        transitionDelegate.showCloseButton = true
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = false
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.customHeight = 450
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+    }
+    
     @objc private func onlineClicked(){
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "play") as! PlayDrawer
         
@@ -2121,8 +2285,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     
     func dismissModalPlaySuccess(){
         self.rivalStatus = "unavailable"
-        self.fullProfileTable.reloadData()
-        self.updateMoreComplete()
+        self.getInfoForProfile()
     }
     
     @objc func didDismissStorkBySwipe(){
@@ -2133,6 +2296,8 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         } else {
             self.checkOnlineAnnouncements()
         }
+        
+        self.currentSearchModal?.onModalDismissed()
     }
     
     @objc func didDismissStorkByTap() {
@@ -2236,7 +2401,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                         } else {
                             var buttons = [PopupDialogButton]()
                             let title = "manage instagram"
-                            let message = "do you want to remove your instagram from your account?"
+                            let message = "do you want to remove your instagram info from your account?"
                             
                             let buttonOne = DestructiveButton(title: "clear my info") { [weak self] in
                                 if(self != nil){
@@ -2257,25 +2422,25 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                             // Present dialog
                             self.present(popup, animated: true, completion: nil)
                         }
-                } else if (currentObjTitle == "add discord" || currentObjTitle == "manage discord"){
-                    if(self.userForProfile!.discordConnect.isEmpty){
-                        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "socialConnect") as! SocialConnectModal
-                        currentViewController.thingType = "discord"
-                        
-                        let transitionDelegate = SPStorkTransitioningDelegate()
-                        currentViewController.transitioningDelegate = transitionDelegate
-                        currentViewController.modalPresentationStyle = .custom
-                        currentViewController.modalPresentationCapturesStatusBarAppearance = true
-                        transitionDelegate.showIndicator = true
-                        transitionDelegate.customHeight = 550
-                        transitionDelegate.swipeToDismissEnabled = true
-                        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
-                        transitionDelegate.storkDelegate = self
-                        self.present(currentViewController, animated: true, completion: nil)
+                }   else if (currentObjTitle == "add discord" || currentObjTitle == "manage discord"){
+                        if(self.userForProfile!.discordConnect.isEmpty){
+                            let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "socialConnect") as! SocialConnectModal
+                            currentViewController.thingType = "discord"
+                            
+                            let transitionDelegate = SPStorkTransitioningDelegate()
+                            currentViewController.transitioningDelegate = transitionDelegate
+                            currentViewController.modalPresentationStyle = .custom
+                            currentViewController.modalPresentationCapturesStatusBarAppearance = true
+                            transitionDelegate.showIndicator = true
+                            transitionDelegate.customHeight = 550
+                            transitionDelegate.swipeToDismissEnabled = true
+                            transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+                            transitionDelegate.storkDelegate = self
+                            self.present(currentViewController, animated: true, completion: nil)
                     } else {
                         var buttons = [PopupDialogButton]()
                         let title = "manage discord"
-                        let message = "do you want to remove your discord from your account?"
+                        let message = "do you want to remove your discord info from your account?"
                         
                         let buttonOne = DestructiveButton(title: "clear my info") { [weak self] in
                             if(self != nil){
@@ -2311,6 +2476,41 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                         transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
                         transitionDelegate.storkDelegate = self
                         self.present(currentViewController, animated: true, completion: nil)
+                    } else {
+                            /*let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "manageTwitch") as! ManageTwitchModal
+                            
+                            let transitionDelegate = SPStorkTransitioningDelegate()
+                            currentViewController.transitioningDelegate = transitionDelegate
+                            currentViewController.modalPresentationStyle = .custom
+                            currentViewController.modalPresentationCapturesStatusBarAppearance = true
+                            transitionDelegate.showIndicator = true
+                            transitionDelegate.customHeight = 550
+                            transitionDelegate.swipeToDismissEnabled = true
+                            transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+                            transitionDelegate.storkDelegate = self
+                            self.present(currentViewController, animated: true, completion: nil)*/
+                        var buttons = [PopupDialogButton]()
+                        let title = "manage twitch"
+                        let message = "do you want to remove your twitch info from your account?"
+                        
+                        let buttonOne = DestructiveButton(title: "clear my info") { [weak self] in
+                            if(self != nil){
+                                Database.database().reference().child("Users").child(self!.userForProfile!.uId).child("twitchConnect").removeValue()
+                                self!.getInfoForProfile()
+                            }
+                        }
+                        buttons.append(buttonOne)
+                        
+                        let button = DefaultButton(title: "nah, nevermind.") { [weak self] in
+                            //do nothing
+                        }
+                        buttons.append(button)
+                        
+                        let popup = PopupDialog(title: title, message: message)
+                        popup.addButtons(buttons)
+
+                        // Present dialog
+                        self.present(popup, animated: true, completion: nil)
                     }
                 } else if (currentObjTitle == "add youtube" || currentObjTitle == "manage youtube"){
                     let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "youtube") as! YoutubeConnect
@@ -2850,11 +3050,20 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
     func onlineAnnounceSent() {
     }
     
+    func onFollowBackSuccess() {
+        self.getInfoForProfile()
+    }
+    
+    func onFollowSuccess() {
+        self.getInfoForProfile()
+    }
+    
     func rivalRequestSuccess() {
         self.rivalSendResultText.text = "sent!"
         self.rivalSendResultSub.text = "one step closer."
         
         UIView.animate(withDuration: 0.8, animations: {
+            self.getInfoForProfile()
             self.rivalLoadingOverlay.alpha = 0
             }, completion: { (finished: Bool) in
             UIView.animate(withDuration: 0.5, delay: 2.0, options: [], animations: {
@@ -2876,6 +3085,7 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         self.rivalSendResultSub.text = "our bad. please try again."
         
         UIView.animate(withDuration: 0.8, animations: {
+            self.getInfoForProfile()
             self.rivalLoadingOverlay.alpha = 1
             }, completion: { (finished: Bool) in
             UIView.animate(withDuration: 0.5, delay: 2.0, options: [], animations: {
@@ -2890,6 +3100,21 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 })
             })
         })
+    }
+    
+    func launchPostView(currentPost: PostObject){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "post") as! PostView
+        currentViewController.currentPost = currentPost
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.customHeight = 600
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
     }
     
     func stringToDate(_ str: String)->Date{
@@ -2979,18 +3204,18 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
                 UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
                     self.fullProfileTable.alpha = 1
                 }, completion: { (finished: Bool) in
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        self.hideWork()
-                    }
+                    //DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    //    self.hideWork()
+                    //}
                 })
             }
         } else {
             self.fullProfileTable.reloadData()
             
             if(self.workBlur.alpha == 1){
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    self.hideWork()
-                }
+                //DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                //    self.hideWork()
+                //}
             }
         }
     }
@@ -3029,16 +3254,17 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             
             UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
                 self.fullProfileTable.alpha = 1
+                self.fullProfileTable.isHidden = false
             }, completion: { (finished: Bool) in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    self.hideWork()
-                }
+                //DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                //    self.hideWork()
+                //}
             })
         } else {
             self.fullProfileTable.reloadData()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.hideWork()
-            }
+            //DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            //    self.hideWork()
+            //}
         }
     }
     
@@ -3093,21 +3319,22 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
             }
         }
         self.fullProfilePayload.append([manager.getGamerTag(user: self.userForProfile!): consoleArray]) //header
-        if(!userForProfile!.youtubeVideos.isEmpty && twitchOnlineStatus != "online"){
-            self.fullProfilePayload.append(userForProfile!.youtubeVideos)
+        self.fullProfilePayload.append("followers")
+        var currentBio = "this user has not created a bio, yet."
+        if(!self.userForProfile!.bio.isEmpty){
+            currentBio = self.userForProfile!.bio
         }
+        self.fullProfilePayload.append(currentBio) //bio
+        //if(!userForProfile!.youtubeVideos.isEmpty && twitchOnlineStatus != "online"){
+        //    self.fullProfilePayload.append(userForProfile!.youtubeVideos)
+        //}
         if(twitchOnlineStatus == "online"){
             self.fullProfilePayload.append("twitch")
         }
         if(!userForProfile!.userLookingFor.isEmpty){
             self.fullProfilePayload.append("looking")
         }
-        self.fullProfilePayload.append(friendsManager.isInFriendList(user: userForProfile!, currentUser: currentUser!)) // interaction buttons
-        var currentBio = "this user has not created a bio, yet."
-        if(!self.userForProfile!.bio.isEmpty){
-            currentBio = self.userForProfile!.bio
-        }
-        self.fullProfilePayload.append(currentBio) //bio
+        //self.fullProfilePayload.append(friendsManager.isInFriendList(user: userForProfile!, currentUser: currentUser!)) // interaction buttons
         
         if(!self.userForProfile!.selectedAge.isEmpty && !self.userForProfile!.primaryLanguage.isEmpty && !self.userForProfile!.secondaryLanguage.isEmpty){
             var userInfo = [String]()
@@ -3119,50 +3346,13 @@ class PlayerProfile: ParentVC, UITableViewDelegate, UITableViewDataSource, Profi
         if(!self.userForProfile!.badges.isEmpty){
             self.fullProfilePayload.append(self.userForProfile!.badges) //badges
         }
+        self.fullProfilePayload.append(self.userForProfile!.posts)
         self.fullProfilePayload.append(0) //game list
         if(userForProfile!.games.isEmpty){
             self.fullProfilePayload.append("empty")
             self.fullProfilePayload.append("empty")
             self.fullProfilePayload.append("empty")
         }
-    }
-    
-    @objc private func collapseClicked(sender: CollapseGesture){
-        sender.currentHeaderCell?.collapsed = true
-        UIView.animate(withDuration: 0.5, animations: {
-            //sender.currentHeaderCell?.gtBaseView.alpha = 0
-            sender.currentHeaderCell?.gtBlurView.alpha = 0
-            sender.currentHeaderCell?.consoleCollection.alpha = 0
-            sender.currentHeaderCell?.videoCover.alpha = 0
-        }, completion: { (finished: Bool) in
-            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                sender.currentHeaderCell?.videoDrawerBase.alpha = 1
-                sender.currentHeaderCell?.videoDrawerBlur.alpha = 1
-            }, completion: { (finished: Bool) in
-               // DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-               //     self.loadUserInfo(uid: self.uid)
-               // }
-            })
-        })
-    }
-    
-    @objc private func expandGTClicked(sender: CollapseGesture){
-        sender.currentHeaderCell?.collapsed = true
-        UIView.animate(withDuration: 0.5, animations: {
-            sender.currentHeaderCell?.videoDrawerBase.alpha = 0
-            sender.currentHeaderCell?.videoDrawerBlur.alpha = 0
-        }, completion: { (finished: Bool) in
-            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                //sender.currentHeaderCell?.gtBaseView.alpha = 1
-                sender.currentHeaderCell?.gtBlurView.alpha = 1
-                sender.currentHeaderCell?.consoleCollection.alpha = 1
-                sender.currentHeaderCell?.videoCover.alpha = 1
-            }, completion: { (finished: Bool) in
-               // DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-               //     self.loadUserInfo(uid: self.uid)
-               // }
-            })
-        })
     }
 }
 
@@ -3401,4 +3591,10 @@ class VoteGesture: UITapGestureRecognizer {
 class ExpandVideosGesture: UITapGestureRecognizer {
     var currentHeaderCell: ProfileYoutubeCell?
     var expand: Bool?
+}
+
+class FollowDrawerGesture: UITapGestureRecognizer {
+    var userId: String?
+    var payload: [FriendObject]?
+    var type: String?
 }

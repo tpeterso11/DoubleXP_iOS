@@ -10,31 +10,25 @@ import Foundation
 import UIKit
 import WebKit
 import youtube_ios_player_helper
+import Lottie
 
-class ProfileHeaderCell: UITableViewCell, UITableViewDataSource, UITableViewDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+class ProfileHeaderCell: UITableViewCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    @IBOutlet weak var youtubeLoadingBlur: UIVisualEffectView!
+    @IBOutlet weak var youtubeLoadingLottie: AnimationView!
     @IBOutlet weak var more: UIImageView!
     @IBOutlet weak var gamertag: UILabel!
     @IBOutlet weak var consoleCollection: UICollectionView!
     @IBOutlet weak var onlineStatus: UILabel!
     @IBOutlet weak var onlineDot: UIImageView!
     @IBOutlet weak var editProfileTag: UILabel!
-    @IBOutlet weak var socialList: UITableView!
     @IBOutlet weak var headerYoutube: UIView!
-    @IBOutlet weak var collapse: UIImageView!
+    @IBOutlet weak var hideButton: UIButton!
     @IBOutlet weak var gtBaseView: UIView!
-    @IBOutlet weak var gtBlurView: UIVisualEffectView!
-    @IBOutlet weak var videoDrawerBlur: UIVisualEffectView!
-    @IBOutlet weak var videoDrawerBase: UIView!
-    @IBOutlet weak var channelLoadingBlur: UIVisualEffectView!
-    @IBOutlet weak var expand: UIImageView!
-    @IBOutlet weak var downVoteButton: UIImageView!
-    @IBOutlet weak var upVoteButton: UIImageView!
-    @IBOutlet weak var upVoteCount: UILabel!
-    @IBOutlet weak var downVoteCount: UILabel!
     @IBOutlet weak var videoCover: UIView!
-    @IBOutlet weak var logo: UIImageView!
     @IBOutlet weak var height: NSLayoutConstraint!
     @IBOutlet weak var playingTag: UILabel!
+    @IBOutlet weak var socialList: UICollectionView!
+    @IBOutlet weak var actionButton: UIButton!
     var payload = [String]()
     var socialPayload = [Any]()
     var collapsed = false
@@ -48,86 +42,85 @@ class ProfileHeaderCell: UITableViewCell, UITableViewDataSource, UITableViewDele
     
     func setSocial(list: [Any], set: Bool){
         self.socialPayload = list
-        self.socialList.estimatedRowHeight = 30
-        self.socialList.rowHeight = UITableView.automaticDimension
         
         if(!list.isEmpty){
             self.socialList.delegate = self
             self.socialList.dataSource = self
         }
-        self.reload(tableView: self.socialList)
+        self.socialList.reloadData()
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return payload.count
+        if(collectionView == self.socialList){
+            return self.socialPayload.count
+        } else {
+            return payload.count
+        }
     }
     
-    func centerItemsInCollectionView(cellWidth: Double, numberOfItems: Double, spaceBetweenCell: Double, collectionView: UICollectionView) -> UIEdgeInsets {
-        let totalWidth = cellWidth * numberOfItems
-        let totalSpacingWidth = spaceBetweenCell * (numberOfItems - 1)
-        let leftInset = (collectionView.frame.width - CGFloat(totalWidth + totalSpacingWidth)) / 2
-        let rightInset = leftInset
-        return UIEdgeInsets(top: 0, left: leftInset, bottom: 0, right: rightInset)
-    }
+    /*func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        if(collectionView == self.socialList){
+            let totalCellWidth = CGFloat(150) * CGFloat(self.socialPayload.count)
+            let totalSpacingWidth = CGFloat(0) * (CGFloat(self.socialPayload.count) - 1)
+
+            let leftInset = ((collectionView.bounds.width) - CGFloat(totalCellWidth + totalSpacingWidth)) / 2
+            let rightInset = leftInset
+
+            return UIEdgeInsets(top: 0, left: leftInset, bottom: 0, right: rightInset)
+        } else {
+            return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        }
+    }*/
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "console", for: indexPath) as! ProfileConsoleCell
-        let current = self.payload[indexPath.item]
-        
-        if(current == "ps"){
-            cell.consoleImg.image = UIImage.init(named: "ps_logo")
-        } else if(current == "xbox"){
-            cell.consoleImg.image = UIImage.init(named: "xbox_logo")
-        } else if(current == "pc"){
-            cell.consoleImg.image = UIImage.init(named: "pc_logo")
-        } else if(current == "nintendo"){
-            cell.consoleImg.image = UIImage.init(named: "nintendo_logo")
+        if(collectionView == consoleCollection){
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "console", for: indexPath) as! ProfileConsoleCell
+            let current = self.payload[indexPath.item]
+            
+            if(current == "ps"){
+                cell.consoleImg.image = UIImage(imageLiteralResourceName: "playstation-logotype (1)")
+            } else if(current == "xbox"){
+                cell.consoleImg.image = UIImage(imageLiteralResourceName: "xbox-logo (1)")
+            } else if(current == "pc"){
+                cell.consoleImg.image = UIImage(imageLiteralResourceName: "pc-logo")
+            } else if(current == "nintendo"){
+                cell.consoleImg.image = UIImage(imageLiteralResourceName: "nintendo-switch")
+            } else {
+                cell.consoleImg.image = UIImage(imageLiteralResourceName: "phone-white")
+            }
+            
+            cell.contentView.layer.cornerRadius = 5.0
+            cell.contentView.layer.borderWidth = 1.0
+            cell.contentView.layer.borderColor = UIColor.clear.cgColor
+            cell.contentView.layer.masksToBounds = true
+            
+            return cell
         } else {
-            cell.consoleImg.image = UIImage.init(named: "mobile_logo")
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "social", for: indexPath) as! ProfileSocialListItem
+            let current = socialPayload[indexPath.item]
+            if(current is TwitchAddedObject){
+                cell.socialLabel.text = "@"+(current as! TwitchAddedObject).twitchId!
+                cell.socialIcon.image = #imageLiteral(resourceName: "twitch_logo_light.png")
+            } else if(current is DiscordAddedObject){
+                cell.socialLabel.text = "@"+(current as! DiscordAddedObject).handle!
+                cell.socialIcon.image = #imageLiteral(resourceName: "discord.png")
+            } else if(current is InstaAddedObject){
+                cell.socialLabel.text = "@"+(current as! InstaAddedObject).instaId!
+                cell.socialIcon.image = #imageLiteral(resourceName: "instagram.png")
+            }
+            return cell
         }
-        
-        cell.contentView.layer.cornerRadius = 5.0
-        cell.contentView.layer.borderWidth = 1.0
-        cell.contentView.layer.borderColor = UIColor.clear.cgColor
-        cell.contentView.layer.masksToBounds = true
-        
-        return cell
     }
     
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: CGFloat(30), height: CGFloat(30))
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.socialPayload.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "social", for: indexPath) as! ProfileSocialListItem
-        let current = socialPayload[indexPath.item]
-        if(current is TwitchAddedObject){
-            cell.socialLabel.text = "@"+(current as! TwitchAddedObject).twitchId!
-            cell.socialIcon.image = #imageLiteral(resourceName: "twitch_logo_light.png")
-        } else if(current is DiscordAddedObject){
-            cell.socialLabel.text = "@"+(current as! DiscordAddedObject).handle!
-            cell.socialIcon.image = #imageLiteral(resourceName: "discord.png")
-        } else if(current is InstaAddedObject){
-            cell.socialLabel.text = "@"+(current as! InstaAddedObject).instaId!
-            cell.socialIcon.image = #imageLiteral(resourceName: "instagram.png")
+        if(collectionView == self.consoleCollection){
+            return CGSize(width: CGFloat(30), height: CGFloat(30))
+        } else {
+            let current = self.socialPayload[indexPath.item]
+            var width = 150
+            return CGSize(width: CGFloat(collectionView.frame.size.width), height: CGFloat(20))
         }
-        return cell
-    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 30
-    }
-    
-    func reload(tableView: UITableView) {
-        let contentOffset = tableView.contentOffset
-        tableView.reloadData()
-        tableView.layoutIfNeeded()
-        tableView.setContentOffset(contentOffset, animated: false)
     }
 }

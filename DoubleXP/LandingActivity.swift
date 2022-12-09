@@ -13,43 +13,12 @@ import FBSDKCoreKit
 import moa
 import Firebase
 import Lottie
+import PopupDialog
 //import GiphyUISDK
 //import GiphyCoreSDK
 import SPStorkController
 
 typealias Runnable = () -> ()
-
-@IBDesignable extension UIButton {
-
-    @IBInspectable var borderWidth: CGFloat {
-        set {
-            layer.borderWidth = newValue
-        }
-        get {
-            return layer.borderWidth
-        }
-    }
-
-    @IBInspectable var cornerRadius: CGFloat {
-        set {
-            layer.cornerRadius = newValue
-        }
-        get {
-            return layer.cornerRadius
-        }
-    }
-
-    @IBInspectable var borderColor: UIColor? {
-        set {
-            guard let uiColor = newValue else { return }
-            layer.borderColor = uiColor.cgColor
-        }
-        get {
-            guard let color = layer.borderColor else { return nil }
-            return UIColor(cgColor: color)
-        }
-    }
-}
 
 protocol Profile {
     func goToProfile()
@@ -57,8 +26,8 @@ protocol Profile {
 
 class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile, SearchCallbacks, LandingMenuCallbacks, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, LandingUICallbacks, SPStorkControllerDelegate, TodayCallbacks {
     
+    @IBOutlet weak var deleteAccount: UIButton!
     @IBOutlet weak var moreClickArea: UIView!
-    @IBOutlet weak var connectClickArea: UIView!
     @IBOutlet weak var requestsClickArea: UIView!
     @IBOutlet weak var gifButton: UIImageView!
     @IBOutlet weak var navigationView: UIView!
@@ -72,7 +41,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     @IBOutlet weak var connect: UIImageView!
     @IBOutlet weak var bottomNavBack: UIImageView!
     @IBOutlet weak var bottomNavSearch: UITextField!
-    @IBOutlet weak var primaryBack: UIImageView!
     @IBOutlet weak var searchButton: UIButton!
     @IBOutlet weak var scoob: AnimationView!
     @IBOutlet weak var universalLoading: UIVisualEffectView!
@@ -85,6 +53,9 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     @IBOutlet weak var menuDrawer: UIVisualEffectView!
     @IBOutlet weak var bottomLogo: UIImageView!
     @IBOutlet weak var popularClickArea: UIView!
+    @IBOutlet weak var searchClickArea: UIView!
+    @IBOutlet weak var welcomeBlur: UIVisualEffectView!
+    @IBOutlet weak var welcomeBlurDismiss: UIButton!
     var menuShowing = false
     var mainNavShowing = false
     var bannerShowing = false
@@ -109,6 +80,14 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     @IBOutlet weak var mainNavCollection: UICollectionView!
     @IBOutlet weak var simpleLoading: UIVisualEffectView!
     @IBOutlet weak var simpleLoadingAnimation: AnimationView!
+    @IBOutlet weak var profileBlur: UIVisualEffectView!
+    @IBOutlet weak var welcomeAnimation: AnimationView!
+    @IBOutlet weak var welcomeHeader: UILabel!
+    @IBOutlet weak var headerDivider: UIView!
+    @IBOutlet weak var feedHeader: UILabel!
+    @IBOutlet weak var welcomeSub: UILabel!
+    @IBOutlet weak var introMenuView: UIView!
+    @IBOutlet weak var introFeedView: UIView!
     private var requestsAdded = false
     private var teamFragAdded = false
     private var profileAdded = false
@@ -152,9 +131,18 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         bottomNavBack.isUserInteractionEnabled = true
         bottomNavBack.addGestureRecognizer(singleTap)
         
-        let singleTap2 = UITapGestureRecognizer(target: self, action: #selector(backButtonClicked))
-        primaryBack.isUserInteractionEnabled = true
-        primaryBack.addGestureRecognizer(singleTap2)
+        let preferences = UserDefaults.standard
+
+        let currentLevelKey = "welcomeBlur"
+        if preferences.object(forKey: currentLevelKey) == nil {
+            self.showWelcomeBlur()
+        } else {
+            self.welcomeBlur.alpha = 0
+        }
+        
+        //let singleTap2 = UITapGestureRecognizer(target: self, action: #selector(backButtonClicked))
+        //primaryBack.isUserInteractionEnabled = true
+        //primaryBack.addGestureRecognizer(singleTap2)
         
         stackDepth = appDelegate.navStack.count
         
@@ -181,6 +169,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         bottomNavHeight = self.bottomNav.bounds.height
         
         logOut.addTarget(self, action: #selector(logout), for: .touchUpInside)
+        deleteAccount.addTarget(self, action: #selector(deleteAccountClicked), for: .touchUpInside)
         
         NotificationCenter.default.addObserver(
             self,
@@ -195,7 +184,12 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             name: UIResponder.keyboardWillHideNotification,
             object: nil
         )
-        
+        self.bottomNav.layer.shadowColor = UIColor.black.cgColor
+        self.bottomNav.layer.shadowOffset = CGSize(width: self.bottomNav.bounds.width, height: 3)
+        self.bottomNav.layer.shadowRadius = 15.0
+        self.bottomNav.layer.shadowOpacity = 0.8
+        self.bottomNav.layer.masksToBounds = false
+        self.bottomNav.layer.shadowPath = UIBezierPath(roundedRect: self.bottomNav.bounds, cornerRadius: self.bottomNav.layer.cornerRadius).cgPath
         //let gifTap = UITapGestureRecognizer(target: self, action: #selector(gifClicked))
         //gifButton.isUserInteractionEnabled = true
         //gifButton.addGestureRecognizer(gifTap)
@@ -214,6 +208,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         addRejectedRivalsRef()
         //addTeamInvitesRef()
         //addInviteRequestsRef()
+        addFollowersRef()
         addBadgesRef()
         addGamesRef()
         addReceivedAnnouncementsRef()
@@ -315,6 +310,49 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     func playSimpleLandingAnimation(){
         self.simpleLoadingAnimation.play()
+    }
+    
+    private func showWelcomeBlur(){
+        UIView.animate(withDuration: 0.8, delay: 0.0, options:[], animations: {
+            self.welcomeBlur.alpha = 1
+        }, completion: { (finished: Bool) in
+            self.welcomeAnimation.play()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
+                    self.welcomeHeader.alpha = 1
+                }, completion: { (finished: Bool) in
+                    UIView.animate(withDuration: 1.0, delay: 0.0, options: [], animations: {
+                        self.headerDivider.alpha = 1
+                        self.welcomeAnimation.alpha = 0
+                    }, completion: { (finished: Bool) in
+                        UIView.animate(withDuration: 0.5, delay: 0.0, options: [], animations: {
+                            self.welcomeSub.alpha = 1
+                        }, completion: { (finished: Bool) in
+                            UIView.animate(withDuration: 0.3, delay: 0.8, options: [], animations: {
+                                self.feedHeader.alpha = 1
+                            }, completion: { (finished: Bool) in
+                                UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
+                                    self.introFeedView.alpha = 1
+                                }, completion: { (finished: Bool) in
+                                    UIView.animate(withDuration: 0.5, delay: 0.8, options: [], animations: {
+                                        self.introMenuView.alpha = 1
+                                        self.welcomeBlurDismiss.alpha = 1
+                                    }, completion: { (finished: Bool) in
+                                        
+                                    })
+                                })
+                            })
+                        })
+                    })
+                })
+            }
+        })
+    
+        let backTap = UITapGestureRecognizer(target: self, action: #selector(self.dismissWelcomeBlur))
+        self.welcomeBlur.isUserInteractionEnabled = true
+        self.welcomeBlur.addGestureRecognizer(backTap)
+        
+        self.welcomeBlurDismiss.addTarget(self, action: #selector(self.dismissWelcomeBlur), for: .touchUpInside)
     }
     
     private func showAlert(alertText: String, tap: UITapGestureRecognizer?){
@@ -439,99 +477,117 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             })
     }
     
+    @objc private func dismissWelcomeBlur(){
+        UIView.animate(withDuration: 0.8, delay: 0.0, options:[], animations: {
+            self.welcomeBlur.alpha = 0
+        }, completion: { (finished: Bool) in
+            let preferences = UserDefaults.standard
+            let currentLevelKey = "welcomeBlur"
+            preferences.set(true, forKey: currentLevelKey)
+        })
+    }
+    
     private func addGamesRef(){
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        
+        let user = appDelegate.currentUser
+        if(user != nil){
         let newTeamsRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("games")
             newTeamsRef.observe(.value, with: { (snapshot) in
-                var games = snapshot.value as? [String] ?? [String]()
-                if(games.count > appDelegate.currentUser!.games.count){
-                    appDelegate.currentUser!.games = games
-                    appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
+                if(snapshot.exists()){
+                    var games = snapshot.value as? [String] ?? [String]()
+                    let user = appDelegate.currentUser
+                    if(games.count > appDelegate.currentUser!.games.count){
+                        appDelegate.currentUser!.games = games
+                        appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
+                    }
                 }
             })
+        }
     }
     
     private func addUpcomingGamesRef(){
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        
-        let upcomingGamesRef = Database.database().reference().child("Upcoming Games")
-            upcomingGamesRef.observe(.value, with: { (snapshot) in
-                if(snapshot.exists()){
-                var upcoming = [UpcomingGame]()
-                for upGame in snapshot.children {
-                    var game = ""
-                    var trailerUrls = [String: String]()
-                    var gameImageUrl = ""
-                    var blurb = ""
-                    var releaseDate = ""
-                    var id = ""
-                    var developer = ""
-                    var releaseDateMillis = ""
-                    var description = ""
-                    var releaseDateProper = ""
-                    
-                    let current = upGame as! DataSnapshot
-                    id = current.key
-                    
-                    if(current.hasChild("trailerUrls")){
-                        trailerUrls = current.childSnapshot(forPath: "trailerUrls").value as? [String: String] ?? [String: String]()
-                    }
-                    
-                    if(current.hasChild("game")){
-                        game = current.childSnapshot(forPath: "game").value as! String
-                    }
-                    
-                    if(current.hasChild("gameImageXXHDPI")){
-                        gameImageUrl = current.childSnapshot(forPath: "gameImageXXHDPI").value as! String
-                    }
-                    
-                    if(current.hasChild("blurb")){
-                        blurb = current.childSnapshot(forPath: "blurb").value as! String
-                    }
-                    
-                    if(current.hasChild("releaseDate")){
-                        releaseDate = current.childSnapshot(forPath: "releaseDate").value as! String
-                    }
-                    
-                    if(current.hasChild("releaseDateMillis")){
-                        releaseDateMillis = current.childSnapshot(forPath: "releaseDateMillis").value as! String
-                    }
-                    
-                    if(current.hasChild("developer")){
-                        developer = current.childSnapshot(forPath: "developer").value as! String
-                    }
-                    
-                    if(current.hasChild("description")){
-                        description = current.childSnapshot(forPath: "description").value as! String
-                    }
-                    
-                    if(current.hasChild("releaseDateProp")){
-                        releaseDateProper = current.childSnapshot(forPath: "releaseDateProp").value as! String
-                    }
-                    
-                    if(!game.isEmpty && !gameImageUrl.isEmpty && !developer.isEmpty){
-                        let upcomingGame = UpcomingGame(id: id, game: game, blurb: blurb, releaseDateMillis: releaseDateMillis, releaseDate: releaseDate, trailerUrls: trailerUrls, gameImageUrl: gameImageUrl, gameDesc: description, releaseDateProper: releaseDateProper)
+        let user = appDelegate.currentUser
+        if(user != nil){
+            let upcomingGamesRef = Database.database().reference().child("Upcoming Games")
+                upcomingGamesRef.observe(.value, with: { (snapshot) in
+                    if(snapshot.exists()){
+                    var upcoming = [UpcomingGame]()
+                    for upGame in snapshot.children {
+                        var game = ""
+                        var trailerUrls = [String: String]()
+                        var gameImageUrl = ""
+                        var blurb = ""
+                        var releaseDate = ""
+                        var id = ""
+                        var developer = ""
+                        var releaseDateMillis = ""
+                        var description = ""
+                        var releaseDateProper = ""
                         
-                        upcoming.append(upcomingGame)
+                        let current = upGame as! DataSnapshot
+                        id = current.key
+                        
+                        if(current.hasChild("trailerUrls")){
+                            trailerUrls = current.childSnapshot(forPath: "trailerUrls").value as? [String: String] ?? [String: String]()
+                        }
+                        
+                        if(current.hasChild("game")){
+                            game = current.childSnapshot(forPath: "game").value as! String
+                        }
+                        
+                        if(current.hasChild("gameImageXXHDPI")){
+                            gameImageUrl = current.childSnapshot(forPath: "gameImageXXHDPI").value as! String
+                        }
+                        
+                        if(current.hasChild("blurb")){
+                            blurb = current.childSnapshot(forPath: "blurb").value as! String
+                        }
+                        
+                        if(current.hasChild("releaseDate")){
+                            releaseDate = current.childSnapshot(forPath: "releaseDate").value as! String
+                        }
+                        
+                        if(current.hasChild("releaseDateMillis")){
+                            releaseDateMillis = current.childSnapshot(forPath: "releaseDateMillis").value as! String
+                        }
+                        
+                        if(current.hasChild("developer")){
+                            developer = current.childSnapshot(forPath: "developer").value as! String
+                        }
+                        
+                        if(current.hasChild("description")){
+                            description = current.childSnapshot(forPath: "description").value as! String
+                        }
+                        
+                        if(current.hasChild("releaseDateProp")){
+                            releaseDateProper = current.childSnapshot(forPath: "releaseDateProp").value as! String
+                        }
+                        
+                        if(!game.isEmpty && !gameImageUrl.isEmpty && !developer.isEmpty){
+                            let upcomingGame = UpcomingGame(id: id, game: game, blurb: blurb, releaseDateMillis: releaseDateMillis, releaseDate: releaseDate, trailerUrls: trailerUrls, gameImageUrl: gameImageUrl, gameDesc: description, releaseDateProper: releaseDateProper)
+                            
+                            upcoming.append(upcomingGame)
+                        }
                     }
-                }
-                
-                if(!upcoming.isEmpty){
-                    let delegate = UIApplication.shared.delegate as! AppDelegate
-                    delegate.upcomingGames.append(contentsOf: upcoming)
                     
-                    if(upcoming.count > delegate.upcomingGames.count){
-                        delegate.currentFeedFrag?.checkOnlineAnnouncements()
+                    if(!upcoming.isEmpty){
+                        let delegate = UIApplication.shared.delegate as! AppDelegate
+                        delegate.upcomingGames.append(contentsOf: upcoming)
+                        
+                        if(upcoming.count > delegate.upcomingGames.count){
+                            delegate.currentFeedFrag?.checkOnlineAnnouncements()
+                        }
                     }
                 }
-            }
-        })
+            })
+        }
     }
     
     private func addRivalsRef(){
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        
+        let user = appDelegate.currentUser
+        if(user != nil){
         let newFriendRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("tempRivals")
             newFriendRef.observe(.value, with: { (snapshot) in
                 var tempArray = [RivalObj]()
@@ -597,327 +653,376 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                     appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
                 }
             })
+        }
     }
     
     private func addAcceptedRivalsRef(){
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        
-        let newFriendRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("acceptedTempRivals")
-        newFriendRef.observe(.value, with: { (snapshot) in
-            var tempArray = [RivalObj]()
-            for rival in snapshot.children{
-                let currentObj = rival as! DataSnapshot
-                let dict = currentObj.value as? [String: Any]
-                let date = dict?["date"] as? String ?? ""
-                let tag = dict?["gamerTag"] as? String ?? ""
-                let game = dict?["game"] as? String ?? ""
-                let uid = dict?["uid"] as? String ?? ""
-                let dbType = dict?["type"] as? String ?? ""
-                let id = dict?["id"] as? String ?? ""
+        let user = appDelegate.currentUser
+        if(user != nil){
+            let newFriendRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("acceptedTempRivals")
+            newFriendRef.observe(.value, with: { (snapshot) in
+                var tempArray = [RivalObj]()
+                for rival in snapshot.children{
+                    let currentObj = rival as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let date = dict?["date"] as? String ?? ""
+                    let tag = dict?["gamerTag"] as? String ?? ""
+                    let game = dict?["game"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    let dbType = dict?["type"] as? String ?? ""
+                    let id = dict?["id"] as? String ?? ""
+                    
+                    let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
+                    tempArray.append(request)
+                }
                 
-                let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
-                tempArray.append(request)
-            }
-            
-            if(tempArray.count > appDelegate.currentUser!.acceptedTempRivals.count){
-                appDelegate.currentUser!.acceptedTempRivals = tempArray
-                self.showAlert(alertText: "play request accepted! go play!", tap: nil)
-                appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
-            }
-        })
+                if(tempArray.count > appDelegate.currentUser!.acceptedTempRivals.count){
+                    appDelegate.currentUser!.acceptedTempRivals = tempArray
+                    self.showAlert(alertText: "play request accepted! go play!", tap: nil)
+                    appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
+                }
+            })
+        }
+    }
+    
+    private func addFollowersRef(){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let user = appDelegate.currentUser
+        if(user != nil){
+        let newFriendRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("followerAnnouncements")
+            newFriendRef.observe(.value, with: { (snapshot) in
+                var followers = [FriendObject]()
+                for friend in snapshot.children{
+                    let currentObj = friend as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    if(dict != nil){
+                        let gamerTag = dict?["gamerTag"] as? String ?? ""
+                        let date = dict?["date"] as? String ?? ""
+                        let uid = dict?["uid"] as? String ?? ""
+                        
+                        /*for follower in appDelegate.currentUser!.followers {
+                            if(follower.uid == uid){
+                                appDelegate.currentUser!.followers.remove(at: appDelegate.currentUser!.followers.index(of: follower)!)
+                            }
+                        }*/
+                        
+                        let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
+                        followers.append(newFriend)
+                    }
+                }
+                
+                if(followers.count > appDelegate.currentUser!.followers.count){
+                    appDelegate.currentUser!.followers = followers
+                    appDelegate.currentUser!.followerAnnouncements = followers
+                    appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
+                }
+            })
+        }
     }
     
     private func addBadgesRef(){
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let newFriendRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("badges")
-        newFriendRef.observe(.value, with: { (snapshot) in
-            var badges = [BadgeObj]()
-            let badgesArray = snapshot.childSnapshot(forPath: "badges")
-            for badge in badgesArray.children{
-                let currentObj = badge as! DataSnapshot
-                let dict = currentObj.value as? [String: Any]
-                let name = dict?["badgeName"] as? String ?? ""
-                let desc = dict?["badgeDesc"] as? String ?? ""
+        let user = appDelegate.currentUser
+        if(user != nil){
+            let newFriendRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("badges")
+            newFriendRef.observe(.value, with: { (snapshot) in
+                var badges = [BadgeObj]()
+                let badgesArray = snapshot.childSnapshot(forPath: "badges")
+                for badge in badgesArray.children{
+                    let currentObj = badge as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let name = dict?["badgeName"] as? String ?? ""
+                    let desc = dict?["badgeDesc"] as? String ?? ""
+                    
+                    let badge = BadgeObj(badge: name, badgeDesc: desc)
+                    badges.append(badge)
+                }
                 
-                let badge = BadgeObj(badge: name, badgeDesc: desc)
-                badges.append(badge)
-            }
-            
-            appDelegate.currentUser!.badges = badges
-        })
+                appDelegate.currentUser!.badges = badges
+            })
+        }
     }
     
     private func addTeamInvitesRef(){
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let newFriendRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("teamInvites")
-        newFriendRef.observe(.value, with: { (snapshot) in
-            var tempArray = [TeamInviteObject]()
-            for invite in snapshot.children{
-                let currentObj = invite as! DataSnapshot
-                let dict = currentObj.value as? [String: Any]
-                let date = dict?["date"] as? String ?? ""
-                let tag = dict?["gamerTag"] as? String ?? ""
-                let teamName = dict?["teamName"] as? String ?? ""
-                let uid = dict?["uid"] as? String ?? ""
+        let user = appDelegate.currentUser
+        if(user != nil){
+            let newFriendRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("teamInvites")
+            newFriendRef.observe(.value, with: { (snapshot) in
+                var tempArray = [TeamInviteObject]()
+                for invite in snapshot.children{
+                    let currentObj = invite as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let date = dict?["date"] as? String ?? ""
+                    let tag = dict?["gamerTag"] as? String ?? ""
+                    let teamName = dict?["teamName"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    
+                    let newInvite = TeamInviteObject(gamerTag: tag, date: date, uid: uid, teamName: teamName)
+                    tempArray.append(newInvite)
+                }
                 
-                let newInvite = TeamInviteObject(gamerTag: tag, date: date, uid: uid, teamName: teamName)
-                tempArray.append(newInvite)
-            }
-            
-            if(tempArray.count > appDelegate.currentUser!.teamInvites.count){
-                appDelegate.currentUser!.teamInvites = tempArray
-                
-                self.showAlert(alertText: "you just got invited!", tap: nil)
-            }
-        })
+                if(tempArray.count > appDelegate.currentUser!.teamInvites.count){
+                    appDelegate.currentUser!.teamInvites = tempArray
+                    
+                    self.showAlert(alertText: "you just got invited!", tap: nil)
+                }
+            })
+        }
     }
     
     private func addInviteRequestsRef(){
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let newFriendRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("inviteRequests")
-        newFriendRef.observe(.value, with: { (snapshot) in
-            var dbRequests = [RequestObject]()
-             for invite in snapshot.children{
-                let currentObj = invite as! DataSnapshot
-                let dict = currentObj.value as? [String: Any]
-                let status = dict?["status"] as? String ?? ""
-                let teamId = dict?["teamId"] as? String ?? ""
-                let teamName = dict?["teamName"] as? String ?? ""
-                let captainId = dict?["captainId"] as? String ?? ""
-                let gamerTag = dict?["gamerTag"] as? String ?? ""
-                let requestId = dict?["requestId"] as? String ?? ""
-                    let userUid = dict?["userUid"] as? String ?? ""
-                 
-                 let profile = currentObj.childSnapshot(forPath: "profile")
-                 let profileDict = profile.value as? [String: Any]
-                 let game = profileDict?["game"] as? String ?? ""
-                 let consoles = profileDict?["consoles"] as? [String] ?? [String]()
-                 let profileGamerTag = profileDict?["gamerTag"] as? String ?? ""
-                 let competitionId = profileDict?["competitionId"] as? String ?? ""
-                 let userId = profileDict?["userId"] as? String ?? ""
-                 
-                var questions = [FAQuestion]()
-                let questionList = dict?["questions"] as? [[String: Any]] ?? [[String: Any]]()
-                        for question in questionList {
-                            var questionNumber = ""
-                            var questionString = ""
-                            var option1 = ""
-                            var option1Description = ""
-                            var option2 = ""
-                            var option2Description = ""
-                            var option3 = ""
-                            var option3Description = ""
-                            var option4 = ""
-                            var option4Description = ""
-                            var option5 = ""
-                            var option5Description = ""
-                            var option6 = ""
-                            var option6Description = ""
-                            var option7 = ""
-                            var option7Description = ""
-                            var option8 = ""
-                            var option8Description = ""
-                            var option9 = ""
-                            var option9Description = ""
-                            var option10 = ""
-                            var option10Description = ""
-                            var required = ""
-                            var questionDescription = ""
-                            var teamNeedQuestion = "false"
-                            var acceptMultiple = ""
-                            var question1SetURL = ""
-                            var question2SetURL = ""
-                            var question3SetURL = ""
-                            var question4SetURL = ""
-                            var question5SetURL = ""
-                            var optionsURL = ""
-                            var maxOptions = ""
-                            var answer = ""
-                            var answerArray = [String]()
-                            
-                            for (key, value) in question {
-                                if(key == "questionNumber"){
-                                    questionNumber = (value as? String) ?? ""
-                                }
-                                if(key == "question"){
-                                    questionString = (value as? String) ?? ""
-                                }
-                                if(key == "option1"){
-                                    option1 = (value as? String) ?? ""
-                                }
-                                if(key == "option1Description"){
-                                    option1Description = (value as? String) ?? ""
-                                }
-                                if(key == "option2"){
-                                    option2 = (value as? String) ?? ""
-                                }
-                                if(key == "option2Description"){
-                                    option2Description = (value as? String) ?? ""
-                                }
-                                if(key == "option3"){
-                                    option3 = (value as? String) ?? ""
-                                }
-                                if(key == "option3Description"){
-                                    option3Description = (value as? String) ?? ""
-                                }
-                                if(key == "option4"){
-                                    option4 = (value as? String) ?? ""
-                                }
-                                if(key == "option4Description"){
-                                    option4Description = (value as? String) ?? ""
-                                }
-                                if(key == "option5"){
-                                    option5 = (value as? String) ?? ""
-                                }
-                                if(key == "option5Description"){
-                                    option5Description = (value as? String) ?? ""
-                                }
-                                if(key == "option6"){
-                                    option6 = (value as? String) ?? ""
-                                }
-                                if(key == "option6Description"){
-                                    option6Description = (value as? String) ?? ""
-                                }
-                                if(key == "option7"){
-                                    option7 = (value as? String) ?? ""
-                                }
-                                if(key == "option7Description"){
-                                    option7Description = (value as? String) ?? ""
-                                }
-                                if(key == "option8"){
-                                    option8 = (value as? String) ?? ""
-                                }
-                                if(key == "option8Description"){
-                                    option8Description = (value as? String) ?? ""
-                                }
-                                if(key == "option9"){
-                                    option9 = (value as? String) ?? ""
-                                }
-                                if(key == "option9Description"){
-                                    option9Description = (value as? String) ?? ""
-                                }
-                                if(key == "option10"){
-                                    option10 = (value as? String) ?? ""
-                                }
-                                if(key == "option10Description"){
-                                    option10Description = (value as? String) ?? ""
-                                }
-                                if(key == "required"){
-                                    required = (value as? String) ?? ""
-                                }
-                                if(key == "questionDescription"){
-                                    questionDescription = (value as? String) ?? ""
-                                }
-                                if(key == "acceptMultiple"){
-                                    acceptMultiple = (value as? String) ?? ""
-                                }
-                                if(key == "question1SetURL"){
-                                    question1SetURL = (value as? String) ?? ""
-                                }
-                                if(key == "question2SetURL"){
-                                    question2SetURL = (value as? String) ?? ""
-                                }
-                                if(key == "question3SetURL"){
-                                    question3SetURL = (value as? String) ?? ""
-                                }
-                                if(key == "question4SetURL"){
-                                    question4SetURL = (value as? String) ?? ""
-                                }
-                                if(key == "question5SetURL"){
-                                    question5SetURL = (value as? String) ?? ""
-                                }
-                                if(key == "teamNeedQuestion"){
-                                    teamNeedQuestion = (value as? String) ?? "false"
-                                }
-                                if(key == "optionsUrl"){
-                                    optionsURL = (value as? String) ?? ""
-                                }
-                                if(key == "maxOptions"){
-                                    maxOptions = (value as? String) ?? ""
-                                }
-                                if(key == "answer"){
-                                    answer = (value as? String) ?? ""
-                                }
-                                if(key == "answerArray"){
-                                    answerArray = (value as? [String]) ?? [String]()
-                                }
-                        }
-                            
-                            let faQuestion = FAQuestion(question: questionString)
-                                faQuestion.questionNumber = questionNumber
-                                faQuestion.question = questionString
-                                faQuestion.option1 = option1
-                                faQuestion.option1Description = option1Description
-                                faQuestion.question1SetURL = question1SetURL
-                                faQuestion.option2 = option2
-                                faQuestion.option2Description = option2Description
-                                faQuestion.question2SetURL = question2SetURL
-                                faQuestion.option3 = option3
-                                faQuestion.option3Description = option3Description
-                                faQuestion.question3SetURL = question3SetURL
-                                faQuestion.option4 = option4
-                                faQuestion.option4Description = option4Description
-                                faQuestion.question4SetURL = question4SetURL
-                                faQuestion.option5 = option5
-                                faQuestion.option5Description = option5Description
-                                faQuestion.question5SetURL = question5SetURL
-                                faQuestion.option6 = option6
-                                faQuestion.option6Description = option6Description
-                                faQuestion.option7 = option7
-                                faQuestion.option7Description = option7Description
-                                faQuestion.option8 = option8
-                                faQuestion.option8Description = option8Description
-                                faQuestion.option9 = option9
-                                faQuestion.option9Description = option9Description
-                                faQuestion.option10 = option10
-                                faQuestion.option10Description = option10Description
-                                faQuestion.required = required
-                                faQuestion.acceptMultiple = acceptMultiple
-                                faQuestion.questionDescription = questionDescription
-                                faQuestion.teamNeedQuestion = teamNeedQuestion
-                                faQuestion.optionsUrl = optionsURL
-                                faQuestion.maxOptions = maxOptions
-                                faQuestion.answer = answer
-                                faQuestion.answerArray = answerArray
-                
-                    questions.append(faQuestion)
+        let user = appDelegate.currentUser
+        if(user != nil){
+            let newFriendRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("inviteRequests")
+            newFriendRef.observe(.value, with: { (snapshot) in
+                var dbRequests = [RequestObject]()
+                 for invite in snapshot.children{
+                    let currentObj = invite as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let status = dict?["status"] as? String ?? ""
+                    let teamId = dict?["teamId"] as? String ?? ""
+                    let teamName = dict?["teamName"] as? String ?? ""
+                    let captainId = dict?["captainId"] as? String ?? ""
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let requestId = dict?["requestId"] as? String ?? ""
+                        let userUid = dict?["userUid"] as? String ?? ""
+                     
+                     let profile = currentObj.childSnapshot(forPath: "profile")
+                     let profileDict = profile.value as? [String: Any]
+                     let game = profileDict?["game"] as? String ?? ""
+                     let consoles = profileDict?["consoles"] as? [String] ?? [String]()
+                     let profileGamerTag = profileDict?["gamerTag"] as? String ?? ""
+                     let competitionId = profileDict?["competitionId"] as? String ?? ""
+                     let userId = profileDict?["userId"] as? String ?? ""
+                     
+                    var questions = [FAQuestion]()
+                    let questionList = dict?["questions"] as? [[String: Any]] ?? [[String: Any]]()
+                            for question in questionList {
+                                var questionNumber = ""
+                                var questionString = ""
+                                var option1 = ""
+                                var option1Description = ""
+                                var option2 = ""
+                                var option2Description = ""
+                                var option3 = ""
+                                var option3Description = ""
+                                var option4 = ""
+                                var option4Description = ""
+                                var option5 = ""
+                                var option5Description = ""
+                                var option6 = ""
+                                var option6Description = ""
+                                var option7 = ""
+                                var option7Description = ""
+                                var option8 = ""
+                                var option8Description = ""
+                                var option9 = ""
+                                var option9Description = ""
+                                var option10 = ""
+                                var option10Description = ""
+                                var required = ""
+                                var questionDescription = ""
+                                var teamNeedQuestion = "false"
+                                var acceptMultiple = ""
+                                var question1SetURL = ""
+                                var question2SetURL = ""
+                                var question3SetURL = ""
+                                var question4SetURL = ""
+                                var question5SetURL = ""
+                                var optionsURL = ""
+                                var maxOptions = ""
+                                var answer = ""
+                                var answerArray = [String]()
+                                
+                                for (key, value) in question {
+                                    if(key == "questionNumber"){
+                                        questionNumber = (value as? String) ?? ""
+                                    }
+                                    if(key == "question"){
+                                        questionString = (value as? String) ?? ""
+                                    }
+                                    if(key == "option1"){
+                                        option1 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option1Description"){
+                                        option1Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option2"){
+                                        option2 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option2Description"){
+                                        option2Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option3"){
+                                        option3 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option3Description"){
+                                        option3Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option4"){
+                                        option4 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option4Description"){
+                                        option4Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option5"){
+                                        option5 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option5Description"){
+                                        option5Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option6"){
+                                        option6 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option6Description"){
+                                        option6Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option7"){
+                                        option7 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option7Description"){
+                                        option7Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option8"){
+                                        option8 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option8Description"){
+                                        option8Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option9"){
+                                        option9 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option9Description"){
+                                        option9Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "option10"){
+                                        option10 = (value as? String) ?? ""
+                                    }
+                                    if(key == "option10Description"){
+                                        option10Description = (value as? String) ?? ""
+                                    }
+                                    if(key == "required"){
+                                        required = (value as? String) ?? ""
+                                    }
+                                    if(key == "questionDescription"){
+                                        questionDescription = (value as? String) ?? ""
+                                    }
+                                    if(key == "acceptMultiple"){
+                                        acceptMultiple = (value as? String) ?? ""
+                                    }
+                                    if(key == "question1SetURL"){
+                                        question1SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "question2SetURL"){
+                                        question2SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "question3SetURL"){
+                                        question3SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "question4SetURL"){
+                                        question4SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "question5SetURL"){
+                                        question5SetURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "teamNeedQuestion"){
+                                        teamNeedQuestion = (value as? String) ?? "false"
+                                    }
+                                    if(key == "optionsUrl"){
+                                        optionsURL = (value as? String) ?? ""
+                                    }
+                                    if(key == "maxOptions"){
+                                        maxOptions = (value as? String) ?? ""
+                                    }
+                                    if(key == "answer"){
+                                        answer = (value as? String) ?? ""
+                                    }
+                                    if(key == "answerArray"){
+                                        answerArray = (value as? [String]) ?? [String]()
+                                    }
+                            }
+                                
+                                let faQuestion = FAQuestion(question: questionString)
+                                    faQuestion.questionNumber = questionNumber
+                                    faQuestion.question = questionString
+                                    faQuestion.option1 = option1
+                                    faQuestion.option1Description = option1Description
+                                    faQuestion.question1SetURL = question1SetURL
+                                    faQuestion.option2 = option2
+                                    faQuestion.option2Description = option2Description
+                                    faQuestion.question2SetURL = question2SetURL
+                                    faQuestion.option3 = option3
+                                    faQuestion.option3Description = option3Description
+                                    faQuestion.question3SetURL = question3SetURL
+                                    faQuestion.option4 = option4
+                                    faQuestion.option4Description = option4Description
+                                    faQuestion.question4SetURL = question4SetURL
+                                    faQuestion.option5 = option5
+                                    faQuestion.option5Description = option5Description
+                                    faQuestion.question5SetURL = question5SetURL
+                                    faQuestion.option6 = option6
+                                    faQuestion.option6Description = option6Description
+                                    faQuestion.option7 = option7
+                                    faQuestion.option7Description = option7Description
+                                    faQuestion.option8 = option8
+                                    faQuestion.option8Description = option8Description
+                                    faQuestion.option9 = option9
+                                    faQuestion.option9Description = option9Description
+                                    faQuestion.option10 = option10
+                                    faQuestion.option10Description = option10Description
+                                    faQuestion.required = required
+                                    faQuestion.acceptMultiple = acceptMultiple
+                                    faQuestion.questionDescription = questionDescription
+                                    faQuestion.teamNeedQuestion = teamNeedQuestion
+                                    faQuestion.optionsUrl = optionsURL
+                                    faQuestion.maxOptions = maxOptions
+                                    faQuestion.answer = answer
+                                    faQuestion.answerArray = answerArray
+                    
+                        questions.append(faQuestion)
+                    }
+                     
+                     let result = FreeAgentObject(gamerTag: profileGamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
+                     
+                     
+                    let newRequest = RequestObject(status: status, teamId: teamId, teamName: teamName, captainId: captainId, requestId: requestId, userUid: userUid, gamerTag: gamerTag)
+                     newRequest.profile = result
+                     
+                     dbRequests.append(newRequest)
                 }
-                 
-                 let result = FreeAgentObject(gamerTag: profileGamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
-                 
-                 
-                let newRequest = RequestObject(status: status, teamId: teamId, teamName: teamName, captainId: captainId, requestId: requestId, userUid: userUid, gamerTag: gamerTag)
-                 newRequest.profile = result
-                 
-                 dbRequests.append(newRequest)
-            }
-            
-            if(dbRequests.count > appDelegate.currentUser!.teamInviteRequests.count){
-                appDelegate.currentUser!.teamInviteRequests = dbRequests
                 
-                self.showAlert(alertText: "someone wants to join your team!", tap: nil)
-            }
-        })
+                if(dbRequests.count > appDelegate.currentUser!.teamInviteRequests.count){
+                    appDelegate.currentUser!.teamInviteRequests = dbRequests
+                    
+                    self.showAlert(alertText: "someone wants to join your team!", tap: nil)
+                }
+            })
+        }
     }
     
     private func addReceivedAnnouncementsRef(){
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        
-        let receivedAnnouncementsRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("receivedAnnouncements")
-        receivedAnnouncementsRef.observe(.value, with: { (snapshot) in
-            if(snapshot.exists()){
-                var received = snapshot.value as? [String] ?? [String]()
-                if(!received.isEmpty){
-                    if(received.count > appDelegate.currentUser!.receivedAnnouncements.count){
-                        appDelegate.currentUser!.receivedAnnouncements = received
-                        let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.showAlertsDrawer))
-                        self.showAlert(alertText: "one of your friends is jumping online right NOW!", tap: drawerTap)
+        let user = appDelegate.currentUser
+        if(user != nil){
+            let receivedAnnouncementsRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("receivedAnnouncements")
+            receivedAnnouncementsRef.observe(.value, with: { (snapshot) in
+                if(snapshot.exists()){
+                    var received = snapshot.value as? [String] ?? [String]()
+                    if(!received.isEmpty){
+                        if(received.count > appDelegate.currentUser!.receivedAnnouncements.count){
+                            appDelegate.currentUser!.receivedAnnouncements = received
+                            let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.showAlertsDrawer))
+                            self.showAlert(alertText: "one of your friends is jumping online right NOW!", tap: drawerTap)
+                            appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
+                        }
                         appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
                     }
-                    appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
                 }
-            }
-        })
+            })
+        }
     }
     
     @objc private func showAlertsDrawer(){
@@ -927,38 +1032,42 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     private func addRejectedRivalsRef(){
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        
-        let newFriendRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("rejectedTempRivals")
-        newFriendRef.observe(.value, with: { (snapshot) in
-            var tempArray = [RivalObj]()
-            for rival in snapshot.children{
-                let currentObj = rival as! DataSnapshot
-                let dict = currentObj.value as? [String: Any]
-                let date = dict?["date"] as? String ?? ""
-                let tag = dict?["gamerTag"] as? String ?? ""
-                let game = dict?["game"] as? String ?? ""
-                let uid = dict?["uid"] as? String ?? ""
-                let dbType = dict?["type"] as? String ?? ""
-                let id = dict?["id"] as? String ?? ""
+        let user = appDelegate.currentUser
+        if(user != nil){
+            let newFriendRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("rejectedTempRivals")
+            newFriendRef.observe(.value, with: { (snapshot) in
+                var tempArray = [RivalObj]()
+                for rival in snapshot.children{
+                    let currentObj = rival as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let date = dict?["date"] as? String ?? ""
+                    let tag = dict?["gamerTag"] as? String ?? ""
+                    let game = dict?["game"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    let dbType = dict?["type"] as? String ?? ""
+                    let id = dict?["id"] as? String ?? ""
+                    
+                    let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
+                    tempArray.append(request)
+                }
                 
-                let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
-                tempArray.append(request)
-            }
-            
-            if(tempArray.count > appDelegate.currentUser!.rejectedTempRivals.count){
-                appDelegate.currentUser!.rejectedTempRivals = tempArray
-                let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.requestButtonClicked))
-                self.showAlert(alertText: "your friend is not available to play.", tap: drawerTap)
-                appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
-            }
-        })
+                if(tempArray.count > appDelegate.currentUser!.rejectedTempRivals.count){
+                    appDelegate.currentUser!.rejectedTempRivals = tempArray
+                    let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.requestButtonClicked))
+                    self.showAlert(alertText: "your friend is not available to play.", tap: drawerTap)
+                    appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
+                }
+            })
+        }
     }
     
     func checkRivals(){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let manager = delegate.profileManager
-        
-        manager.updateTempRivalsDB()
+        let user = delegate.currentUser
+        if(user != nil){
+            manager.updateTempRivalsDB()
+        }
     }
     
     func stringToDate(_ str: String)->Date{
@@ -970,7 +1079,8 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     private func addFriendsRef(){
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        
+        let user = appDelegate.currentUser
+        if(user != nil){
         let newFriendRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("friends")
             newFriendRef.observe(.value, with: { (snapshot) in
                 var friends = [FriendObject]()
@@ -1003,6 +1113,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                     }
                 }
             })
+        }
     }
     
     private func launchAlertBar(view: String, friend: FriendObject?){
@@ -1045,7 +1156,8 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     private func addMessagingRef(){
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        
+        let user = appDelegate.currentUser
+        if(user != nil){
         let newMessageRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("messagingNotifications")
             newMessageRef.observe(.value, with: { (snapshot) in
                 var messageArray = [MeesageQueueObj]()
@@ -1062,6 +1174,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                     self.showMessageAlertQueue(array: messageArray)
                 }
             })
+        }
     }
     
     private func addTeamRequestRef(){
@@ -1303,30 +1416,32 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     private func addPendingFriendsRef(){
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        
-        let pendingFriendsRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("pending_friends")
-        pendingFriendsRef.observe(.value, with: { (snapshot) in
-            var pendingRequests = [FriendRequestObject]()
-            
-            for friend in snapshot.children{
-                let currentObj = friend as! DataSnapshot
-                let dict = currentObj.value as? [String: Any]
-                let gamerTag = dict?["gamerTag"] as? String ?? ""
-                let date = dict?["date"] as? String ?? ""
-                let uid = dict?["uid"] as? String ?? ""
+        let user = appDelegate.currentUser
+        if(user != nil){
+            let pendingFriendsRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("pending_friends")
+            pendingFriendsRef.observe(.value, with: { (snapshot) in
+                var pendingRequests = [FriendRequestObject]()
                 
-                let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
-                pendingRequests.append(newFriend)
-            }
-            
-            if(!pendingRequests.isEmpty && appDelegate.currentUser!.pendingRequests.count < pendingRequests.count){
-                appDelegate.currentUser?.pendingRequests = pendingRequests
+                for friend in snapshot.children{
+                    let currentObj = friend as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    
+                    let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
+                    pendingRequests.append(newFriend)
+                }
                 
-                let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.requestButtonClicked))
-                self.showAlert(alertText: "you have a new friend request!", tap: drawerTap)
-                appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
-            }
-        })
+                if(!pendingRequests.isEmpty && appDelegate.currentUser!.pendingRequests.count < pendingRequests.count){
+                    appDelegate.currentUser?.pendingRequests = pendingRequests
+                    
+                    let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.requestButtonClicked))
+                    self.showAlert(alertText: "you have a new friend request!", tap: drawerTap)
+                    appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
+                }
+            })
+        }
     }
     
     @objc func searchClicked(_ sender: AnyObject?) {
@@ -2046,10 +2161,10 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                     attributes: [NSAttributedString.Key.foregroundColor: UIColor(named:"dark")  ?? UIColor.darkGray])
                 }
                 
-                if(!backButtonShowing && !hideSearch){
-                    primaryBack.slideInBottomSmall()
-                    backButtonShowing = true
-                }
+                //if(!backButtonShowing && !hideSearch){
+                //    primaryBack.slideInBottomSmall()
+                //    backButtonShowing = true
+                //}
                 
                 self.constraint?.constant = self.bottomNav.bounds.height + 60
                 UIView.animate(withDuration: 0.3, delay: 0.2, options: [], animations: {
@@ -2154,10 +2269,10 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                 mainNavShowing = true
             }
             
-            if(!backButtonShowing){
-                primaryBack.slideInBottomSmall()
-                backButtonShowing = true
-            }
+            //if(!backButtonShowing){
+            //    primaryBack.slideInBottomSmall()
+            //    backButtonShowing = true
+            //}
         }
     }
     
@@ -2179,7 +2294,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         else{
             //let appDelegate = UIApplication.shared.delegate as! AppDelegate
             //if(appDelegate.currentFrag == "Home"){
-                primaryBack.slideOutBottomSmall()
+                //primaryBack.slideOutBottomSmall()
                 backButtonShowing = false
             //}
         }
@@ -2187,15 +2302,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     
     private func enableButtons(){
-        let singleTapTwitch = UITapGestureRecognizer(target: self, action: #selector(twitchClicked))
-        self.twitchClickArea.isUserInteractionEnabled = true
-        self.twitchClickArea.addGestureRecognizer(singleTapTwitch)
-        
-        let singleTapHome = UITapGestureRecognizer(target: self, action: #selector(homeButtonClicked))
-        self.connectClickArea.isUserInteractionEnabled = true
-        self.connectClickArea.addGestureRecognizer(singleTapHome)
-        
-        let singleTapRequests = UITapGestureRecognizer(target: self, action: #selector(requestButtonClicked))
+        let singleTapRequests = UITapGestureRecognizer(target: self, action: #selector(playButtonClicked))
         self.requestsClickArea.isUserInteractionEnabled = true
         self.requestsClickArea.addGestureRecognizer(singleTapRequests)
         
@@ -2207,9 +2314,9 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         self.myProfileClickArea.isUserInteractionEnabled = true
         self.myProfileClickArea.addGestureRecognizer(singleTapProfile)
         
-        let singleTapPopular = UITapGestureRecognizer(target: self, action: #selector(popularButtonClicked))
-        self.popularClickArea.isUserInteractionEnabled = true
-        self.popularClickArea.addGestureRecognizer(singleTapPopular)
+        let singleTapSearch = UITapGestureRecognizer(target: self, action: #selector(searchButtonClicked))
+        self.searchClickArea.isUserInteractionEnabled = true
+        self.searchClickArea.addGestureRecognizer(singleTapSearch)
         
         bottomNav.isHidden = false
         bottomNav.isUserInteractionEnabled = true
@@ -2284,6 +2391,21 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         self.performSegue(withIdentifier: "profile", sender: nil)
     }
     
+    @objc func searchButtonClicked(){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "feedSearch") as! FeedSearchModal
+        //currentViewController.currentFeed = self
+        
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+    }
+    
     @objc func homeButtonClicked(_ sender: AnyObject?) {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         if(appDelegate.currentFrag != "Home"){
@@ -2333,11 +2455,26 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         currentViewController.modalPresentationStyle = .custom
         currentViewController.modalPresentationCapturesStatusBarAppearance = true
         transitionDelegate.showIndicator = true
+        transitionDelegate.customHeight = 500
         transitionDelegate.swipeToDismissEnabled = true
         transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
         transitionDelegate.storkDelegate = self
         self.present(currentViewController, animated: true, completion: nil)
-        self.performSegue(withIdentifier: "requests", sender: nil)
+        //self.performSegue(withIdentifier: "requests", sender: nil)
+    }
+    
+    @objc func playButtonClicked(_ sender: AnyObject?) {
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "playModal") as! PlayModal
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+        //self.performSegue(withIdentifier: "requests", sender: nil)
     }
     
     @objc func menuButtonClicked(_ sender: AnyObject?) {
@@ -2373,8 +2510,9 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         
         self.menuItems.append(0)
         //self.menuItems.append(1)
-        //self.menuItems.append(3)
-        self.menuItems.append("Friends")
+        self.menuItems.append(4)
+        self.menuItems.append(5)
+        self.menuItems.append("friends")
         self.menuItems.append(2)
         
         if let flowLayout = menuCollection?.collectionViewLayout as? UICollectionViewFlowLayout {
@@ -2557,6 +2695,28 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "upgrade", for: indexPath) as! MenuUpgradeCell
                     return cell
                 }
+                else if(current as? Int == 4){
+                    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "option", for: indexPath) as! NewMenuOptionCell
+                    cell.optionLabel.text = "my followers"
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    if(!delegate.currentUser!.followers.isEmpty){
+                        cell.sub.text = "view your list of followers"
+                    } else {
+                        cell.sub.text = "no followers yet."
+                    }
+                    return cell
+                }
+                else if(current as? Int == 5){
+                    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "option", for: indexPath) as! NewMenuOptionCell
+                    cell.optionLabel.text = "following"
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    if(!delegate.currentUser!.followers.isEmpty){
+                        cell.sub.text = "view who you are following."
+                    } else {
+                        cell.sub.text = "you're not following anyone."
+                    }
+                    return cell
+                }
                 else{
                     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "dxpFriends", for: indexPath) as! MenuFriendsCell
                     return cell
@@ -2591,6 +2751,12 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                 else if(current as? Int == 3){
                     return CGSize(width: collectionView.bounds.size.width, height: CGFloat(150))
                 }
+                else if(current as? Int == 4){
+                    return CGSize(width: collectionView.bounds.size.width, height: CGFloat(70))
+                }
+                else if(current as? Int == 5){
+                    return CGSize(width: collectionView.bounds.size.width, height: CGFloat(70))
+                }
                 
                 else{
                     return CGSize(width: collectionView.bounds.size.width, height: CGFloat(100))
@@ -2603,6 +2769,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let delegate = UIApplication.shared.delegate as! AppDelegate
         let current = menuItems[indexPath.item]
         if(current is Int){
             if((current as! Int) ==  1){
@@ -2639,6 +2806,66 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                     })
                 })
             }
+            else if((current as! Int) == 4 && !delegate.currentUser!.followers.isEmpty){
+                self.menuShowing = false
+                
+                let top = CGAffineTransform(translationX: 0, y: 0)
+                UIView.animate(withDuration: 0.4, delay: 0.0, options:[], animations: {
+                    self.menuDrawer.transform = top
+                    self.clickArea.isUserInteractionEnabled = false
+                }, completion: { (finished: Bool) in
+                    UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
+                        self.newMenuBlur.alpha = 0.0
+                    }, completion: { (finished: Bool) in
+                        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing Menu - Upgrade"))
+                        
+                        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "follower") as! MenuFollowerDrawer
+                        currentViewController.payload = delegate.currentUser!.followers
+                        currentViewController.type = "followers"
+                        currentViewController.userUid = delegate.currentUser!.uId
+                        let transitionDelegate = SPStorkTransitioningDelegate()
+                        currentViewController.transitioningDelegate = transitionDelegate
+                        currentViewController.modalPresentationStyle = .custom
+                        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+                        transitionDelegate.showIndicator = true
+                        transitionDelegate.customHeight = 600
+                        transitionDelegate.swipeToDismissEnabled = true
+                        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+                        transitionDelegate.storkDelegate = self
+                        self.present(currentViewController, animated: true, completion: nil)
+                    })
+                })
+            }
+            else if((current as! Int) == 5 && !delegate.currentUser!.following.isEmpty){
+                self.menuShowing = false
+                
+                let top = CGAffineTransform(translationX: 0, y: 0)
+                UIView.animate(withDuration: 0.4, delay: 0.0, options:[], animations: {
+                    self.menuDrawer.transform = top
+                    self.clickArea.isUserInteractionEnabled = false
+                }, completion: { (finished: Bool) in
+                    UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
+                        self.newMenuBlur.alpha = 0.0
+                    }, completion: { (finished: Bool) in
+                        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing Menu - Upgrade"))
+                        
+                        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "follower") as! MenuFollowerDrawer
+                        currentViewController.payload = delegate.currentUser!.following
+                        currentViewController.type = "following"
+                        currentViewController.userUid = delegate.currentUser!.uId
+                        let transitionDelegate = SPStorkTransitioningDelegate()
+                        currentViewController.transitioningDelegate = transitionDelegate
+                        currentViewController.modalPresentationStyle = .custom
+                        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+                        transitionDelegate.showIndicator = true
+                        transitionDelegate.customHeight = 600
+                        transitionDelegate.swipeToDismissEnabled = true
+                        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+                        transitionDelegate.storkDelegate = self
+                        self.present(currentViewController, animated: true, completion: nil)
+                    })
+                })
+            }
         }
     }
     
@@ -2652,6 +2879,51 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         UserDefaults.standard.removeObject(forKey: "userId")
         
         self.performSegue(withIdentifier: "logout", sender: nil)
+    }
+    
+    
+    @objc func deleteAccountClicked(){
+        var buttons = [PopupDialogButton]()
+        let title = "delete your account."
+        let message = "we really hate to see you go, are you sure you want to delete your account?"
+        
+        let button = DefaultButton(title: "delete my account.") { [weak self] in
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+                    
+            let ref = Database.database().reference().child("Users")
+            ref.observeSingleEvent(of: .value, with: { (snapshot) in
+                if(snapshot.hasChild(delegate.currentUser!.uId)) {
+                    ref.child(delegate.currentUser!.uId).removeValue()
+                    delegate.currentUser = nil
+                    UserDefaults.standard.removeObject(forKey: "userId")
+                    
+                    let user = Auth.auth().currentUser
+
+                    user?.delete { error in
+                      if let error = error {
+                        // An error happened.
+                      } else {
+                        // Account deleted.
+                      }
+                    }
+                }
+                self!.performSegue(withIdentifier: "logout", sender: nil)
+            }) { (error) in
+                print(error.localizedDescription)
+            }
+        }
+        buttons.append(button)
+        
+        let buttonOne = CancelButton(title: "nevermind") { [weak self] in
+            
+        }
+        buttons.append(buttonOne)
+        
+        let popup = PopupDialog(title: title, message: message)
+        popup.addButtons(buttons)
+
+        // Present dialog
+        self.present(popup, animated: true, completion: nil)
     }
     
 }

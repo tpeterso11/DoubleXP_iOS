@@ -15,9 +15,9 @@ import CoreLocation
 import GeoFire
 import SwiftNotificationCenter
 import FBSDKLoginKit
+import SPStorkController
 
-class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSource, UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate {
-    @IBOutlet weak var gameTable: UITableView!
+class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSource, UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate, SPStorkControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     @IBOutlet weak var continueButton: UIButton!
     var selectedGames = [String]()
     var originalList = [GamerConnectGame]()
@@ -53,6 +53,9 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @IBOutlet weak var mobileCover: UIView!
     @IBOutlet weak var tableButton: UIView!
     @IBOutlet weak var tableCover: UIView!
+    @IBOutlet weak var gameCollection: UICollectionView!
+    @IBOutlet weak var gameSelectionHeader: UILabel!
+    @IBOutlet weak var gameSelectionSub: UILabel!
     var currentSelectedConsoles = [String]()
     var currentSelectedGamerTags = [String]()
     var currentSelectedGame = ""
@@ -70,20 +73,27 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
     var returning = false
     var modalPopped = false
     var upgradeFrag: Upgrade?
+    var currentGameGroup = "all"
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.currentGameSelection = self
         let list = delegate.gcGames
         let sorted = list!.sorted(by: { $0.gameName < $1.gameName })
         gameList = sorted
         
         if(returning){
+            self.gameSelectionHeader.text = "what games do you play?"
+            self.gameSelectionSub.text = "add your favortite games to your profile, increase your chances"
             continueButton.addTarget(self, action: #selector(self.closeModal), for: .touchUpInside)
             self.selectedGames.append(contentsOf: delegate.currentUser!.games)
             self.profiles.append(contentsOf: delegate.currentUser!.gamerTags)
         } else {
+            self.gameSelectionHeader.text = "add your first game"
+            self.gameSelectionSub.text = "add your favorite game to complete your profile."
+            self.continueButton.setTitle("skip for now", for: .normal)
             continueButton.addTarget(self, action: #selector(self.advanceToResults), for: .touchUpInside)
         }
         
@@ -111,53 +121,37 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.mobileButton.isUserInteractionEnabled = true
         self.mobileButton.addGestureRecognizer(mobileTap)
         
-        gameTable.delegate = self
-        gameTable.dataSource = self
+        gameCollection.delegate = self
+        gameCollection.dataSource = self
         
-        gameDrawerTagEntry.delegate = self
         search.delegate = self
-        gameDrawerTagEntry.returnKeyType = UIReturnKeyType.done
         search.returnKeyType = UIReturnKeyType.done
-        
-        self.constraint = NSLayoutConstraint(item: self.gameDrawer, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0.0, constant: 465)
-        self.constraint?.isActive = true
-        
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(keyboardWillShow),
-            name: UIResponder.keyboardWillShowNotification,
-            object: nil
-        )
-        
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(keyboardWillDisappear),
-            name: UIResponder.keyboardWillHideNotification,
-            object: nil
-        )
-        
-        //let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
-        //view.addGestureRecognizer(tap)
         
         search.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
     }
     
     @objc func allClicked(){
-        handleButtons(selected: "all")
+        self.currentGameGroup = "all"
+        handleButtons(selected: self.currentGameGroup)
     }
     @objc func pcClicked(){
+        self.currentGameGroup = "pc"
         handleButtons(selected: "pc")
     }
     @objc func mobileClicked(){
+        self.currentGameGroup = "mobile"
         handleButtons(selected: "mobile")
     }
     @objc func consoleClicked(){
+        self.currentGameGroup = "console"
         handleButtons(selected: "console")
     }
     @objc func popularClicked(){
+        self.currentGameGroup = "popular"
         handleButtons(selected: "popular")
     }
     @objc func tabletopClicked(){
+        self.currentGameGroup = "tabletop"
         handleButtons(selected: "tabletop")
     }
     
@@ -168,7 +162,7 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
             let sorted = list!.sorted(by: { $0.gameName < $1.gameName })
             gameList = sorted
             
-            self.gameTable.reloadData()
+            self.gameCollection.reloadData()
             
             self.allGamesCover.alpha = 1
             self.popularCover.alpha = 0
@@ -187,7 +181,7 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
                     gameList.remove(at: gameList.index(of: game)!)
                 }
             }
-            self.gameTable.reloadData()
+            self.gameCollection.reloadData()
             
             self.allGamesCover.alpha = 0
             self.popularCover.alpha = 0
@@ -206,7 +200,7 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
                     gameList.remove(at: gameList.index(of: game)!)
                 }
             }
-            self.gameTable.reloadData()
+            self.gameCollection.reloadData()
             
             self.allGamesCover.alpha = 0
             self.popularCover.alpha = 0
@@ -226,7 +220,7 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
                     gameList.remove(at: gameList.index(of: game)!)
                 }
             }
-            self.gameTable.reloadData()
+            self.gameCollection.reloadData()
             
             self.allGamesCover.alpha = 0
             self.popularCover.alpha = 0
@@ -245,7 +239,7 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
                     gameList.remove(at: gameList.index(of: game)!)
                 }
             }
-            self.gameTable.reloadData()
+            self.gameCollection.reloadData()
             
             self.allGamesCover.alpha = 0
             self.popularCover.alpha = 0
@@ -264,7 +258,7 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
                     gameList.remove(at: gameList.index(of: game)!)
                 }
             }
-            self.gameTable.reloadData()
+            self.gameCollection.reloadData()
             
             self.allGamesCover.alpha = 0
             self.popularCover.alpha = 1
@@ -277,15 +271,6 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
-        if(textField == self.gameDrawerTagEntry){
-            if(self.gameDrawerTagEntry.text!.count >= 4){
-                if(self.currentSelectedConsoles.count == 1){
-                    self.addGame()
-                } else {
-                    self.createProfileAndContinue()
-                }
-            }
-        }
         return false
     }
     
@@ -325,63 +310,7 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
         return true
     }
     
-    @objc func keyboardWillShow(_ notification: Notification) {
-        self.keyboardOpen = true
-        if(self.gameDrawer.alpha == 1){
-            if let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
-                let keyboardRectangle = keyboardFrame.cgRectValue
-                let keyboardHeight = keyboardRectangle.height
-                
-                extendBottom(height: keyboardHeight)
-            }
-        }
-    }
-    
-    @objc func keyboardWillDisappear() {
-        self.keyboardOpen = false
-        if(self.gameDrawer.alpha == 1){
-            if(self.gtDeckHeight != nil){
-                restoreBottom(height: self.gtDeckHeight!)
-            }
-        }
-    }
-    
-    func extendBottom(height: CGFloat){
-        UIView.animate(withDuration: 0.3, animations: {
-            self.gtDeckHeight = 200 + 465
-            self.constraint?.constant = self.gtDeckHeight!
-            
-            UIView.animate(withDuration: 0.5) {
-                self.view.layoutIfNeeded()
-            }
-            
-            let top = CGAffineTransform(translationX: 0, y: -60)
-            UIView.animate(withDuration: 0.5, delay: 0.5, options: [], animations: {
-                self.checkKeyboardNext()
-                self.keyboardNext.transform = top
-            }, completion: nil)
-        
-        }, completion: nil)
-    }
-    
-    func restoreBottom(height: CGFloat){
-        UIView.animate(withDuration: 0.3, animations: {
-            self.constraint?.constant = 465
-            
-            UIView.animate(withDuration: 0.5) {
-                self.view.layoutIfNeeded()
-            }
-            
-            let top = CGAffineTransform(translationX: 0, y: 0)
-            UIView.animate(withDuration: 0.5, animations: {
-                self.keyboardNext.alpha = 0
-                self.keyboardNext.transform = top
-            }, completion: nil)
-        
-        }, completion: nil)
-    }
-    
-    @objc func dismissKeyboard() {
+    @objc override func dismissKeyboard() {
         //Causes the view (or one of its embedded text fields) to resign the first responder status.
         view.endEditing(true)
     }
@@ -400,342 +329,159 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
                     }
                 }
             }
-            self.gameTable.reloadData()
-        } else {
-            self.currentSelectedGT = textField.text!.replacingOccurrences(of: "\\s+$", with: "", options: .regularExpression)
-            checkAddButton()
-            checkKeyboardNext()
+            self.gameCollection.reloadData()
         }
     }
+    
+    /*func didDismissStorkBySwipe() {
+        if(returning){
+            DispatchQueue.main.async {
+                self.gameCollection.reloadData()
+                self.gameCollection.performBatchUpdates({ [weak self] in
+                        let visibleItems = self?.gameCollection.indexPathsForVisibleItems ?? []
+                        self?.gameCollection.reloadItems(at: visibleItems)
+                    }, completion: { (_) in
+                })
+                self.gameCollection.collectionViewLayout.invalidateLayout()
+                self.gameCollection.layoutSubviews()
+            }
+        } else {
+            DispatchQueue.main.async {
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                if(!appDelegate.currentUser!.games.isEmpty){
+                    self.advanceToResults()
+                }
+            }
+        }
+    }*/
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if(tableView == gameTable){
-            return gameList.count
-        } else {
-            return availableConsoles.count
-        }
+        return availableConsoles.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if(tableView == gameTable){
-            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! GameSelectionV2Cell
-            let current = gameList[indexPath.item]
-            cell.developer.text = current.developer
-            cell.gamename.text = current.gameName
-            
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            let cache = appDelegate.imageCache
-            if(cache.object(forKey: current.imageUrl as NSString) != nil){
-                cell.gameback.image = cache.object(forKey: current.imageUrl as NSString)
-            } else {
-                cell.gameback.image = Utility.Image.placeholder
-                cell.gameback.moa.onSuccess = { image in
-                    cell.gameback.image = image
-                    appDelegate.imageCache.setObject(image, forKey: current.imageUrl as NSString)
-                    return image
-                }
-                cell.gameback.moa.url = current.imageUrl
-            }
-            
-            cell.gameback.contentMode = .scaleAspectFill
-            cell.gameback.clipsToBounds = true
-            
-            if(self.selectedGames.contains(current.gameName)){
-                cell.coverblur.alpha = 1
-            } else {
-                cell.coverblur.alpha = 0
-            }
-            return cell
+        let cell = tableView.dequeueReusableCell(withIdentifier: "console", for: indexPath) as! ConsoleSelectionTableviewCell
+        let current = self.availableConsoles[indexPath.item]
+        
+        cell.console.text = self.mapConsoleForDisplay(console: current)
+        cell.coverConsole.text = self.mapConsoleForDisplay(console: current)
+        
+        if(self.currentSelectedConsoles.contains(current)){
+            cell.selectedCover.alpha = 1
         } else {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "console", for: indexPath) as! ConsoleSelectionTableviewCell
-            let current = self.availableConsoles[indexPath.item]
-            
-            cell.console.text = self.mapConsoleForDisplay(console: current)
-            cell.coverConsole.text = self.mapConsoleForDisplay(console: current)
-            
-            if(self.currentSelectedConsoles.contains(current)){
-                cell.selectedCover.alpha = 1
-            } else {
-                cell.selectedCover.alpha = 0
-            }
-            return cell
+            cell.selectedCover.alpha = 0
         }
+        return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if(tableView == gameTable){
-            let current = gameList[indexPath.item]
-            var contained = false
-            for profile in profiles {
-                if(profile.game == current.gameName){
-                    contained = true
-                    if(self.selectedGames.contains(profile.game)){
-                        self.selectedGames.remove(at: self.selectedGames.index(of: profile.game)!)
-                    }
-                    profiles.remove(at: profiles.index(of: profile)!)
-                }
-            }
-            
-            if(!contained){
-                if(keyboardOpen){
-                    dismissKeyboard()
-                }
-                showGameDrawer(gcGame: current)
-            } else {
-                gameTable.reloadData()
-            }
+        let current = self.availableConsoles[indexPath.item]
+        if(self.currentSelectedConsoles.contains(current)){
+            self.currentSelectedConsoles.remove(at: self.currentSelectedConsoles.index(of: current)!)
+        } else {
+            self.currentSelectedConsoles.append(current)
         }
-        else {
-            let current = self.availableConsoles[indexPath.item]
-            if(self.currentSelectedConsoles.contains(current)){
-                self.currentSelectedConsoles.remove(at: self.currentSelectedConsoles.index(of: current)!)
-            } else {
-                self.currentSelectedConsoles.append(current)
-            }
-            self.consoleTable.reloadData()
-            self.checkNextButton()
-        }
+        self.consoleTable.reloadData()
+        //self.checkNextButton()
     }
     
     private func showGameDrawer(gcGame: GamerConnectGame){
-        self.gameDrawerAdd.removeTarget(nil, action: nil, for: .allEvents)
-        self.keyboardNext.removeTarget(nil, action: nil, for: .allEvents)
-        currentSelectedGame = gcGame.gameName
-        currentSelectedConsoles = [String]()
-        currentSelectedGamerTags = [String]()
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "quickAddGame") as! QuickAddGameDrawer
+        currentViewController.gameName = gcGame.gameName
+        currentViewController.currentGameSelectionModal = self
         
-        self.gameDrawerDev.text = gcGame.developer
-        self.gameDrawerGame.text = gcGame.gameName
-        self.availableConsoles = [String]()
-        self.availableConsoles.append(contentsOf: gcGame.availablebConsoles)
-        configureAddButtons()
-        self.keyboardNext.alpha = 0
-        
-        if(self.availableConsoles.count > 1){
-            if(!consolesSet){
-                self.consolesSet = true
-                self.consoleTable.delegate = self
-                self.consoleTable.dataSource = self
-                self.consoleTable.reloadData()
-                self.consoleTable.alpha = 1
-            } else {
-                self.consoleTable.reloadData()
-                self.consoleTable.alpha = 1
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.customHeight = 650
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+        //self.currentSelectedGame = gcGame.gameName
+        //self.performSegue(withIdentifier: "addGame", sender: nil)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "addGame" {
+            if let nextViewController = segue.destination as? QuickAddGameDrawer {
+                nextViewController.gameName = self.currentSelectedGame
             }
         }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return self.gameList.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        showGameDrawer(gcGame: self.gameList[indexPath.item])
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! GameSelectionV2Cell
+        let current = gameList[indexPath.item]
+        cell.developer.text = current.developer
+        cell.gamename.text = current.gameName
         
-        self.gameDrawerTagEntry.text = ""
-        self.gameDrawerAdd.alpha = 0.4
-        self.gameDrawerTagEntry.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
-        self.gameDrawerNo.addTarget(self, action: #selector(self.dismissDrawer), for: .touchUpInside)
-        if(self.currentSelectedConsoles.count == 1){
-            self.checkAddButton()
-            showGamertag()
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let cache = appDelegate.imageCache
+        if(cache.object(forKey: current.imageUrl as NSString) != nil){
+            cell.gameback.image = cache.object(forKey: current.imageUrl as NSString)
         } else {
-            checkNextButton()
-        }
-        
-        let top = CGAffineTransform(translationX: 0, y: -465)
-        UIView.animate(withDuration: 0.5, animations: {
-            self.gameDrawerBlur.alpha = 1.0
-            self.gameDrawerAdd.titleLabel!.text = "next."
-        }, completion: { (finished: Bool) in
-            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                self.gameDrawer.transform = top
-                self.gameDrawer.alpha = 1.0
-            }, completion: { (finished: Bool) in
-                self.keyboardNext.alpha = 0.4
-            })
-        })
-    }
-    
-    @objc private func dismissDrawer(){
-        self.keyboardNext.alpha = 0
-        let top = CGAffineTransform(translationX: 0, y: 0)
-        UIView.animate(withDuration: 0.5, animations: {
-            self.gameDrawer.transform = top
-            self.gameDrawer.alpha = 0
-        }, completion: { (finished: Bool) in
-            let reset1 = CGAffineTransform(translationX: 0, y: 0)
-            let reset2 = CGAffineTransform(translationX: 0, y: 0)
-            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                self.gameDrawerBlur.alpha = 0
-                self.gamerTagCover.transform = reset1
-                self.gamerTagCover.alpha = 0
-                self.gamertagTag.transform = reset2
-                self.gameDrawerTagEntry.transform = reset2
-            }, completion: nil)
-        })
-    }
-    
-    private func configureAddButtons(){
-        if(self.availableConsoles.count == 1){
-            self.gamertagTag.text = "my gamertag for " + self.currentSelectedGame + " is..."
-            self.consoleTable.alpha = 0
-            self.gamerTagCover.alpha = 1
-            self.currentSelectedConsole = self.availableConsoles[0]
-            self.currentSelectedConsoles.append(self.availableConsoles[0])
-            
-            self.keyboardNext.addTarget(self, action: #selector(self.addGame), for: .touchUpInside)
-            self.gameDrawerAdd.addTarget(self, action: #selector(self.addGame), for: .touchUpInside)
-            self.gameDrawerAdd.titleLabel!.text = "add game."
-        } else {
-            self.consoleTable.alpha = 1
-            self.gamerTagCover.alpha = 0
-            self.consoleTag.alpha = 1
-            
-            self.gameDrawerAdd.addTarget(self, action: #selector(self.showGamertag), for: .touchUpInside)
-            self.gameDrawerAdd.titleLabel!.text = "next"
-        }
-    }
-    
-    private func checkKeyboardNext(){
-        if(self.gameDrawerTagEntry.text!.count >= 4 && keyboardOpen){
-            self.keyboardNext.alpha = 1
-            self.keyboardNext.isUserInteractionEnabled = true
-        } else {
-            self.keyboardNext.isUserInteractionEnabled = false
-            self.keyboardNext.alpha = 0.4
-        }
-        
-        if(self.currentSelectedConsoles.count > 1){
-            self.keyboardNext.addTarget(self, action: #selector(self.createProfileAndContinue), for: .touchUpInside)
-        } else {
-            self.keyboardNext.removeTarget(nil, action: nil, for: .allEvents)
-            self.keyboardNext.addTarget(self, action: #selector(self.addGame), for: .touchUpInside)
-        }
-    }
-    
-    private func checkAddButton(){
-        if(self.gameDrawerTagEntry.text!.count >= 4 && self.gameDrawerAdd.alpha != 1.0){
-            UIView.animate(withDuration: 0.4, animations: {
-                self.gameDrawerAdd.alpha = 1
-                self.gameDrawerAdd.isUserInteractionEnabled = true
-            }, completion: nil)
-        } else if(self.gameDrawerTagEntry.text!.count >= 4){
-            self.gameDrawerAdd.alpha = 1
-            self.gameDrawerAdd.isUserInteractionEnabled = true
-        } else if((self.gameDrawerTagEntry.text!.count < 4 && self.gameDrawerAdd.alpha == 1.0)){
-            UIView.animate(withDuration: 0.4, animations: {
-                self.gameDrawerAdd.alpha = 0.4
-                self.gameDrawerAdd.isUserInteractionEnabled = false
-            }, completion: nil)
-        } else {
-            self.gameDrawerAdd.alpha = 0.4
-            self.gameDrawerAdd.isUserInteractionEnabled = false
-        }
-    }
-    
-    private func checkNextButton(){
-        if(!self.currentSelectedConsoles.isEmpty && self.gameDrawerAdd.alpha != 1.0){
-            UIView.animate(withDuration: 0.4, animations: {
-                self.gameDrawerAdd.alpha = 1
-                self.gameDrawerAdd.addTarget(self, action: #selector(self.showGamertag), for: .touchUpInside)
-                self.gameDrawerAdd.isUserInteractionEnabled = true
-            }, completion: nil)
-        } else if(!self.currentSelectedConsoles.isEmpty){
-            self.gameDrawerAdd.alpha = 1
-            self.gameDrawerAdd.addTarget(self, action: #selector(self.showGamertag), for: .touchUpInside)
-            self.gameDrawerAdd.isUserInteractionEnabled = true
-        } else if((self.currentSelectedConsoles.isEmpty && self.gameDrawerAdd.alpha == 1.0)){
-            UIView.animate(withDuration: 0.4, animations: {
-                self.gameDrawerAdd.alpha = 0.4
-                self.gameDrawerAdd.isUserInteractionEnabled = false
-            }, completion: nil)
-        } else {
-            self.gameDrawerAdd.alpha = 0.4
-            self.gameDrawerAdd.isUserInteractionEnabled = false
-            self.gameDrawerAdd.addTarget(self, action: #selector(self.showGamertag), for: .touchUpInside)
-        }
-    }
-    
-    @objc private func showGamertag(){
-        self.consoleTag.alpha = 0
-        self.checkKeyboardNext()
-        self.gameDrawerAdd.alpha = 0.3
-        self.gameDrawerAdd.isUserInteractionEnabled = false
-        
-        if(!self.currentSelectedConsoles.isEmpty){
-            let current = self.currentSelectedConsoles[0]
-            self.currentSelectedConsole = current
-            self.gamertagTag.text = "my gamertag on " + self.mapConsoleForDisplay(console: current) + " is..."
-            
-            if(!self.currentSelectedGT.isEmpty){
-                self.gameDrawerTagEntry.text = self.currentSelectedGT
-                self.gameDrawerAdd.alpha = 1
-                self.gameDrawerAdd.isUserInteractionEnabled = true
-            } else {
-                self.gameDrawerTagEntry.text = ""
+            cell.gameback.image = Utility.Image.placeholder
+            cell.gameback.moa.onSuccess = { image in
+                cell.gameback.image = image
+                appDelegate.imageCache.setObject(image, forKey: current.imageUrl as NSString)
+                return image
             }
-            
-            if(self.currentSelectedConsoles.count > 1){
-                self.gameDrawerAdd.addTarget(self, action: #selector(self.createProfileAndContinue), for: .touchUpInside)
-            } else {
-                self.gameDrawerAdd.addTarget(self, action: #selector(self.addGame), for: .touchUpInside)
-            }
-            
-            UIView.animate(withDuration: 0.5, animations: {
-                self.gamerTagCover.alpha = 1
-                self.consoleTable.alpha = 0
-            }, completion: { (finished: Bool) in
-                UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                    self.gamertagTag.alpha = 1
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        self.gameDrawerTagEntry.alpha = 1
-                    }
-                }, completion: nil)
-            })
+            cell.gameback.moa.url = current.imageUrl
         }
+        
+        cell.gameback.contentMode = .scaleAspectFill
+        cell.gameback.clipsToBounds = true
+        
+        if(appDelegate.currentUser!.games.contains(current.gameName)){
+            cell.testCheck.alpha = 1
+        } else {
+            cell.testCheck.alpha = 0
+        }
+        cell.selectedCover.alpha = 0
+        return cell
     }
     
-    @objc private func createProfileAndContinue(){
-        dismissKeyboard()
-        self.keyboardNext.isUserInteractionEnabled = false
-        self.gameDrawerAdd.isUserInteractionEnabled = false
-        if(!self.currentSelectedGT.isEmpty && !self.currentSelectedConsole.isEmpty && !self.currentSelectedGame.isEmpty){
-            let currentGameProfile = GamerProfile(gamerTag: self.currentSelectedGT, game: self.currentSelectedGame, console: self.currentSelectedConsole, quizTaken: "false")
-            self.currentGameProfiles.append(currentGameProfile)
-        
-            UIView.animate(withDuration: 0.5, animations: {
-                self.gamerTagCover.alpha = 0
-                self.gamertagTag.alpha = 0
-                self.gameDrawerTagEntry.alpha = 0
-            }, completion: { (finished: Bool) in
-                UIView.animate(withDuration: 0.5, delay: 0.3, options: [], animations: {
-                    if(self.currentSelectedConsoles.contains(self.currentSelectedConsole)){
-                        self.currentSelectedConsoles.remove(at: self.currentSelectedConsoles.index(of: self.currentSelectedConsole)!)
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        self.showGamertag()
-                    }
-                }, completion: { (finished: Bool) in
-                    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: collectionView.bounds.size.width, height: CGFloat(120))
+    }
+    
+    func onModalReturn(){
+        if(returning){
+            DispatchQueue.main.async {
+                self.gameCollection.reloadData()
+                self.gameCollection.performBatchUpdates({ [weak self] in
+                        let visibleItems = self?.gameCollection.indexPathsForVisibleItems ?? []
+                        self?.gameCollection.reloadItems(at: visibleItems)
+                    }, completion: { (_) in
                 })
-            })
+                self.gameCollection.collectionViewLayout.invalidateLayout()
+                self.gameCollection.layoutSubviews()
+            }
+        } else {
+            DispatchQueue.main.async {
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                if(!appDelegate.currentUser!.games.isEmpty){
+                    self.advanceToResults()
+                }
+            }
         }
-    }
-    
-    @objc private func addGame(){
-        dismissKeyboard()
-        //add the one on screen now, whether there were more or not.
-        self.currentSelectedGT = self.gameDrawerTagEntry.text!.replacingOccurrences(of: "\\s+$", with: "", options: .regularExpression)
-        if(!self.currentSelectedGT.isEmpty && !self.currentSelectedConsole.isEmpty && !self.currentSelectedGame.isEmpty){
-            let currentGameProfile = GamerProfile(gamerTag: self.currentSelectedGT, game: self.currentSelectedGame, console: self.currentSelectedConsole, quizTaken: "false")
-            self.profiles.append(currentGameProfile)
-        }
-        
-        if(!currentGameProfiles.isEmpty){
-            self.profiles.append(contentsOf: self.currentGameProfiles)
-        }
-        self.selectedGames.append(self.currentSelectedGame)
-        self.gameTable.reloadData()
-        
-        self.dismissDrawer()
     }
     
     @objc private func advanceToResults(){
         UIView.animate(withDuration: 0.8, animations: {
             self.buildingBlur.alpha = 1
+            self.buildingAnimation.alpha = 1
         }, completion: { (finished: Bool) in
             UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
                 self.buildingHeader.alpha = 1
@@ -766,54 +512,6 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     private func updatePayload(){
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        let ref = Database.database().reference().child("Users").child(delegate.currentUser!.uId)
-        ref.child("games").setValue(selectedGames)
-        delegate.currentUser!.games = selectedGames
-        
-        var sendUp = [[String: String]]()
-        if(profiles.isEmpty){
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - No GC"))
-        } else {
-            for profile in self.profiles {
-                self.consoles.append(profile.console)
-                let currentProfile = ["gamerTag": profile.gamerTag, "game": profile.game, "console": profile.console]
-                sendUp.append(currentProfile)
-            }
-        }
-        delegate.currentUser!.gamerTags = self.profiles
-        
-        if(self.consoles.contains("pc")){
-            delegate.currentUser!.pc = true
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PC User"))
-        }
-        if(self.consoles.contains("xbox")){
-            delegate.currentUser!.xbox = true
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - xBox User"))
-        }
-        if(self.consoles.contains("ps")){
-            delegate.currentUser!.ps = true
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PS User"))
-        }
-        if(self.consoles.contains("nintendo")){
-            delegate.currentUser!.nintendo = true
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Nintendo User"))
-        }
-        
-        if(!self.currentSelectedGT.isEmpty && delegate.currentUser!.gamerTag.isEmpty){
-            ref.child("gamerTag").setValue(self.currentSelectedGT)
-            delegate.currentUser!.gamerTag = self.currentSelectedGT
-        }
-        ref.child("gamerTags").setValue(sendUp)
-        ref.child("consoles").child("ps").setValue(self.consoles.contains("ps"))
-        ref.child("consoles").child("xbox").setValue(self.consoles.contains("xbox"))
-        ref.child("consoles").child("nintendo").setValue(self.consoles.contains("nintendo"))
-        ref.child("consoles").child("pc").setValue(self.consoles.contains("pc"))
-        ref.child("consoles").child("mobile").setValue(self.consoles.contains("mobile"))
-        
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Update - GC"))
-        
-        
         if(self.modalPopped){
             self.upgradeFrag?.dismissModal()
             self.dismiss(animated: true) {
@@ -827,57 +525,13 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     private func sendPayload(){
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        let ref = Database.database().reference().child("Users").child(delegate.currentUser!.uId)
-        ref.child("games").setValue(selectedGames)
-        delegate.currentUser!.games = selectedGames
-        
-        var sendUp = [[String: String]]()
-        if(profiles.isEmpty){
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - No GC"))
-        } else {
-            for profile in self.profiles {
-                self.consoles.append(profile.console)
-                let currentProfile = ["gamerTag": profile.gamerTag, "game": profile.game, "console": profile.console]
-                sendUp.append(currentProfile)
-            }
-        }
-        delegate.currentUser!.gamerTags = self.profiles
-        
-        if(self.consoles.contains("pc")){
-            delegate.currentUser!.pc = true
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PC User"))
-        }
-        if(self.consoles.contains("xbox")){
-            delegate.currentUser!.xbox = true
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - xBox User"))
-        }
-        if(self.consoles.contains("ps")){
-            delegate.currentUser!.ps = true
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - PS User"))
-        }
-        if(self.consoles.contains("nintendo")){
-            delegate.currentUser!.nintendo = true
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Nintendo User"))
-        }
-        
-        if(!self.currentSelectedGT.isEmpty && delegate.currentUser!.gamerTag.isEmpty){
-            ref.child("gamerTag").setValue(self.currentSelectedGT)
-            delegate.currentUser!.gamerTag = self.currentSelectedGT
-        }
-        ref.child("gamerTags").setValue(sendUp)
-        ref.child("consoles").child("ps").setValue(self.consoles.contains("ps"))
-        ref.child("consoles").child("xbox").setValue(self.consoles.contains("xbox"))
-        ref.child("consoles").child("nintendo").setValue(self.consoles.contains("nintendo"))
-        ref.child("consoles").child("pc").setValue(self.consoles.contains("pc"))
-        ref.child("consoles").child("mobile").setValue(self.consoles.contains("mobile"))
-        
         let manager = delegate.socialMediaManager
         manager.getTwitchAppToken(token: nil, uid: delegate.currentUser!.uId)
         
         AppEvents.logEvent(AppEvents.Name(rawValue: "Register - GC"))
         
         if(!self.returning && !delegate.currentUser!.gamerTag.isEmpty){
-            self.buildUserCache()
+            self.proceedToResults()
         } else {
             if(self.modalPopped){
                 upgradeFrag?.dismissModal()

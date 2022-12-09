@@ -78,6 +78,8 @@ protocol RequestsUpdate: class{
     func friendRemoveFail()
     func onlineAnnounceSent()
     func onlineAnnounceFail()
+    func onFollowSuccess()
+    func onFollowBackSuccess()
 }
 
 protocol TeamCallbacks: class{

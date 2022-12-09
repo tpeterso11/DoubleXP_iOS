@@ -19,6 +19,7 @@ class ProfileUnknownInteractionCell: UITableViewCell {
     @IBOutlet weak var noFriendsCover: UIView!
     @IBOutlet weak var noFriendsEdit: UIButton!
     @IBOutlet weak var currentUserBlur: UIVisualEffectView!
+    @IBOutlet weak var requestTag: UILabel!
     
     @IBOutlet weak var editButton: UIButton!
 }

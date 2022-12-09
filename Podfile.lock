@@ -87,6 +87,7 @@ PODS:
     - FlagPhoneNumber/libPhoneNumberiOS (= 0.8.0)
   - FlagPhoneNumber/libPhoneNumberiOS (0.8.0)
   - FoldingCell (5.0.2)
+  - FRadioPlayer (0.1.22)
   - GeoFire (4.1.0):
     - Firebase/Database (~> 6.0)
     - GeoFire/Utils (= 4.1.0)
@@ -198,6 +199,7 @@ DEPENDENCIES:
   - Firebase/Messaging
   - FlagPhoneNumber
   - FoldingCell
+  - FRadioPlayer
   - GeoFire (~> 4.0)
   - Google-Mobile-Ads-SDK
   - GoogleSignIn
@@ -248,6 +250,7 @@ SPEC REPOS:
     - FirebaseMessaging
     - FlagPhoneNumber
     - FoldingCell
+    - FRadioPlayer
     - GeoFire
     - Google-Mobile-Ads-SDK
     - GoogleAppMeasurement
@@ -318,6 +321,7 @@ SPEC CHECKSUMS:
   FirebaseMessaging: 5eca4ef173de76253352511aafef774caa1cba2a
   FlagPhoneNumber: 3712455b95f66cb0f2016fef7d9e34cddf8c7f9a
   FoldingCell: f92eb5fb9842319e7cd08c71533c98408b785099
+  FRadioPlayer: 7c6173cc44a3be39a9419abd3a931d9223e175e4
   GeoFire: 8372fdf980b5ef1df6767dba7ff79288fad34612
   Google-Mobile-Ads-SDK: 8b58584890539de4527c47ef01e4da941a10bc8a
   GoogleAppMeasurement: a6a3a066369828db64eda428cb2856dc1cdc7c4e
@@ -358,6 +362,6 @@ SPEC CHECKSUMS:
   YoutubeKit: 9f66eba839211158f2aac7ad3833593bd56fa8f9
   YoutubePlayerView: 3870fc10f2db3f54156697757f44d304203bdc7e
 
-PODFILE CHECKSUM: 1cc9435bab79df939bcc8d4e29a85be5ecbb89e6
+PODFILE CHECKSUM: 5261db8a747abad5fa6d31ec37f34385dfc4e0ce
 
-COCOAPODS: 1.9.1
+COCOAPODS: 1.11.3

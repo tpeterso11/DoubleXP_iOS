@@ -17,51 +17,41 @@ class Results: UIViewController, UITableViewDataSource, UITableViewDelegate, SPS
     var returning = false
     var userUid = ""
     var currentUpgradeChoice = ""
+    var animatedTitles = [String]()
     @IBOutlet weak var resultTable: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.currentResultsFrag = self
         buildPayload()
     }
     
+    func onModalReturn(){
+        self.resultTable.reloadData()
+    }
+    
     private func buildPayload(){
-        let delegate = UIApplication.shared.delegate as! AppDelegate
         payload = [Any]()
         
         payload.append("header") //header "we did it!"
+        //payload.append("gif")
         
         if(isKeyPresentInUserDefaults(key: "registered")){
             self.returning = true
         }
         
-        if(!returning){
-            if(!delegate.registerUserCache.isEmpty){
-                let usersPayload = [delegate.cachedUserType: delegate.registerUserCache]
-                payload.append(usersPayload)
-            } else {
-                let usersPayload = [delegate.cachedUserType: createDefaultList()]
-                payload.append(usersPayload)
-            }
-        }
+        payload.append("toolsHeader")
         
-        let currentUser = delegate.currentUser!
-        let games = currentUser.games
+        let optionAbout = UpgradeOption()
+        optionAbout.title = "tell us about you"
+        optionAbout.sub = "pick the tags that describe you the best."
+        payload.append(optionAbout)
         
-        for game in delegate.gcGames {
-            //if((game.hasQuiz && games.contains(game.gameName)) || (game.statsAvailable && games.contains(game.gameName))){
-            if((!game.quizUrl.isEmpty && games.contains(game.gameName))){
-                payload.append("toolsHeader")
-                break
-            }
-        }
-        //quizzes
-        for game in delegate.gcGames {
-            if(!game.quizUrl.isEmpty && games.contains(game.gameName)){
-                payload.append(0)
-                break
-            }
-        }
+        let optionLooking = UpgradeOption()
+        optionLooking.title = "tell us what you're looking for"
+        optionLooking.sub = "pick the tags that describe your dream teammate would be."
+        payload.append(optionLooking)
         //stats
         /*for game in delegate.gcGames {
             if(game.statsAvailable && games.contains(game.gameName)){
@@ -88,13 +78,9 @@ class Results: UIViewController, UITableViewDataSource, UITableViewDelegate, SPS
         if(current is String){
             if((current as! String) == "header"){
                 let cell = tableView.dequeueReusableCell(withIdentifier: "header", for: indexPath) as! ResultsHeaderCell
-                if(self.returning){
-                    cell.header.text = "welcome back!"
-                    cell.sub.text = "now, let's see how we can upgrade your profile."
-                } else {
-                    cell.header.text = "we did it!"
-                    cell.sub.text = "i knew we could..."
-                }
+                cell.header.text = "we did it!"
+                cell.sub.text = "i knew we could..."
+                
                 cell.header.alpha = 1
                 cell.header.isHidden = false
                 
@@ -116,6 +102,12 @@ class Results: UIViewController, UITableViewDataSource, UITableViewDelegate, SPS
                 let cell = tableView.dequeueReusableCell(withIdentifier: "toolsHeader", for: indexPath) as! EmptyCell
                 return cell
             }
+            else if((current as! String) == "gif"){
+                let cell = tableView.dequeueReusableCell(withIdentifier: "gif", for: indexPath) as! TestGifCell
+                let img = UIImage.gifImageWithURL("https://firebasestorage.googleapis.com/v0/b/gameterminal-767f7.appspot.com/o/xxhdpi%2FAcclaimedLivelyChuckwalla-size_restricted.gif?alt=media&token=be781e7c-f5b2-4efc-a77d-1a78439ff2c0")
+                cell.gifImg.image = img
+                return cell
+            }
         }
         if(current is [String: [User]]){
             let current = (current as! [String: [User]])
@@ -125,45 +117,59 @@ class Results: UIViewController, UITableViewDataSource, UITableViewDelegate, SPS
             cell.setUserList(list: values[0], type: delegate.cachedUserType, resultsConroller: self)
             return cell
         }
-        if(current is Int){
-            //if((current as! Int) == 0){
-                let cell = tableView.dequeueReusableCell(withIdentifier: "upgrade", for: indexPath) as! ResultsUpgradeCell
-                cell.header.text = "take a free agent quiz"
-                cell.sub.text = "let them know how you play."
-                
-                let cellTap = UpgradeTapGesture(target: self, action: #selector(proceedUpgrade))
-                cellTap.tag = indexPath.item
-                cell.isUserInteractionEnabled = true
-                cell.contentView.addGestureRecognizer(cellTap)
-                return cell
-            /*} else {
-                let cell = tableView.dequeueReusableCell(withIdentifier: "upgrade", for: indexPath) as! ResultsUpgradeCell
-                cell.header.text = "import stats"
-                cell.sub.text = "let them know how good you are."
-                
-                let cellTap = UpgradeTapGesture(target: self, action: #selector(proceedUpgrade))
-                cellTap.tag = indexPath.item
-                cell.isUserInteractionEnabled = true
-                cell.contentView.addGestureRecognizer(cellTap)
-                return cell
-            }*/
+        if(current is UpgradeOption){
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            let cell = tableView.dequeueReusableCell(withIdentifier: "upgrade", for: indexPath) as! ResultsUpgradeCell
+            cell.header.text = (current as! UpgradeOption).title
+            cell.sub.text = (current as! UpgradeOption).sub
+            
+            if((current as! UpgradeOption).title == "tell us about you"){
+                cell.upgradeImage.image = #imageLiteral(resourceName: "profile_cta.jpg")
+                if(delegate.currentUser!.userAbout.isEmpty){
+                    cell.completedOverlay.alpha = 0
+                } else {
+                    cell.completedOverlay.alpha = 1
+                    if(self.animatedTitles.contains("tell us about you")){
+                        cell.completeAnimation.currentFrame = cell.completeAnimation.animation?.endFrame ?? 0
+                    } else {
+                        self.animatedTitles.append("tell us about you")
+                        cell.completeAnimation.play()
+                    }
+                }
+            }
+            if((current as! UpgradeOption).title == "take a free agent quiz"){
+                cell.upgradeImage.image = #imageLiteral(resourceName: "test_img.jpg")
+            }
+            if((current as! UpgradeOption).title == "tell us what you're looking for"){
+                cell.upgradeImage.image = #imageLiteral(resourceName: "test_mobile_img.jpg")
+                if(delegate.currentUser!.userLookingFor.isEmpty){
+                    cell.completedOverlay.alpha = 0
+                } else {
+                    cell.completedOverlay.alpha = 1
+                    if(self.animatedTitles.contains("tell us what you're looking for")){
+                        cell.completeAnimation.currentFrame = cell.completeAnimation.animation?.endFrame ?? 0
+                    } else {
+                        self.animatedTitles.append("tell us what you're looking for")
+                        cell.completeAnimation.play()
+                    }
+                }
+            }
+            
+            let cellTap = UpgradeTapGesture(target: self, action: #selector(proceedUpgrade))
+            cellTap.tag = indexPath.item
+            cell.isUserInteractionEnabled = true
+            cell.contentView.addGestureRecognizer(cellTap)
+            return cell
         }
         if(current is Bool){
             let cell = tableView.dequeueReusableCell(withIdentifier: "button", for: indexPath) as! ResultsButtonCell
-            if(returning){
-                cell.header.text = "you keep gaming."
-                cell.sub.text = "we'll keep finding ways to get you gaming."
-                cell.button.titleLabel!.text = "done."
-            } else {
-                cell.header.text = "we've kept you long enough"
-                cell.sub.text = "let's get you back in the game."
-                cell.button.titleLabel!.text = "done."
-            }
+            cell.header.text = "we've kept you long enough"
+            cell.sub.text = "let's get you back in the game."
+            cell.button.titleLabel!.text = "done."
             cell.button.addTarget(self, action: #selector(self.proceedHome), for: .touchUpInside)
             return cell
         }
-        
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! GameSelectionV2Cell
+        let cell = tableView.dequeueReusableCell(withIdentifier: "header", for: indexPath) as! ResultsHeaderCell
         return cell
     }
     
@@ -173,13 +179,36 @@ class Results: UIViewController, UITableViewDataSource, UITableViewDelegate, SPS
     }
     
     @objc private func proceedUpgrade(sender: UpgradeTapGesture){
-        let current = payload[sender.tag] as? Int ?? -1
-        if(current == 0){
-            currentUpgradeChoice = "quiz"
-        } /*else {
-            currentUpgradeChoice = "stats"
-        }*/
-        performSegue(withIdentifier: "upgrade", sender: self)
+        let current = payload[sender.tag]
+        
+        if((current as? UpgradeOption)?.title == "tell us about you"){
+            let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "aboutYou") as! AboutYouDrawer
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            let transitionDelegate = SPStorkTransitioningDelegate()
+            currentViewController.transitioningDelegate = transitionDelegate
+            currentViewController.modalPresentationStyle = .custom
+            currentViewController.modalPresentationCapturesStatusBarAppearance = true
+            currentViewController.usersSelected = delegate.currentUser!.userAbout
+            transitionDelegate.showIndicator = true
+            transitionDelegate.swipeToDismissEnabled = true
+            transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+            transitionDelegate.storkDelegate = self
+            self.present(currentViewController, animated: true, completion: nil)
+        }
+        if((current as! UpgradeOption).title == "tell us what you're looking for"){
+            let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "looking") as! LookingFor
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            let transitionDelegate = SPStorkTransitioningDelegate()
+            currentViewController.transitioningDelegate = transitionDelegate
+            currentViewController.modalPresentationStyle = .custom
+            currentViewController.modalPresentationCapturesStatusBarAppearance = true
+            currentViewController.usersSelected = delegate.currentUser!.userLookingFor
+            transitionDelegate.showIndicator = true
+            transitionDelegate.swipeToDismissEnabled = true
+            transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+            transitionDelegate.storkDelegate = self
+            self.present(currentViewController, animated: true, completion: nil)
+        }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -244,4 +273,9 @@ class Results: UIViewController, UITableViewDataSource, UITableViewDelegate, SPS
 
 class UpgradeTapGesture: UITapGestureRecognizer {
     var tag: Int!
+}
+
+class UpgradeOption {
+    var title: String!
+    var sub: String!
 }

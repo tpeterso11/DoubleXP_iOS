@@ -97,6 +97,7 @@ class AboutYouDrawer: UIViewController, UITableViewDelegate, UITableViewDataSour
         ref.child("aboutMe").setValue(self.usersSelected)
         appDelegate.currentUser!.userAbout = self.usersSelected
         upgrade?.updateButtons()
+        appDelegate.currentResultsFrag?.onModalReturn()
         self.dismiss(animated: true, completion: nil)
     }
 }
