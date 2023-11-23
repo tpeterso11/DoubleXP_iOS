@@ -8,9 +8,8 @@
 
 import Foundation
 import UIKit
-//import collection_view_layouts
 
-class LookingForOptions: UITableViewCell, UICollectionViewDelegate, UICollectionViewDataSource {
+class LookingForOptions: UITableViewCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     @IBOutlet weak var lookingForOptionCollection: UICollectionView!
     var payload = [String]()
@@ -24,12 +23,18 @@ class LookingForOptions: UITableViewCell, UICollectionViewDelegate, UICollection
         self.currentSelection = selection
         self.currentLookingFor = lookingFor
 
-        //let alignedFlowLayout = AlignedCollectionViewFlowLayout(horizontalAlignment: .left, verticalAlignment: .top)
-       // alignedFlowLayout.estimatedItemSize = .init(width: 100, height: 40)
-        //self.lookingForOptionCollection.collectionViewLayout = alignedFlowLayout
-        lookingForOptionCollection.delegate = self
-        lookingForOptionCollection.dataSource = self
-        lookingForOptionCollection.reloadData()
+        /*let alignedFlowLayout = AlignedCollectionViewFlowLayout(horizontalAlignment: .left, verticalAlignment: .top)
+        alignedFlowLayout.estimatedItemSize = .init(width: 100, height: 40)
+        self.lookingForOptionCollection.collectionViewLayout = alignedFlowLayout*/
+        if(!set){
+            self.set = true
+            //let tagCellLayout = UserProfileTagsFlowLayout()
+            //self.lookingForOptionCollection.collectionViewLayout = tagCellLayout
+            lookingForOptionCollection.delegate = self
+            lookingForOptionCollection.dataSource = self
+        } else {
+            lookingForOptionCollection.reloadData()
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -57,6 +62,28 @@ class LookingForOptions: UITableViewCell, UICollectionViewDelegate, UICollection
         
         return cell
     }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+            let tag = self.payload[indexPath.row]
+            let font = UIFont.systemFont(ofSize: 14.0)
+            let size = tag.size(withAttributes: [NSAttributedString.Key.font: font])
+            let dynamicCellWidth = size.width
+
+            /*
+              The "+ 20" gives me the padding inside the cell
+            */
+            return CGSize(width: dynamicCellWidth + 20, height: 40)
+        }
+        
+        // Space between rows
+        func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+            return 5
+        }
+        
+        // Space between cells
+        func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+            return 10
+        }
     
     override func systemLayoutSizeFitting(_ targetSize: CGSize, withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority, verticalFittingPriority: UILayoutPriority) -> CGSize {
             // `collectionView.contentSize` has a wrong width because in this nested example, the sizing pass occurs before the layout pass,

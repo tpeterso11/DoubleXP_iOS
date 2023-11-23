@@ -17,7 +17,7 @@ class AlertsDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource
     @IBOutlet weak var alertsTable: UITableView!
     @IBOutlet weak var alertsImg: UIImageView!
     @IBOutlet weak var alertWorkOverlay: UIVisualEffectView!
-    @IBOutlet weak var workAnimation: AnimationView!
+    @IBOutlet weak var workAnimation: LottieAnimationView!
     @IBOutlet weak var kobeHeader: UILabel!
     @IBOutlet weak var clearButton: UIButton!
     var dataSet = false

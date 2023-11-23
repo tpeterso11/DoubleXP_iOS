@@ -633,6 +633,16 @@ class User: NSObject, NSCoding {
         }
     }
     
+    var _myPosts = [PostObject]()
+    var myPosts:[PostObject] {
+        get {
+            return (_myPosts)
+        }
+        set (newVal) {
+            _myPosts = newVal
+        }
+    }
+    
     var _viewedPosts: [String]? = [String]()
        var viewedPosts: [String] {
            get {
@@ -649,6 +659,9 @@ class User: NSObject, NSCoding {
             count += 1
         }
         if(!twitchConnect.isEmpty){
+            count += 1
+        }
+        if(!discordConnect.isEmpty){
             count += 1
         }
         
@@ -768,6 +781,7 @@ class User: NSObject, NSCoding {
         self.followerAnnouncements = (decoder.decodeObject(forKey: "followerAnnouncements") as! [FriendObject])
         self.posts = (decoder.decodeObject(forKey: "posts") as! [PostObject])
         self.receivedPosts = (decoder.decodeObject(forKey: "receivedPosts") as! [PostObject])
+        self.myPosts = (decoder.decodeObject(forKey: "myPosts") as! [PostObject])
         self.viewedPosts = (decoder.decodeObject(forKey: "viewedPosts") as! [String])
     }
     
@@ -821,6 +835,7 @@ class User: NSObject, NSCoding {
         coder.encode(self.posts, forKey: "posts")
         coder.encode(self.receivedPosts, forKey: "receivedPosts")
         coder.encode(self.viewedPosts, forKey: "viewedPosts")
+        coder.encode(self.myPosts, forKey: "myPosts")
     }
     
     struct Post: Hashable, Equatable {

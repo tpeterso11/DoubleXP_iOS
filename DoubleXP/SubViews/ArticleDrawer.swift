@@ -45,8 +45,8 @@ class ArticleDrawer: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @IBOutlet weak var articleTable: UITableView!
     @IBOutlet weak var articleVideoView: UIView!
     @IBOutlet weak var scoobLoading: UIVisualEffectView!
-    @IBOutlet weak var scoob: AnimationView!
     @IBOutlet weak var scoobSub: UIView!
+    @IBOutlet weak var scoob: LottieAnimationView!
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -142,11 +142,11 @@ class ArticleDrawer: UIViewController, UITableViewDelegate, UITableViewDataSourc
         let current = self.articlePayload[indexPath.item]
         let cell = tableView.dequeueReusableCell(withIdentifier: "text", for: indexPath) as! ArticleTextCell
         
-        let groupStyle = StyleXML.init(base: styleBase, ["strong" : testAttr])
+        /*let groupStyle = StyleXML.init(base: styleBase, ["strong" : testAttr])
         let attr = (current as! String).htmlToAttributedString
                       
         cell.label.attributedText = attr?.string.set(style: groupStyle)
-        cell.label.font = UIFont(name: cell.label.font!.fontName, size: 18)
+        cell.label.font = UIFont(name: cell.label.font!.fontName, size: 18)*/
         
         return cell
     }
@@ -164,11 +164,11 @@ class ArticleDrawer: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.showScoob()
         
         if(newsObj.source == "gs"){
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Media - GS Video Selected"))
+            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Media - GS Video Selected"))
             delegate.mediaManager.downloadVideo(title: newsObj.title, url: newsObj.videoUrl, callbacks: self)
         }
         else{
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Media - DXP Video Selected"))
+            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Media - DXP Video Selected"))
             self.onVideoLoaded(url: newsObj.videoUrl)
         }
     }

@@ -12,7 +12,6 @@ import Lottie
 
 class DistanceCell : UITableViewCell {
     
-    @IBOutlet weak var lottie: AnimationView!
     @IBOutlet weak var howFar: UILabel!
     @IBOutlet weak var cover: UIView!
     @IBOutlet weak var fifty: UIView!

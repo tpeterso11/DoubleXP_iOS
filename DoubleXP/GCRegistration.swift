@@ -29,7 +29,8 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     @IBOutlet weak var overBox: UIView!
     @IBOutlet weak var overCover: UIView!
     
-    @IBOutlet weak var locationAnimationLight: AnimationView!
+    
+    @IBOutlet weak var locationAnimationLight: LottieAnimationView!
     @IBOutlet weak var five: UILabel!
     @IBOutlet weak var four: UILabel!
     @IBOutlet weak var three: UILabel!
@@ -52,7 +53,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     @IBOutlet weak var femaleBox: UIView!
     @IBOutlet weak var maleBox: UIView!
     @IBOutlet weak var genderLayout: UIView!
-    @IBOutlet weak var locationAnimation: AnimationView!
+    @IBOutlet weak var locationAnimation: LottieAnimationView!
     @IBOutlet weak var refuseLocation: UIButton!
     @IBOutlet weak var allowLocation: UIButton!
     @IBOutlet weak var locationLayout: UIView!
@@ -63,7 +64,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     @IBOutlet weak var drawer: UIView!
     @IBOutlet weak var startLayout: UIView!
     @IBOutlet weak var startProfileButton: UIButton!
-    @IBOutlet weak var celebrateAnimation: AnimationView!
+    @IBOutlet weak var celebrateAnimation: LottieAnimationView!
     @IBOutlet weak var gcContinueButton: UIButton!
     @IBOutlet weak var skipCover: UIView!
     var consoles = [String]()

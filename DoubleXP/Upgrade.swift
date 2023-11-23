@@ -21,7 +21,7 @@ class Upgrade: UIViewController, UITableViewDelegate, UITableViewDataSource, Sta
     @IBOutlet weak var header: UILabel!
     //@IBOutlet weak var sub: UILabel!
     @IBOutlet weak var lookingForButton: UIButton!
-    @IBOutlet weak var animation: AnimationView!
+    @IBOutlet weak var animation: LottieAnimationView!
     @IBOutlet weak var updateButton: UIButton!
     @IBOutlet weak var quizQuestion: UIImageView!
     @IBOutlet weak var addGamesButton: UIButton!

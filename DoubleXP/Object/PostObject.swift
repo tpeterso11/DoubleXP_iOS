@@ -20,6 +20,16 @@ class PostObject: NSObject, NSCoding {
         }
     }
     
+    var _date:String? = ""
+    var date:String {
+        get {
+            return (_date)!
+        }
+        set (newVal) {
+            _date = newVal
+        }
+    }
+    
     var _postId:String? = ""
     var postId:String {
         get {
@@ -80,16 +90,6 @@ class PostObject: NSObject, NSCoding {
            }
        }
     
-    var _date:String? = ""
-       var date:String {
-           get {
-               return (_date)!
-           }
-           set (newVal) {
-               _date = newVal
-           }
-       }
-    
     var _game:String? = ""
        var game:String {
            get {
@@ -107,6 +107,16 @@ class PostObject: NSObject, NSCoding {
            }
            set (newVal) {
                _upVotes = newVal
+           }
+       }
+    
+    var _comments: [VideoCommentObject]? = [VideoCommentObject]()
+       var comments: [VideoCommentObject] {
+           get {
+               return (_comments)!
+           }
+           set (newVal) {
+               _comments = newVal
            }
        }
     
@@ -140,9 +150,20 @@ class PostObject: NSObject, NSCoding {
            }
        }
     
-    init(title: String, videoOwnerGamerTag: String, videoOwnerUid: String, publicPost: String, date: String, youtubeId: String, imgUrl: String, postConsole: String, game: String)
+    var _viewedUids: [String]? = [String]()
+       var viewedUids: [String] {
+           get {
+               return (_viewedUids)!
+           }
+           set (newVal) {
+               _viewedUids = newVal
+           }
+       }
+    
+    init(postId: String, title: String, videoOwnerGamerTag: String, videoOwnerUid: String, publicPost: String, date: String, youtubeId: String, imgUrl: String, postConsole: String, game: String)
     {
         super.init()
+        self.postId = postId
         self.title = title
         self.videoOwnerGamerTag = videoOwnerGamerTag
         self.videoOwnerUid = videoOwnerUid
@@ -169,6 +190,10 @@ class PostObject: NSObject, NSCoding {
         self.recipientIds = (decoder.decodeObject(forKey: "recipientIds") as! [String])
         self.postConsole = (decoder.decodeObject(forKey: "postConsole") as! String)
         self.game = (decoder.decodeObject(forKey: "game") as! String)
+        self.date = (decoder.decodeObject(forKey: "date") as! String)
+        self.postId = (decoder.decodeObject(forKey: "postId") as! String)
+        self.comments = (decoder.decodeObject(forKey: "postId") as! [VideoCommentObject])
+        self.viewedUids = (decoder.decodeObject(forKey: "viewedUids") as! [String])
     }
     
     func encode(with coder: NSCoder) {
@@ -184,5 +209,8 @@ class PostObject: NSObject, NSCoding {
         coder.encode(self.recipientIds, forKey: "recipientIds")
         coder.encode(self.postConsole, forKey: "postConsole")
         coder.encode(self.game, forKey: "game")
+        coder.encode(self.postId, forKey: "postId")
+        coder.encode(self.comments, forKey: "comments")
+        coder.encode(self.viewedUids, forKey: "viewedUids")
     }
 }

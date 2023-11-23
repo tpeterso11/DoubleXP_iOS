@@ -12,31 +12,33 @@ import UnderLineTextField
 import FBSDKCoreKit
 import Lottie
 import FirebaseDatabase
+import SceneKit
 
 class FeedHeaderCell : UITableViewCell {
     
+    @IBOutlet weak var HeaderWelcomeTex: UILabel!
+    @IBOutlet weak var scene: SCNView!
     @IBOutlet weak var headerHeight: NSLayoutConstraint!
-    @IBOutlet weak var todayImg: UIImageView!
     @IBOutlet weak var dynamicSub: UILabel!
     @IBOutlet weak var hero: UIImageView!
     @IBOutlet weak var headerText: UILabel!
     //@IBOutlet weak var headerSearch: UnderLineTextField!
+    @IBOutlet weak var hookupBackgroundImg: UIImageView!
     @IBOutlet weak var gameCollection: UICollectionView!
     @IBOutlet weak var hookupLayout: UIView!
-    @IBOutlet weak var todayBlur: UIVisualEffectView!
     @IBOutlet weak var justHereForTheBlur: UIView!
     @IBOutlet weak var requestAmount: UILabel!
     @IBOutlet weak var alertsAmount: UILabel!
     @IBOutlet weak var requestsLayout: UIView!
     @IBOutlet weak var alertsLayout: UIView!
     @IBOutlet weak var todayNotificationDot: UIImageView!
-    @IBOutlet weak var todayLoadingBlur: UIVisualEffectView!
-    @IBOutlet weak var todayLoadingAnimation: AnimationView!
     @IBOutlet weak var todayOnlineStatus: UIImageView!
     @IBOutlet weak var startLayout: UIView!
     @IBOutlet weak var green: UIView!
     @IBOutlet weak var messageLayout: UIView!
     @IBOutlet weak var red: UIView!
+    @IBOutlet weak var alertsBackground: UIImageView!
+    @IBOutlet weak var requestsBackground: UIImageView!
     var feedFrag: Feed?
     var dataSet = false
     var recommendedLoaded = false
@@ -49,13 +51,39 @@ class FeedHeaderCell : UITableViewCell {
         let defaults = UserDefaults.standard
         if(defaults.bool(forKey: "landing_returning") == true){
             if(appDelegate.currentUser!.gamerTag.isEmpty){
-                self.headerText.text = "welcome back!"
+                self.HeaderWelcomeTex.text = "welcome back!"
+                self.headerText.text = ""
             } else {
-                self.headerText.text = "welcome back, " + appDelegate.currentUser!.gamerTag + "!"
+                self.HeaderWelcomeTex.text = "welcome back,"
+                self.headerText.text = appDelegate.currentUser!.gamerTag + "!"
             }
         } else {
             defaults.set(true, forKey: "landing_returning")
-            self.headerText.text = "welcome!"
+            self.HeaderWelcomeTex.text = "welcome!"
+            self.headerText.text = ""
+        }
+        
+        if(appDelegate.recommendedUsersManager.recommendationsAvailable()){
+            self.hookupBackgroundImg.image = UIImage(named: "test_hookup")
+            
+            let hookupTap = UITapGestureRecognizer(target: self, action: #selector(hookupClicked))
+            self.hookupLayout.isUserInteractionEnabled = true
+            self.hookupLayout.addGestureRecognizer(hookupTap)
+        } else {
+            self.hookupBackgroundImg.image = UIImage(named: "testhookupempty")
+        }
+        
+        if(appDelegate.currentUser!.acceptedTempRivals.isEmpty && appDelegate.currentUser!.rejectedTempRivals.isEmpty &&
+           appDelegate.currentUser!.receivedAnnouncements.isEmpty && appDelegate.currentUser!.followerAnnouncements.isEmpty){
+            self.alertsBackground.image = UIImage(named: "testalertempty")
+        } else {
+            self.alertsBackground.image = UIImage(named: "testalert")
+        }
+        
+        if(appDelegate.currentUser!.pendingRequests.isEmpty && appDelegate.currentUser!.tempRivals.isEmpty){
+            self.requestsBackground.image = UIImage(named: "testrequestsempty")
+        } else {
+            self.requestsBackground.image = UIImage(named: "testrequests")
         }
         
         if(self.headerText.alpha == 0){
@@ -74,7 +102,6 @@ class FeedHeaderCell : UITableViewCell {
             if(cache.object(forKey: appDelegate.heroDarkUrl as NSString) != nil){
                 hero.image = cache.object(forKey: appDelegate.heroDarkUrl as NSString)
             } else {
-                hero.image = Utility.Image.placeholder
                 hero.moa.onSuccess = { image in
                     self.hero.image = image
                     appDelegate.imageCache.setObject(image, forKey: appDelegate.heroDarkUrl as NSString)
@@ -89,7 +116,6 @@ class FeedHeaderCell : UITableViewCell {
             if(cache.object(forKey: appDelegate.heroLightUrl as NSString) != nil){
                 hero.image = cache.object(forKey: appDelegate.heroLightUrl as NSString)
             } else {
-                hero.image = Utility.Image.placeholder
                 hero.moa.onSuccess = { image in
                     self.hero.image = image
                     appDelegate.imageCache.setObject(image, forKey: appDelegate.heroLightUrl as NSString)
@@ -118,49 +144,6 @@ class FeedHeaderCell : UITableViewCell {
         
         //sub
         dynamicSub.text = appDelegate.feedSub
-        
-        //today blur
-        if self.traitCollection.userInterfaceStyle == .dark {
-            self.todayImg.image = #imageLiteral(resourceName: "test_twitch_header.jpg")
-        } else {
-            self.todayImg.image = #imageLiteral(resourceName: "discover_2.jpg")
-        }
-        
-        self.todayBlur.layer.cornerRadius = 15.0
-        self.todayBlur.layer.borderWidth = 1.0
-        self.todayBlur.layer.borderColor = UIColor.clear.cgColor
-        self.todayBlur.layer.masksToBounds = true
-    
-        if(self.todayBlur.alpha == 0 && !todayAnimated && !todayAnimating){
-            self.feedFrag?.todayAnimating = true
-            self.todayBlur.isHidden = false
-            self.todayBlur.contentView.alpha = 0
-            UIView.animate(withDuration: 0.8, delay: 1.5, options: [], animations: {
-                self.todayBlur.alpha = 1
-            }, completion: { (finished: Bool) in
-                UIView.animate(withDuration: 0.5, animations: {
-                    self.todayImg.alpha = 1
-                    //self.justHereForTheBlur.alpha = 1
-                }, completion: { (finished: Bool) in
-                    self.todayLoadingBlur.isHidden = false
-                    UIView.animate(withDuration: 0.5, animations: {
-                        self.todayLoadingBlur.alpha = 1
-                        self.todayLoadingAnimation.loopMode = .loop
-                        self.todayLoadingAnimation.play()
-                    }, completion: { (finished: Bool) in
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                            self.fetchTodayInfo()
-                        }
-                    })
-                })
-            })
-        } else if(todayAnimated && !todayAnimating){
-            self.todayBlur.alpha = 1
-            self.todayImg.alpha = 1
-            self.justHereForTheBlur.alpha = 1
-            self.todayBlur.contentView.alpha = 1
-            self.todayBlur.isHidden = false
-        }
     
         self.messageLayout.layer.shadowColor = UIColor.black.cgColor
         self.messageLayout.layer.shadowOffset = CGSize(width: 0, height: 2.0)
@@ -168,20 +151,6 @@ class FeedHeaderCell : UITableViewCell {
         self.messageLayout.layer.shadowOpacity = 0.5
         self.messageLayout.layer.masksToBounds = false
         self.messageLayout.layer.shadowPath = UIBezierPath(roundedRect: self.messageLayout.bounds, cornerRadius: self.messageLayout.layer.cornerRadius).cgPath
-        
-        self.startLayout.layer.shadowColor = UIColor.black.cgColor
-        self.startLayout.layer.shadowOffset = CGSize(width: 0, height: 2.0)
-        self.startLayout.layer.shadowRadius = 2.0
-        self.startLayout.layer.shadowOpacity = 0.5
-        self.startLayout.layer.masksToBounds = false
-        self.startLayout.layer.shadowPath = UIBezierPath(roundedRect: self.startLayout.bounds, cornerRadius: self.startLayout.layer.cornerRadius).cgPath
-        
-        UIView.animate(withDuration: 0.8, delay: 2.0, options: [], animations: {
-            self.startLayout.alpha = 1
-            self.messageLayout.alpha = 1
-        }, completion: { (finished: Bool) in
-            
-        })
         
         let alertsTap = UITapGestureRecognizer(target: self, action: #selector(alertsClicked))
         self.alertsLayout.isUserInteractionEnabled = true
@@ -204,8 +173,23 @@ class FeedHeaderCell : UITableViewCell {
         self.red.clipsToBounds = true
         self.red.layer.cornerRadius = 10
         self.red.layer.maskedCorners = [.layerMinXMinYCorner, .layerMinXMaxYCorner]
-        
-        self.headerHeight.constant = 350
+        self.justHereForTheBlur.alpha = 1
+        self.animateHeader()
+        //self.headerHeight.constant = 350
+    }
+    
+    private func animateHeader(){
+        UIView.animate(withDuration: 0.8, delay: 0.5, options: [], animations: {
+            self.requestsLayout.alpha = 1
+            self.alertsLayout.alpha = 1
+            self.hookupLayout.alpha = 1
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.8, delay: 0.3, options: [], animations: {
+                self.startLayout.alpha = 1
+            }, completion: { (finished: Bool) in
+                
+            })
+        })
     }
     
     //combine videos to show messaging functionality for intro animation. you already downloaded the gameplay animation, next should prolly be like achievements or winning.
@@ -237,7 +221,6 @@ class FeedHeaderCell : UITableViewCell {
                 self.todayOnlineStatus.alpha = 0
             }
             
-            self.dismissTodayLoading()
         } else {
             if(!appDelegate.currentUser!.receivedAnnouncements.isEmpty){
                 let ref = Database.database().reference().child("Users")
@@ -274,8 +257,6 @@ class FeedHeaderCell : UITableViewCell {
                         self.todayNotificationDot.alpha = 0
                     }
                     
-                    self.dismissTodayLoading()
-                    
                     return
                 })
             } else {
@@ -289,8 +270,6 @@ class FeedHeaderCell : UITableViewCell {
                 } else {
                     self.todayNotificationDot.alpha = 0
                 }
-                
-                self.dismissTodayLoading()
             }
         }
         
@@ -304,25 +283,6 @@ class FeedHeaderCell : UITableViewCell {
             self.hookupLayout.alpha = 0.3
             self.hookupLayout.isUserInteractionEnabled = false
         }
-    }
-    
-    private func showTodayLoading(){
-        self.todayLoadingAnimation.play()
-        UIView.animate(withDuration: 0.5, animations: {
-            self.todayLoadingBlur.alpha = 0
-        }, completion: nil)
-    }
-    
-    private func dismissTodayLoading(){
-        UIView.animate(withDuration: 0.5, animations: {
-            self.todayBlur.contentView.alpha = 1
-        }, completion: { (finished: Bool) in
-            UIView.animate(withDuration: 0.8, delay: 0.5, options: [], animations: {
-                self.todayLoadingBlur.alpha = 0
-            }, completion: { (finished: Bool) in
-                self.todayLoadingAnimation.pause()
-            })
-        })
     }
     
     @objc private func hookupClicked(){
@@ -391,7 +351,7 @@ class FeedHeaderCell : UITableViewCell {
             cell.mobile.isHidden = true
         }
         cell.hook.text = game.hook
-        AppEvents.logEvent(AppEvents.Name(rawValue: "GC-Connect " + game.gameName + " Click"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC-Connect " + game.gameName + " Click"))
         
         cell.contentView.layer.cornerRadius = 2.0
         cell.contentView.layer.borderWidth = 1.0

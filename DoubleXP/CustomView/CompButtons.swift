@@ -12,8 +12,8 @@ import Lottie
 
 class CompButtons : UITableViewCell {
     
+    @IBOutlet weak var notificationAnimation: LottieAnimationView!
     @IBOutlet weak var notificationText: UILabel!
-    @IBOutlet weak var notificationAnimation: AnimationView!
     @IBOutlet weak var notificationButton: UIView!
     @IBOutlet weak var enterButton: UIView!
     @IBOutlet weak var voteButton: UIView!

@@ -18,7 +18,7 @@ class CompetitionPageV2 : UIViewController, UITableViewDelegate, UITableViewData
     var payload = [String]()
     var currentComp: CompetitionObj?
     var entryEligible = false
-    var currentNotificationLottie: AnimationView?
+    var currentNotificationLottie: LottieAnimationView?
     var notifications = false
     var currentNotificationsButtion: UIView?
     var playAnimation = false

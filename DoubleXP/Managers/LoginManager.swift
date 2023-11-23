@@ -14,6 +14,7 @@ class LoginHelper{
     
     func getFeedInfo(uid: String?, activity: PreSplashActivity) {
         self.getFeaturedGame(uid: uid, activity: activity)
+        self.getLoginVideo()
     }
     
     func getFeaturedGame(uid: String?, activity: PreSplashActivity){
@@ -29,6 +30,18 @@ class LoginHelper{
                 }
             } else {
                 self.getFeedCta(uid: uid, activity: activity)
+            }
+        })
+    }
+    
+    func getLoginVideo(){
+        let ref = Database.database().reference().child("Feed")
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if(snapshot.exists()){
+                if(snapshot.hasChild("loginVideo")){
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    delegate.loginVideoUrl = snapshot.childSnapshot(forPath: "loginVideo").value as? String ?? ""
+                }
             }
         })
     }

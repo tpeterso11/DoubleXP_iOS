@@ -19,7 +19,7 @@ class ProfileTwitchCell: UITableViewCell {
     @IBOutlet weak var offlineView: UIView!
     @IBOutlet weak var notConnectedView: UIView!
     @IBOutlet weak var workBlur: UIVisualEffectView!
-    @IBOutlet weak var workSpinner: AnimationView!
+    @IBOutlet weak var workSpinner: LottieAnimationView!
     @IBOutlet weak var currentUserView: UIView!
     @IBOutlet weak var twitchWV: WKWebView!
     @IBOutlet weak var twitchLogo: UIImageView!

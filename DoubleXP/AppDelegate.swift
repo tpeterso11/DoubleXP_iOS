@@ -15,6 +15,8 @@ import FirebaseMessaging
 import GoogleMobileAds
 import SwiftNotificationCenter
 import AVKit
+import YoutubeKit
+
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
@@ -28,11 +30,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var currentGCSearchFrag: GamerConnectSearch?
     var currentUser: User?
     var currentLanding: LandingActivity?
-    var currentMediaFrag: MediaFrag?
     var currentProfileFrag: PlayerProfile?
     var currentDiscoverGamePage: DiscoverGamePage?
     var currentGameSelection: GameSelection?
-    var currentTeamFrag: TeamFrag?
     var currentRequests: Requests?
     var currentFeedFrag: Feed?
     var currentFrag: String = ""
@@ -49,6 +49,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var competitions = [CompetitionObj]()
     var upcomingGames = [UpcomingGame]()
     var episodes = [EpisodeObj]()
+    var feedPosts = [PostObject]()
     var announcementManager = AnnouncementManager()
     var imageCache = NSCache<NSString, UIImage>()
     var registerUserCache = [User]()
@@ -65,12 +66,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var currentLoginActivity: LoginController?
     var playHeaderUrl = ""
     var playHeaderCompId = ""
+    var currentEditProfile: ProfileFrag?
+    var loginVideoUrl = ""
     
     var currentDiscoverFrag: DiscoverFrag?
     var currentDiscoverCat: DiscoveryCategoryFrag?
     var currentFeedSearchModal: FeedSearchModal?
     var currentCompetitionPage: CompetitionPageV2?
+    var currentPreSplash: PreSplashActivity?
     var currentResultsFrag: Results?
+    var youtubeCache = NSCache<NSString, YTSwiftyPlayer>()
     
     private var apnsToken: String = ""
     private var fcmToken: String = ""
@@ -80,46 +85,52 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         freeAgentProfiles = [FreeAgentObject]()
         // Override point for customization after application launch.
         
-        FirebaseApp.configure()
-        GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
-        
-        Messaging.messaging().delegate = self
-        
-        GADMobileAds.sharedInstance().start(completionHandler: nil)
-        
-        TwitterHelper.shared.start(withConsumerKey: "sEWJZFZjZAIaxwZUrzdd2JPeI", consumerSecret: "K2yk5yy8AHmyC4mMFHecB1WBoowFnf4uMs4ET7zEjFe06hWmCm")
-        
-        if #available(iOS 10.0, *) {
-          // For iOS 10 display notification (sent via APNS)
-            UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
+        DispatchQueue.global(qos: .userInitiated).async {
+            print("This is run on a background queue")
+            
+            FirebaseApp.configure()
+            let gIdConfiguration = GIDConfiguration(clientID: FirebaseApp.app()?.options.clientID ?? "", serverClientID: FirebaseApp.app()?.options.clientID ?? "")
+            GIDSignIn.sharedInstance.configuration = gIdConfiguration
+            
+            Messaging.messaging().delegate = self
+            
+            GADMobileAds.sharedInstance().start(completionHandler: nil)
+            
+            TwitterHelper.shared.start(withConsumerKey: "sEWJZFZjZAIaxwZUrzdd2JPeI", consumerSecret: "K2yk5yy8AHmyC4mMFHecB1WBoowFnf4uMs4ET7zEjFe06hWmCm")
+            
+            if #available(iOS 10.0, *) {
+              // For iOS 10 display notification (sent via APNS)
+                UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
 
-            let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
-            UNUserNotificationCenter.current().requestAuthorization(
-                options: authOptions,
-                completionHandler: {_, _ in })
+                let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+                UNUserNotificationCenter.current().requestAuthorization(
+                    options: authOptions,
+                    completionHandler: {_, _ in })
+                }
+                else {
+                        let settings: UIUserNotificationSettings =
+                        UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
+                        application.registerUserNotificationSettings(settings)
             }
-            else {
-                    let settings: UIUserNotificationSettings =
-                    UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
-                    application.registerUserNotificationSettings(settings)
+            
+            do {
+                try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback, mode: AVAudioSession.Mode.default, options: [.mixWithOthers, .allowAirPlay])
+                    print("Playback OK")
+                try AVAudioSession.sharedInstance().setActive(true)
+                    print("Session is Active")
+                } catch {
+                    print(error)
+                }
         }
-
+        
         application.registerForRemoteNotifications()
         
-        getToken()
+        self.getToken()
         
         let notificationCenter = NotificationCenter.default
-            notificationCenter.addObserver(self, selector: #selector(appMovedToBackground), name: UIApplication.willResignActiveNotification, object: nil)
-            notificationCenter.addObserver(self, selector: #selector(appCameToForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
-        
-        do {
-            try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback, mode: AVAudioSession.Mode.default, options: [.mixWithOthers, .allowAirPlay])
-                print("Playback OK")
-            try AVAudioSession.sharedInstance().setActive(true)
-                print("Session is Active")
-            } catch {
-                print(error)
-            }
+        notificationCenter.addObserver(self, selector: #selector(self.appMovedToBackground), name: UIApplication.willResignActiveNotification, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(self.appCameToForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
+    
         return true
     }
     
@@ -155,11 +166,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     @available(iOS 9.0, *)
     func application(_ application: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any])
       -> Bool {
-      return GIDSignIn.sharedInstance().handle(url)
+          return GIDSignIn.sharedInstance.handle(url)
     }
     
     func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
-        return GIDSignIn.sharedInstance().handle(url)
+        return GIDSignIn.sharedInstance.handle(url)
     }
     
     func addToNavStack(vc: ParentVC){
@@ -193,7 +204,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         case "View Teams":
             self.navStack = KeepOrderDictionary<String, ParentVC>()
             self.navStack["Home"] = Feed()
-            self.navStack["Team"] = TeamFrag()
             self.navStack[vc.pageName!] = vc
             break
         default:
@@ -236,7 +246,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         
         UIApplication.shared.applicationIconBadgeNumber = 0
         
-        AppEvents.activateApp()
+        AppEvents.shared.activateApp()
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
@@ -296,14 +306,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     }
     
     func getToken(){
-        InstanceID.instanceID().instanceID { (result, error) in
-          if let error = error {
-            print("Error fetching remote instance ID: \(error)")
-          } else if let result = result {
-            print("Remote instance ID token: \(result.token)")
-            
-            //self.instanceIDTokenMessage.text  = "Remote InstanceID token: \(result.token)"
-          }
+        Messaging.messaging().token { token, error in
+           // Check for error. Otherwise do what you will with token here
         }
     }
     
@@ -348,15 +352,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         print("Unable to register for remote notifications: \(error.localizedDescription)")
     }
-    
-    func messaging(_ messaging: Messaging, didReceive remoteMessage: MessagingRemoteMessage) {
-        print("Received data message: \(remoteMessage.appData)")
-
-    }
     // [END ios_10_data_message]
 
-    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
-        print("Firebase registration token: \(fcmToken)")
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+        //print("Firebase registration token: \(fcmToken)")
 
         // TODO: If necessary send token to application server.
         // Note: This callback is fired at each app startup and whenever a new token is generated.

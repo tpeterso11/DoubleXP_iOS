@@ -13,7 +13,7 @@ import Lottie
 
 class CompetitionHeader : UITableViewCell {
     
-    @IBOutlet weak var liveAnim: AnimationView!
+    @IBOutlet weak var liveAnim: LottieAnimationView!
     @IBOutlet weak var compTitle: UILabel!
     @IBOutlet weak var sponsorLabel: UILabel!
     @IBOutlet weak var sponsorContainer: UIView!

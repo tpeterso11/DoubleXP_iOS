@@ -74,9 +74,9 @@ class SocialMediaManager{
                     let status = jsonObj["message"] as? String ?? ""
                     if(!status.isEmpty){
                         if(status == "missing authorization token"){
-                            //AppEvents.logEvent(AppEvents.Name(rawValue: "tokens missing for validation"))
+                            //AppEvents.shared.logEvent(AppEvents.Name(rawValue: "tokens missing for validation"))
                         } else if(status == "invalid access token") {
-                            //AppEvents.logEvent(AppEvents.Name(rawValue: "invalid access tokens being sent"))
+                            //AppEvents.shared.logEvent(AppEvents.Name(rawValue: "invalid access tokens being sent"))
                         }
                         let ref = Database.database().reference().child("Users").child(uid)
                         ref.child("twitchAppToken").removeValue()
@@ -265,7 +265,7 @@ class SocialMediaManager{
     func checkTwitchStream(twitchId: String, callbacks: SocialMediaManagerCallback){
         HTTP.GET("https://us-central1-gameterminal-767f7.cloudfunctions.net/checkTwitchStream?token=" + token + "&twitch_login=" + twitchId) { response in
             if let err = response.error {
-                AppEvents.logEvent(AppEvents.Name(rawValue: "Check Stream - Error"))
+                AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Check Stream - Error"))
                 callbacks.onStreamsLoaded(streams: [TwitchStreamObject]())
                 return
             }
@@ -310,11 +310,11 @@ class SocialMediaManager{
                             callbacks.onStreamsLoaded(streams: streams)
                         }
                     } else {
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "Check Stream - No Data"))
+                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Check Stream - No Data"))
                         callbacks.onStreamsLoaded(streams: [TwitchStreamObject]())
                     }
                 } else {
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "Check Stream - Bad payload"))
+                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Check Stream - Bad payload"))
                     callbacks.onStreamsLoaded(streams: [TwitchStreamObject]())
                 }
             }
@@ -568,6 +568,11 @@ class SocialMediaManager{
                                             imgUrl = (mediumDict.value(forKey: "url") as? String ?? "")
                                         }
                                     }
+                                }
+                                
+                                if let imgDict = videoDict.value(forKey: "contentDetails") as? NSDictionary {
+                                    let duration = imgDict.value(forKey: "duration") as? String ?? ""
+                                    print(duration)
                                 }
                                 
                                 if(!id.isEmpty && !title.isEmpty && !date.isEmpty){

@@ -15,6 +15,6 @@ class ResultsUpgradeCell: UITableViewCell {
     @IBOutlet weak var sub: UILabel!
     @IBOutlet weak var upgradeImage: UIImageView!
     @IBOutlet weak var completedOverlay: UIView!
-    @IBOutlet weak var completeAnimation: AnimationView!
+    @IBOutlet weak var completeAnimation: LottieAnimationView!
     
 }

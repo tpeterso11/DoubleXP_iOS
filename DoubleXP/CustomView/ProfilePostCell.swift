@@ -11,8 +11,9 @@ import UIKit
 
 class ProfilePostCell : UICollectionViewCell {
     
-    @IBOutlet weak var postTitle: UILabel!
+    @IBOutlet weak var daysAgo: UILabel!
     @IBOutlet weak var consoleImg: UIImageView!
     @IBOutlet weak var publicVisibilityImg: UIImageView!
     @IBOutlet weak var postImg: UIImageView!
+    
 }

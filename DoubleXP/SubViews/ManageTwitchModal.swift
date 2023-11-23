@@ -15,7 +15,7 @@ class ManageTwitchModal: UIViewController {
     @IBOutlet weak var streamingButton: UIButton!
     @IBOutlet weak var removeButton: UIButton!
     @IBOutlet weak var dismissButton: UIButton!
-    @IBOutlet weak var streamingAnimation: AnimationView!
+    @IBOutlet weak var streamingAnimation: LottieAnimationView!
     
     override func viewDidLoad() {
         super.viewDidLoad()

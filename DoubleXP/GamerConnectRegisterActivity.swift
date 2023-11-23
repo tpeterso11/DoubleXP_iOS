@@ -51,7 +51,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
     @IBOutlet weak var clickArea: UIView!
     @IBOutlet weak var gcDrawerGamenam: UILabel!
     @IBOutlet weak var statsSwitch: AIFlatSwitch!
-    @IBOutlet weak var buildingAnimation: AnimationView!
+    @IBOutlet weak var buildingAnimation: LottieAnimationView!
     @IBOutlet weak var buildingHeader: UIView!
     @IBOutlet weak var creationView: UIView!
     @IBOutlet weak var finishButton: UIButton!
@@ -155,7 +155,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         continueButton.addTarget(self, action: #selector(continuePressed), for: .touchUpInside)
         finishButton.addTarget(self, action: #selector(finishPressed), for: .touchUpInside)
         gotItButton.addTarget(self, action: #selector(gotItPressed), for: .touchUpInside)
-        AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register"))
 
         //put disabling stats and deleting stats in settings
         //gameCollection.configureForPeekingDelegate()
@@ -817,7 +817,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                     newStatObj.authorized = "true"
                     
                     self.saveAndProceed(statObj: newStatObj)
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Overwatch Stats Received"))
+                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Overwatch Stats Received"))
                 }
                 else{
                     self.finishAndMoveToNext()
@@ -891,7 +891,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         HTTP.GET(url) { response in
             if let err = response.error {
                 print("error: \(err.localizedDescription)")
-                AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Division PlayerID Error" + url))
+                AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Division PlayerID Error" + url))
                 self.finishAndMoveToNext()
                 return //also notify app of failure as needed
             }
@@ -926,17 +926,17 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                             }
                         }
                         else{
-                            AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Division PlayerID Empty Payload" + url))
+                            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Division PlayerID Empty Payload" + url))
                             self.finishAndMoveToNext()
                         }
                     }
                     else{
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Division PlayerID No Payload" + url))
+                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Division PlayerID No Payload" + url))
                         self.finishAndMoveToNext()
                     }
                 }
                 else{
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Division PlayerID No Response" + url))
+                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Division PlayerID No Response" + url))
                     self.finishAndMoveToNext()
                 }
             }
@@ -980,12 +980,12 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                         }
                     }
                     else{
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Division PlayerID Empty Payload" + url))
+                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Division PlayerID Empty Payload" + url))
                         self.finishAndMoveToNext()
                     }
                 }
                 else{
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Division PlayerID Failed " + url))
+                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Division PlayerID Failed " + url))
                     self.finishAndMoveToNext()
                 }
             }
@@ -998,7 +998,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         HTTP.GET(url) { response in
             if let err = response.error {
                 print("error: \(err.localizedDescription)")
-                AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Division Extended Stats Failed"))
+                AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Division Extended Stats Failed"))
 
                 self.finishAndMoveToNext()
                 return //also notify app of failure as needed
@@ -1021,11 +1021,11 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                         statObj._statUrl = url
                         
                         self.saveAndProceed(statObj: statObj)
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Division Extended Stats Received"))
+                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Division Extended Stats Received"))
                     }
                 }
                 else{
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Division Extended Stats No Payload" + url))
+                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Division Extended Stats No Payload" + url))
                     self.finishAndMoveToNext()
                 }
             }
@@ -1038,7 +1038,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         HTTP.GET(url) { response in
             if let err = response.error {
                 print("error: \(err.localizedDescription)")
-                AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Siege Extended Stats Failed"))
+                AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Siege Extended Stats Failed"))
 
                 self.finishAndMoveToNext()
                 return //also notify app of failure as needed
@@ -1060,11 +1060,11 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                         statObj._statUrl = url
                         
                         self.saveAndProceed(statObj: statObj)
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Siege Extended Stats Received"))
+                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Siege Extended Stats Received"))
                     }
                 }
                 else{
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Seige Extended Stats No Response" + url))
+                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Seige Extended Stats No Response" + url))
                     self.finishAndMoveToNext()
                 }
             }
@@ -1121,15 +1121,15 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                         statObject.codLevel = String(level)
                         
                         self.saveAndProceed(statObj: statObject)
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - COD Stats Received"))
+                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - COD Stats Received"))
                     }
                     else{
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - COD Stats No Payload"))
+                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - COD Stats No Payload"))
                         self.finishAndMoveToNext()
                     }
                 }
                 else{
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - COD No Response"))
+                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - COD No Response"))
                     self.finishAndMoveToNext()
                 }
             }
@@ -1153,17 +1153,17 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                         if(!id.isEmpty){
                             self.getFortniteStats(playerId: id)
                         } else {
-                            AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Fortnite no Id"))
+                            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Fortnite no Id"))
                             self.finishAndMoveToNext()
                         }
                     }
                     else{
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Fortnite no Id"))
+                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Fortnite no Id"))
                         self.finishAndMoveToNext()
                     }
                 }
                 else{
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Fortnite Wrong Payload"))
+                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Fortnite Wrong Payload"))
                     self.finishAndMoveToNext()
                 }
             }
@@ -1174,7 +1174,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         let url = "https://fortniteapi.io/stats?account="+playerId
         HTTP.GET(url, headers: ["authorization": "2192fa37-951e6ed9-15f5d6d5-f1080fcf"]) { response in
             if let err = response.error {
-                AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Fortnite Stats Error"))
+                AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Fortnite Stats Error"))
                 self.finishAndMoveToNext()
                 print("error: \(err.localizedDescription)")
                 return //also notify app of failure as needed
@@ -1224,15 +1224,15 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                         statObj.authorized = "true"
                         
                         self.saveAndProceed(statObj: statObj)
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - COD Stats Received"))
+                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - COD Stats Received"))
                     }
                     else{
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Fortnite Not Available"))
+                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Fortnite Not Available"))
                         self.finishAndMoveToNext()
                     }
                 }
                 else{
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Fortnite Wrong Payload"))
+                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Fortnite Wrong Payload"))
                     self.finishAndMoveToNext()
                 }
             }
@@ -1255,7 +1255,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
     private func getOverwatchProfileStats(url: String){
         HTTP.GET(url, headers: ["TRN-Api-Key": "7fa6a9d9-6fbc-4350-adf3-79bfe45a303c"]) { response in
             if let err = response.error {
-                AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Overwatch Profile Stats Error"))
+                AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Overwatch Profile Stats Error"))
                 self.finishAndMoveToNext()
                 return //also notify app of failure as needed
             }
@@ -1466,10 +1466,10 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                     newStatObj.authorized = "true"
                     
                     self.saveAndProceed(statObj: newStatObj)
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Overwatch Stats Received"))
+                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Overwatch Stats Received"))
                 }
                 else{
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Overwatch Profile Stats Incorrect Payload"))
+                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Overwatch Profile Stats Incorrect Payload"))
                     self.finishAndMoveToNext()
                 }
             }
@@ -1538,7 +1538,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                         self.performSegue(withIdentifier: "gcSkip", sender: nil)
                     }
                     
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "GC Register - Successful Registration"))
+                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Successful Registration"))
                 })
             })
         }

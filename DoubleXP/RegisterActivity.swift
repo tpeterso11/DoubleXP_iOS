@@ -18,7 +18,7 @@ import FlagPhoneNumber
 import SPStorkController
 
 
-class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding, FPNTextFieldDelegate, SPStorkControllerDelegate {
+class RegisterActivity: UIViewController, UITextFieldDelegate, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding, FPNTextFieldDelegate, SPStorkControllerDelegate {
     
     @IBOutlet weak var headerImage: UIImageView!
     
@@ -69,7 +69,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
     
     func loginManagerDidComplete(_ result: LoginManagerLoginResult?, _ error: Error?) {
         if let result = result, result.isCancelled {
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Canceled"))
+            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Canceled"))
             
             var buttons = [PopupDialogButton]()
             let title = "facebook login canceled."
@@ -99,7 +99,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                 
                 registerUser(email: nil, pass: nil, facebook: true, google: false, apple: false)
             } else {
-                AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Fail - " + "\(error?.localizedDescription ?? "")"))
+                AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Fail - " + "\(error?.localizedDescription ?? "")"))
                 
                 var buttons = [PopupDialogButton]()
                 let title = "facebook login error."
@@ -177,7 +177,9 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
     @objc private func emailSwitchAction(){
         if(phoneLayout.alpha == 1){ //if phone layout is showing, make email bold, show email layout
             self.emailSwitch.font = UIFont.boldSystemFont(ofSize: self.phoneSwitch.font.pointSize)
+            self.emailSwitch.backgroundColor = UIColor(named: "greenToDarker")
             self.phoneSwitch.font = UIFont.systemFont(ofSize: self.phoneSwitch.font.pointSize)
+            self.phoneSwitch.backgroundColor = UIColor(named: "darkAlpha")
             UIView.animate(withDuration: 0.8, animations: {
                 self.phoneLayout.alpha = 0
             }, completion: { (finished: Bool) in
@@ -186,15 +188,19 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                 }, completion: nil)
             })
         } else {
-            self.phoneSwitch.font = UIFont.boldSystemFont(ofSize: self.phoneSwitch.font.pointSize)
-            self.emailSwitch.font = UIFont.systemFont(ofSize: self.emailSwitch.font.pointSize)
+            self.emailSwitch.font = UIFont.boldSystemFont(ofSize: self.emailSwitch.font.pointSize)
+            self.emailSwitch.backgroundColor = UIColor(named: "greenToDarker")
+            self.phoneSwitch.font = UIFont.systemFont(ofSize: self.phoneSwitch.font.pointSize)
+            self.phoneSwitch.backgroundColor = UIColor(named: "darkAlpha")
         }
     }
     
     @objc private func phoneSwitchAction(){
         if(phoneLayout.alpha == 0){
             self.phoneSwitch.font = UIFont.boldSystemFont(ofSize: self.phoneSwitch.font.pointSize)
+            self.phoneSwitch.backgroundColor = UIColor(named: "greenToDarker")
             self.emailSwitch.font = UIFont.systemFont(ofSize: self.phoneSwitch.font.pointSize)
+            self.emailSwitch.backgroundColor = UIColor(named: "darkAlpha")
             UIView.animate(withDuration: 0.8, animations: {
                 self.emailLayout.alpha = 0
             }, completion: { (finished: Bool) in
@@ -204,13 +210,15 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
             })
             
         } else {
-            self.phoneSwitch.font = UIFont.systemFont(ofSize: self.phoneSwitch.font.pointSize)
-            self.emailSwitch.font = UIFont.boldSystemFont(ofSize: self.phoneSwitch.font.pointSize)
+            self.phoneSwitch.font = UIFont.boldSystemFont(ofSize: self.phoneSwitch.font.pointSize)
+            self.phoneSwitch.backgroundColor = UIColor(named: "greenToDarker")
+            self.emailSwitch.font = UIFont.systemFont(ofSize: self.phoneSwitch.font.pointSize)
+            self.emailSwitch.backgroundColor = UIColor(named: "darkAlpha")
         }
     }
 
     @IBAction private func loginWithReadPermissions() {
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login"))
         let loginManager = LoginManager()
         loginManager.logIn(permissions: ["public_profile", "email"], from: self) { [weak self] (result, error) in
             self?.loginManagerDidComplete(result, error)
@@ -236,9 +244,10 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
         delegate.currentRegisterActivity = self
         nextButton.addTarget(self, action: #selector(nextButtonClicked(_:)), for: .touchUpInside)
         
-        let backTap = UITapGestureRecognizer(target: self, action: #selector(backButtonClicked))
-        backX.isUserInteractionEnabled = true
-        backX.addGestureRecognizer(backTap)
+        //let backTap = UITapGestureRecognizer(target: self, action: #selector(backButtonClicked))
+        //backX.isUserInteractionEnabled = true
+        //backX.addGestureRecognizer(backTap)
+        backX.isHidden = true
         
         emailField.returnKeyType = .done
         emailField.delegate = self
@@ -261,12 +270,10 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
            let appleTap = UITapGestureRecognizer(target: self, action: #selector(appleClicked))
            appleRegister.isUserInteractionEnabled = true
            appleRegister.addGestureRecognizer(appleTap)
-       } else {
-           appleRegister.alpha = 0.3
-           appleRegister.isUserInteractionEnabled = false
-       }
-        
-        GIDSignIn.sharedInstance().delegate = self
+        } else {
+            appleRegister.alpha = 0.3
+            appleRegister.isUserInteractionEnabled = false
+        }
         
         checkNextButton()
         
@@ -297,7 +304,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
             object: nil
         )
         
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Register"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Register"))
     }
     
     func fpnDidSelectCountry(name: String, dialCode: String, code: String) {
@@ -312,14 +319,24 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
     }
     
     @objc func googleClicked(){
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Google Login"))
-        GIDSignIn.sharedInstance()?.presentingViewController = self
-        GIDSignIn.sharedInstance().signIn()
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Register - Google Login"))
+        GIDSignIn.sharedInstance.signIn(
+            withPresenting: self, hint: nil, additionalScopes: ["email", "https://www.googleapis.com/auth/youtube.readonly"]
+        ) { result, error in
+            if let token = result?.user.idToken {
+                self.onSignInComplete(result: result, didSignInFor: result?.user, withError: nil)
+                return
+            }
+            guard let error = error as? GIDSignInError else {
+                fatalError("No token and no GIDSignInError: \(String(describing: error))")
+            }
+            self.onSignInComplete(result: result, didSignInFor: nil, withError: error)
+        }
     }
     
     @available(iOS 13, *)
     @objc func appleClicked(){
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Apple Login"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Register - Apple Login"))
         startSignInWithAppleFlow()
     }
     
@@ -424,7 +441,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
             Auth.auth().signIn(with: credential) { (authResult, error) in
               if let error = error {
               let authError = error as NSError
-                AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Fail Firebase - " + error.localizedDescription))
+                AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Fail Firebase - " + error.localizedDescription))
                 
                 var message: String = ""
                 let code = String(error._code)
@@ -461,7 +478,8 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                                 DispatchQueue.main.async {
                                     let delegate = UIApplication.shared.delegate as! AppDelegate
                                     delegate.currentUser = user
-                                    self.performSegue(withIdentifier: "newReg", sender: nil)
+                                    delegate.currentLoginActivity?.transitionNewRegistration()
+                                    self.dismiss(animated: true)
                                 }
                             }
                         }) { (error) in
@@ -477,7 +495,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                 Auth.auth().signIn(with: credential) { (authResult, error) in
                    if let error = error {
                                let authError = error as NSError
-                                 AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Fail Firebase - " + error.localizedDescription))
+                                 AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Fail Firebase - " + error.localizedDescription))
                                  
                                  var message: String = ""
                                  let code = String(error._code)
@@ -513,7 +531,8 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                                         DispatchQueue.main.async {
                                             let delegate = UIApplication.shared.delegate as! AppDelegate
                                             delegate.currentUser = user
-                                            self.performSegue(withIdentifier: "newReg", sender: nil)
+                                            delegate.currentLoginActivity?.transitionNewRegistration()
+                                            self.dismiss(animated: true)
                                         }
                                     }
                                 }) { (error) in
@@ -532,7 +551,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                 Auth.auth().signIn(with: credential) { (authResult, error) in
                   if (error != nil) {
                     let authError = error! as NSError
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Apple Login Fail Firebase"))
+                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Register - Apple Login Fail Firebase"))
                       
                       var message: String = ""
                       let code = String(error!._code)
@@ -568,7 +587,8 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                                         DispatchQueue.main.async {
                                             let delegate = UIApplication.shared.delegate as! AppDelegate
                                             delegate.currentUser = user
-                                            self.performSegue(withIdentifier: "newReg", sender: nil)
+                                            delegate.currentLoginActivity?.transitionNewRegistration()
+                                            self.dismiss(animated: true)
                                         }
                                       }
                                   }) { (error) in
@@ -583,7 +603,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                 Auth.auth().createUser(withEmail: email!, password: pass!) { authResult, error in
                     if let error = error {
                                  let authError = error as NSError
-                                   AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Fail Firebase - " + error.localizedDescription))
+                                   AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Fail Firebase - " + error.localizedDescription))
                                    
                                    var message: String = ""
                                    let code = String(error._code)
@@ -616,7 +636,8 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                             DispatchQueue.main.async {
                                 let delegate = UIApplication.shared.delegate as! AppDelegate
                                 delegate.currentUser = user
-                                self.performSegue(withIdentifier: "newReg", sender: nil)
+                                delegate.currentLoginActivity?.transitionNewRegistration()
+                                self.dismiss(animated: true)
                             }
                         }
                     }
@@ -637,7 +658,8 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                 DispatchQueue.main.async {
                     let delegate = UIApplication.shared.delegate as! AppDelegate
                     delegate.currentUser = user
-                    self.performSegue(withIdentifier: "newReg", sender: nil)
+                    delegate.currentLoginActivity?.transitionNewRegistration()
+                    self.dismiss(animated: true)
                 }
             }
             else{
@@ -681,7 +703,8 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                     DispatchQueue.main.async {
                         let delegate = UIApplication.shared.delegate as! AppDelegate
                         delegate.currentUser = user
-                        self.performSegue(withIdentifier: "newReg", sender: nil)
+                        delegate.currentLoginActivity?.transitionNewRegistration()
+                        self.dismiss(animated: true)
                     }
                 }
             }) { (error) in
@@ -1291,7 +1314,7 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                     let delegate = UIApplication.shared.delegate as! AppDelegate
                     delegate.currentUser = user
                     
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "Successful Login"))
+                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Successful Login"))
                     
                     self.performSegue(withIdentifier: "loginSuccessful", sender: nil)
                 }
@@ -1308,12 +1331,13 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
                 DispatchQueue.main.async {
                     let delegate = UIApplication.shared.delegate as! AppDelegate
                     delegate.currentUser = user
-                    self.performSegue(withIdentifier: "newReg", sender: nil)
+                    delegate.currentLoginActivity?.transitionNewRegistration()
+                    self.dismiss(animated: true)
                 }
             }
             
             }) { (error) in
-                AppEvents.logEvent(AppEvents.Name(rawValue: "Login Error"))
+                AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Login Error"))
                 print(error.localizedDescription)
         }
     }
@@ -1545,38 +1569,37 @@ class RegisterActivity: UIViewController, UITextFieldDelegate, GIDSignInDelegate
         self.present(alertController, animated: true, completion: nil)
     }
     
-    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error?) {
-      // ...
-      if let error = error {
-        // ...AppEvents.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login Fail - " + error.localizedDescription))
-        
-        var buttons = [PopupDialogButton]()
-        let title = "google login error."
-        let message = "there was an error getting you logged into google. try again, or try registering using your email."
-        
-        let button = DefaultButton(title: "try again.") { [weak self] in
-            self?.loginWithReadPermissions()
+    func onSignInComplete(result: GIDSignInResult?, didSignInFor user: GIDGoogleUser!, withError error: Error?){
+        if let error = error {
+            var buttons = [PopupDialogButton]()
+            let title = "google login error."
+            let message = "there was an error getting you logged into google. try again, or try registering using your email."
             
+            let button = DefaultButton(title: "try again.") { [weak self] in
+                self?.loginWithReadPermissions()
+                
+            }
+            buttons.append(button)
+            
+            let buttonOne = CancelButton(title: "nevermind") { [weak self] in
+                //do nothing
+            }
+            buttons.append(buttonOne)
+            
+            let popup = PopupDialog(title: title, message: message)
+            popup.addButtons(buttons)
+
+            // Present dialog
+            self.present(popup, animated: true, completion: nil)
+            return
         }
-        buttons.append(button)
         
-        let buttonOne = CancelButton(title: "nevermind") { [weak self] in
-            //do nothing
-        }
-        buttons.append(buttonOne)
+        guard let authentication = result?.user else { return }
+        let credential = GoogleAuthProvider.credential(withIDToken: authentication.idToken?.tokenString ?? "",
+                                                       accessToken: authentication.accessToken.tokenString)
         
-        let popup = PopupDialog(title: title, message: message)
-        popup.addButtons(buttons)
-
-        // Present dialog
-        self.present(popup, animated: true, completion: nil)
-        return
-      }
-
-      guard let authentication = user.authentication else { return }
-
-        self.googleTokenString = authentication.accessToken
-        self.googleToken = authentication.idToken
+        self.googleTokenString = authentication.accessToken.tokenString
+        self.googleToken = authentication.idToken?.tokenString ?? "nil"
         self.googleLoginAccepted = true
         self.registrationType = "google"
         

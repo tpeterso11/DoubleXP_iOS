@@ -16,7 +16,6 @@ class NewRegGameCell: UITableViewCell/*, UICollectionViewDataSource, UICollectio
     @IBOutlet weak var gameBack: UIImageView!
     @IBOutlet weak var gameName: UILabel!
     @IBOutlet weak var cover: UIView!
-    @IBOutlet weak var confirmAnimation: AnimationView!
     @IBOutlet weak var backConsole: UIView!
     @IBOutlet weak var gamerTagField: UnderLineTextField!
     @IBOutlet weak var gamerTagContinue: UIButton!
@@ -47,7 +46,6 @@ class NewRegGameCell: UITableViewCell/*, UICollectionViewDataSource, UICollectio
     private func showSelected(){
         self.selectedCell = true
         self.cover.isHidden = false
-        self.confirmAnimation.currentFrame = 1500
     }
     
     private func clearSelection(){
@@ -56,7 +54,6 @@ class NewRegGameCell: UITableViewCell/*, UICollectionViewDataSource, UICollectio
             return
         }
         self.selectedCell = false
-        self.confirmAnimation.currentFrame = 0
         gamerTagField.text = ""
         self.gamerTagContinue.alpha = 0.5
         self.gamerTagContinue.isUserInteractionEnabled = false
@@ -105,15 +102,10 @@ class NewRegGameCell: UITableViewCell/*, UICollectionViewDataSource, UICollectio
             UIView.animate(withDuration: 0.8, animations: {
                 self.cover.alpha = 1
             }, completion: { (finished: Bool) in
-                self.confirmAnimation.play(toFrame: 500)
+                
             })
         } else {
-            self.confirmAnimation.play { (false) in
-                self.selectedCell = false
-                UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                    self.cover.alpha = 0
-                }, completion: nil)
-            }
+            
         }
     }
     

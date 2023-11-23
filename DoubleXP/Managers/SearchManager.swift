@@ -31,6 +31,7 @@ class SearchManager {
         questionMatches = [String]()
         ageFilters = [String]()
         searchLookingFor = [String]()
+        currentSelectedConsoles = [String]()
     }
     
     func searchWithLocation(callbacks: SearchManagerCallbacks){
@@ -317,7 +318,7 @@ class SearchManager {
                 for tag in gamerTags {
                     if(!tag.gamerTag.isEmpty){
                         if(tag.game == self.currentGameSearch){
-                            if(self.currentSelectedConsoles.contains(tag.console)){
+                            if(self.currentSelectedConsoles.isEmpty || self.currentSelectedConsoles.contains(tag.console)){
                                 containedProfile = true
                                 gamerTag = tag.gamerTag
                                 break

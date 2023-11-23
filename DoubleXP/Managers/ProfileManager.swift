@@ -74,7 +74,7 @@ class ProfileManage {
         }
     }
     
-    func saveChanges(bio: String, gamertag: String?, callbacks: CurrentProfileCallbacks){
+    func saveChanges(bio: String, gamertag: String?){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let user = delegate.currentUser!
         
@@ -90,8 +90,6 @@ class ProfileManage {
                     ref.child("gamerTag").setValue(gamertag)
                     user.gamerTag = gamertag!
                 }
-                
-                callbacks.changesComplete()
             }
             
         }) { (error) in

@@ -25,13 +25,16 @@ class FeedSearchModal: UIViewController, UITableViewDelegate, UITableViewDataSou
     @IBOutlet weak var finalSearchIntroLayout: UIView!
     @IBOutlet weak var blurDismissButton: UIButton!
     @IBOutlet weak var searchIntroOverlay: UIView!
-    @IBOutlet weak var introSearchAnimation: AnimationView!
+    @IBOutlet weak var introSearchAnimation: LottieAnimationView!
+    
+    @IBOutlet weak var emptyActionButton: UIView!
     private var dataSet = false
     private var payload = [Any]()
     private var userGames = [GamerConnectGame]()
     var currentFeed: Feed?
     private var pastCharacterCount = 0
     private var clearActive = false
+    private var gcGamesLoaded = false
     private var selectedGame: GamerConnectGame?
     
     override func viewWillAppear(_ animated: Bool) {
@@ -115,6 +118,10 @@ class FeedSearchModal: UIViewController, UITableViewDelegate, UITableViewDataSou
             }
             self.emptyBlur.alpha = 1
             self.emptyImg.alpha = 1
+            
+            let actionTap = UITapGestureRecognizer(target: self, action: #selector(self.launchGames))
+            self.emptyActionButton.isUserInteractionEnabled = true
+            self.emptyActionButton.addGestureRecognizer(actionTap)
         } else {
             self.emptyImg.isUserInteractionEnabled = false
             self.emptyBlur.isUserInteractionEnabled = false
@@ -201,6 +208,7 @@ class FeedSearchModal: UIViewController, UITableViewDelegate, UITableViewDataSou
     
     func onModalDismissed(){
         self.searchTable.reloadData()
+        self.gcGames.reloadData()
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -718,9 +726,9 @@ class FeedSearchModal: UIViewController, UITableViewDelegate, UITableViewDataSou
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let kWhateverHeightYouWant = 200
+        let kWhateverHeightYouWant = 230
         
-        return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(kWhateverHeightYouWant))
+        return CGSize(width: collectionView.bounds.size.width - 20, height: collectionView.bounds.size.height)
     }
     
     
@@ -732,6 +740,22 @@ class FeedSearchModal: UIViewController, UITableViewDelegate, UITableViewDataSou
     @objc private func test(sender: FeedSearchGameGesture){
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "gamerConnectSearch") as! GamerConnectSearch
         currentViewController.game = sender.game!
+        
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+    }
+    
+    @objc private func launchGames(){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "gameSelection") as! GameSelection
+        currentViewController.returning = true
+        currentViewController.modalPopped = true
         
         let transitionDelegate = SPStorkTransitioningDelegate()
         currentViewController.transitioningDelegate = transitionDelegate

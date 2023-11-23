@@ -23,10 +23,10 @@ class ProfilePostsCell : UITableViewCell, UICollectionViewDelegate, UICollection
         self.currentProfile = currentProfile
         
         if(payload.count >= 3){
-            self.cellHeight.constant = 320
+            self.cellHeight.constant = 500
             self.payload.append("empty")
         }  else if(payload.count >= 1){
-            self.cellHeight.constant = 240
+            self.cellHeight.constant = 300
             self.payload.append("empty")
         }
         
@@ -78,14 +78,6 @@ class ProfilePostsCell : UITableViewCell, UICollectionViewDelegate, UICollection
             cell.postImg.clipsToBounds = true
             cell.layer.cornerRadius = 10
             
-            cell.postTitle.text = currentPost.title
-            
-            if(currentPost.publicPost == "true"){
-                cell.publicVisibilityImg.image = UIImage.init(named: "public")
-            } else {
-                cell.publicVisibilityImg.image = UIImage.init(named: "private_light")
-            }
-            
             if(currentPost.postConsole == "ps"){
                 cell.consoleImg.image = UIImage.init(named: "ps_logo")
             } else if(currentPost.postConsole == "xbox"){
@@ -96,6 +88,19 @@ class ProfilePostsCell : UITableViewCell, UICollectionViewDelegate, UICollection
                 cell.consoleImg.image = UIImage.init(named: "nintendo_logo")
             } else {
                 cell.consoleImg.image = UIImage.init(named: "mobile_logo")
+            }
+            
+            if(!currentPost.date.isEmpty){
+                cell.daysAgo.alpha = 1
+                let milisecond = Int64(currentPost.date)
+                if(milisecond != nil){
+                    let dateVar = Date.init(timeIntervalSince1970: TimeInterval(milisecond!)/1000)
+                    cell.daysAgo.text = dateVar.timeAgoSinceDate()
+                } else {
+                    cell.daysAgo.alpha = 0
+                }
+            } else {
+                cell.daysAgo.alpha = 0
             }
             
             return cell
@@ -114,5 +119,50 @@ class ProfilePostsCell : UITableViewCell, UICollectionViewDelegate, UICollection
                 let space: CGFloat = (flowayout?.minimumInteritemSpacing ?? 0.0) + (flowayout?.sectionInset.left ?? 0.0) + (flowayout?.sectionInset.right ?? 0.0)
                 let size:CGFloat = (collectionView.frame.size.width - space) / 2.0
                 return CGSize(width: size, height: 220)
+    }
+}
+
+extension Date {
+
+    func timeAgoSinceDate() -> String {
+
+        // From Time
+        let fromDate = self
+
+        // To Time
+        let toDate = Date()
+
+        // Estimation
+        // Year
+        if let interval = Calendar.current.dateComponents([.year], from: fromDate, to: toDate).year, interval > 0  {
+
+            return interval == 1 ? "\(interval)" + " " + "year ago" : "\(interval)" + " " + "years ago"
+        }
+
+        // Month
+        if let interval = Calendar.current.dateComponents([.month], from: fromDate, to: toDate).month, interval > 0  {
+
+            return interval == 1 ? "\(interval)" + " " + "month ago" : "\(interval)" + " " + "months ago"
+        }
+
+        // Day
+        if let interval = Calendar.current.dateComponents([.day], from: fromDate, to: toDate).day, interval > 0  {
+
+            return interval == 1 ? "\(interval)" + " " + "day ago" : "\(interval)" + " " + "days ago"
+        }
+
+        // Hours
+        if let interval = Calendar.current.dateComponents([.hour], from: fromDate, to: toDate).hour, interval > 0 {
+
+            return interval == 1 ? "\(interval)" + " " + "hour ago" : "\(interval)" + " " + "hours ago"
+        }
+
+        // Minute
+        if let interval = Calendar.current.dateComponents([.minute], from: fromDate, to: toDate).minute, interval > 0 {
+
+            return interval == 1 ? "\(interval)" + " " + "minute ago" : "\(interval)" + " " + "minutes ago"
+        }
+
+        return "a moment ago"
     }
 }

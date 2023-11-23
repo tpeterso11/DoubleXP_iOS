@@ -42,7 +42,7 @@ class FAQuizConfirmation: UIViewController, UICollectionViewDataSource, UICollec
         questionList.dataSource = self
         
         submitButton.addTarget(self, action: #selector(nextButtonClicked), for: .touchUpInside)
-        AppEvents.logEvent(AppEvents.Name(rawValue: "FA Quiz Confirmation"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "FA Quiz Confirmation"))
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -68,7 +68,7 @@ class FAQuizConfirmation: UIViewController, UICollectionViewDataSource, UICollec
     
     @objc func nextButtonClicked(_ sender: AnyObject?) {
         interviewManager?.submitProfile()
-        AppEvents.logEvent(AppEvents.Name(rawValue: "FA Quiz Confirmation - Submit"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "FA Quiz Confirmation - Submit"))
     }
     
     func showImageDialog(animated: Bool = true, pos: Int) {
@@ -134,7 +134,7 @@ class FAQuizConfirmation: UIViewController, UICollectionViewDataSource, UICollec
         // Present dialog
         self.present(popup, animated: animated, completion: nil)
         
-        AppEvents.logEvent(AppEvents.Name(rawValue: "FA Quiz Confirmation - Change Answer Popup"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "FA Quiz Confirmation - Change Answer Popup"))
     }
     
     func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage {

@@ -6,8 +6,8 @@
 //  Copyright © 2019 Peterson, Toussaint. All rights reserved.
 //
 
+
 import UIKit
-import SendBirdSDK
 
 protocol NavigateToProfile: class {
     
@@ -17,33 +17,11 @@ protocol NavigateToProfile: class {
     
     func navigateToHome()
     
-    func navigateToTeams()
-    
     func navigateToRequests()
-    
-    func navigateToCreateFrag()
-    
-    func navigateToTeamDashboard(team: TeamObject?, teamInvite: TeamInviteObject?, newTeam: Bool)
-    
-    func navigateToTeamNeeds(team: TeamObject)
-    
-    func navigateToTeamBuild(team: TeamObject)
-    
-    func navigateToTeamFreeAgentSearch(team: TeamObject)
-    
-    func navigateToTeamFreeAgentResults(team: TeamObject)
-    
-    func navigateToTeamFreeAgentDash()
-    
-    func navigateToTeamFreeAgentFront()
-    
-    func navigateToViewTeams()
     
     func navigateToMedia()
     
     func navigateToCurrentUserProfile()
-    
-    func navigateToMessaging(groupChannelUrl: String?, otherUserId: String?)
     
     func navigateToFreeAgentQuiz(team: TeamObject?, gcGame: GamerConnectGame, currentUser: User)
     
@@ -88,19 +66,6 @@ protocol TeamCallbacks: class{
 
 protocol FACallbacks: class{
     func updateCell(indexPath: IndexPath)
-}
-
-protocol MessagingCallbacks: class {
-    func connectionSuccessful()
-    func connectionFailed()
-    func createTeamChannelSuccessful(groupChannel: SBDGroupChannel)
-    func messageSuccessfullyReceived(message: SBDUserMessage)
-    func onMessagesLoaded(messages: [SBDUserMessage])
-    func successfulLeaveChannel()
-    func messageSentSuccessfully(chatMessage: ChatMessage, sender: SBDSender)
-    func createTeamChannelFailed()
-    func errorLoadingMessages()
-    func errorLoadingChannel()
 }
 
 protocol TeamInteractionCallbacks: class{
@@ -163,10 +128,6 @@ protocol MediaCallbacks: class{
     func onMediaReceived(category: String)
     
     func onVideoLoaded(url: String)
-}
-
-protocol LandingUICallbacks: class{
-    func updateNavColor(color: UIColor)
 }
 
 protocol CurrentProfileCallbacks: class{

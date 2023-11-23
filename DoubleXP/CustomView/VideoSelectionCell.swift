@@ -12,5 +12,6 @@ import UIKit
 class VideoSelectionCell : UICollectionViewCell {
     @IBOutlet weak var videoTitle: UILabel!
     
+    @IBOutlet weak var videoSelectedCover: UIView!
     @IBOutlet weak var youtubeImg: UIImageView!
 }

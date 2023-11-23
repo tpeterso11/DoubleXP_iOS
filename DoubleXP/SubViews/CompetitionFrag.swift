@@ -20,11 +20,11 @@ class CompetitionFrag: ParentVC, UITextFieldDelegate {
     var competition: CompetitionObj!
     var timer: Timer!
     
+    @IBOutlet weak var streamAnimation: LottieAnimationView!
     @IBOutlet weak var notifyView: UIView!
     @IBOutlet weak var notifyMe: AIFlatSwitch!
     @IBOutlet weak var streamLoading: UIActivityIndicatorView!
     @IBOutlet weak var competitionViewer: TestPlayer!
-    @IBOutlet weak var streamAnimation: AnimationView!
     @IBOutlet weak var overlayRegisterButton: UIButton!
     @IBOutlet weak var verifyCheck: AIFlatSwitch!
     @IBOutlet weak var schoolEntry: UnderLineTextField!
@@ -71,7 +71,7 @@ class CompetitionFrag: ParentVC, UITextFieldDelegate {
         thirdPrize.text = competition.thirdPrize
         grandPrize.text = competition.topPrize
         
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Competition " + competition.competitionId + " viewed"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Competition " + competition.competitionId + " viewed"))
         addEmergencyLiveRef()
         addEmergencyRegOverRef()
         figureRegistered()
@@ -406,7 +406,7 @@ class CompetitionFrag: ParentVC, UITextFieldDelegate {
             competitionViewer.configuration.mediaTypesRequiringUserActionForPlayback = []
             competitionViewer.setChannel(to: competition.twitchChannelId)
             
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Competition " + competition.competitionId + " streamed live"))
+            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Competition " + competition.competitionId + " streamed live"))
         }
         else{
             if(self.registerWithGamerTag.isEmpty){
@@ -433,7 +433,7 @@ class CompetitionFrag: ParentVC, UITextFieldDelegate {
                 self.present(popup, animated: true, completion: nil)
             }
             else{
-                AppEvents.logEvent(AppEvents.Name(rawValue: "Competition " + competition.competitionId + " registration view shown"))
+                AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Competition " + competition.competitionId + " registration view shown"))
                 let delegate = UIApplication.shared.delegate as! AppDelegate
                 for tag in delegate.currentUser!.gamerTags{
                     if(tag.game == competition.gcName){
@@ -488,7 +488,7 @@ class CompetitionFrag: ParentVC, UITextFieldDelegate {
                     
                     currentUser.subscriptions.append(self.competition.subscriptionId)
                     
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "Competition " + self.competition.competitionId + " notify selected"))
+                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Competition " + self.competition.competitionId + " notify selected"))
                     
                     //Firebase
                     Messaging.messaging().subscribe(toTopic: self.competition.subscriptionId) { error in
@@ -509,7 +509,7 @@ class CompetitionFrag: ParentVC, UITextFieldDelegate {
                       print("Unsubscribed from topic")
                     }
                     
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "Competition " + self.competition.competitionId + " notify unselected"))
+                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Competition " + self.competition.competitionId + " notify unselected"))
                 }
             }
         }) { (error) in
@@ -547,7 +547,7 @@ class CompetitionFrag: ParentVC, UITextFieldDelegate {
     }
     
     @objc func registerClicked(_ sender: AnyObject?) {
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Competition " + self.competition.competitionId + " sending registration"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Competition " + self.competition.competitionId + " sending registration"))
         if(self.schoolEntry.text != nil){
             self.registerSchool = self.schoolEntry.text!
         }
@@ -623,13 +623,13 @@ class CompetitionFrag: ParentVC, UITextFieldDelegate {
                         
                         self.updateUser()
                         
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "Competition " + self.competition.competitionId + " successful registration"))
+                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Competition " + self.competition.competitionId + " successful registration"))
                     }
                     
                 }) { (error) in
                     self.updateUser()
                     
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "Competition " + self.competition.competitionId + " registration error"))
+                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Competition " + self.competition.competitionId + " registration error"))
                     print(error.localizedDescription)
                 }
             }, completion: nil)
@@ -746,7 +746,7 @@ class CompetitionFrag: ParentVC, UITextFieldDelegate {
             
             handleActionButton()
             
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Competition " + self.competition.competitionId + " user on page when timer ends."))
+            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Competition " + self.competition.competitionId + " user on page when timer ends."))
         }
     }
     

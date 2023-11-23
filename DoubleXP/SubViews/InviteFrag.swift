@@ -22,7 +22,6 @@ class InviteFrag: ParentVC, MFMessageComposeViewControllerDelegate, MFMailCompos
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
         navDictionary = ["state": "backOnly"]
-        delegate.currentLanding?.updateNavigation(currentFrag: self)
         
         self.pageName = "Invite"
         delegate.addToNavStack(vc: self)

@@ -11,5 +11,6 @@ import UIKit
 
 class LookingForHeader: UITableViewCell {
     
+    @IBOutlet weak var headerImg: UIImageView!
     @IBOutlet weak var title: UILabel!
 }

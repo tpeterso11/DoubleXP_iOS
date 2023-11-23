@@ -59,7 +59,7 @@ class FAQuizConsoles: UIViewController{
             chosenConsole = "nintendo"
         }
         
-        AppEvents.logEvent(AppEvents.Name(rawValue: "FA Quiz - Console Chosen - " + chosenConsole))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "FA Quiz - Console Chosen - " + chosenConsole))
         interviewManager?.setConsoles(console: selectedConsole)
     }
     

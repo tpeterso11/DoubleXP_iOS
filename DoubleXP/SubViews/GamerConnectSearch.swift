@@ -19,7 +19,7 @@ import PopupDialog
 import CoreLocation
 import GeoFire
 
-class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDataSource,  UICollectionViewDelegateFlowLayout, SearchCallbacks, SPStorkControllerDelegate, SearchManagerCallbacks, UITableViewDelegate, UITableViewDataSource, CLLocationManagerDelegate {
+class GamerConnectSearch: ParentVC, SearchCallbacks, SPStorkControllerDelegate, SearchManagerCallbacks, UITableViewDelegate, UITableViewDataSource, CLLocationManagerDelegate {
     
     var game: GamerConnectGame? = nil
     
@@ -32,26 +32,15 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
     var set = false
     var frontSearchPayload = [Any]()
     
-    @IBOutlet weak var searchBlur: UIVisualEffectView!
-    @IBOutlet weak var filterButton: UIImageView!
+    @IBOutlet weak var loadingAnimation: LottieAnimationView!
+    @IBOutlet weak var filterButton: LottieAnimationView!
+    @IBOutlet weak var loadingBlur: UIVisualEffectView!
     @IBOutlet weak var gameHeaderImage: UIImageView!
-    @IBOutlet weak var gamerConnectResults: UICollectionView!
-    @IBOutlet weak var psSwitch: UISwitch!
-    @IBOutlet weak var xboxSwitch: UISwitch!
-    @IBOutlet weak var nintendoSwitch: UISwitch!
-    @IBOutlet weak var pcSwitch: UISwitch!
-    @IBOutlet weak var searchEmpty: UIView!
-    @IBOutlet weak var searchEmptyText: UILabel!
-    @IBOutlet weak var searchEmptySub: UILabel!
-    @IBOutlet weak var loadingView: UIView!
-    @IBOutlet weak var searchAnimation: AnimationView!
-    @IBOutlet weak var psLabel: UILabel!
-    @IBOutlet weak var pcLabel: UILabel!
-    @IBOutlet weak var xboxLabel: UILabel!
-    @IBOutlet weak var nintendoLabel: UILabel!
-    @IBOutlet weak var mobileLabel: UILabel!
-    @IBOutlet weak var mobileSwitch: UISwitch!
     @IBOutlet weak var searchTable: UITableView!
+    @IBOutlet weak var searchCover: UIView!
+    @IBOutlet weak var searchEmpty: UIView!
+    @IBOutlet weak var searchEmptyTitle: UILabel!
+    @IBOutlet weak var searchEmptyMessage: UILabel!
     var basicFilterList = [filterCell]()
     var locationCell: filterCell?
     var popup: PopupDialog?
@@ -64,27 +53,25 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
     var currentLocationIndexPath: IndexPath?
     var usersSelectedTags = [String]()
     
-    override func viewWillAppear(_ animated: Bool) {
-        if self.traitCollection.userInterfaceStyle == .dark {
-            self.searchBlur.effect = UIBlurEffect(style: .dark)
-                } else {
-                    self.searchBlur.effect = UIBlurEffect(style: .light)
-                }
-        super.viewWillAppear(animated)
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         //check rivals on entry.
         
         if(game != nil){
             //gameHeaderImage.alpha = 0
+            filterButton.loopMode = .playOnce
+            filterButton.play()
+            
+            let filterTap = UITapGestureRecognizer(target: self, action: #selector(self.showFilters))
+            filterButton.isUserInteractionEnabled = true
+            filterButton.addGestureRecognizer(filterTap)
+        
+            
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             let cache = appDelegate.imageCache
             if(cache.object(forKey: game!.imageUrl as NSString) != nil){
                 gameHeaderImage.image = cache.object(forKey: game!.imageUrl as NSString)
             } else {
-                gameHeaderImage.image = Utility.Image.placeholder
                 gameHeaderImage.moa.onSuccess = { image in
                     self.gameHeaderImage.image = image
                     appDelegate.imageCache.setObject(image, forKey: self.game!.imageUrl as NSString)
@@ -104,14 +91,6 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
             maskLayer.frame = testBounds
             self.gameHeaderImage.layer.mask = maskLayer
             
-            /*gameHeaderImage.layer.shadowColor = UIColor.black.cgColor
-            gameHeaderImage.layer.shadowOffset = CGSize(width: 0, height: 2.0)
-            gameHeaderImage.layer.shadowRadius = 2.0
-            gameHeaderImage.layer.shadowOpacity = 0.5
-            gameHeaderImage.layer.masksToBounds = true
-            gameHeaderImage.layer.shadowPath = UIBezierPath(roundedRect: gameHeaderImage.bounds, cornerRadius: gameHeaderImage.layer.cornerRadius).cgPath*/
-            //gameImageHeader.clipsToBounds = true
-            
             searchPS = false
             searchXbox = false
             searchNintendo = false
@@ -125,309 +104,51 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
             manager.currentGameSearch = game?.gameName ?? ""
             manager.resetFilters()
             
-            var availableCount = 0
-            var userConsolesForGame = [String]()
-            var psAvailable = false
-            var xboxAvailable = false
-            var nintendoAvailable = false
-            var mobileAvailable = false
-            var pcAvailable = false
-            
-            for profile in currentUser!.gamerTags {
-                if(profile.game == game!.gameName){
-                    userConsolesForGame.append(profile.console)
-                }
-            }
-            
-            if(game!.availablebConsoles.contains("ps")){
-                psAvailable = true
-                availableCount += 1
-            }
-            if(game!.availablebConsoles.contains("xbox")){
-                xboxAvailable = true
-                availableCount += 1
-            }
-            if(game!.availablebConsoles.contains("nintendo")){
-                nintendoAvailable = true
-                availableCount += 1
-            }
-            
-            if(game!.availablebConsoles.contains("pc")){
-                pcAvailable = true
-                availableCount += 1
-            }
-            
-            if(game!.availablebConsoles.contains("mobile")){
-                mobileAvailable = true
-                availableCount += 1
-            }
-            
-            if(availableCount == 0 || availableCount == 1){
-                self.pcSwitch.alpha = 0.4
-                self.pcLabel.alpha = 0.4
-                self.mobileSwitch.alpha = 0.4
-                self.mobileLabel.alpha = 0.4
-                self.psSwitch.alpha = 0.4
-                self.psLabel.alpha = 0.4
-                self.nintendoSwitch.alpha = 0.4
-                self.nintendoLabel.alpha = 0.4
-                self.xboxSwitch.alpha = 0.4
-                self.xboxLabel.alpha = 0.4
-                
-                if(availableCount == 1){
-                    if(psAvailable){
-                        searchPS = true
-                        self.psSwitch.setOn(true, animated: false)
-                        manager.currentSelectedConsoles.append("ps")
-                    }
-                    if(xboxAvailable){
-                        searchXbox = true
-                        self.xboxSwitch.setOn(true, animated: false)
-                        manager.currentSelectedConsoles.append("xbox")
-                    }
-                    if(nintendoAvailable){
-                        searchNintendo = true
-                        self.nintendoSwitch.setOn(true, animated: false)
-                        manager.currentSelectedConsoles.append("nintendo")
-                    }
-                    if(pcAvailable){
-                        searchPC = true
-                        self.pcSwitch.setOn(true, animated: false)
-                        manager.currentSelectedConsoles.append("pc")
-                    }
-                    if(mobileAvailable){
-                        searchMobile = true
-                        self.mobileSwitch.setOn(true, animated: false)
-                        manager.currentSelectedConsoles.append("mobile")
-                    }
-                }
-            } else  {
-                if(psAvailable){
-                    psSwitch.alpha = 1.0
-                    psLabel.alpha = 1.0
-                    psSwitch.isEnabled = true
-                    
-                    var contained = false
-                    for console in userConsolesForGame {
-                        if(console == "ps"){
-                            contained = true
-                        }
-                    }
-                    if(contained){
-                        psSwitch.isOn = true
-                        searchPS = true
-                        manager.currentSelectedConsoles.append("ps")
-                    } else {
-                        if(userConsolesForGame.isEmpty){
-                            psSwitch.isOn = true
-                            searchPS = true
-                            manager.currentSelectedConsoles.append("ps")
-                        } else {
-                            psSwitch.isOn = false
-                            searchPS = false
-                        }
-                    }
-                    psSwitch.addTarget(self, action: #selector(psSwitchChanged), for: UIControl.Event.valueChanged)
-                } else {
-                    psSwitch.alpha = 0.3
-                    psLabel.alpha = 0.3
-                    psSwitch.isEnabled = false
-                }
-                if(xboxAvailable){
-                    xboxSwitch.alpha = 1.0
-                    xboxLabel.alpha = 1.0
-                    xboxSwitch.isEnabled = true
-                    
-                    var contained = false
-                    for console in userConsolesForGame {
-                        if(console == "xbox"){
-                            contained = true
-                        }
-                    }
-                    if(contained){
-                        xboxSwitch.setOn(true, animated: false)
-                        searchXbox = true
-                        manager.currentSelectedConsoles.append("xbox")
-                    } else {
-                        if(userConsolesForGame.isEmpty){
-                            xboxSwitch.setOn(true, animated: false)
-                            searchXbox = true
-                            manager.currentSelectedConsoles.append("xbox")
-                        } else {
-                            xboxSwitch.setOn(false, animated: false)
-                            searchXbox = false
-                        }
-                    }
-                    xboxSwitch.addTarget(self, action: #selector(xboxSwitchChanged), for: UIControl.Event.valueChanged)
-                } else {
-                    xboxSwitch.alpha = 0.3
-                    xboxLabel.alpha = 0.3
-                    xboxSwitch.isEnabled = false
-                }
-                if(nintendoAvailable){
-                    nintendoSwitch.alpha = 1.0
-                    nintendoLabel.alpha = 1.0
-                    nintendoSwitch.isEnabled = true
-                    
-                    var contained = false
-                    for console in userConsolesForGame {
-                        if(console == "nintendo"){
-                            contained = true
-                        }
-                    }
-                    if(contained){
-                        nintendoSwitch.setOn(true, animated: false)
-                        searchNintendo = true
-                        manager.currentSelectedConsoles.append("nintendo")
-                    } else {
-                        if(userConsolesForGame.isEmpty){
-                            nintendoSwitch.setOn(true, animated: false)
-                            searchNintendo = true
-                            manager.currentSelectedConsoles.append("nintendo")
-                        } else {
-                            nintendoSwitch.setOn(false, animated: false)
-                            searchNintendo = false
-                        }
-                    }
-                    nintendoSwitch.addTarget(self, action: #selector(nintendoSwitchChanged), for: UIControl.Event.valueChanged)
-                } else {
-                    nintendoSwitch.alpha = 0.3
-                    nintendoLabel.alpha = 0.3
-                    nintendoSwitch.isEnabled = false
-                }
-                if(pcAvailable){
-                    pcSwitch.alpha = 1.0
-                    pcLabel.alpha = 1.0
-                    pcSwitch.isEnabled = true
-                    
-                    var contained = false
-                    for console in userConsolesForGame {
-                        if(console == "pc"){
-                            contained = true
-                        }
-                    }
-                    if(contained){
-                        pcSwitch.setOn(true, animated: false)
-                        searchPC = true
-                        manager.currentSelectedConsoles.append("pc")
-                    } else {
-                        if(userConsolesForGame.isEmpty){
-                            pcSwitch.setOn(true, animated: false)
-                            searchPC = true
-                            manager.currentSelectedConsoles.append("pc")
-                        } else {
-                            pcSwitch.setOn(false, animated: false)
-                            searchPC = false
-                        }
-                    }
-                    pcSwitch.addTarget(self, action: #selector(pcSwitchChanged), for: UIControl.Event.valueChanged)
-                } else {
-                    pcSwitch.alpha = 0.3
-                    pcLabel.alpha = 0.3
-                    pcSwitch.isEnabled = false
-                }
-                if(mobileAvailable){
-                    mobileSwitch.alpha = 1.0
-                    mobileLabel.alpha = 1.0
-                    mobileSwitch.isEnabled = true
-                    
-                    var contained = false
-                    for console in userConsolesForGame {
-                        if(console == "mobile"){
-                            contained = true
-                        }
-                    }
-                    if(contained){
-                        mobileSwitch.setOn(true, animated: false)
-                        searchMobile = true
-                        manager.currentSelectedConsoles.append("mobile")
-                    } else {
-                        if(userConsolesForGame.isEmpty){
-                            mobileSwitch.setOn(true, animated: false)
-                            searchMobile = true
-                            manager.currentSelectedConsoles.append("mobile")
-                        } else {
-                            mobileSwitch.setOn(false, animated: false)
-                            searchMobile = false
-                        }
-                    }
-                    mobileSwitch.addTarget(self, action: #selector(mobileSwitchChanged), for: UIControl.Event.valueChanged)
-                } else {
-                    mobileSwitch.alpha = 0.3
-                    mobileLabel.alpha = 0.3
-                    mobileSwitch.isEnabled = false
-                }
-            }
-            
-            psSwitch.addTarget(self, action: #selector(psSwitchChanged), for: UIControl.Event.valueChanged)
-            pcSwitch.addTarget(self, action: #selector(pcSwitchChanged), for: UIControl.Event.valueChanged)
-            xboxSwitch.addTarget(self, action: #selector(xboxSwitchChanged), for: UIControl.Event.valueChanged)
-            nintendoSwitch.addTarget(self, action: #selector(nintendoSwitchChanged), for: UIControl.Event.valueChanged)
-            
             Broadcaster.register(SearchCallbacks.self, observer: self)
             
-            let singleTap = UITapGestureRecognizer(target: self, action: #selector(showFilters))
-            filterButton.isUserInteractionEnabled = true
-            filterButton.addGestureRecognizer(singleTap)
-            
+            showLoading()
             checkRivals()
             FriendsManager().checkOnlineAnnouncements()
             
-            self.searchTable.estimatedRowHeight = 250
-            self.searchTable.rowHeight = UITableView.automaticDimension
-            self.frontSearchPayload.append("")
-            self.searchTable.delegate = self
-            self.searchTable.dataSource = self
+            //self.searchTable.estimatedRowHeight = 250
+            //self.searchTable.rowHeight = UITableView.automaticDimension
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                self.searchUsers(userName: nil)
+            }
         }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.searchManager.resetFilters()
+        super.viewWillDisappear(animated)
     }
     
     private func showLoading(){
-        if(self.loadingView.alpha == 0){
-            self.searchAnimation.play()
-            
-            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                self.loadingView.alpha = 1
-            }, completion: nil)
-        }
+        self.loadingAnimation.loopMode = .loop
+        self.loadingAnimation.play()
+        
+        UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+            self.loadingBlur.alpha = 1
+        }, completion: nil)
     }
     
     private func hideLoading(){
-        if(self.searchBlur.alpha == 1){
-            UIView.animate(withDuration: 0.5, animations: {
-                self.loadingView.alpha = 0
+        if(self.loadingBlur.alpha == 1){
+            UIView.animate(withDuration: 0.5, delay: 0.8, options: [], animations: {
+                self.loadingBlur.alpha = 0
             }, completion: { (finished: Bool) in
-                UIView.animate(withDuration: 0.5, delay: 0.5, options: [], animations: {
-                    self.searchBlur.alpha = 0
-                }, completion: nil)
-            })
-        } else {
-            if(self.loadingView.alpha == 1){
-                self.searchAnimation.pause()
                 
-                UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                    self.loadingView.alpha = 0
-                }, completion: nil)
-            }
+            })
         }
     }
     
     func dismissModal(){
         self.searchTable.reloadData()
-        /*let delegate = UIApplication.shared.delegate as! AppDelegate
-        showLoading()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            if(delegate.currentUser!.userLat != 0.0){
-                delegate.searchManager.searchWithLocation(callbacks: self)
-            } else {
-                delegate.searchManager.searchWithFilters(callbacks: self)
-            }
-        }*/
     }
     
     @objc func didDismissStorkBySwipe(){
         self.searchTable.reloadData()
-        /*let delegate = UIApplication.shared.delegate as! AppDelegate
-        delegate.searchManager.searchWithFilters(callbacks: self)*/
     }
     
     private func checkRivals(){
@@ -435,159 +156,29 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
         let manager = delegate.profileManager
         currentUser = delegate.currentUser
         manager.updateTempRivalsDB()
-        
-        showLoading()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-            let manager = delegate.searchManager
-            //manager.searchWithFilters(callbacks: self)
-            
-            self.currentManager = delegate.searchManager
-            
-            if(delegate.currentUser!.userLat != 0.0){
-                self.updateLocation()
-            } else {
-                self.buildFilterList()
-            }
-        }
     }
     
-    @objc private func showFilters(){
-        UIView.animate(withDuration: 0.5, animations: {
-            self.searchBlur.alpha = 1
-        }, completion: { (finished: Bool) in
-            UIView.animate(withDuration: 0.5, delay: 0.3, options: [], animations: {
-                self.searchTable.alpha = 1
-            }, completion: nil)
-        })
-        /*let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    @objc func showFilters(_ sender: AnyObject?){
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "filters") as! GCSearchFilters
-        if(self.game != nil){
-            currentViewController.gcGame = game
-            appDelegate.currentFrag = "Filters"
-            
-            let transitionDelegate = SPStorkTransitioningDelegate()
-            currentViewController.transitioningDelegate = transitionDelegate
-            currentViewController.modalPresentationStyle = .custom
-            currentViewController.modalPresentationCapturesStatusBarAppearance = true
-            transitionDelegate.showIndicator = true
-            transitionDelegate.swipeToDismissEnabled = true
-            transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
-            transitionDelegate.storkDelegate = self
-            self.present(currentViewController, animated: true, completion: nil)
-        }*/
+        currentViewController.gcGame = self.game!
+        
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+        
+        
     }
     
     func stringToDate(_ str: String)->Date{
         let formatter = DateFormatter()
         formatter.dateFormat="yyyy.MM.dd hh:mm aaa"
         return formatter.date(from: str)!
-    }
-    
-    @objc func psSwitchChanged(stationSwitch: UISwitch) {
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        let manager = delegate.searchManager
-        if(stationSwitch.isOn){
-            searchPS = true
-            manager.currentSelectedConsoles.append("ps")
-        }
-        else{
-            searchPS = false
-            manager.currentSelectedConsoles.remove(at: manager.currentSelectedConsoles.index(of: "ps")!)
-        }
-        showLoading()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            if(delegate.currentUser!.userLat != 0.0){
-                delegate.searchManager.searchWithLocation(callbacks: self)
-            } else {
-                delegate.searchManager.searchWithFilters(callbacks: self)
-            }
-        }
-    }
-    @objc func xboxSwitchChanged(xSwitch: UISwitch) {
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        let manager = delegate.searchManager
-        if(xSwitch.isOn){
-            searchXbox = true
-            manager.currentSelectedConsoles.append("xbox")
-        }
-        else{
-            searchXbox = false
-            manager.currentSelectedConsoles.remove(at: manager.currentSelectedConsoles.index(of: "xbox")!)
-        }
-        showLoading()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            if(delegate.currentUser!.userLat != 0.0){
-                delegate.searchManager.searchWithLocation(callbacks: self)
-            } else {
-                delegate.searchManager.searchWithFilters(callbacks: self)
-            }
-        }
-    }
-    @objc func nintendoSwitchChanged(switchSwitch: UISwitch) {
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        let manager = delegate.searchManager
-        if(switchSwitch.isOn){
-            searchNintendo = true
-            manager.currentSelectedConsoles.append("nintendo")
-        }
-        else{
-            searchNintendo = false
-            manager.currentSelectedConsoles.remove(at: manager.currentSelectedConsoles.index(of: "nintendo")!)
-        }
-        showLoading()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            if(delegate.currentUser!.userLat != 0.0){
-                delegate.searchManager.searchWithLocation(callbacks: self)
-            } else {
-                delegate.searchManager.searchWithFilters(callbacks: self)
-            }
-        }
-    }
-    
-    @objc func mobileSwitchChanged(switchSwitch: UISwitch) {
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        let manager = delegate.searchManager
-        if(switchSwitch.isOn){
-            searchMobile = true
-            manager.currentSelectedConsoles.append("mobile")
-        }
-        else{
-            searchMobile = false
-            manager.currentSelectedConsoles.remove(at: manager.currentSelectedConsoles.index(of: "mobile")!)
-        }
-        showLoading()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            if(delegate.currentUser!.userLat != 0.0){
-                delegate.searchManager.searchWithLocation(callbacks: self)
-            } else {
-                delegate.searchManager.searchWithFilters(callbacks: self)
-            }
-        }
-    }
-    @objc func pcSwitchChanged(compSwitch: UISwitch) {
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        let manager = delegate.searchManager
-        if(compSwitch.isOn){
-            searchPC = true
-            manager.currentSelectedConsoles.append("pc")
-        }
-        else{
-            searchPC = false
-            manager.currentSelectedConsoles.remove(at: manager.currentSelectedConsoles.index(of: "pc")!)
-        }
-        showLoading()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            if(delegate.currentUser!.userLat != 0.0){
-                delegate.searchManager.searchWithLocation(callbacks: self)
-            } else {
-                delegate.searchManager.searchWithFilters(callbacks: self)
-            }
-        }
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return returnedUsers.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -754,53 +345,29 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
         }
     }
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        AppEvents.logEvent(AppEvents.Name(rawValue: "GC Search - Profile Accessed"))
-        
-        let current = returnedUsers[indexPath.item]
-        if(current is User){
-            let uid = (current as! User).uId
-            
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            appDelegate.cachedTest = uid
-            
-            let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "playerProfile") as! PlayerProfile
-            let transitionDelegate = SPStorkTransitioningDelegate()
-            currentViewController.transitioningDelegate = transitionDelegate
-            currentViewController.modalPresentationStyle = .custom
-            currentViewController.modalPresentationCapturesStatusBarAppearance = true
-            currentViewController.editMode = false
-            transitionDelegate.showIndicator = true
-            transitionDelegate.swipeToDismissEnabled = true
-            transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
-            transitionDelegate.storkDelegate = self
-            self.present(currentViewController, animated: true, completion: nil)
-        }
-    }
-    
     private func searchUsers(userName: String?){
         if(self.searchPS){
-            AppEvents.logEvent(AppEvents.Name(rawValue: "GC Search - Console: PS, Game: " + self.game!.gameName))
+            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Search - Console: PS, Game: " + self.game!.gameName))
         }
         if(self.searchXbox){
-            AppEvents.logEvent(AppEvents.Name(rawValue: "GC Search - Console: XBox, Game: " + self.game!.gameName))
+            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Search - Console: XBox, Game: " + self.game!.gameName))
         }
         if(self.searchPC){
-            AppEvents.logEvent(AppEvents.Name(rawValue: "GC Search - Console: PC, Game: " + self.game!.gameName))
+            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Search - Console: PC, Game: " + self.game!.gameName))
         }
         if(self.searchNintendo){
-            AppEvents.logEvent(AppEvents.Name(rawValue: "GC Search - Console: Nintendo, Game: " + self.game!.gameName))
+            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Search - Console: Nintendo, Game: " + self.game!.gameName))
         }
         
         if(userName != nil){
-            AppEvents.logEvent(AppEvents.Name(rawValue: "GC Search - User"))
+            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Search - User"))
         }
         
-        if(self.loadingView.alpha == 0){
-            self.searchAnimation.play()
+        if(self.loadingBlur.alpha == 0){
+            self.loadingAnimation.play()
             
             UIView.animate(withDuration: 0.8, delay: 0.2, options: [], animations: {
-                self.loadingView.alpha = 1
+                self.loadingBlur.alpha = 1
             }, completion: { (finished: Bool) in
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                     self.searchUsers(userName: userName)
@@ -815,8 +382,6 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
             // Get user value
             for user in snapshot.children{
                 let value = (user as! DataSnapshot).value as? NSDictionary
-                
-                
                 let search = value?["search"] as? String ?? "true"
                 let gamerTag = value?["gamerTag"] as? String ?? ""
                 
@@ -1005,16 +570,23 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
         }
         
         if(!self.set){
-            self.gamerConnectResults.delegate = self
-            self.gamerConnectResults.dataSource = self
+            self.searchTable.delegate = self
+            self.searchTable.dataSource = self
             
             self.set = true
             
-            self.hideLoading()
+            if(self.returnedUsers.isEmpty){
+                self.searchEmpty.alpha = 1
+            } else {
+                self.searchEmpty.alpha = 0
+            }
+            
             UIView.animate(withDuration: 0.8, animations: {
-                self.loadingView.alpha = 0
+                self.searchTable.alpha = 1
+                self.searchTable.reloadData()
             }, completion: { (finished: Bool) in
-                UIView.animate(withDuration: 0.8, delay: 0.5, options: [], animations: {
+                self.hideLoading()
+                /*UIView.animate(withDuration: 0.8, delay: 0.5, options: [], animations: {
                     if(!self.returnedUsers.isEmpty){
                         self.searchEmpty.isHidden = true
                     }
@@ -1024,17 +596,23 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
                         self.searchEmptyText.text = "No users returned for your chosen game."
                         self.searchEmptySub.text = "No worries, try your search again later."
                     }
-                }, completion: nil)
+                }, completion: nil)*/
             })
         }
         else{
-            self.hideLoading()
             UIView.animate(withDuration: 0.8, animations: {
-                self.loadingView.alpha = 0
-            }, completion: { (finished: Bool) in
-                self.gamerConnectResults.reloadData()
+                self.searchTable.alpha = 1
+                self.searchTable.reloadData()
                 
-                if(!self.returnedUsers.isEmpty){
+                if(self.returnedUsers.isEmpty){
+                    self.searchEmpty.alpha = 1
+                } else {
+                    self.searchEmpty.alpha = 0
+                }
+            }, completion: { (finished: Bool) in
+                self.hideLoading()
+                
+                /*if(!self.returnedUsers.isEmpty){
                     self.searchEmpty.isHidden = true
                 }
                 else{
@@ -1048,30 +626,19 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
                         self.searchEmptyText.text = "No users returned for your chosen game."
                         self.searchEmptySub.text = "No worries, try your search again later."
                     }
-                }
+                }*/
             })
         }
         
         }) { (error) in
             print(error.localizedDescription)
-            AppEvents.logEvent(AppEvents.Name(rawValue: "GamerConnect Search "))
+            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GamerConnect Search "))
         }
     }
     
     func searchSubmitted(searchString: String) {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.searchManager.searchForUser(searchTag: searchString, callbacks: self)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let current = self.returnedUsers[indexPath.item]
-        if(current is String){
-            return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(40))
-        } else {
-            return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(120))
-        }
     }
     
     private func addUserToList(returnedUser: User){
@@ -1103,280 +670,129 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
     
     func onSuccess(returnedUsers: [User]) {
         if(returnedUsers.isEmpty){
+            //self.searchEmpty.alpha = 1
+            //self.searchEmpty.isHidden = false
+            //self.searchEmptySub.text = "please change a search filter or try again later."
             self.searchEmpty.alpha = 1
-            self.searchEmpty.isHidden = false
-            self.searchEmptySub.text = "please change a search filter or try again later."
             self.hideLoading()
             return
         }
         if(!set){
-            self.searchEmpty.alpha = 0
+            self.set = true
             self.returnedUsers = returnedUsers
-            self.returnedUsers.append("empty")
-            self.gamerConnectResults.delegate = self
-            self.gamerConnectResults.dataSource = self
-            self.gamerConnectResults.reloadData()
+            self.searchTable.delegate = self
+            self.searchTable.dataSource = self
+            self.searchTable.reloadData()
+            self.searchEmpty.alpha = 0
+        
             
             UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                self.gamerConnectResults.alpha = 1
+                self.searchTable.alpha = 1
             }, completion: nil)
         } else {
-            self.searchEmpty.alpha = 0
             self.returnedUsers = returnedUsers
-            self.returnedUsers.append("empty")
-            self.gamerConnectResults.reloadData()
+            self.searchEmpty.alpha = 0
+            self.searchTable.reloadData()
+        }
+        if(self.searchTable.alpha == 0){
+            UIView.animate(withDuration: 0.8, animations: {
+                self.searchTable.alpha = 1
+            }, completion: { (finished: Bool) in
+            
+            })
         }
         self.hideLoading()
     }
     
     func onFailure() {
-        self.searchEmpty.alpha = 1
-        self.searchEmptySub.text = "please change a search filter or try again later."
+        //self.searchEmpty.alpha = 1
+        //self.searchEmptySub.text = "please change a search filter or try again later."
     }
     
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return self.basicFilterList.count
-    }
+    //func numberOfSections(in tableView: UITableView) -> Int {
+    //    return self.basicFilterList.count
+   // }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if(self.basicFilterList[section].opened == true){
-            return self.basicFilterList[section].options.count + 1
-        } else {
-            return 1
-        }
+        return self.returnedUsers.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if(indexPath.row == 0){
-            if(self.basicFilterList[indexPath.section].header == true){
-                if(self.basicFilterList[indexPath.section].mainHeader == true){
-                    let cell = tableView.dequeueReusableCell(withIdentifier: "searchHeader", for: indexPath) as! SearchHeader
-                    
-                    let delegate = UIApplication.shared.delegate as! AppDelegate
-                    let searchManager = delegate.searchManager
-                    if(searchManager.searchLookingFor.isEmpty && (searchManager.locationFilter.isEmpty || searchManager.locationFilter == "none") && searchManager.ageFilters.isEmpty){
-                        if(cell.searchButton.title(for: .normal) != "quick search"){
-                            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                                cell.searchButton.setTitle("quick search", for: .normal)
-                                cell.searchButton.addTarget(self, action: #selector(self.quickSearch), for: UIControl.Event.touchUpInside)
-                                cell.searchSub.text = "just show me what you've got"
-                            }, completion: nil)
-                        } else {
-                            cell.searchButton.setTitle("quick search", for: .normal)
-                            cell.searchButton.addTarget(self, action: #selector(self.quickSearch), for: UIControl.Event.touchUpInside)
-                            cell.searchSub.text = "just show me what you've got"
-                        }
-                    } else if(searchManager.searchLookingFor.isEmpty && searchManager.ageFilters.isEmpty && (!searchManager.locationFilter.isEmpty && searchManager.locationFilter != "none")){
-                        if(cell.searchButton.title(for: .normal) != "location search"){
-                            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                                cell.searchButton.setTitle("location search", for: .normal)
-                                cell.searchSub.text = "we're getting warmer..."
-                                cell.searchButton.addTarget(self, action: #selector(self.quickSearch), for: UIControl.Event.touchUpInside)
-                            }, completion: nil)
-                        } else {
-                            cell.searchButton.setTitle("location search", for: .normal)
-                            cell.searchSub.text = "we're getting warmer..."
-                            cell.searchButton.addTarget(self, action: #selector(self.quickSearch), for: UIControl.Event.touchUpInside)
-                        }
-                    } else {
-                        if(cell.searchButton.title(for: .normal) != "quick search"){
-                            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                                cell.searchButton.setTitle("filter search", for: .normal)
-                                cell.searchSub.text = "ok, so you know what you're looking for."
-                                cell.searchButton.addTarget(self, action: #selector(self.quickSearch), for: UIControl.Event.touchUpInside)
-                            }, completion: nil)
-                        } else {
-                            cell.searchButton.setTitle("filter search", for: .normal)
-                            cell.searchSub.text = "ok, so you know what you're looking for."
-                            cell.searchButton.addTarget(self, action: #selector(self.quickSearch), for: UIControl.Event.touchUpInside)
-                        }
-                    }
-                    
-                    return cell
-                }
-                else if(self.basicFilterList[indexPath.section].type == "activate"){
-                    let cell = tableView.dequeueReusableCell(withIdentifier: "activate", for: indexPath) as! FilterActivateCell
-                    cell.actionButton.setTitle(self.basicFilterList[indexPath.section].title, for: .normal)
-                    
-                    if(self.basicFilterList[indexPath.section].title == "location"){
-                        self.currentLocationActivationCell = cell
-                        let delegate = UIApplication.shared.delegate as! AppDelegate
-                        if(delegate.currentUser!.userLat != 0.0){
-                            cell.switch.isOn = true
-                            cell.actionButton.borderColor = #colorLiteral(red: 0.1667544842, green: 0.6060172915, blue: 0.279296875, alpha: 1)
-                        } else {
-                            cell.switch.isOn = false
-                            cell.actionButton.borderColor = UIColor.init(named: "darkToWhite")
-                        }
-                        cell.actionButton.addTarget(self, action: #selector(locationButtonTriggered), for: UIControl.Event.touchUpInside)
-                        cell.switch.addTarget(self, action: #selector(locationSwitchTriggered), for: UIControl.Event.valueChanged)
-                    }
-                    return cell
-                } else if(self.basicFilterList[indexPath.section].type == "lookingFor"){
-                    let cell = tableView.dequeueReusableCell(withIdentifier: "lookingFor", for: indexPath) as! SearchLookingForCell
-                    cell.setPayload(payload: self.game!.lookingFor, search: self)
-                    return cell
-                } else {
-                    let cell = tableView.dequeueReusableCell(withIdentifier: "category", for: indexPath) as! FilterCategory
-                    cell.title.text = self.basicFilterList[indexPath.section].title
-                    return cell
-                }
-            } else {
-                let cell = tableView.dequeueReusableCell(withIdentifier: "header", for: indexPath) as! FilterHeader
-                cell.headerAction.setTitle(self.basicFilterList[indexPath.section].title, for: .normal)
-                
-                if(self.basicFilterList[indexPath.section].title == "age range"){
-                    cell.headerSwitch.alpha = 1
-                    let delegate = UIApplication.shared.delegate as! AppDelegate
-                    let searchManager = delegate.searchManager
-                    if(searchManager.ageFilters.isEmpty){
-                        cell.headerSwitch.isOn = false
-                        cell.headerAction.borderColor = #colorLiteral(red: 0.6666666865, green: 0.6666666865, blue: 0.6666666865, alpha: 1)
-                    } else {
-                        cell.headerSwitch.isOn = true
-                        cell.headerAction.borderColor = #colorLiteral(red: 0.1667544842, green: 0.6060172915, blue: 0.279296875, alpha: 1)
-                    }
-                } else {
-                    cell.headerSwitch.alpha = 0
-                }
-                
-                let headerTap = HeaderGesture(target: self, action: #selector(headerTriggered))
-                headerTap.question = self.basicFilterList[indexPath.section].title
-                headerTap.payload = self.basicFilterList[indexPath.section].choices
-                cell.headerAction.addGestureRecognizer(headerTap)
-                
-                cell.headerSwitch.isUserInteractionEnabled = false
-                return cell
-            }
+        let cell = tableView.dequeueReusableCell(withIdentifier: "user", for: indexPath) as! GamerConnectUserCell
+        let manager = GamerProfileManager()
+        let current = self.returnedUsers[indexPath.item] as! User
+        cell.gamerTag.text = manager.getGamerTag(user: current)
+        if(current.bio.isEmpty){
+            cell.bioField.text = "no bio available"
         } else {
-            if(self.basicFilterList[indexPath.section].header == true){
-                if(self.basicFilterList[indexPath.section].title == "location"){
-                    let cell = tableView.dequeueReusableCell(withIdentifier: "distance", for: indexPath) as! DistanceCell
-                    
-                    let fiftyTap = DistanceGesture(target: self, action: #selector(distanceChosen))
-                    fiftyTap.tag = "fifty_miles"
-                    fiftyTap.section = indexPath.section
-                    cell.fifty.isUserInteractionEnabled = true
-                    cell.fifty.addGestureRecognizer(fiftyTap)
-                    
-                    if(self.currentManager.locationFilter == "fifty_miles"){
-                        cell.fiftyCover.alpha = 1
-                    } else {
-                        cell.fiftyCover.alpha = 0
-                    }
-                    
-                    let hundredTap = DistanceGesture(target: self, action: #selector(distanceChosen))
-                    hundredTap.tag = "hundred_miles"
-                    hundredTap.section = indexPath.section
-                    cell.hundred.isUserInteractionEnabled = true
-                    cell.hundred.addGestureRecognizer(hundredTap)
-                    
-                    if(self.currentManager.locationFilter == "hundred_miles"){
-                        cell.hundredCover.alpha = 1
-                    } else {
-                        cell.hundredCover.alpha = 0
-                    }
-                    
-                    let timezoneTap = DistanceGesture(target: self, action: #selector(distanceChosen))
-                    timezoneTap.tag = "timezone"
-                    timezoneTap.section = indexPath.section
-                    cell.timezoneButton.isUserInteractionEnabled = true
-                    cell.timezoneButton.addGestureRecognizer(timezoneTap)
-                    
-                    if(self.currentManager.locationFilter == "timezone"){
-                        cell.timezoneCover.alpha = 1
-                    } else {
-                        cell.timezoneCover.alpha = 0
-                    }
-                    
-                    let noneTap = DistanceGesture(target: self, action: #selector(distanceChosen))
-                    noneTap.tag = "none"
-                    noneTap.section = indexPath.section
-                    cell.globalButton.isUserInteractionEnabled = true
-                    cell.globalButton.addGestureRecognizer(noneTap)
-                    
-                    if(self.currentManager.locationFilter == "none"){
-                        cell.globalCover.alpha = 1
-                    } else {
-                        cell.globalCover.alpha = 0
-                    }
-                    
-                    let delegate = UIApplication.shared.delegate as! AppDelegate
-                    if(delegate.currentUser!.userLat != 0.0){
-                        cell.cover.alpha = 0
-                        cell.howFar.alpha = 1
-                    } else {
-                        cell.cover.alpha = 1
-                        cell.howFar.alpha = 0
-                        
-                        if self.traitCollection.userInterfaceStyle == .dark {
-                            cell.lottie.animation = Animation.named("search_location_light")
-                            cell.lottie.contentMode = .scaleAspectFit
-                            cell.lottie.loopMode = .playOnce
-                            cell.lottie.play()
-                        } else {
-                            cell.lottie.animation = Animation.named("search_location_dark")
-                            cell.lottie.contentMode = .scaleAspectFit
-                            cell.lottie.loopMode = .playOnce
-                            cell.lottie.play()
-                        }
-                    }
-                    
-                    return cell
-                } else {
-                    let cell = tableView.dequeueReusableCell(withIdentifier: "empty", for: indexPath) as! EmptyCell
-                    return cell
-                }
-            }
-            else {
-                let cell = tableView.dequeueReusableCell(withIdentifier: "option", for: indexPath) as! FilterOption
-                let current = self.basicFilterList[indexPath.section].options[indexPath.row - 1] as? [String: String]
-                let key = Array(current!.keys)[0]
-                
-                let currentFilter = self.basicFilterList[indexPath.section]
-                if(currentFilter.type != "advanced"){
-                    cell.option.text = key
-                    cell.coverLabel.text = key
-                    
-                    if(self.currentManager.ageFilters.contains(current![key] ?? "") || self.currentManager.langaugeFilters.contains(current![key] ?? "")){
-                        cell.cover.alpha = 1
-                    } else {
-                        cell.cover.alpha = 0
-                    }
-                } else {
-                    cell.option.text = current![key]
-                    cell.coverLabel.text = current![key]
-                    
-                    var contained = false
-                    for option in self.currentManager.advancedFilters {
-                        let thisKey = Array(option.keys)[0]
-                        let thisValue = option[thisKey]
-                        if(key == thisKey && thisValue == current![key]){
-                            contained = true
-                            break
-                        }
-                    }
-                    if(contained){
-                        cell.cover.alpha = 1
-                    } else {
-                        cell.cover.alpha = 0
-                    }
-                }
-                return cell
-            }
+            cell.bioField.text = current.bio
         }
+        
+        if(!current.ps){
+            cell.psLogo.alpha = 0.1
+        }
+        else {
+            cell.psLogo.alpha = 1.0
+        }
+        if(!current.xbox){
+            cell.xboxLogo.alpha = 0.1
+        }
+        else {
+            cell.xboxLogo.alpha = 1.0
+        }
+        if(!current.pc){
+            cell.pcLogo.alpha = 0.1
+        }
+        else {
+            cell.pcLogo.alpha = 1.0
+        }
+        if(!current.nintendo){
+            cell.nintendoLogo.alpha = 0.1
+        }
+        else {
+            cell.nintendoLogo.alpha = 1.0
+        }
+        
+        if(!current.primaryLanguage.isEmpty){
+            cell.primaryLanguageText.isHidden = false
+            cell.primaryLanguageBubble.isHidden = false
+            cell.primaryLanguageText.text = current.primaryLanguage.prefix(3).capitalized
+        } else {
+            cell.primaryLanguageBubble.isHidden = true
+            cell.primaryLanguageText.isHidden = true
+        }
+        
+        if(!current.secondaryLanguage.isEmpty){
+            cell.secondaryLanguageText.isHidden = false
+            cell.secondaryLanguageBubble.isHidden = false
+            cell.secondaryLanguageText.text = current.secondaryLanguage.prefix(3).capitalized
+        } else {
+            cell.secondaryLanguageText.isHidden = true
+            cell.secondaryLanguageBubble.isHidden = true
+        }
+        
+        if(current.onlineStatus == "online"){
+            cell.onlineDot.backgroundColor = .systemGreen
+            cell.onlineText.textColor = .systemGreen
+            cell.onlineText.text = "online now!"
+        } else {
+            cell.onlineDot.backgroundColor = .darkGray
+            cell.onlineText.textColor = .darkGray
+            cell.onlineText.text = "idle"
+        }
+        return cell
     }
     
     @objc private func locationButtonTriggered(){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         if(delegate.currentUser!.userLat != 0.0){
-            self.currentLocationActivationCell?.switch.setOn(false, animated: true)
+            self.currentLocationActivationCell?.filterSwitch.setOn(false, animated: true)
             delegate.currentUser!.userLat = 0.0
             delegate.currentUser!.userLong = 0.0
             self.sendLocationInfo()
             self.searchTable.reloadData()
         } else {
-            self.currentLocationActivationCell?.switch.setOn(true, animated: true)
+            self.currentLocationActivationCell?.filterSwitch.setOn(true, animated: true)
             locationManager = CLLocationManager()
             locationManager?.delegate = self
             if #available(iOS 14.0, *) {
@@ -1402,9 +818,13 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
         })
     }
     
-    @objc private func filterSearch(){
-        UIView.animate(withDuration: 0.5, animations: {
+    @objc func filterSearch(){
+        UIView.animate(withDuration: 0.8, animations: {
+            if(self.searchEmpty.alpha == 1){
+                self.searchEmpty.alpha = 0
+            }
             self.searchTable.alpha = 0
+            self.showLoading()
         }, completion: { (finished: Bool) in
             let delegate = UIApplication.shared.delegate as! AppDelegate
             if(delegate.currentUser!.userLat != 0.0){
@@ -1628,68 +1048,28 @@ class GamerConnectSearch: ParentVC, UICollectionViewDelegate, UICollectionViewDa
         }
     }
     
-    /*func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if(indexPath.row == 0){
-            let type = self.basicFilterList[indexPath.section].type
-            if(self.basicFilterList[indexPath.section].header != true){
-                if(self.basicFilterList[indexPath.section].opened == true){
-                    self.basicFilterList[indexPath.section].opened = false
-                    let sections = IndexSet.init(integer: indexPath.section)
-                    tableView.reloadSections(sections, with: .none)
-                } else {
-                    self.basicFilterList[indexPath.section].opened = true
-                    let sections = IndexSet.init(integer: indexPath.section)
-                    tableView.reloadSections(sections, with: .none)
-                }
-            }
-        } else {
-            let currentFilter = self.basicFilterList[indexPath.section]
-            if(currentFilter.type != "advanced"){
-                let current = self.basicFilterList[indexPath.section].options[indexPath.row - 1] as? [String: String]
-                let key = Array(current!.keys)[0]
-                if(currentFilter.type == "age"){
-                    let value = current![key]!
-                    if(self.currentManager.ageFilters.contains(value)){
-                        self.currentManager.ageFilters.remove(at: self.currentManager.ageFilters.index(of: value)!)
-                    } else {
-                        self.currentManager.ageFilters.append(value)
-                    }
-                } else {
-                    let value = current![key] ?? ""
-                    if(self.currentManager.langaugeFilters.contains(value)){
-                        self.currentManager.langaugeFilters.remove(at: self.currentManager.langaugeFilters.index(of:value)!)
-                    } else {
-                        if(!value.isEmpty){
-                            self.currentManager.langaugeFilters.append(value)
-                        }
-                    }
-                }
-                //checkClearButton()
-                self.searchTable.reloadData()
-            } else {
-                let current = self.basicFilterList[indexPath.section].options[indexPath.row - 1] as? [String: String]
-                let selectedKey = Array(current!.keys)[0]
-                var contained = false
-                
-                for array in self.currentManager.advancedFilters {
-                    let arrayKey = Array(array.keys)[0]
-                    let value = array[arrayKey]
-                    if(arrayKey == selectedKey && value == current![selectedKey]){
-                        self.currentManager.advancedFilters.remove(at: self.currentManager.advancedFilters.index(of: array)!)
-                        contained = true
-                        break
-                    }
-                }
-                
-                if(!contained){
-                    self.currentManager.advancedFilters.append(current!)
-                }
-                
-                //checkClearButton()
-                self.searchTable.reloadData()
-            }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let current = returnedUsers[indexPath.item]
+        if(current is User){
+            let uid = (current as! User).uId
+            
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            appDelegate.cachedTest = uid
+            
+            let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "playerProfile") as! PlayerProfile
+            let transitionDelegate = SPStorkTransitioningDelegate()
+            currentViewController.transitioningDelegate = transitionDelegate
+            currentViewController.modalPresentationStyle = .custom
+            currentViewController.modalPresentationCapturesStatusBarAppearance = true
+            currentViewController.editMode = false
+            transitionDelegate.showIndicator = true
+            transitionDelegate.swipeToDismissEnabled = true
+            transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+            transitionDelegate.storkDelegate = self
+            self.present(currentViewController, animated: true, completion: nil)
         }
-    }*/
+    }
 }
 
 extension Int {

@@ -27,10 +27,11 @@ class QuickAddGameDrawer: UIViewController, UICollectionViewDelegate, UICollecti
     @IBOutlet weak var successTag: UILabel!
     @IBOutlet weak var gameAddedTag: UILabel!
     @IBOutlet weak var gameBack: UIImageView!
-    @IBOutlet weak var workAnimation: AnimationView!
+    
+    @IBOutlet weak var workAnimation: LottieAnimationView!
     @IBOutlet weak var dismissButton: UIButton!
     @IBOutlet weak var searchButton: UIButton!
-    @IBOutlet weak var doneAnimation: AnimationView!
+    @IBOutlet weak var doneAnimation: LottieAnimationView!
     @IBOutlet weak var workBlur: UIVisualEffectView!
     @IBOutlet weak var success: UIView!
     @IBOutlet weak var gamerTagField: UnderLineTextField!

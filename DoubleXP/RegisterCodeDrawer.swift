@@ -19,7 +19,7 @@ class RegisterCodeDrawer: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var nevermindButton: UIButton!
     @IBOutlet weak var codeEntry: UITextField!
     @IBOutlet weak var loadingView: UIVisualEffectView!
-    @IBOutlet weak var loadingAnimation: AnimationView!
+    @IBOutlet weak var loadingAnimation: LottieAnimationView!
     
     
     override func viewDidLoad() {

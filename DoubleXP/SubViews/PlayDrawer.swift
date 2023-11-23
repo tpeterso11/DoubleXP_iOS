@@ -13,7 +13,7 @@ import FirebaseDatabase
 
 class PlayDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource, UIPickerViewDelegate, UIPickerViewDataSource, RequestsUpdate {
     
-    @IBOutlet weak var notificationAnim: AnimationView!
+    @IBOutlet weak var notificationAnim: LottieAnimationView!
     @IBOutlet weak var gotItButton: UIButton!
     @IBOutlet weak var header: UIView!
     @IBOutlet weak var selectionHeader: UIView!
@@ -32,15 +32,15 @@ class PlayDrawer: UIViewController, UITableViewDelegate, UITableViewDataSource, 
     @IBOutlet weak var sendButton: UIButton!
     @IBOutlet weak var confirmationView: UIView!
     @IBOutlet weak var sendingOverlay: UIView!
-    @IBOutlet weak var sendingAnimation: AnimationView!
     @IBOutlet weak var doneView: UIView!
     @IBOutlet weak var whatsnext: UIView!
     @IBOutlet weak var doneButton: UIView!
     @IBOutlet weak var errorView: UIView!
     @IBOutlet weak var onlineView: UIView!
-    @IBOutlet weak var onlineAnimation: AnimationView!
     @IBOutlet weak var onlineButton: UIButton!
     @IBOutlet weak var whatNextText: UILabel!
+    @IBOutlet weak var onlineAnimation: LottieAnimationView!
+    @IBOutlet weak var sendingAnimation: LottieAnimationView!
     var variation = ""
     var gamesPayload = [GamerConnectGame]()
     var selectedGame = "anything"

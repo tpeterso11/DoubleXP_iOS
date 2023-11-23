@@ -17,9 +17,10 @@ import CryptoKit
 import AuthenticationServices
 import FlagPhoneNumber
 import SPStorkController
+import AVKit
 
 
-class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding, UITextFieldDelegate, FPNTextFieldDelegate, SPStorkControllerDelegate {
+class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding, UITextFieldDelegate, FPNTextFieldDelegate, SPStorkControllerDelegate {
     private var data: [NewsObject]!
     private var games: [GamerConnectGame]!
     var handle: AuthStateDidChangeListenerHandle?
@@ -38,7 +39,9 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
     @IBOutlet weak var emailSwitch: UILabel!
     @IBOutlet weak var phoneEntry: FPNTextField!
     @IBOutlet weak var phoneLogin: UIButton!
+    @IBOutlet weak var loginVideo: UIView!
     private var validPhone = false
+    private var loginPlayer: AVPlayer?
     
     var socialRegisteredUid = ""
     var selectedSocial = ""
@@ -47,7 +50,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
         if let result = result, result.isCancelled {
             hideWork()
             
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login Canceled"))
+            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login Canceled"))
             
             var buttons = [PopupDialogButton]()
             let title = "your login attempt was canceled."
@@ -66,16 +69,16 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
             
             let popup = PopupDialog(title: title, message: message)
             popup.addButtons(buttons)
-
+            
             // Present dialog
             self.present(popup, animated: true, completion: nil)
         } else {
             if let tokenString = result?.token?.tokenString {
                 let credential = FacebookAuthProvider.credential(withAccessToken: tokenString)
-                    Auth.auth().signIn(with: credential) { (authResult, error) in
+                Auth.auth().signIn(with: credential) { (authResult, error) in
                     if let error = error {
                         let authError = error as NSError
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Fail Firebase - " + authError.localizedDescription))
+                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Fail Firebase - " + authError.localizedDescription))
                     }
                     else{
                         let uId = authResult?.user.uid ?? ""
@@ -91,7 +94,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                                 checkRef.child("registrationType").setValue("facebook")
                                 checkRef.child("model").setValue(UIDevice.modelName)
                                 checkRef.child("notifications").setValue("true")
-                                    
+                                
                                 DispatchQueue.main.async {
                                     let delegate = UIApplication.shared.delegate as! AppDelegate
                                     delegate.currentUser = user
@@ -104,7 +107,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
             } else {
                 hideWork()
                 
-                AppEvents.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login Fail - " + "\(error?.localizedDescription ?? "")"))
+                AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login Fail - " + "\(error?.localizedDescription ?? "")"))
                 
                 var buttons = [PopupDialogButton]()
                 let title = "facebook login error."
@@ -123,7 +126,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                 
                 let popup = PopupDialog(title: title, message: message)
                 popup.addButtons(buttons)
-
+                
                 // Present dialog
                 self.present(popup, animated: true, completion: nil)
             }
@@ -133,53 +136,71 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
     @objc private func emailSwitchAction(){
         if(phoneLayout.alpha == 1){ //if phone layout is showing, make email bold, show email layout
             self.emailSwitch.font = UIFont.boldSystemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
+            self.emailSwitch.backgroundColor = UIColor(named: "greenToDarker")
             self.phoneNumberSwitch.font = UIFont.systemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
-            UIView.animate(withDuration: 0.8, animations: {
+            self.phoneNumberSwitch.backgroundColor = UIColor(named: "darkAlpha")
+            UIView.animate(withDuration: 0.5, animations: {
                 self.phoneLayout.alpha = 0
             }, completion: { (finished: Bool) in
-                UIView.animate(withDuration: 0.5, delay: 0.3, options: [], animations: {
+                UIView.animate(withDuration: 0.3, delay: 0.3, options: [], animations: {
                     self.emailLayout.alpha = 1
                 }, completion: nil)
             })
         } else {
-            self.phoneNumberSwitch.font = UIFont.boldSystemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
-            self.emailSwitch.font = UIFont.systemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
+            self.emailSwitch.font = UIFont.boldSystemFont(ofSize: self.emailSwitch.font.pointSize)
+            self.phoneNumberSwitch.backgroundColor = UIColor(named: "darkAlpha")
+            self.phoneNumberSwitch.font = UIFont.systemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
+            self.emailSwitch.backgroundColor = UIColor(named: "greenToDarker")
         }
     }
     
     @objc private func phoneSwitchAction(){
         if(phoneLayout.alpha == 0){
             self.phoneNumberSwitch.font = UIFont.boldSystemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
+            self.phoneNumberSwitch.backgroundColor = UIColor(named: "greenToDarker")
             self.emailSwitch.font = UIFont.systemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
-            UIView.animate(withDuration: 0.8, animations: {
+            self.emailSwitch.backgroundColor = UIColor(named: "darkAlpha")
+            UIView.animate(withDuration: 0.5, animations: {
                 self.emailLayout.alpha = 0
             }, completion: { (finished: Bool) in
-                UIView.animate(withDuration: 0.5, delay: 0.3, options: [], animations: {
+                UIView.animate(withDuration: 0.3, delay: 0.3, options: [], animations: {
                     self.phoneLayout.alpha = 1
                 }, completion: nil)
             })
             
         } else {
-            self.phoneNumberSwitch.font = UIFont.systemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
+            self.phoneNumberSwitch.font = UIFont.boldSystemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
+            self.phoneNumberSwitch.backgroundColor = UIColor(named: "greenToDarker")
+            self.emailSwitch.font = UIFont.systemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
+            self.emailSwitch.backgroundColor = UIColor(named: "darkAlpha")
         }
     }
-
+    
     @IBAction private func loginWithReadPermissions() {
         let loginManager = LoginManager()
         loginManager.logIn(permissions: ["public_profile", "email"], from: self) { [weak self] (result, error) in
             self?.loginManagerDidComplete(result, error)
         }
     }
-
+    
     @IBAction private func logOut() {
         let loginManager = LoginManager()
         loginManager.logOut()
-
+        
         let alertController = UIAlertController(
             title: "Logout",
             message: "Logged out.", preferredStyle: .alert
         )
         present(alertController, animated: true, completion: nil)
+    }
+    
+    func transitionNewRegistration(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        if(delegate.currentUser != nil){
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                self.performSegue(withIdentifier: "newReg", sender: nil)
+            }
+        }
     }
     
     @available(iOS 13.0, *)
@@ -195,6 +216,11 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
         delegate.currentLoginActivity = self
         
         loginButton.addTarget(self, action: #selector(loginButtonClicked), for: .touchUpInside)
+        
+        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: self.loginPlayer?.currentItem, queue: .main) { [weak self] _ in
+            self?.loginPlayer?.seek(to: CMTime.zero)
+            self?.loginPlayer?.play()
+        }
         
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(registerClicked))
         registerText.isUserInteractionEnabled = true
@@ -220,11 +246,9 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
         }
         //todo IMPLEMET APPLE LOGIN~!!!!
         
-        GIDSignIn.sharedInstance().delegate = self
-        
         addDoneButtonOnKeyboard()
         
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Login"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Login"))
         
         emailField.returnKeyType = .done
         emailField.delegate = self
@@ -243,6 +267,18 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
         let emailTap = UITapGestureRecognizer(target: self, action: #selector(emailSwitchAction))
         self.emailSwitch.isUserInteractionEnabled = true
         self.emailSwitch.addGestureRecognizer(emailTap)
+        
+        let videoURL = delegate.loginVideoUrl
+        if(!videoURL.isEmpty){
+            self.loginPlayer = AVPlayer(url: URL(string: videoURL)!)
+            let playerLayer = AVPlayerLayer(player: self.loginPlayer)
+            //playerLayer.frame = self.loginVideo.bounds
+            playerLayer.frame = CGRect(x: 0, y: 0, width: self.loginVideo.bounds.width + 20, height: self.loginVideo.bounds.height + 20)
+            playerLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
+            self.loginPlayer?.isMuted = true
+            self.loginVideo.layer.addSublayer(playerLayer)
+            self.loginPlayer?.play()
+        }
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool
@@ -286,11 +322,11 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                     code = error
                     
                     switch(code){
-                        case "17007": message = "sorry, that email is already in use."
-                        case "17008": message = "sorry, please enter a valid email to continue."
-                        case "17009": message = "sorry, that password is incorrect. please try again."
-                        case "17011": message = "sorry, we do not have that user in our database."
-                        default: message = "there was an error logging you in. please try again."
+                    case "17007": message = "sorry, that email is already in use."
+                    case "17008": message = "sorry, please enter a valid email to continue."
+                    case "17009": message = "sorry, that password is incorrect. please try again."
+                    case "17011": message = "sorry, we do not have that user in our database."
+                    default: message = "there was an error logging you in. please try again."
                     }
                     
                     let alertController = UIAlertController(title: "login error", message: message, preferredStyle: .alert)
@@ -306,7 +342,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
     }
     
     @objc func facebookLoginClicked(_ sender: AnyObject?) {
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login"))
         showWork()
         
         self.selectedSocial = "facebook"
@@ -316,20 +352,29 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
     }
     
     @objc func googleLoginClicked(_ sender: AnyObject?) {
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Login - Google Login"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Login - Google Login"))
         showWork()
         
         self.selectedSocial = "google"
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-            GIDSignIn.sharedInstance()?.presentingViewController = self
-            GIDSignIn.sharedInstance()?.scopes = ["email", "https://www.googleapis.com/auth/youtube.readonly"]
-            GIDSignIn.sharedInstance().signIn()
+            GIDSignIn.sharedInstance.signIn(
+                withPresenting: self, hint: nil, additionalScopes: ["email", "https://www.googleapis.com/auth/youtube.readonly"]
+            ) { result, error in
+                if let token = result?.user.idToken {
+                    self.onSignInComplete(result: result, didSignInFor: result?.user, withError: nil)
+                    return
+                }
+                guard let error = error as? GIDSignInError else {
+                    fatalError("No token and no GIDSignInError: \(String(describing: error))")
+                }
+                self.onSignInComplete(result: result, didSignInFor: nil, withError: error)
+            }
         }
     }
     
     @available(iOS 13, *)
     @objc func appleLoginClicked(_ sender: AnyObject?) {
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Login - Apple Login"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Login - Apple Login"))
         
         self.selectedSocial = "apple"
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
@@ -338,10 +383,21 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
     }
     
     @objc func registerClicked(_ sender: AnyObject?) {
-        self.performSegue(withIdentifier: "register", sender: nil) // noraml
+        /*let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "register") as! RegisterActivity
+         let transitionDelegate = SPStorkTransitioningDelegate()
+         currentViewController.transitioningDelegate = transitionDelegate
+         currentViewController.modalPresentationStyle = .custom
+         currentViewController.modalPresentationCapturesStatusBarAppearance = true
+         transitionDelegate.showIndicator = true
+         transitionDelegate.swipeToDismissEnabled = true
+         transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+         transitionDelegate.storkDelegate = self
+         self.present(currentViewController, animated: true, completion: nil)*/
+        
+        //self.performSegue(withIdentifier: "register", sender: nil) // noraml
         //self.performSegue(withIdentifier: "test", sender: nil) // game selection
-        //self.performSegue(withIdentifier: "newReg", sender: nil) //registration
-    
+        self.performSegue(withIdentifier: "newReg", sender: nil) //registration
+        
     }
     
     private func display(alertController: UIAlertController){
@@ -360,78 +416,78 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
     }
     
     private func hideWork(){
-           UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+        UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
             self.workSpinner.stopAnimating()
-               self.workOverlay.alpha = 0
-           }, completion: nil)
-       }
+            self.workOverlay.alpha = 0
+        }, completion: nil)
+    }
     
     @available(iOS 13.0, *)
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
-          guard let nonce = currentNonce else {
-            fatalError("Invalid state: A login callback was received, but no login request was sent.")
-          }
-          guard let appleIDToken = appleIDCredential.identityToken else {
-            print("Unable to fetch identity token")
-            return
-          }
-          guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
-            print("Unable to serialize token string from data: \(appleIDToken.debugDescription)")
-            return
-          }
-          // Initialize a Firebase credential.
-          let credential = OAuthProvider.credential(withProviderID: "apple.com",
-                                                    idToken: idTokenString,
-                                                    rawNonce: nonce)
-          // Sign in with Firebase.
-          Auth.auth().signIn(with: credential) { (authResult, error) in
-            if (error != nil) {
-              // Error. If error.code == .MissingOrInvalidNonce, make sure
-              // you're sending the SHA256-hashed nonce as a hex string with
-              // your request to Apple.
-                AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Apple Login Fail Firebase"))
+            guard let nonce = currentNonce else {
+                fatalError("Invalid state: A login callback was received, but no login request was sent.")
             }
-            else{
-                if(authResult != nil){
-                    let uId = authResult?.user.uid ?? ""
-                    UserDefaults.standard.set(uId, forKey: "userId")
-                    self.downloadDBRef(uid: uId, registrationType: "apple", accessToken: nil, userId: nil)
+            guard let appleIDToken = appleIDCredential.identityToken else {
+                print("Unable to fetch identity token")
+                return
+            }
+            guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
+                print("Unable to serialize token string from data: \(appleIDToken.debugDescription)")
+                return
+            }
+            // Initialize a Firebase credential.
+            let credential = OAuthProvider.credential(withProviderID: "apple.com",
+                                                      idToken: idTokenString,
+                                                      rawNonce: nonce)
+            // Sign in with Firebase.
+            Auth.auth().signIn(with: credential) { (authResult, error) in
+                if (error != nil) {
+                    // Error. If error.code == .MissingOrInvalidNonce, make sure
+                    // you're sending the SHA256-hashed nonce as a hex string with
+                    // your request to Apple.
+                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Register - Apple Login Fail Firebase"))
                 }
                 else{
-                    //need to redo this. AuthResult is null, so then uId will be empty.
-                    let uId = authResult?.user.uid ?? ""
-                    if(!uId.isEmpty){
+                    if(authResult != nil){
+                        let uId = authResult?.user.uid ?? ""
                         UserDefaults.standard.set(uId, forKey: "userId")
-                        if(authResult != nil){
-                            self.downloadDBRef(uid: uId, registrationType: "apple", accessToken: nil, userId: nil)
-                        }
-                        else{
-                            let checkRef = Database.database().reference().child("Users").child(uId)
-                            let user = User(uId: uId)
-                            checkRef.child("platform").setValue("ios")
-                            checkRef.child("search").setValue("true")
-                            checkRef.child("registrationType").setValue("apple")
-                            checkRef.child("model").setValue(UIDevice.modelName)
-                            checkRef.child("notifications").setValue("true")
+                        self.downloadDBRef(uid: uId, registrationType: "apple", accessToken: nil, userId: nil)
+                    }
+                    else{
+                        //need to redo this. AuthResult is null, so then uId will be empty.
+                        let uId = authResult?.user.uid ?? ""
+                        if(!uId.isEmpty){
+                            UserDefaults.standard.set(uId, forKey: "userId")
+                            if(authResult != nil){
+                                self.downloadDBRef(uid: uId, registrationType: "apple", accessToken: nil, userId: nil)
+                            }
+                            else{
+                                let checkRef = Database.database().reference().child("Users").child(uId)
+                                let user = User(uId: uId)
+                                checkRef.child("platform").setValue("ios")
+                                checkRef.child("search").setValue("true")
+                                checkRef.child("registrationType").setValue("apple")
+                                checkRef.child("model").setValue(UIDevice.modelName)
+                                checkRef.child("notifications").setValue("true")
                                 
-                            DispatchQueue.main.async {
-                                let delegate = UIApplication.shared.delegate as! AppDelegate
-                                delegate.currentUser = user
-                                self.performSegue(withIdentifier: "newReg", sender: nil)
+                                DispatchQueue.main.async {
+                                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                                    delegate.currentUser = user
+                                    self.performSegue(withIdentifier: "newReg", sender: nil)
+                                }
                             }
                         }
                     }
                 }
             }
         }
-      }
     }
     
     private func downloadDBRef(uid: String, registrationType: String, accessToken: String?, userId: String?){
         let ref = Database.database().reference().child("Users").child(uid)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
-                // Get user value
+            // Get user value
             if(snapshot.exists()){
                 if(accessToken != nil && !accessToken!.isEmpty){
                     ref.child("googleAccessToken").setValue(accessToken)
@@ -527,7 +583,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                 
                 var teamInviteReqs = [RequestObject]()
                 let teamInviteRequests = snapshot.childSnapshot(forPath: "inviteRequests")
-                 for invite in teamInviteRequests.children{
+                for invite in teamInviteRequests.children{
                     let currentObj = invite as! DataSnapshot
                     let dict = currentObj.value as? [String: Any]
                     let status = dict?["status"] as? String ?? ""
@@ -536,210 +592,210 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                     let captainId = dict?["captainId"] as? String ?? ""
                     let gamerTag = dict?["gamerTag"] as? String ?? ""
                     let requestId = dict?["requestId"] as? String ?? ""
-                        let userUid = dict?["userUid"] as? String ?? ""
-                     
-                     let profile = currentObj.childSnapshot(forPath: "profile")
-                     let profileDict = profile.value as? [String: Any]
-                     let game = profileDict?["game"] as? String ?? ""
-                     let consoles = profileDict?["consoles"] as? [String] ?? [String]()
-                     let profileGamerTag = profileDict?["gamerTag"] as? String ?? ""
-                     let competitionId = profileDict?["competitionId"] as? String ?? ""
-                     let userId = profileDict?["userId"] as? String ?? ""
-                     
+                    let userUid = dict?["userUid"] as? String ?? ""
+                    
+                    let profile = currentObj.childSnapshot(forPath: "profile")
+                    let profileDict = profile.value as? [String: Any]
+                    let game = profileDict?["game"] as? String ?? ""
+                    let consoles = profileDict?["consoles"] as? [String] ?? [String]()
+                    let profileGamerTag = profileDict?["gamerTag"] as? String ?? ""
+                    let competitionId = profileDict?["competitionId"] as? String ?? ""
+                    let userId = profileDict?["userId"] as? String ?? ""
+                    
                     var questions = [FAQuestion]()
                     let questionList = dict?["questions"] as? [[String: Any]] ?? [[String: Any]]()
-                            for question in questionList {
-                                var questionNumber = ""
-                                var questionString = ""
-                                var option1 = ""
-                                var option1Description = ""
-                                var option2 = ""
-                                var option2Description = ""
-                                var option3 = ""
-                                var option3Description = ""
-                                var option4 = ""
-                                var option4Description = ""
-                                var option5 = ""
-                                var option5Description = ""
-                                var option6 = ""
-                                var option6Description = ""
-                                var option7 = ""
-                                var option7Description = ""
-                                var option8 = ""
-                                var option8Description = ""
-                                var option9 = ""
-                                var option9Description = ""
-                                var option10 = ""
-                                var option10Description = ""
-                                var required = ""
-                                var questionDescription = ""
-                                var teamNeedQuestion = "false"
-                                var acceptMultiple = ""
-                                var question1SetURL = ""
-                                var question2SetURL = ""
-                                var question3SetURL = ""
-                                var question4SetURL = ""
-                                var question5SetURL = ""
-                                var optionsURL = ""
-                                var maxOptions = ""
-                                var answer = ""
-                                var answerArray = [String]()
-                                
-                                for (key, value) in question {
-                                    if(key == "questionNumber"){
-                                        questionNumber = (value as? String) ?? ""
-                                    }
-                                    if(key == "question"){
-                                        questionString = (value as? String) ?? ""
-                                    }
-                                    if(key == "option1"){
-                                        option1 = (value as? String) ?? ""
-                                    }
-                                    if(key == "option1Description"){
-                                        option1Description = (value as? String) ?? ""
-                                    }
-                                    if(key == "option2"){
-                                        option2 = (value as? String) ?? ""
-                                    }
-                                    if(key == "option2Description"){
-                                        option2Description = (value as? String) ?? ""
-                                    }
-                                    if(key == "option3"){
-                                        option3 = (value as? String) ?? ""
-                                    }
-                                    if(key == "option3Description"){
-                                        option3Description = (value as? String) ?? ""
-                                    }
-                                    if(key == "option4"){
-                                        option4 = (value as? String) ?? ""
-                                    }
-                                    if(key == "option4Description"){
-                                        option4Description = (value as? String) ?? ""
-                                    }
-                                    if(key == "option5"){
-                                        option5 = (value as? String) ?? ""
-                                    }
-                                    if(key == "option5Description"){
-                                        option5Description = (value as? String) ?? ""
-                                    }
-                                    if(key == "option6"){
-                                        option6 = (value as? String) ?? ""
-                                    }
-                                    if(key == "option6Description"){
-                                        option6Description = (value as? String) ?? ""
-                                    }
-                                    if(key == "option7"){
-                                        option7 = (value as? String) ?? ""
-                                    }
-                                    if(key == "option7Description"){
-                                        option7Description = (value as? String) ?? ""
-                                    }
-                                    if(key == "option8"){
-                                        option8 = (value as? String) ?? ""
-                                    }
-                                    if(key == "option8Description"){
-                                        option8Description = (value as? String) ?? ""
-                                    }
-                                    if(key == "option9"){
-                                        option9 = (value as? String) ?? ""
-                                    }
-                                    if(key == "option9Description"){
-                                        option9Description = (value as? String) ?? ""
-                                    }
-                                    if(key == "option10"){
-                                        option10 = (value as? String) ?? ""
-                                    }
-                                    if(key == "option10Description"){
-                                        option10Description = (value as? String) ?? ""
-                                    }
-                                    if(key == "required"){
-                                        required = (value as? String) ?? ""
-                                    }
-                                    if(key == "questionDescription"){
-                                        questionDescription = (value as? String) ?? ""
-                                    }
-                                    if(key == "acceptMultiple"){
-                                        acceptMultiple = (value as? String) ?? ""
-                                    }
-                                    if(key == "question1SetURL"){
-                                        question1SetURL = (value as? String) ?? ""
-                                    }
-                                    if(key == "question2SetURL"){
-                                        question2SetURL = (value as? String) ?? ""
-                                    }
-                                    if(key == "question3SetURL"){
-                                        question3SetURL = (value as? String) ?? ""
-                                    }
-                                    if(key == "question4SetURL"){
-                                        question4SetURL = (value as? String) ?? ""
-                                    }
-                                    if(key == "question5SetURL"){
-                                        question5SetURL = (value as? String) ?? ""
-                                    }
-                                    if(key == "teamNeedQuestion"){
-                                        teamNeedQuestion = (value as? String) ?? "false"
-                                    }
-                                    if(key == "optionsUrl"){
-                                        optionsURL = (value as? String) ?? ""
-                                    }
-                                    if(key == "maxOptions"){
-                                        maxOptions = (value as? String) ?? ""
-                                    }
-                                    if(key == "answer"){
-                                        answer = (value as? String) ?? ""
-                                    }
-                                    if(key == "answerArray"){
-                                        answerArray = (value as? [String]) ?? [String]()
-                                    }
+                    for question in questionList {
+                        var questionNumber = ""
+                        var questionString = ""
+                        var option1 = ""
+                        var option1Description = ""
+                        var option2 = ""
+                        var option2Description = ""
+                        var option3 = ""
+                        var option3Description = ""
+                        var option4 = ""
+                        var option4Description = ""
+                        var option5 = ""
+                        var option5Description = ""
+                        var option6 = ""
+                        var option6Description = ""
+                        var option7 = ""
+                        var option7Description = ""
+                        var option8 = ""
+                        var option8Description = ""
+                        var option9 = ""
+                        var option9Description = ""
+                        var option10 = ""
+                        var option10Description = ""
+                        var required = ""
+                        var questionDescription = ""
+                        var teamNeedQuestion = "false"
+                        var acceptMultiple = ""
+                        var question1SetURL = ""
+                        var question2SetURL = ""
+                        var question3SetURL = ""
+                        var question4SetURL = ""
+                        var question5SetURL = ""
+                        var optionsURL = ""
+                        var maxOptions = ""
+                        var answer = ""
+                        var answerArray = [String]()
+                        
+                        for (key, value) in question {
+                            if(key == "questionNumber"){
+                                questionNumber = (value as? String) ?? ""
                             }
-                                
-                                let faQuestion = FAQuestion(question: questionString)
-                                    faQuestion.questionNumber = questionNumber
-                                    faQuestion.question = questionString
-                                    faQuestion.option1 = option1
-                                    faQuestion.option1Description = option1Description
-                                    faQuestion.question1SetURL = question1SetURL
-                                    faQuestion.option2 = option2
-                                    faQuestion.option2Description = option2Description
-                                    faQuestion.question2SetURL = question2SetURL
-                                    faQuestion.option3 = option3
-                                    faQuestion.option3Description = option3Description
-                                    faQuestion.question3SetURL = question3SetURL
-                                    faQuestion.option4 = option4
-                                    faQuestion.option4Description = option4Description
-                                    faQuestion.question4SetURL = question4SetURL
-                                    faQuestion.option5 = option5
-                                    faQuestion.option5Description = option5Description
-                                    faQuestion.question5SetURL = question5SetURL
-                                    faQuestion.option6 = option6
-                                    faQuestion.option6Description = option6Description
-                                    faQuestion.option7 = option7
-                                    faQuestion.option7Description = option7Description
-                                    faQuestion.option8 = option8
-                                    faQuestion.option8Description = option8Description
-                                    faQuestion.option9 = option9
-                                    faQuestion.option9Description = option9Description
-                                    faQuestion.option10 = option10
-                                    faQuestion.option10Description = option10Description
-                                    faQuestion.required = required
-                                    faQuestion.acceptMultiple = acceptMultiple
-                                    faQuestion.questionDescription = questionDescription
-                                    faQuestion.teamNeedQuestion = teamNeedQuestion
-                                    faQuestion.optionsUrl = optionsURL
-                                    faQuestion.maxOptions = maxOptions
-                                    faQuestion.answer = answer
-                                    faQuestion.answerArray = answerArray
-                    
+                            if(key == "question"){
+                                questionString = (value as? String) ?? ""
+                            }
+                            if(key == "option1"){
+                                option1 = (value as? String) ?? ""
+                            }
+                            if(key == "option1Description"){
+                                option1Description = (value as? String) ?? ""
+                            }
+                            if(key == "option2"){
+                                option2 = (value as? String) ?? ""
+                            }
+                            if(key == "option2Description"){
+                                option2Description = (value as? String) ?? ""
+                            }
+                            if(key == "option3"){
+                                option3 = (value as? String) ?? ""
+                            }
+                            if(key == "option3Description"){
+                                option3Description = (value as? String) ?? ""
+                            }
+                            if(key == "option4"){
+                                option4 = (value as? String) ?? ""
+                            }
+                            if(key == "option4Description"){
+                                option4Description = (value as? String) ?? ""
+                            }
+                            if(key == "option5"){
+                                option5 = (value as? String) ?? ""
+                            }
+                            if(key == "option5Description"){
+                                option5Description = (value as? String) ?? ""
+                            }
+                            if(key == "option6"){
+                                option6 = (value as? String) ?? ""
+                            }
+                            if(key == "option6Description"){
+                                option6Description = (value as? String) ?? ""
+                            }
+                            if(key == "option7"){
+                                option7 = (value as? String) ?? ""
+                            }
+                            if(key == "option7Description"){
+                                option7Description = (value as? String) ?? ""
+                            }
+                            if(key == "option8"){
+                                option8 = (value as? String) ?? ""
+                            }
+                            if(key == "option8Description"){
+                                option8Description = (value as? String) ?? ""
+                            }
+                            if(key == "option9"){
+                                option9 = (value as? String) ?? ""
+                            }
+                            if(key == "option9Description"){
+                                option9Description = (value as? String) ?? ""
+                            }
+                            if(key == "option10"){
+                                option10 = (value as? String) ?? ""
+                            }
+                            if(key == "option10Description"){
+                                option10Description = (value as? String) ?? ""
+                            }
+                            if(key == "required"){
+                                required = (value as? String) ?? ""
+                            }
+                            if(key == "questionDescription"){
+                                questionDescription = (value as? String) ?? ""
+                            }
+                            if(key == "acceptMultiple"){
+                                acceptMultiple = (value as? String) ?? ""
+                            }
+                            if(key == "question1SetURL"){
+                                question1SetURL = (value as? String) ?? ""
+                            }
+                            if(key == "question2SetURL"){
+                                question2SetURL = (value as? String) ?? ""
+                            }
+                            if(key == "question3SetURL"){
+                                question3SetURL = (value as? String) ?? ""
+                            }
+                            if(key == "question4SetURL"){
+                                question4SetURL = (value as? String) ?? ""
+                            }
+                            if(key == "question5SetURL"){
+                                question5SetURL = (value as? String) ?? ""
+                            }
+                            if(key == "teamNeedQuestion"){
+                                teamNeedQuestion = (value as? String) ?? "false"
+                            }
+                            if(key == "optionsUrl"){
+                                optionsURL = (value as? String) ?? ""
+                            }
+                            if(key == "maxOptions"){
+                                maxOptions = (value as? String) ?? ""
+                            }
+                            if(key == "answer"){
+                                answer = (value as? String) ?? ""
+                            }
+                            if(key == "answerArray"){
+                                answerArray = (value as? [String]) ?? [String]()
+                            }
+                        }
+                        
+                        let faQuestion = FAQuestion(question: questionString)
+                        faQuestion.questionNumber = questionNumber
+                        faQuestion.question = questionString
+                        faQuestion.option1 = option1
+                        faQuestion.option1Description = option1Description
+                        faQuestion.question1SetURL = question1SetURL
+                        faQuestion.option2 = option2
+                        faQuestion.option2Description = option2Description
+                        faQuestion.question2SetURL = question2SetURL
+                        faQuestion.option3 = option3
+                        faQuestion.option3Description = option3Description
+                        faQuestion.question3SetURL = question3SetURL
+                        faQuestion.option4 = option4
+                        faQuestion.option4Description = option4Description
+                        faQuestion.question4SetURL = question4SetURL
+                        faQuestion.option5 = option5
+                        faQuestion.option5Description = option5Description
+                        faQuestion.question5SetURL = question5SetURL
+                        faQuestion.option6 = option6
+                        faQuestion.option6Description = option6Description
+                        faQuestion.option7 = option7
+                        faQuestion.option7Description = option7Description
+                        faQuestion.option8 = option8
+                        faQuestion.option8Description = option8Description
+                        faQuestion.option9 = option9
+                        faQuestion.option9Description = option9Description
+                        faQuestion.option10 = option10
+                        faQuestion.option10Description = option10Description
+                        faQuestion.required = required
+                        faQuestion.acceptMultiple = acceptMultiple
+                        faQuestion.questionDescription = questionDescription
+                        faQuestion.teamNeedQuestion = teamNeedQuestion
+                        faQuestion.optionsUrl = optionsURL
+                        faQuestion.maxOptions = maxOptions
+                        faQuestion.answer = answer
+                        faQuestion.answerArray = answerArray
+                        
                         questions.append(faQuestion)
                     }
-                     
-                     let result = FreeAgentObject(gamerTag: profileGamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
-                     
-                     
+                    
+                    let result = FreeAgentObject(gamerTag: profileGamerTag, competitionId: competitionId, consoles: consoles, game: game, userId: userId, questions: questions)
+                    
+                    
                     let newRequest = RequestObject(status: status, teamId: teamId, teamName: teamName, captainId: captainId, requestId: requestId, userUid: userUid, gamerTag: gamerTag)
-                     newRequest.profile = result
-                     
-                     teamInviteReqs.append(newRequest)
+                    newRequest.profile = result
+                    
+                    teamInviteReqs.append(newRequest)
                 }
                 
                 var friends = [FriendObject]()
@@ -776,19 +832,19 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                 }
                 let messagingNotifications = value?["messagingNotifications"] as? Bool ?? false
                 
-               var teams = [EasyTeamObj]()
-               let teamsArray = snapshot.childSnapshot(forPath: "teams")
-               for teamObj in teamsArray.children {
-                   let currentObj = teamObj as! DataSnapshot
-                   let dict = currentObj.value as? [String: Any]
-                   let teamName = dict?["teamName"] as? String ?? ""
-                   let teamId = dict?["teamId"] as? String ?? ""
-                   let game = dict?["gameName"] as? String ?? ""
-                   let teamCaptainId = dict?["teamCaptainId"] as? String ?? ""
-                   let newTeam = dict?["newTeam"] as? String ?? ""
-                   
-                   teams.append(EasyTeamObj(teamName: teamName, teamId: teamId, gameName: game, teamCaptainId: teamCaptainId, newTeam: newTeam))
-               }
+                var teams = [EasyTeamObj]()
+                let teamsArray = snapshot.childSnapshot(forPath: "teams")
+                for teamObj in teamsArray.children {
+                    let currentObj = teamObj as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let teamName = dict?["teamName"] as? String ?? ""
+                    let teamId = dict?["teamId"] as? String ?? ""
+                    let game = dict?["gameName"] as? String ?? ""
+                    let teamCaptainId = dict?["teamCaptainId"] as? String ?? ""
+                    let newTeam = dict?["newTeam"] as? String ?? ""
+                    
+                    teams.append(EasyTeamObj(teamName: teamName, teamId: teamId, gameName: game, teamCaptainId: teamCaptainId, newTeam: newTeam))
+                }
                 
                 var currentTeamInvites = [TeamInviteObject]()
                 let teamInvites = snapshot.childSnapshot(forPath: "teamInvites")
@@ -1039,7 +1095,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                     let delegate = UIApplication.shared.delegate as! AppDelegate
                     delegate.currentUser = user
                     
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "Successful Login"))
+                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Successful Login"))
                     //self.performSegue(withIdentifier: "results", sender: nil) //results
                     self.performSegue(withIdentifier: "loginSuccessful", sender: nil)
                 }
@@ -1052,7 +1108,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                 checkRef.child("registrationType").setValue(registrationType)
                 checkRef.child("model").setValue(UIDevice.modelName)
                 checkRef.child("notifications").setValue("true")
-                    
+                
                 DispatchQueue.main.async {
                     let delegate = UIApplication.shared.delegate as! AppDelegate
                     delegate.currentUser = user
@@ -1060,9 +1116,9 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                 }
             }
             
-            }) { (error) in
-                AppEvents.logEvent(AppEvents.Name(rawValue: "Login Error"))
-                print(error.localizedDescription)
+        }) { (error) in
+            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Login Error"))
+            print(error.localizedDescription)
         }
     }
     
@@ -1118,7 +1174,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                         }
                         
                         if(contained){
-                          break
+                            break
                         }
                     }
                 }
@@ -1136,60 +1192,60 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
     fileprivate var currentNonce: String?
     @available(iOS 13, *)
     func startSignInWithAppleFlow() {
-      let nonce = randomNonceString()
-      currentNonce = nonce
-      let appleIDProvider = ASAuthorizationAppleIDProvider()
-      let request = appleIDProvider.createRequest()
-      request.requestedScopes = [.fullName, .email]
-      request.nonce = sha256(nonce)
-
-      let authorizationController = ASAuthorizationController(authorizationRequests: [request])
-      authorizationController.delegate = self
-      authorizationController.presentationContextProvider = self
-      authorizationController.performRequests()
+        let nonce = randomNonceString()
+        currentNonce = nonce
+        let appleIDProvider = ASAuthorizationAppleIDProvider()
+        let request = appleIDProvider.createRequest()
+        request.requestedScopes = [.fullName, .email]
+        request.nonce = sha256(nonce)
+        
+        let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+        authorizationController.delegate = self
+        authorizationController.presentationContextProvider = self
+        authorizationController.performRequests()
     }
-
+    
     @available(iOS 13, *)
     private func sha256(_ input: String) -> String {
-      let inputData = Data(input.utf8)
-      let hashedData = SHA256.hash(data: inputData)
-      let hashString = hashedData.compactMap {
-        return String(format: "%02x", $0)
-      }.joined()
-
-      return hashString
+        let inputData = Data(input.utf8)
+        let hashedData = SHA256.hash(data: inputData)
+        let hashString = hashedData.compactMap {
+            return String(format: "%02x", $0)
+        }.joined()
+        
+        return hashString
     }
     
     private func randomNonceString(length: Int = 32) -> String {
-      precondition(length > 0)
-      let charset: Array<Character> =
-          Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
-      var result = ""
-      var remainingLength = length
-
-      while remainingLength > 0 {
-        let randoms: [UInt8] = (0 ..< 16).map { _ in
-          var random: UInt8 = 0
-          let errorCode = SecRandomCopyBytes(kSecRandomDefault, 1, &random)
-          if errorCode != errSecSuccess {
-            fatalError("Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)")
-          }
-          return random
+        precondition(length > 0)
+        let charset: Array<Character> =
+        Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
+        var result = ""
+        var remainingLength = length
+        
+        while remainingLength > 0 {
+            let randoms: [UInt8] = (0 ..< 16).map { _ in
+                var random: UInt8 = 0
+                let errorCode = SecRandomCopyBytes(kSecRandomDefault, 1, &random)
+                if errorCode != errSecSuccess {
+                    fatalError("Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)")
+                }
+                return random
+            }
+            
+            randoms.forEach { random in
+                if remainingLength == 0 {
+                    return
+                }
+                
+                if random < charset.count {
+                    result.append(charset[Int(random)])
+                    remainingLength -= 1
+                }
+            }
         }
-
-        randoms.forEach { random in
-          if remainingLength == 0 {
-            return
-          }
-
-          if random < charset.count {
-            result.append(charset[Int(random)])
-            remainingLength -= 1
-          }
-        }
-      }
-
-      return result
+        
+        return result
     }
     
     private func convertRequests(list: [String], pathString: String, userUid: String){
@@ -1260,29 +1316,29 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
         let phoneNumber = self.phoneEntry.getFormattedPhoneNumber(format: .E164)
         if(phoneNumber != nil){
             PhoneAuthProvider.provider().verifyPhoneNumber(phoneNumber!, uiDelegate: nil) { (verificationID, error) in
-              if let error = error {
-                var buttons = [PopupDialogButton]()
-                let title = "phone number signup error"
-                let message = "there was an error signing you up. make sure your phone number is correct and try again."
-                
-                let button = DefaultButton(title: "try again.") { [weak self] in
-                    self?.continueClickedPhone()
+                if let error = error {
+                    var buttons = [PopupDialogButton]()
+                    let title = "phone number signup error"
+                    let message = "there was an error signing you up. make sure your phone number is correct and try again."
                     
+                    let button = DefaultButton(title: "try again.") { [weak self] in
+                        self?.continueClickedPhone()
+                        
+                    }
+                    buttons.append(button)
+                    
+                    let buttonOne = CancelButton(title: "nevermind") { [weak self] in
+                        //do nothing
+                    }
+                    buttons.append(buttonOne)
+                    
+                    let popup = PopupDialog(title: title, message: message)
+                    popup.addButtons(buttons)
+                    
+                    // Present dialog
+                    self.present(popup, animated: true, completion: nil)
+                    return
                 }
-                buttons.append(button)
-                
-                let buttonOne = CancelButton(title: "nevermind") { [weak self] in
-                    //do nothing
-                }
-                buttons.append(buttonOne)
-                
-                let popup = PopupDialog(title: title, message: message)
-                popup.addButtons(buttons)
-
-                // Present dialog
-                self.present(popup, animated: true, completion: nil)
-                return
-              }
                 UserDefaults.standard.set(verificationID, forKey: "authVerificationID")
                 self.showCode()
             }
@@ -1294,14 +1350,14 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
         doneToolbar.barStyle       = UIBarStyle.default
         let flexSpace              = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
         let done: UIBarButtonItem  = UIBarButtonItem(title: "Done", style: UIBarButtonItem.Style.done, target: self, action: #selector(doneButtonAction))
-
+        
         var items = [UIBarButtonItem]()
         items.append(flexSpace)
         items.append(done)
-
+        
         doneToolbar.items = items
         doneToolbar.sizeToFit()
-
+        
         self.phoneEntry.inputAccessoryView = doneToolbar
     }
     
@@ -1332,27 +1388,102 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                 self.downloadDBRef(uid: uid, registrationType: "phone", accessToken: nil, userId: nil)
             }
             else{
-                    let user = User(uId: uid)
-                    checkRef.child("platform").setValue("ios")
-                    checkRef.child("search").setValue("true")
-                    checkRef.child("registrationType").setValue("google")
-                    checkRef.child("model").setValue(UIDevice.modelName)
-                    checkRef.child("notifications").setValue("true")
-                    DispatchQueue.main.async {
-                        let delegate = UIApplication.shared.delegate as! AppDelegate
-                        delegate.currentUser = user
-                        self.performSegue(withIdentifier: "newReg", sender: nil)
-                    }
+                let user = User(uId: uid)
+                checkRef.child("platform").setValue("ios")
+                checkRef.child("search").setValue("true")
+                checkRef.child("registrationType").setValue("google")
+                checkRef.child("model").setValue(UIDevice.modelName)
+                checkRef.child("notifications").setValue("true")
+                DispatchQueue.main.async {
+                    let delegate = UIApplication.shared.delegate as! AppDelegate
+                    delegate.currentUser = user
+                    self.performSegue(withIdentifier: "newReg", sender: nil)
                 }
-            }) { (error) in
-                print(error.localizedDescription)
+            }
+        }) { (error) in
+            print(error.localizedDescription)
         }
     }
     
-    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error?) {
+    func onSignInComplete(result: GIDSignInResult?, didSignInFor user: GIDGoogleUser!, withError error: Error?){
+        if let error = error {
+            // ...AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login Fail - " + error.localizedDescription))
+            
+            var buttons = [PopupDialogButton]()
+            let title = "google login error."
+            let message = "there was an error getting you logged into google. try again, or try registering using your email."
+            
+            let button = DefaultButton(title: "try again.") { [weak self] in
+                self?.loginWithReadPermissions()
+                
+            }
+            buttons.append(button)
+            
+            let buttonOne = CancelButton(title: "nevermind") { [weak self] in
+                self?.hideWork()
+            }
+            buttons.append(buttonOne)
+            
+            let popup = PopupDialog(title: title, message: message)
+            popup.addButtons(buttons)
+            
+            // Present dialog
+            self.present(popup, animated: true, completion: nil)
+            return
+        }
+        
+        guard let authentication = result?.user else { return }
+        let credential = GoogleAuthProvider.credential(withIDToken: authentication.idToken?.tokenString ?? "",
+                                                       accessToken: authentication.accessToken.tokenString)
+        
+        Auth.auth().signIn(with: credential) { authResult, error in
+            if error != nil {
+                AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Register - Google Login Fail Firebase"))
+                print(error)
+            } else {
+                if(authResult != nil){
+                    let uId = authResult?.user.uid ?? ""
+                    UserDefaults.standard.set(uId, forKey: "userId")
+                    var userId = ""
+                    if(user.userID != nil && !user.userID!.isEmpty){
+                        userId = user.userID!
+                    }
+                    let accessToken = user.accessToken.tokenString
+                    // Use accessToken in your URL Requests Header
+                    self.downloadDBRef(uid: uId, registrationType: "google", accessToken: accessToken, userId: userId)
+                }
+                else{
+                    let uId = authResult?.user.uid ?? ""
+                    if(!uId.isEmpty){
+                        if(authResult != nil){
+                            UserDefaults.standard.set(uId, forKey: "userId")
+                            self.downloadDBRef(uid: uId, registrationType: "google", accessToken: nil, userId: nil)
+                        }
+                        else{
+                            let checkRef = Database.database().reference().child("Users").child(uId)
+                            let user = User(uId: uId)
+                            checkRef.child("platform").setValue("ios")
+                            checkRef.child("search").setValue("true")
+                            checkRef.child("registrationType").setValue("google")
+                            checkRef.child("model").setValue(UIDevice.modelName)
+                            checkRef.child("notifications").setValue("true")
+                            
+                            DispatchQueue.main.async {
+                                let delegate = UIApplication.shared.delegate as! AppDelegate
+                                delegate.currentUser = user
+                                self.performSegue(withIdentifier: "newReg", sender: nil)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    func sign(_ signIn: GIDSignIn, didSignInFor user: GIDGoogleUser!, withError error: Error?) {
       // ...
-      if let error = error {
-        // ...AppEvents.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login Fail - " + error.localizedDescription))
+      /*if let error = error {
+        // ...AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login Fail - " + error.localizedDescription))
         
         var buttons = [PopupDialogButton]()
         let title = "google login error."
@@ -1384,7 +1515,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
         Auth.auth().signIn(with: credential) { (authResult, error) in
                if let error = error {
                    let authError = error as NSError
-                   AppEvents.logEvent(AppEvents.Name(rawValue: "Register - Google Login Fail Firebase - " + authError.localizedDescription))
+                   AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Register - Google Login Fail Firebase - " + authError.localizedDescription))
                }
                else{
                    if(authResult != nil){
@@ -1425,7 +1556,7 @@ class LoginController: UIViewController, GIDSignInDelegate, ASAuthorizationContr
                 }
                }
             }
-        }
+        }*/
     }
 
     func sign(_ signIn: GIDSignIn!, didDisconnectWith user: GIDGoogleUser!, withError error: Error!) {

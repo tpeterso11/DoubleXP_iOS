@@ -13,7 +13,8 @@ import Lottie
 
 class CommunityReviews : UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
-    @IBOutlet weak var loadingAnimation: AnimationView!
+    
+    @IBOutlet weak var loadingAnimation: LottieAnimationView!
     @IBOutlet weak var loadingView: UIVisualEffectView!
     @IBOutlet weak var reviewsList: UICollectionView!
     var game: GamerConnectGame!

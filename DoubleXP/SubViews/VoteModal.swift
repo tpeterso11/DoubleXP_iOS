@@ -27,9 +27,11 @@ class VoteModal: UIViewController, YTSwiftyPlayerDelegate {
     var currentEntry: CompEntryObject?
     var maxEntriesReached = false
     var currentIds = [String]()
-    @IBOutlet weak var testTvAnimation: AnimationView!
-    @IBOutlet weak var successAnimation: AnimationView!
-    @IBOutlet weak var passAnimation: AnimationView!
+    
+    @IBOutlet weak var testTvAnimation: LottieAnimationView!
+    
+    @IBOutlet weak var successAnimation: LottieAnimationView!
+    @IBOutlet weak var passAnimation: LottieAnimationView!
     @IBOutlet weak var status: UILabel!
     @IBOutlet weak var emptyView: UIView!
     @IBOutlet weak var emptyDismiss: UIButton!
@@ -103,7 +105,7 @@ class VoteModal: UIViewController, YTSwiftyPlayerDelegate {
         self.gamertag.text = self.payload[0].gamerTag
         self.currentEntry = self.payload[0]
         self.player = YTSwiftyPlayer(frame: CGRect(x: -200, y: -150, width: self.view.bounds.width + 400, height: self.youtubePlayer.bounds.height + 400), playerVars: [
-            .mute(true),
+            //.mute(true),
             .playsInline(true),
             .videoID(self.currentEntry?.youtubeId ?? ""),
             .loopVideo(true),

@@ -13,8 +13,8 @@ import youtube_ios_player_helper
 import Lottie
 
 class ProfileHeaderCell: UITableViewCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    @IBOutlet weak var youtubeLoadingAnimation: LottieAnimationView!
     @IBOutlet weak var youtubeLoadingBlur: UIVisualEffectView!
-    @IBOutlet weak var youtubeLoadingLottie: AnimationView!
     @IBOutlet weak var more: UIImageView!
     @IBOutlet weak var gamertag: UILabel!
     @IBOutlet weak var consoleCollection: UICollectionView!
@@ -29,6 +29,7 @@ class ProfileHeaderCell: UITableViewCell, UICollectionViewDelegate, UICollection
     @IBOutlet weak var playingTag: UILabel!
     @IBOutlet weak var socialList: UICollectionView!
     @IBOutlet weak var actionButton: UIButton!
+    @IBOutlet weak var defaultBackgroundImg: UIImageView!
     var payload = [String]()
     var socialPayload = [Any]()
     var collapsed = false

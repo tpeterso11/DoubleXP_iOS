@@ -24,25 +24,12 @@ protocol Profile {
     func goToProfile()
 }
 
-class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile, SearchCallbacks, LandingMenuCallbacks, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, LandingUICallbacks, SPStorkControllerDelegate, TodayCallbacks {
+class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, LandingMenuCallbacks, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, SPStorkControllerDelegate, TodayCallbacks {
     
     @IBOutlet weak var deleteAccount: UIButton!
     @IBOutlet weak var moreClickArea: UIView!
-    @IBOutlet weak var requestsClickArea: UIView!
-    @IBOutlet weak var gifButton: UIImageView!
-    @IBOutlet weak var navigationView: UIView!
     @IBOutlet weak var navContainer: UIView!
-    @IBOutlet weak var homeButton: UIImageView!
-    @IBOutlet weak var requestButton: UIImageView!
-    @IBOutlet weak var bottomNav: UIView!
-    @IBOutlet weak var mainNavView: UIView!
-    @IBOutlet weak var secondaryNv: UIView!
-    @IBOutlet weak var requests: UIImageView!
-    @IBOutlet weak var connect: UIImageView!
-    @IBOutlet weak var bottomNavBack: UIImageView!
-    @IBOutlet weak var bottomNavSearch: UITextField!
-    @IBOutlet weak var searchButton: UIButton!
-    @IBOutlet weak var scoob: AnimationView!
+    @IBOutlet weak var scoob: LottieAnimationView!
     @IBOutlet weak var universalLoading: UIVisualEffectView!
     @IBOutlet weak var scoobSub: UIView!
     @IBOutlet weak var scoobCancel: UIButton!
@@ -51,8 +38,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     @IBOutlet weak var dismissBody: UILabel!
     @IBOutlet weak var newMenuBlur: UIView!
     @IBOutlet weak var menuDrawer: UIVisualEffectView!
-    @IBOutlet weak var bottomLogo: UIImageView!
-    @IBOutlet weak var popularClickArea: UIView!
     @IBOutlet weak var searchClickArea: UIView!
     @IBOutlet weak var welcomeBlur: UIVisualEffectView!
     @IBOutlet weak var welcomeBlurDismiss: UIButton!
@@ -63,25 +48,26 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     var resultsUserUid: String? = nil
     //@IBOutlet weak var newNav: UIView!
     
+    @IBOutlet weak var bottomNav: UIVisualEffectView!
     @IBOutlet weak var logOut: UIButton!
     @IBOutlet weak var myProfileClickArea: UIView!
-    @IBOutlet weak var twitchClickArea: UIView!
+    @IBOutlet weak var postsClickArea: UIView!
     @IBOutlet weak var alertSubjectStatus: UILabel!
     @IBOutlet weak var alertSubject: UILabel!
     @IBOutlet weak var alertBarFriendLayout: UIView!
-    @IBOutlet weak var alertBarAnimation: AnimationView!
+    @IBOutlet weak var alertBarAnimation: LottieAnimationView!
     @IBOutlet weak var alertBar: UIView!
     @IBOutlet weak var notificationLabel: UILabel!
     @IBOutlet weak var clickArea: UIView!
     @IBOutlet weak var menuCollection: UICollectionView!
     @IBOutlet weak var friendsLabel: UILabel!
-    @IBOutlet weak var menuButton: UIImageView!
     @IBOutlet weak var menuVie: AnimatingView!
     @IBOutlet weak var mainNavCollection: UICollectionView!
     @IBOutlet weak var simpleLoading: UIVisualEffectView!
-    @IBOutlet weak var simpleLoadingAnimation: AnimationView!
+    @IBOutlet weak var simpleLoadingAnimation: LottieAnimationView!
+    
     @IBOutlet weak var profileBlur: UIVisualEffectView!
-    @IBOutlet weak var welcomeAnimation: AnimationView!
+    @IBOutlet weak var welcomeAnimation: LottieAnimationView!
     @IBOutlet weak var welcomeHeader: UILabel!
     @IBOutlet weak var headerDivider: UIView!
     @IBOutlet weak var feedHeader: UILabel!
@@ -122,14 +108,10 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         appDelegate.registerUserOnlineStatus()
         
         if self.traitCollection.userInterfaceStyle == .dark {
-            self.bottomLogo.alpha = 0.1
+            self.bottomNav.effect = UIBlurEffect(style: .dark)
         } else {
-            self.bottomLogo.alpha = 0.3
+            self.bottomNav.effect = UIBlurEffect(style: .regular)
         }
-        
-        let singleTap = UITapGestureRecognizer(target: self, action: #selector(backButtonClicked))
-        bottomNavBack.isUserInteractionEnabled = true
-        bottomNavBack.addGestureRecognizer(singleTap)
         
         let preferences = UserDefaults.standard
 
@@ -140,31 +122,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             self.welcomeBlur.alpha = 0
         }
         
-        //let singleTap2 = UITapGestureRecognizer(target: self, action: #selector(backButtonClicked))
-        //primaryBack.isUserInteractionEnabled = true
-        //primaryBack.addGestureRecognizer(singleTap2)
-        
-        stackDepth = appDelegate.navStack.count
-        
-        /*Giphy.configure(apiKey: giphyKey)
-        giphy.mediaTypeConfig = [.gifs, .emoji]
-        giphy.rating = .ratedPG13
-        giphy.renditionType = .fixedWidth
-        giphy.shouldLocalizeSearch = false
-        giphy.showConfirmationScreen = true
-        GiphyViewController.trayHeightMultiplier = 0.7
-        
-        giphy.delegate = self*/
-        
-        self.constraint = NSLayoutConstraint(item: self.secondaryNv, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0.0, constant: 0)
-        self.constraint?.isActive = true
-        
         menuDrawer.alpha = 1.0
-        
-        bottomNavSearch.addTarget(self, action: #selector(textFieldDidBeginEditing(_:)), for: .editingChanged)
-        //bottomNavSearch.addTarget(self, action: #selector(textFieldDidEndEditing(_:)), for: .editingChanged)
-        bottomNavSearch.delegate = self
-        bottomNavSearch.returnKeyType = .done
         
         bottomNavHeight = self.bottomNav.bounds.height
         
@@ -178,36 +136,21 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             object: nil
         )
         
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(keyboardWillDisappear),
-            name: UIResponder.keyboardWillHideNotification,
-            object: nil
-        )
         self.bottomNav.layer.shadowColor = UIColor.black.cgColor
         self.bottomNav.layer.shadowOffset = CGSize(width: self.bottomNav.bounds.width, height: 3)
         self.bottomNav.layer.shadowRadius = 15.0
         self.bottomNav.layer.shadowOpacity = 0.8
         self.bottomNav.layer.masksToBounds = false
         self.bottomNav.layer.shadowPath = UIBezierPath(roundedRect: self.bottomNav.bounds, cornerRadius: self.bottomNav.layer.cornerRadius).cgPath
-        //let gifTap = UITapGestureRecognizer(target: self, action: #selector(gifClicked))
-        //gifButton.isUserInteractionEnabled = true
-        //gifButton.addGestureRecognizer(gifTap)
-        gifButton.alpha = 0
-        
-        //self.view.bringSubviewToFront(self.giphy)
+    
         Broadcaster.register(LandingMenuCallbacks.self, observer: self)
         
         addFriendsRef()
         addPendingFriendsRef()
         addMessagingRef()
-        //addTeamRequestRef()
-        //addTeamsRef()
         addRivalsRef()
         addAcceptedRivalsRef()
         addRejectedRivalsRef()
-        //addTeamInvitesRef()
-        //addInviteRequestsRef()
         addFollowersRef()
         addBadgesRef()
         addGamesRef()
@@ -250,51 +193,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         
             appDelegate.recommendedUsersManager.getRecommendedUsers(cachedViewedUids: appDelegate.currentUser!.cachedRecommendedUids, callbacks: self)
         }
-        
-        //DispatchQueue.main.asyncAfter(deadline: .now() + 8.5) {
-            //var array = [[String: Any]]()
-            /*let test = ["gamerTag": "SUCCESSFUL!!!!!!!", "game": "Test", "observableTime": "0", "timeInMs": "50000"] as [String : String]
-            
-            //array.append(test)
-            //let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            let allNewChildrenRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId)
-            allNewChildrenRef.child("tempRivals").setValue(test)
-        allNewChildrenRef.child("thisShitIsSoFuckingAnnoying").setValue("FUCK YOU!")*/
-        
-        
-        /*let allNewChildrenRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId)
-        allNewChildrenRef.observe(.childAdded, with: { (snapshot) in
-            if(appDelegate.currentUser!.pendingRequests.isEmpty && snapshot.hasChild("pending_requests")){
-                let child = snapshot.childSnapshot(forPath: "pending_requests")
-                
-                var pendingRequests = [FriendRequestObject]()
-                
-                for friend in child.children{
-                    let currentObj = friend as! DataSnapshot
-                    let dict = currentObj.value as! [String: Any]
-                    let gamerTag = dict["gamerTag"] as? String ?? ""
-                    let date = dict["date"] as? String ?? ""
-                    let uid = dict["uid"] as? String ?? ""
-                    
-                    let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
-                    pendingRequests.append(newFriend)
-                }
-                
-                if(!pendingRequests.isEmpty && appDelegate.currentUser!.pendingRequests.count < pendingRequests.count){
-                    appDelegate.currentUser?.pendingRequests = pendingRequests
-                    
-                    let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.navigateToRequests))
-                    self.showAlert(alertText: "you have a new friend request!", tap: drawerTap)
-                }
-            }
-        })*/
-        
-        
-        /*DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            let current = ["gamerTag": "test", "date": "today", "uid": "123"] as [String : String]
-            
-            newMessageRef.setValue([current])
-        }*/
     }
     
     func onSuccess() {
@@ -432,49 +330,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             var upList = [[String: String]]()
             messageQueue.setValue(upList)
         }
-    }
-    
-    private func addTeamsRef(){
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        
-        let newTeamsRef = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId).child("teams")
-            newTeamsRef.observe(.value, with: { (snapshot) in
-                var teams = [EasyTeamObj]()
-                var newTeamsPayload = [EasyTeamObj]()
-                for teamObj in snapshot.children {
-                    let currentObj = teamObj as! DataSnapshot
-                    let dict = currentObj.value as? [String: Any]
-                    let teamName = dict?["teamName"] as? String ?? ""
-                    let teamId = dict?["teamId"] as? String ?? ""
-                    let game = dict?["gameName"] as? String ?? ""
-                    let teamCaptainId = dict?["teamCaptainId"] as? String ?? ""
-                    let newTeam = dict?["newTeam"] as? String ?? ""
-                    
-                    let teamObj = EasyTeamObj(teamName: teamName, teamId: teamId, gameName: game, teamCaptainId: teamCaptainId, newTeam: newTeam)
-                    teams.append(teamObj)
-                    
-                    if(newTeam == "true"){
-                        newTeamsPayload.append(teamObj)
-                        newTeamsRef.child(currentObj.key).child("newTeam").setValue("false")
-                    }
-                }
-                
-                if(!newTeamsPayload.isEmpty){
-                    let delegate = UIApplication.shared.delegate as! AppDelegate
-                    delegate.currentUser!.teams = teams
-                    
-                    if(teams.count > 1){
-                        delegate.currentTeamFrag?.reloadTeams()
-                        let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.navigateToTeams))
-                        self.showAlert(alertText: "you've just joined some new teams!", tap: drawerTap)
-                    }
-                    else if(teams.count == 1){
-                        delegate.currentTeamFrag?.reloadTeams()
-                        
-                        self.launchAlertBar(view: "team", friend: nil)
-                    }
-                }
-            })
     }
     
     @objc private func dismissWelcomeBlur(){
@@ -1444,124 +1299,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         }
     }
     
-    @objc func searchClicked(_ sender: AnyObject?) {
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing Search Clicked"))
-        if(!bottomNavSearch.text!.isEmpty){
-            Broadcaster.notify(SearchCallbacks.self) {
-                $0.searchSubmitted(searchString: bottomNavSearch.text!)
-            }
-            
-            bottomNavSearch.text = ""
-            self.view!.endEditing(true)
-        }
-    }
-    
-    @objc func gifClicked(_ sender: AnyObject?) {
-        //present(giphy, animated: true, completion: nil)
-    }
-    
-    @objc func sendMessage(_ sender: AnyObject?) {
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Messaging - Send Message"))
-        var count = 0
-        if(!bottomNavSearch.text!.isEmpty && count < 1){
-            count += 1
-            Broadcaster.notify(SearchCallbacks.self) {
-                $0.messageTextSubmitted(string: bottomNavSearch.text!, list: nil)
-            }
-            
-            bottomNavSearch.text = ""
-            self.view!.endEditing(true)
-        }
-    }
-    
-    @objc func backButtonClicked(_ sender: AnyObject?) {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        if(self.menuShowing){
-            dismissMenu()
-        }
-        else if(appDelegate.currentProfileFrag != nil && appDelegate.currentProfileFrag!.drawerOpen){
-            appDelegate.currentProfileFrag!.hideStatsOverlay()
-        }
-        else if(appDelegate.currentMediaFrag != nil){
-            if(appDelegate.currentMediaFrag!.articleOpen){
-                appDelegate.currentMediaFrag!.closeOverlay()
-                appDelegate.currentMediaFrag = nil
-            }
-            else if(appDelegate.currentMediaFrag!.channelOpen){
-                appDelegate.currentMediaFrag!.closeChannel()
-                appDelegate.currentMediaFrag = nil
-            }
-            else{
-                var stack = appDelegate.navStack
-                stackDepth -= 1
-                
-                if self.stackDepth >= 0 && self.stackDepth < stack.count {
-                    let current = Array(stack)[self.stackDepth].value
-                    let key = Array(stack)[self.stackDepth - 1].value
-                    
-                    if(stack.count > 0 && key != nil){
-                        Broadcaster.notify(NavigateToProfile.self) {
-                            $0.programmaticallyLoad(vc: key, fragName: key.pageName!)
-                            updateNavigation(currentFrag: key)
-                        }
-                        
-                        if(stack.count > 1){
-                            stack.removeValue(forKey: current.pageName!)
-                            appDelegate.navStack = stack
-                        }
-                        
-                        if(stack.count == 1){
-                            restoreBottomNav()
-                        }
-                    }
-                }
-            }
-        }
-        else{
-            var stack = appDelegate.navStack
-            stackDepth -= 1
-            
-            
-            if self.stackDepth >= 0 && self.stackDepth < stack.count {
-                do {
-                    //safe:[index] makes so we can get null returned if it's out of bounds and we can catch it and just send them home.
-                    guard let current = Array(stack)[safe: self.stackDepth]?.value else {
-                        appDelegate.currentLanding!.checkRivals()
-                        navigateToHome()
-                        return
-                    }
-                    let key = Array(stack)[self.stackDepth - 1].value
-                    
-                    if(stack.count > 0 && key != nil){
-                        Broadcaster.notify(NavigateToProfile.self) {
-                            $0.programmaticallyLoad(vc: key, fragName: key.pageName!)
-                        }
-                        
-                        if(stack.count > 1){
-                            stack.removeValue(forKey: current.pageName!)
-                            appDelegate.navStack = stack
-                        }
-                        
-                        if(stack.count == 1){
-                            appDelegate.currentLanding!.checkRivals()
-                            restoreBottomNav()
-                        }
-                    }
-                    else{
-                        appDelegate.currentLanding!.checkRivals()
-                        Broadcaster.notify(NavigateToProfile.self) {
-                            $0.navigateToHome()
-                        }
-                    }
-                }
-            }
-            else{
-                appDelegate.currentLanding!.checkRivals()
-                navigateToHome()
-            }
-        }
-    }
-    
     @objc func navigateToProfile(uid: String){
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.cachedTest = uid
@@ -1580,42 +1317,39 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     }
     
     func navigateToSponsor() {
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Sponsor"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Sponsor"))
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToSponsor()
         }
     }
     
     @objc func navigateToRequests(){
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Requests"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Requests"))
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToRequests()
         }
     }
     
     func navigateToHome(){
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To GamerConnect"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To GamerConnect"))
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToHome()
         }
     }
     
     @objc func navigateToTeams() {
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Teams"))
-        Broadcaster.notify(NavigateToProfile.self) {
-            $0.navigateToTeams()
-        }
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Teams"))
     }
     
     func navigateToInvite() {
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Invite"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Invite"))
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToInvite()
         }
     }
     
     func navigateToSearch(game: GamerConnectGame){
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Search"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Search"))
         
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "gamerConnectSearch") as! GamerConnectSearch
         currentViewController.game = game
@@ -1643,7 +1377,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     delegate.currentDiscoverFrag!.dismiss(animated: true, completion: nil)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Search"))
+                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Search"))
                         Broadcaster.notify(NavigateToProfile.self) {
                             $0.navigateToSearch(game: game)
                         }
@@ -1653,15 +1387,31 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         }
     }
     
+    @objc func launchVideoMessage(){
+        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "videoMessage") as! VideoMessage
+        //currentViewController.newsObj = newsObj
+        //currentViewController.selectedImage = image
+        
+        let transitionDelegate = SPStorkTransitioningDelegate()
+        currentViewController.transitioningDelegate = transitionDelegate
+        currentViewController.modalPresentationStyle = .custom
+        currentViewController.modalPresentationCapturesStatusBarAppearance = true
+        transitionDelegate.showIndicator = true
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+        transitionDelegate.storkDelegate = self
+        self.present(currentViewController, animated: true, completion: nil)
+    }
+    
     func navigateToCompetition(competition: CompetitionObj) {
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Competition"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Competition"))
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToCompetition(competition: competition)
         }
     }
     
     @objc func navigateToCurrentUserProfile() {
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Current User Profile"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Current User Profile"))
         self.menuShowing = false
         let top = CGAffineTransform(translationX: -320, y: 0)
         UIView.animate(withDuration: 0.4, delay: 0.0, options:[], animations: {
@@ -1671,29 +1421,22 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
                 self.newMenuBlur.alpha = 0.0
             }, completion: { (finished: Bool) in
-                UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
-                    self.restoreBottomNav()
-                }, completion: { (finished: Bool) in
-                    let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "playerProfile") as! PlayerProfile
-                    let transitionDelegate = SPStorkTransitioningDelegate()
-                    currentViewController.transitioningDelegate = transitionDelegate
-                    currentViewController.modalPresentationStyle = .custom
-                    currentViewController.modalPresentationCapturesStatusBarAppearance = true
-                    transitionDelegate.showIndicator = true
-                    transitionDelegate.swipeToDismissEnabled = true
-                    transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
-                    transitionDelegate.storkDelegate = self
-                    self.present(currentViewController, animated: true, completion: nil)
-                })
+                let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "playerProfile") as! PlayerProfile
+                let transitionDelegate = SPStorkTransitioningDelegate()
+                currentViewController.transitioningDelegate = transitionDelegate
+                currentViewController.modalPresentationStyle = .custom
+                currentViewController.modalPresentationCapturesStatusBarAppearance = true
+                transitionDelegate.showIndicator = true
+                transitionDelegate.swipeToDismissEnabled = true
+                transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
+                transitionDelegate.storkDelegate = self
+                self.present(currentViewController, animated: true, completion: nil)
             })
         })
     }
     
     func navigateToCreateFrag() {
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Create Team"))
-        Broadcaster.notify(NavigateToProfile.self) {
-            $0.navigateToCreateFrag()
-        }
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Create Team"))
     }
     
     @objc func navigateToSettings() {
@@ -1707,10 +1450,9 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                 self.newMenuBlur.alpha = 0.0
             }, completion: { (finished: Bool) in
                 UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
-                    self.restoreBottomNav()
                 }, completion: { (finished: Bool) in
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Settings"))
+                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Settings"))
                         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "settings") as! SettingsFrag
                         let delegate = UIApplication.shared.delegate as! AppDelegate
                         
@@ -1745,10 +1487,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     @objc func navigateToTeamDashboard(team: TeamObject?, teamInvite: TeamInviteObject?, newTeam: Bool) {
         if(team != nil){
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Dashboard"))
-            Broadcaster.notify(NavigateToProfile.self) {
-                $0.navigateToTeamDashboard(team: team, teamInvite: nil, newTeam: false)
-            }
+            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Dashboard"))
         }
     }
     
@@ -1832,64 +1571,52 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     }
     
     func navigateToTeamNeeds(team: TeamObject) {
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Needs"))
-        Broadcaster.notify(NavigateToProfile.self) {
-            $0.navigateToTeamNeeds(team: team)
-        }
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Needs"))
+        
     }
     
     func navigateToTeamBuild(team: TeamObject) {
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Build"))
-        Broadcaster.notify(NavigateToProfile.self) {
-            $0.navigateToTeamBuild(team: team)
-        }
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Build"))
+        
     }
     
     func navigateToMedia() {
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Media"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Media"))
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToMedia()
         }
     }
     
     func navigateToTeamFreeAgentSearch(team: TeamObject){
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Search"))
-        Broadcaster.notify(NavigateToProfile.self) {
-            $0.navigateToTeamFreeAgentSearch(team: team)
-        }
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Search"))
+        
     }
     
     func navigateToTeamFreeAgentResults(team: TeamObject){
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Results"))
-        Broadcaster.notify(NavigateToProfile.self) {
-            $0.navigateToTeamFreeAgentResults(team: team)
-        }
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Results"))
+        
     }
     
     func navigateToTeamFreeAgentDash(){
         
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Dash"))
-       Broadcaster.notify(NavigateToProfile.self) {
-           $0.navigateToTeamFreeAgentDash()
-       }
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Dash"))
+       
     }
     
     func navigateToTeamFreeAgentFront(){
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Quiz Front"))
-       Broadcaster.notify(NavigateToProfile.self) {
-           $0.navigateToTeamFreeAgentFront()
-       }
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Quiz Front"))
+       
     }
     
     func navigateToFreeAgentQuiz(user: User!, team: TeamObject?, game: GamerConnectGame!) {
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Quiz - " + game.gameName))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Quiz - " + game.gameName))
         Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToFreeAgentQuiz(team: team, gcGame: game, currentUser: user)
         }
     }
     
     func navigateToFreeAgentQuiz(team: TeamObject?, gcGame: GamerConnectGame, currentUser: User){
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Quiz - " + (team?.teamName ?? "")))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Quiz - " + (team?.teamName ?? "")))
           Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToFreeAgentQuiz(team: team, gcGame: gcGame, currentUser: currentUser)
           }
@@ -1917,14 +1644,13 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         }
         
         if(chatUrl != nil){
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Messaging Team"))
+            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Messaging Team"))
         }
         else if(chatOtherId != nil){
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Messaging User"))
+            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Messaging User"))
         }
     
         if(chatUrl != nil || chatOtherId != nil){
-            self.restoreBottomNav()
             self.performSegue(withIdentifier: "messaging", sender: nil)
             //self.popMessagingModal(groupChannelUrl: chatUrl, otherUserId: chatOtherId)
         }
@@ -1935,7 +1661,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         delegate.cachedUidForMessaging = uId
         self.bottomNavHeight = self.bottomNav.bounds.height + 60
         
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing Menu - Messaging User"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing Menu - Messaging User"))
         self.menuShowing = false
         
         let top = CGAffineTransform(translationX: -320, y: 0)
@@ -1946,7 +1672,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
                 self.newMenuBlur.alpha = 0.0
             }, completion: { (finished: Bool) in
-                self.restoreBottomNav()
                 self.performSegue(withIdentifier: "messaging", sender: nil)
                 //self.popMessagingModal(groupChannelUrl: nil, otherUserId: uId)
             })
@@ -1954,19 +1679,12 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if (segue.identifier == "messaging") {
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-            if let currentViewController = segue.destination as? MessagingFrag {
-                currentViewController.currentUser = delegate.currentUser!
-                currentViewController.otherUserId = delegate.cachedUidForMessaging
-            }
-        }
+        
     }
     
     func menuNavigateToProfile(uId: String){
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing Menu - Friend Profile"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing Menu - Friend Profile"))
         self.menuShowing = false
-        self.restoreBottomNav()
         
         let top = CGAffineTransform(translationX: -320, y: 0)
         UIView.animate(withDuration: 0.4, delay: 0.3, options:[], animations: {
@@ -1985,10 +1703,8 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     
     func navigateToViewTeams(){
         
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - View Teams"))
-        Broadcaster.notify(NavigateToProfile.self) {
-          $0.navigateToViewTeams()
-        }
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - View Teams"))
+       
     }
     
     func searchSubmitted(searchString: String) {
@@ -2000,7 +1716,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         }
     }
     
-    func showScoob(callback: LandingUICallbacks, cancelableWV: WKWebView?){
+    func showScoob(cancelableWV: WKWebView?){
         resetDismissScoob()
         setupScoobCancel(cancelableWV: cancelableWV)
         
@@ -2100,211 +1816,11 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     func programmaticallyLoad(vc: UIViewController, fragName: String) {
     }
     
-    func updateNavigation(currentFrag: ParentVC){
-        let navOptions = currentFrag.navDictionary
-        
-        switch(navOptions!["state"]){
-            case "original":
-                restoreBottomNav()
-            break
-            
-            case "backOnly":
-                removeBottomNav(showNewNav: false, hideSearch: true, searchHint: nil, searchButtonText: nil, isMessaging: false)
-            break
-            
-            case "secondary":
-                removeBottomNav(showNewNav: true, hideSearch: true, searchHint: nil, searchButtonText: nil, isMessaging: false)
-            break
-            
-            case "search":
-                removeBottomNav(showNewNav: true, hideSearch: false, searchHint: navOptions!["searchHint"], searchButtonText: navOptions!["searchButton"], isMessaging: false)
-            break
-            
-            case "messaging":
-                removeBottomNav(showNewNav: true, hideSearch: false, searchHint: navOptions!["searchHint"], searchButtonText: navOptions!["searchButton"], isMessaging: true)
-            break
-            
-            case "none":
-                removeBottomNav(showNewNav: true, hideSearch: true, searchHint: nil, searchButtonText: nil, isMessaging: false)
-            break
-            
-            default:
-                removeBottomNav(showNewNav: false, hideSearch: false, searchHint: nil, searchButtonText: nil, isMessaging: false)
-            break
-        }
-    }
-    
-    
-    func removeBottomNav(showNewNav: Bool, hideSearch: Bool, searchHint: String?, searchButtonText: String?, isMessaging: Bool){
-        if(showNewNav){
-            //show bottom nav WITH textfield. (Messaging Uses this first method)
-            if(!bottomNavSearch.isHidden && !hideSearch){
-                bottomNavSearch.isHidden = false
-                
-                if(searchButtonText != nil){
-                    searchButton.alpha = 1
-                    searchButton.setTitle(searchButtonText, for: .normal)
-                    
-                    if(isMessaging){
-                        searchButton.addTarget(self, action: #selector(sendMessage), for: .touchUpInside)
-                    } else {
-                        searchButton.addTarget(self, action: #selector(searchClicked), for: .touchUpInside)
-                    }
-                }
-                
-                if(searchHint != nil){
-                    bottomNavSearch.attributedPlaceholder = NSAttributedString(string: searchHint!,
-                                                                               attributes: [NSAttributedString.Key.foregroundColor: UIColor(named:"dark") ?? UIColor.darkGray])
-                }
-                else{
-                    bottomNavSearch.attributedPlaceholder = NSAttributedString(string: "Search",
-                    attributes: [NSAttributedString.Key.foregroundColor: UIColor(named:"dark")  ?? UIColor.darkGray])
-                }
-                
-                //if(!backButtonShowing && !hideSearch){
-                //    primaryBack.slideInBottomSmall()
-                //    backButtonShowing = true
-                //}
-                
-                self.constraint?.constant = self.bottomNav.bounds.height + 60
-                UIView.animate(withDuration: 0.3, delay: 0.2, options: [], animations: {
-                
-                        //self.articleOverlay.alpha = 1
-                        //self.view.bringSubviewToFront(self.secondaryNv)
-                        self.view.layoutIfNeeded()
-                        
-                        self.isSecondaryNavShowing = true
-                    
-                
-                }, completion: nil)
-            }
-            /*else{
-                //search is not showing and we want to show it
-                if(bottomNavSearch.isHidden && hideSearch == false){
-                    bottomNavSearch.isHidden = false
-                    bottomNavSearch.slideInBottomReset()
-                    
-                    //apply title to search button and bring it in.
-                    if(searchButtonText != nil){
-                        searchButton.setTitle(searchButtonText, for: .normal)
-                    }
-                    searchButton.slideInBottomReset()
-                    
-                    if(isMessaging){
-                        searchButton.addTarget(self, action: #selector(sendMessage), for: .touchUpInside)
-                    }
-                    else{
-                        searchButton.addTarget(self, action: #selector(searchClicked), for: .touchUpInside)
-                    }
-                }
-                //if search is already showing
-                else if(!bottomNavSearch.isHidden && hideSearch == false){
-                    if(searchButtonText != nil){
-                        searchButton.setTitle(searchButtonText, for: .normal)
-                    }
-                    searchButton.slideInBottomReset()
-                    
-                    if(isMessaging){
-                        searchButton.addTarget(self, action: #selector(sendMessage), for: .touchUpInside)
-                    }
-                    else{
-                        searchButton.addTarget(self, action: #selector(searchClicked), for: .touchUpInside)
-                    }
-                }
-                else{
-                    bottomNavSearch.isHidden = hideSearch
-                    searchShowing = hideSearch
-                }
-            }
-            
-            if(searchHint != nil){
-                bottomNavSearch.placeholder = searchHint
-            }
-            else{
-                bottomNavSearch.placeholder = "Search"
-            }
-            
-            //if(!backButtonShowing){
-            //    secondaryNv.slideInBottom()
-            //    secondaryNv.isHidden = false
-            //}
-            
-            isSecondaryNavShowing = true*/
-        }
-        else if(isSecondaryNavShowing){
-            if(isSecondaryNavShowing){
-                UIView.animate(withDuration: 0.3, delay: 0.2, options: [], animations: {
-                    self.constraint?.constant = 0
-                    
-                    UIView.animate(withDuration: 0.5) {
-                        //self.articleOverlay.alpha = 1
-                        //self.view.bringSubviewToFront(self.secondaryNv)
-                        self.view.layoutIfNeeded()
-                        
-                        self.isSecondaryNavShowing = false
-                    }
-                
-                }, completion: nil)
-            }
-        }
-        else{
-            if(isSecondaryNavShowing){
-                secondaryNv.slideOutBottomSecond()
-            }
-            isSecondaryNavShowing = false
-            
-            //if(hideSearch && searchShowing){
-            //    bottomNavSearch.slideOutBottom()
-            //    searchButton.slideOutBottom()
-            //}
-            //else if(!hideSearch && !searchShowing){
-            //    bottomNavSearch.isHidden = false
-            //    searchButton.isHidden = false
-                
-            //    searchShowing = true
-            //}
-            
-            if(!mainNavShowing){
-                mainNavView.slideInBottomNav()
-                mainNavShowing = true
-            }
-            
-            //if(!backButtonShowing){
-            //    primaryBack.slideInBottomSmall()
-            //    backButtonShowing = true
-            //}
-        }
-    }
-    
-    func restoreBottomNav(){
-        if(isSecondaryNavShowing == true){
-            UIView.animate(withDuration: 0.3, delay: 0.2, options: [], animations: {
-                self.constraint?.constant = 0
-                
-                UIView.animate(withDuration: 0.5) {
-                    //self.articleOverlay.alpha = 1
-                    //self.view.bringSubviewToFront(self.secondaryNv)
-                    self.view.layoutIfNeeded()
-                    
-                    self.isSecondaryNavShowing = false
-                }
-            
-            }, completion: nil)
-        }
-        else{
-            //let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            //if(appDelegate.currentFrag == "Home"){
-                //primaryBack.slideOutBottomSmall()
-                backButtonShowing = false
-            //}
-        }
-    }
-    
     
     private func enableButtons(){
-        let singleTapRequests = UITapGestureRecognizer(target: self, action: #selector(playButtonClicked))
-        self.requestsClickArea.isUserInteractionEnabled = true
-        self.requestsClickArea.addGestureRecognizer(singleTapRequests)
+        let singleTapRequests = UITapGestureRecognizer(target: self, action: #selector(launchVideoMessage))
+        self.postsClickArea.isUserInteractionEnabled = true
+        self.postsClickArea.addGestureRecognizer(singleTapRequests)
         
         let singleTapMenu = UITapGestureRecognizer(target: self, action: #selector(menuButtonClicked))
         self.moreClickArea.isUserInteractionEnabled = true
@@ -2331,7 +1847,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     }
     
     @objc private func twitchClicked(){
-        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "mediaFrag") as! MediaFrag
+        /*let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "mediaFrag") as! MediaFrag
         currentViewController.pageName = "Media"
         currentViewController.navDictionary = ["state": "backOnly"]
         
@@ -2346,13 +1862,13 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         transitionDelegate.swipeToDismissEnabled = true
         transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
         transitionDelegate.storkDelegate = self
-        self.present(currentViewController, animated: true, completion: nil)
+        self.present(currentViewController, animated: true, completion: nil)*/
         //self.presentAsStork(controller)
         //self.performSegue(withIdentifier: "twitch", sender: nil)
     }
     
     func navigateToTwitchFromDiscover(gameName: String){
-        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "mediaFrag") as! MediaFrag
+        /*let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "mediaFrag") as! MediaFrag
         currentViewController.pageName = "Media"
         currentViewController.navDictionary = ["state": "backOnly"]
         currentViewController.discoverGameName = gameName
@@ -2365,7 +1881,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         transitionDelegate.swipeToDismissEnabled = true
         transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
         transitionDelegate.storkDelegate = self
-        self.present(currentViewController, animated: true, completion: nil)
+        self.present(currentViewController, animated: true, completion: nil)*/
     }
     
     @objc func didDismissStorkBySwipe(){
@@ -2416,8 +1932,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             profileAdded = false
             mediaAdded = false
         }
-        
-        updateNavColor(color: UIColor(named: "darker")!)
     }
     
     @objc func mediaButtonClicked(_ sender: AnyObject?) {
@@ -2430,8 +1944,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             profileAdded = false
             mediaAdded = true
         }
-        
-        updateNavColor(color: UIColor(named: "darker")!)
     }
     
     @objc func teamButtonClicked(_ sender: AnyObject?) {
@@ -2444,8 +1956,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             profileAdded = false
             mediaAdded = false
         }
-        
-        updateNavColor(color: UIColor(named: "darker")!)
     }
     
     @objc func requestButtonClicked(_ sender: AnyObject?) {
@@ -2539,14 +2049,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
     func messageTextSubmitted(string: String, list: [String]?) {
     }
     
-    func updateNavColor(color: UIColor) {
-        UIView.transition(with: self.bottomNav, duration: 0.3, options: .curveEaseInOut, animations: {
-            self.bottomNav.backgroundColor = color
-            self.mainNavView.backgroundColor = color
-            self.secondaryNv.backgroundColor = color
-        }, completion: nil)
-    }
-    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
@@ -2593,14 +2095,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         }
     }
     
-    @objc func keyboardWillDisappear() {
-        if(isSecondaryNavShowing){
-            if(self.messagingDeckHeight != nil){
-                restoreBottom(height: self.messagingDeckHeight!)
-            }
-        }
-    }
-    
     func extendBottom(height: CGFloat){
         //let top = CGAffineTransform(translationX: 0, y: 50)
         UIView.animate(withDuration: 0.3, animations: {
@@ -2619,27 +2113,12 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
         }, completion: nil)
     }
     
-    func restoreBottom(height: CGFloat){
-        let top = CGAffineTransform(translationX: 0, y: 0)
-        UIView.animate(withDuration: 0.3, animations: {
-            self.bottomNavSearch.transform = top
-            self.constraint?.constant = self.bottomNav.bounds.height + 60
-            
-            UIView.animate(withDuration: 0.5) {
-                //self.articleOverlay.alpha = 1
-                //self.view.sendSubviewToBack(self.secondaryNv)
-                self.view.layoutIfNeeded()
-            }
-        
-        }, completion: nil)
-    }
-    
     func navigateToMessagingFromMenu(uId: String){
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.cachedUidForMessaging = uId
         self.bottomNavHeight = self.bottomNav.bounds.height + 60
         
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Current User Profile"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Current User Profile"))
         self.menuShowing = false
         let top = CGAffineTransform(translationX: -320, y: 0)
         UIView.animate(withDuration: 0.4, delay: 0.0, options:[], animations: {
@@ -2649,11 +2128,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
             UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
                 self.newMenuBlur.alpha = 0.0
             }, completion: { (finished: Bool) in
-                UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
-                    self.restoreBottomNav()
-                }, completion: { (finished: Bool) in
-                    self.navigateToMessaging(groupChannelUrl: nil, otherUserId: uId)
-                })
+                self.navigateToMessaging(groupChannelUrl: nil, otherUserId: uId)
             })
         })
     }
@@ -2783,7 +2258,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                     UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
                         self.newMenuBlur.alpha = 0.0
                     }, completion: { (finished: Bool) in
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing Menu - Messaging User"))
+                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing Menu - Messaging User"))
                     
                         let delegate = UIApplication.shared.delegate as! AppDelegate
                         self.navigateToProfile(uid: delegate.currentUser!.uId)
@@ -2800,7 +2275,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                     UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
                         self.newMenuBlur.alpha = 0.0
                     }, completion: { (finished: Bool) in
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing Menu - Upgrade"))
+                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing Menu - Upgrade"))
                     
                         self.performSegue(withIdentifier: "upgrade", sender: nil)
                     })
@@ -2817,7 +2292,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                     UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
                         self.newMenuBlur.alpha = 0.0
                     }, completion: { (finished: Bool) in
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing Menu - Upgrade"))
+                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing Menu - Upgrade"))
                         
                         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "follower") as! MenuFollowerDrawer
                         currentViewController.payload = delegate.currentUser!.followers
@@ -2847,7 +2322,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, NavigateToProfile
                     UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
                         self.newMenuBlur.alpha = 0.0
                     }, completion: { (finished: Bool) in
-                        AppEvents.logEvent(AppEvents.Name(rawValue: "Landing Menu - Upgrade"))
+                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing Menu - Upgrade"))
                         
                         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "follower") as! MenuFollowerDrawer
                         currentViewController.payload = delegate.currentUser!.following

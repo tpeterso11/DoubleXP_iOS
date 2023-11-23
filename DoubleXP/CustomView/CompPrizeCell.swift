@@ -12,7 +12,7 @@ import Lottie
 
 class CompPrizeCell : UITableViewCell {
     
-    @IBOutlet weak var moneyAnimation: AnimationView!
+    @IBOutlet weak var moneyAnimation: LottieAnimationView!
     @IBOutlet weak var compTopPrize: UILabel!
     @IBOutlet weak var prizeUnits: UILabel!
 }

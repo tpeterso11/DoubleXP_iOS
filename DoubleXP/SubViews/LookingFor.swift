@@ -12,9 +12,6 @@ import FirebaseDatabase
 
 class LookingFor: UIViewController, UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var lookingTable: UITableView!
-    @IBOutlet weak var currentCountLabel: UILabel!
-    @IBOutlet weak var maxCountLabel: UILabel!
-    @IBOutlet weak var doneButton: UIButton!
     
     var payload = [Any]() // String or [String]
     var usersSelected = [String]()
@@ -26,7 +23,6 @@ class LookingFor: UIViewController, UITableViewDelegate, UITableViewDataSource {
         
         buildPayload()
         
-        self.doneButton.addTarget(self, action: #selector(sendPayload), for: .touchUpInside)
         self.lookingTable.estimatedRowHeight = 350
         self.lookingTable.rowHeight = UITableView.automaticDimension
     }
@@ -36,7 +32,9 @@ class LookingFor: UIViewController, UITableViewDelegate, UITableViewDataSource {
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         if(!appDelegate.generalLookingFor.isEmpty){
-            payload.append("general")
+            let obj = LookingForObj()
+            obj.name = "general"
+            payload.append(obj)
             
             let selection = LookingForSelection()
             selection.gameName = "general"
@@ -46,7 +44,10 @@ class LookingFor: UIViewController, UITableViewDelegate, UITableViewDataSource {
         if(!appDelegate.currentUser!.games.isEmpty){
             for game in appDelegate.gcGames {
                 if(appDelegate.currentUser!.games.contains(game.gameName) && !game.lookingFor.isEmpty){
-                    payload.append(game.gameName)
+                    let obj = LookingForObj()
+                    obj.name = game.gameName
+                    obj.image = game.imageUrl
+                    payload.append(obj)
                     
                     let selection = LookingForSelection()
                     selection.gameName = game.gameName
@@ -55,22 +56,14 @@ class LookingFor: UIViewController, UITableViewDelegate, UITableViewDataSource {
                 }
             }
         }
+        payload.append("end")
         if(!payload.isEmpty){
-            if(appDelegate.currentUser!.userLookingFor != nil){
-                self.usersSelected = appDelegate.currentUser!.userLookingFor
-            }
-            updateCount()
+            self.usersSelected = appDelegate.currentUser!.userLookingFor
             self.lookingTable.delegate = self
             self.lookingTable.dataSource = self
         } else {
             //show oops
         }
-    }
-    
-    func updateCount(){
-        let count = self.usersSelected.count
-        currentCountLabel.text = String(count)
-        self.currentSelectedCount = count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -80,9 +73,29 @@ class LookingFor: UIViewController, UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let current = self.payload[indexPath.item]
         
-        if(current is String){
+        if(current is LookingForObj){
+            let currentObj = (current as! LookingForObj)
             let cell = tableView.dequeueReusableCell(withIdentifier: "header", for: indexPath) as! LookingForHeader
-            cell.title.text = current as? String ?? ""
+            cell.title.text = currentObj.name
+            if((current as! LookingForObj).image != nil){
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                let cache = appDelegate.imageCache
+                if(cache.object(forKey: currentObj.image! as NSString) != nil){
+                    cell.headerImg.image = cache.object(forKey: currentObj.image! as NSString)
+                } else {
+                    cell.headerImg.moa.onSuccess = { image in
+                        cell.headerImg.image = image
+                        appDelegate.imageCache.setObject(image, forKey: currentObj.image! as NSString)
+                        return image
+                    }
+                    cell.headerImg.moa.url = currentObj.image!
+                }
+            } else {
+                cell.headerImg.image = UIImage(named: "profile_cta.jpg")
+            }
+            return cell
+        } else if(current is String){
+            let cell = tableView.dequeueReusableCell(withIdentifier: "end", for: indexPath) as! LookingForEndCell
             return cell
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "options", for: indexPath) as! LookingForOptions
@@ -98,29 +111,22 @@ class LookingFor: UIViewController, UITableViewDelegate, UITableViewDataSource {
     func addRemoveChoice(selected: String, choice: LookingForSelection){
         if(self.usersSelected.contains(selected)){
             self.usersSelected.remove(at: self.usersSelected.index(of: selected)!)
+            self.updateChoices(usersSelected: self.usersSelected)
             self.lookingTable.reloadData()
-            self.updateCount()
         } else {
             if(self.usersSelected.count < 8){
                 self.usersSelected.append(selected)
+                self.updateChoices(usersSelected: self.usersSelected)
                 self.lookingTable.reloadData()
-                self.updateCount()
-                
-                if(self.usersSelected.count == 8){
-                    self.currentCountLabel.textColor = #colorLiteral(red: 0.6423664689, green: 0, blue: 0.04794860631, alpha: 1)
-                }
             }
         }
     }
     
-    @objc func sendPayload(){
+    private func updateChoices(usersSelected: [String]){
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let ref = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId)
-        ref.child("lookingFor").setValue(self.usersSelected)
-        appDelegate.currentUser!.userLookingFor = self.usersSelected
-        upgrade?.updateButtons()
-        appDelegate.currentResultsFrag?.onModalReturn()
-        self.dismiss(animated: true, completion: nil)
+        ref.child("lookingFor").setValue(usersSelected)
+        appDelegate.currentUser!.userLookingFor = usersSelected
     }
 }
 
@@ -131,4 +137,9 @@ class LookingForSelection: Equatable {
     static func == (lhs: LookingForSelection, rhs: LookingForSelection) -> Bool {
         return lhs.gameName == rhs.gameName && lhs.choices == rhs.choices
     }
+}
+
+class LookingForObj {
+    var name: String? = nil
+    var image: String? = nil
 }

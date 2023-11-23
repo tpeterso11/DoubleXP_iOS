@@ -8,7 +8,6 @@
 
 import Foundation
 import UIKit
-import VideoBackground
 
 class CompetitionCell: UICollectionViewCell{
     @IBOutlet weak var competitionName: UILabel!

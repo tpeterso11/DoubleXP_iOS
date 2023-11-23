@@ -15,30 +15,24 @@ import FBSDKLoginKit
 import Firebase
 import Lottie
 
-class YoutubeConnect: UIViewController, GIDSignInDelegate, SocialMediaManagerCallback, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate {
+class YoutubeConnect: UIViewController, SocialMediaManagerCallback, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate {
     
+    @IBOutlet weak var loadingAnimation: LottieAnimationView!
     @IBOutlet weak var signInButton: UIButton!
     @IBOutlet weak var dismissButton: UIButton!
     @IBOutlet weak var videoTabel: UITableView!
-    @IBOutlet weak var clear: UIButton!
-    @IBOutlet weak var doneButton: UIButton!
     @IBOutlet weak var googleBlur: UIVisualEffectView!
     @IBOutlet weak var loading: UIVisualEffectView!
-    @IBOutlet weak var loadingAnimation: AnimationView!
     @IBOutlet weak var youtubeHeader: UILabel!
     @IBOutlet weak var youtubeSub: UILabel!
-    @IBOutlet weak var youtubeInstructions: UILabel!
     var videoPayload = [YoutubeVideoObj]()
     var selectedPayload = [YoutubeVideoObj]()
-    var selectedIds = [String]()
+    var selectedVideo: YoutubeVideoObj?
     var profileUser: User!
     var competitionId: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        GIDSignIn.sharedInstance().delegate = self
-        GIDSignIn.sharedInstance()?.presentingViewController = self
         if(!profileUser.googleApiAccessToken.isEmpty){
             UIView.animate(withDuration: 0.5, animations: {
                 self.loading.alpha = 1
@@ -46,162 +40,36 @@ class YoutubeConnect: UIViewController, GIDSignInDelegate, SocialMediaManagerCal
             }, completion: { (finished: Bool) in
                 let manager = SocialMediaManager()
                 manager.getYoutubeAccess(accessToken: self.profileUser.googleApiAccessToken, callbacks: self, currentUser: self.profileUser, tryRefresh: true)
-                
-                self.doneButton.addTarget(self, action: #selector(self.sendPayload), for: .touchUpInside)
-                self.clear.addTarget(self, action: #selector(self.clearClicked), for: .touchUpInside)
             })
         } else {
             loading.alpha = 0
             googleBlur.alpha = 1
-            signInButton.addTarget(self, action: #selector(googleSignIn), for: .touchUpInside)
-            dismissButton.addTarget(self, action: #selector(dismissModal), for: .touchUpInside)
             self.googleBlur.alpha = 1
-        }
-        
-        setupLongPressGesture()
-    }
-    
-    func setupLongPressGesture() {
-        let longPressGesture:UILongPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(self.handleLongPress))
-        longPressGesture.minimumPressDuration = 1.0 // 1 second press
-        longPressGesture.delegate = self
-        self.videoTabel.addGestureRecognizer(longPressGesture)
-    }
-
-    @objc func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer){
-        if gestureRecognizer.state == .began {
-            let touchPoint = gestureRecognizer.location(in: self.videoTabel)
-            if let indexPath = videoTabel.indexPathForRow(at: touchPoint) {
-                let current = self.videoPayload[indexPath.item]
-                var containedFavorite: YoutubeVideoObj? = nil
-                for video in self.selectedPayload {
-                    if(video.youtubeFavorite == "true"){
-                        containedFavorite = video
-                        break
-                    }
-                }
-                
-                //if the list is full, and there is already a favorite
-                if(self.selectedPayload.count == 5 && containedFavorite != nil){
-                    print(containedFavorite!.youtubeId)
-                    if(containedFavorite!.youtubeId != current.youtubeId){
-                        //only if the youtubeId is different, remove the old favorite completely, replace with new.
-                        for video in self.selectedPayload {
-                            if(video.youtubeId == containedFavorite!.youtubeId){
-                                self.selectedPayload.remove(at: self.selectedPayload.index(of: video)!)
-                                break
-                            }
-                        }
-                        for video in self.videoPayload {
-                            if(video.youtubeId == containedFavorite!.youtubeId){
-                                video.youtubeFavorite = "false"
-                                break
-                            }
-                        }
-                        if(self.selectedIds.contains(containedFavorite!.youtubeId)){
-                            self.selectedIds.remove(at: self.selectedIds.index(of: containedFavorite!.youtubeId)!)
-                        }
-                        current.youtubeFavorite = "true"
-                        
-                        if(!self.selectedIds.contains(current.youtubeId)){
-                            self.selectedIds.append(current.youtubeId)
-                            self.selectedPayload.append(current)
-                        }
-                    }
-                } else if(self.selectedPayload.count == 5 && containedFavorite == nil){
-                    if(containedFavorite!.youtubeId != current.youtubeId){
-                        //only if the youtubeId is different, remove the first chosen vid, replace with new favorite.
-                        let firstVid = self.selectedPayload[0]
-                        if(self.selectedIds.contains(firstVid.youtubeId)){
-                            self.selectedIds.remove(at: self.selectedIds.index(of: firstVid.youtubeId)!)
-                        }
-                        for video in self.selectedPayload {
-                            if(video.youtubeId == firstVid.youtubeId){
-                                self.selectedPayload.remove(at: self.selectedPayload.index(of: video)!)
-                                break
-                            }
-                        }
-                        current.youtubeFavorite = "true"
-                        if(!self.selectedIds.contains(current.youtubeId)){
-                            self.selectedIds.append(current.youtubeId)
-                            self.selectedPayload.append(current)
-                        }
-                    }
-                } else if(self.selectedPayload.count < 5) {
-                    for video in self.selectedPayload {
-                        if(video.youtubeFavorite == "true" && video.youtubeId != current.youtubeId){
-                            video.youtubeFavorite = "false"
-                        } else if(video.youtubeId == current.youtubeId && video.youtubeFavorite == "false"){
-                            video.youtubeFavorite = "true"
-                        }
-                    }
-                    if(!self.selectedIds.contains(current.youtubeId)){
-                        current.youtubeFavorite = "true"
-                        self.selectedIds.append(current.youtubeId)
-                        self.selectedPayload.append(current)
-                    }
-                    
-                    for video in self.videoPayload {
-                        if(video.youtubeFavorite == "true" && video.youtubeId != current.youtubeId){
-                            video.youtubeFavorite = "false"
-                        }
-                        if(video.youtubeId == current.youtubeId){
-                            video.youtubeFavorite = "true"
-                        }
-                    }
-                }
-                self.videoTabel.reloadData()
-            }
         }
     }
     
     func handleSelection(position: Int){
-        let selectedVideo = self.videoPayload[position]
-        if(self.competitionId != nil && self.selectedIds.count < 1){
-            self.selectedIds.append(selectedVideo.youtubeId)
-            self.selectedPayload.append(selectedVideo)
-        } else if(self.competitionId == nil && selectedVideo.youtubeFavorite == "false" && !self.selectedIds.contains(selectedVideo.youtubeId) && self.selectedIds.count < 5){
-            self.selectedIds.append(selectedVideo.youtubeId)
-            self.selectedPayload.append(selectedVideo)
-        } else if(selectedVideo.youtubeFavorite == "true"){
-            selectedVideo.youtubeFavorite = "false"
-        } else {
-            if(self.selectedIds.contains(selectedVideo.youtubeId)){
-                self.selectedIds.remove(at: self.selectedIds.index(of: selectedVideo.youtubeId)!)
+        let checkVideo = self.videoPayload[position]
+        for video in self.videoPayload {
+            if(video.youtubeId != checkVideo.youtubeId){
+                video.youtubeFavorite = "false"
             }
-            for video in self.selectedPayload {
-                if(video.youtubeId == selectedVideo.youtubeId){
-                    self.selectedPayload.remove(at: self.selectedPayload.index(of: video)!)
-                    break
+            if(video.youtubeId == checkVideo.youtubeId){
+                video.youtubeFavorite = "true"
+                self.selectedVideo = video
+                
+                if(!self.selectedPayload.isEmpty){
+                    self.selectedPayload.removeAll()
                 }
+                self.selectedPayload.append(video)
             }
-        }
-        
-        if(self.doneButton.alpha == 0.3 && !self.selectedPayload.isEmpty){
-            self.doneButton.alpha = 1
-            self.doneButton.isUserInteractionEnabled = true
-        } else if(self.selectedPayload.isEmpty && self.competitionId != nil){
-            self.doneButton.alpha = 0.3
-            self.doneButton.isUserInteractionEnabled = false
-        } else {
-            self.doneButton.alpha = 1
-            self.doneButton.isUserInteractionEnabled = true
         }
         self.videoTabel.reloadData()
     }
     
-    @objc func clearClicked(){
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        
-        let ref = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId)
-        ref.child("googleApiAccessToken").removeValue()
-        ref.child("googleApiRefreshToken").removeValue()
-        ref.child("googleUserId").removeValue()
-        ref.child("youtubeVideos").removeValue()
-        
-        //Database.database().reference().child("YoutubeSubmissions").child(appDelegate.currentUser!.uId).removeValue()
-        
-        dismissModal()
+    override func viewWillDisappear(_ animated: Bool) {
+        self.sendPayload()
+        super.viewWillDisappear(true)
     }
     
     @objc func dismissModal(){
@@ -218,46 +86,52 @@ class YoutubeConnect: UIViewController, GIDSignInDelegate, SocialMediaManagerCal
         }
     }
     
-    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error?) {
-      // ...
-      if let error = error {
-        // ...AppEvents.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login Fail - " + error.localizedDescription))
-        
-        var buttons = [PopupDialogButton]()
-        let title = "google login error."
-        let message = "there was an error getting you logged into google. try again, or try registering using your email."
-        
-        let button = DefaultButton(title: "try again.") { [weak self] in
-            self?.googleSignIn()
+    func onSignInComplete(result: GIDSignInResult?, didSignInFor user: GIDGoogleUser!, withError error: Error?){
+        if let error = error {
+            // ...AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login Fail - " + error.localizedDescription))
+            
+            var buttons = [PopupDialogButton]()
+            let title = "google login error."
+            let message = "there was an error getting you logged into google. try again, or try registering using your email."
+            
+            let button = DefaultButton(title: "try again.") { [weak self] in
+                self?.googleSignIn()
+                
+            }
+            buttons.append(button)
+            
+            let buttonOne = CancelButton(title: "nevermind") { [weak self] in
+                
+            }
+            buttons.append(buttonOne)
+            
+            let popup = PopupDialog(title: title, message: message)
+            popup.addButtons(buttons)
+            
+            // Present dialog
+            self.present(popup, animated: true, completion: nil)
+            return
         }
-        buttons.append(button)
         
-        let buttonOne = CancelButton(title: "nevermind") { [weak self] in
-            //
-        }
-        buttons.append(buttonOne)
+        guard let authentication = result?.user else { return }
+        let credential = GoogleAuthProvider.credential(withIDToken: authentication.idToken?.tokenString ?? "",
+                                                       accessToken: authentication.accessToken.tokenString)
         
-        let popup = PopupDialog(title: title, message: message)
-        popup.addButtons(buttons)
-
-        // Present dialog
-        self.present(popup, animated: true, completion: nil)
-         return
-      }
-
-      guard let authentication = user.authentication else { return }
-      let _ = GoogleAuthProvider.credential(withIDToken: authentication.idToken,
-                                                        accessToken: authentication.accessToken)
-        if(user.userID != nil && !user.userID.isEmpty){
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-            let ref = Database.database().reference().child("Users").child(delegate.currentUser!.uId)
-            ref.child("googleUserId").setValue(user.userID)
-            if(!authentication.accessToken.isEmpty){
-                delegate.currentUser!.googleApiAccessToken = authentication.accessToken
-                delegate.currentUser!.googleApiRefreshToken = authentication.refreshToken
-                ref.child("googleApiAccessToken").setValue(authentication.accessToken)
-                ref.child("googleApiRefreshToken").setValue(authentication.refreshToken)
-                SocialMediaManager().getYoutubeAccess(accessToken: authentication.accessToken, callbacks: self, currentUser: self.profileUser, tryRefresh: true)
+        Auth.auth().signIn(with: credential) { authResult, error in
+            if error != nil {
+                AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Register - Google Login Fail Firebase"))
+                print(error)
+            } else {
+                let delegate = UIApplication.shared.delegate as! AppDelegate
+                let ref = Database.database().reference().child("Users").child(delegate.currentUser!.uId)
+                ref.child("googleUserId").setValue(user.userID)
+                if(!authentication.accessToken.tokenString.isEmpty){
+                    delegate.currentUser!.googleApiAccessToken = authentication.accessToken.tokenString
+                    delegate.currentUser!.googleApiRefreshToken = authentication.refreshToken.tokenString
+                    ref.child("googleApiAccessToken").setValue(authentication.accessToken.tokenString)
+                    ref.child("googleApiRefreshToken").setValue(authentication.refreshToken.tokenString)
+                    SocialMediaManager().getYoutubeAccess(accessToken: authentication.accessToken.tokenString, callbacks: self, currentUser: self.profileUser, tryRefresh: true)
+                }
             }
         }
     }
@@ -268,8 +142,18 @@ class YoutubeConnect: UIViewController, GIDSignInDelegate, SocialMediaManagerCal
             self.loadingAnimation.alpha = 1
             self.loadingAnimation.play()
         }, completion: { (finished: Bool) in
-            GIDSignIn.sharedInstance()?.scopes = ["https://www.googleapis.com/auth/youtube.readonly"]
-            GIDSignIn.sharedInstance().signIn()
+            GIDSignIn.sharedInstance.signIn(
+                withPresenting: self, hint: nil, additionalScopes: ["email", "https://www.googleapis.com/auth/youtube.readonly"]
+            ) { result, error in
+                if let token = result?.user.idToken {
+                    self.onSignInComplete(result: result, didSignInFor: result?.user, withError: nil)
+                    return
+                }
+                guard let error = error as? GIDSignInError else {
+                    fatalError("No token and no GIDSignInError: \(String(describing: error))")
+                }
+                self.onSignInComplete(result: result, didSignInFor: nil, withError: error)
+            }
         })
     }
 
@@ -301,7 +185,7 @@ class YoutubeConnect: UIViewController, GIDSignInDelegate, SocialMediaManagerCal
             // Present dialog
             self.present(popup, animated: true, completion: nil)
         } else {
-            AppEvents.logEvent(AppEvents.Name(rawValue: "Youtube - Google Login Fail - " + "\(error?.localizedDescription ?? "")"))
+            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Youtube - Google Login Fail - " + "\(error?.localizedDescription ?? "")"))
             
             var buttons = [PopupDialogButton]()
             let title = "google login error."
@@ -340,11 +224,6 @@ class YoutubeConnect: UIViewController, GIDSignInDelegate, SocialMediaManagerCal
             cell.baseColorLayer.alpha = 0.6
             cell.selectedBlur.alpha = 0
             cell.favoriteStar.alpha = 1
-        } else if(self.selectedIds.contains(current.youtubeId)){
-            cell.baseColorLayer.backgroundColor = #colorLiteral(red: 0.3333052099, green: 0.3333491981, blue: 0.3332902789, alpha: 1)
-            cell.baseColorLayer.alpha = 0.6
-            cell.selectedBlur.alpha = 0
-            cell.favoriteStar.alpha = 0
         } else {
             cell.baseColorLayer.alpha = 0
             cell.selectedBlur.alpha = 0
@@ -374,7 +253,7 @@ class YoutubeConnect: UIViewController, GIDSignInDelegate, SocialMediaManagerCal
     }
     
     @objc func sendPayload(){
-        if(self.selectedPayload.isEmpty){
+        if(!self.selectedPayload.isEmpty){
             UIView.animate(withDuration: 0.5, animations: {
                 self.loading.alpha = 1
                 self.loadingAnimation.alpha = 1
@@ -450,7 +329,7 @@ class YoutubeConnect: UIViewController, GIDSignInDelegate, SocialMediaManagerCal
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return CGFloat(100)
+        return CGFloat(120)
     }
     
     func setYoutubeInfo(){
@@ -458,25 +337,11 @@ class YoutubeConnect: UIViewController, GIDSignInDelegate, SocialMediaManagerCal
         self.videoTabel.delegate = self
         self.videoTabel.reloadData()
         
-        self.doneButton.addTarget(self, action: #selector(self.sendPayload), for: .touchUpInside)
-        self.clear.addTarget(self, action: #selector(self.clearClicked), for: .touchUpInside)
-        
         if(self.competitionId != nil){
             self.youtubeHeader.text = "your most recent videos"
             self.youtubeSub.text = ""
-            self.youtubeInstructions.text = "select which one of your recent youtube uploads you would like to submit."
-            self.doneButton.alpha = 0.3
-            self.doneButton.isUserInteractionEnabled = false
-            self.doneButton.setTitle("i choose this one", for: .normal)
-            
-            self.clear.setTitle("dismiss", for: .normal)
-            self.clear.addTarget(self, action: #selector(self.dismissModal), for: .touchUpInside)
-        } else {
-            self.youtubeHeader.text = "your most recent videos"
-            self.youtubeSub.text = "tap to select up to 5 videos to feature on your profile."
-            
-            self.doneButton.setTitle("done.", for: .normal)
         }
+        
         UIView.animate(withDuration: 0.5, delay: 0.5, options: [], animations: {
             self.loading.alpha = 0
             self.googleBlur.alpha = 0
@@ -512,7 +377,6 @@ class YoutubeConnect: UIViewController, GIDSignInDelegate, SocialMediaManagerCal
                                     youtubeVideo.upVotes = upVotes
                                     
                                     self.selectedPayload.append(youtubeVideo)
-                                    self.selectedIds.append(youtubeVideo.youtubeId)
                                 }
                             }
                             if(!contained){
@@ -530,7 +394,6 @@ class YoutubeConnect: UIViewController, GIDSignInDelegate, SocialMediaManagerCal
                                 newVideo.downVotes = downVotes
                                 newVideo.upVotes = upVotes
                                 
-                                self.selectedIds.append(id)
                                 self.selectedPayload.append(newVideo)
                                 self.videoPayload.append(newVideo)
                             }

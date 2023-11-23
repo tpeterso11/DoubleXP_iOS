@@ -12,5 +12,4 @@ import Lottie
 
 class FeedMorePostsCell: UICollectionViewCell {
     
-    @IBOutlet weak var moreAnimation: AnimationView!
 }

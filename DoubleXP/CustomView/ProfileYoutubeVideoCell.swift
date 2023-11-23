@@ -12,6 +12,6 @@ import Lottie
 
 class ProfileYoutubeVideoCell : UICollectionViewCell {
     
-    @IBOutlet weak var playingAnimation: AnimationView!
+    @IBOutlet weak var playingAnimation: LottieAnimationView!
     @IBOutlet weak var videoImg: UIImageView!
 }

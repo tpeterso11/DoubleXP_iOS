@@ -23,7 +23,7 @@ class RatingDrawer: UIViewController, UITextViewDelegate {
     @IBOutlet weak var newClose: UIButton!
     @IBOutlet weak var oldReviewerLayout: UIView!
     @IBOutlet weak var newReviewerLayout: UIView!
-    @IBOutlet weak var loadingAnimation: AnimationView!
+    @IBOutlet weak var loadingAnimation: LottieAnimationView!
     @IBOutlet weak var loadingView: UIVisualEffectView!
     @IBOutlet weak var submit: UIButton!
     @IBOutlet weak var ratingFeedback: UILabel!

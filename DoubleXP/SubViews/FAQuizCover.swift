@@ -22,7 +22,7 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
     var interviewManager: InterviewManager?
     var currentUrl = ""
     
-    @IBOutlet weak var lottie: AnimationView!
+    @IBOutlet weak var lottie: LottieAnimationView!
     @IBOutlet weak var bottomView: UIView!
     var maxProfiles = 0
     
@@ -43,7 +43,7 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
             self.getQuestions()
         }
         
-        AppEvents.logEvent(AppEvents.Name(rawValue: "FA Quiz Front"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "FA Quiz Front"))
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -62,7 +62,7 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
     
     @objc func startButtonClicked(_ sender: AnyObject?) {
         self.interviewManager?.showFirstQuestion()
-        AppEvents.logEvent(AppEvents.Name(rawValue: "FA Quiz Front - Start Button"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "FA Quiz Front - Start Button"))
     }
     
     func showEmpty() {
@@ -70,12 +70,12 @@ class FAQuizCover: ParentVC, FreeAgentQuizNav{
     }
     
     @objc func dashButtonClicked(_ sender: AnyObject?) {
-        AppEvents.logEvent(AppEvents.Name(rawValue: "FA Quiz Front - Dash Button - Navigate to FA Dash"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "FA Quiz Front - Dash Button - Navigate to FA Dash"))
         LandingActivity().navigateToTeamFreeAgentDash()
     }
     
     @objc func doneButtonClicked(_ sender: AnyObject?) {
-        AppEvents.logEvent(AppEvents.Name(rawValue: "FA Quiz Front - Done Button - Navigate to FA Dash"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "FA Quiz Front - Done Button - Navigate to FA Dash"))
         LandingActivity().navigateToTeamFreeAgentDash()
     }
     

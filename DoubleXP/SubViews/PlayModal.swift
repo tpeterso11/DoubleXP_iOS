@@ -19,9 +19,8 @@ class PlayModal: UIViewController, UITableViewDelegate, UITableViewDataSource, S
     var payload = [String]()
     var compPayload = [CompetitionObj]()
     private var player: AVPlayer!
-    @IBOutlet weak var introPlayHeaderAnimation: AnimationView!
-    @IBOutlet weak var introPlayPlayAnimation: AnimationView!
     
+    @IBOutlet weak var introPlayHeaderAnimation: LottieAnimationView!
     @IBOutlet weak var playIntroBlur: UIVisualEffectView!
     @IBOutlet weak var introDismissButton: UIButton!
     @IBOutlet weak var introBottom: UIView!

@@ -103,14 +103,14 @@ class FeedFeedCell : UITableViewCell, UICollectionViewDataSource, UICollectionVi
             
             if((current as! RecommendedUser).gamerTag == "allthesaints011"){
                 cell.xBox.isHidden = true
-                AppEvents.logEvent(AppEvents.Name(rawValue: "GC-Connect Toussaint Click"))
+                AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC-Connect Toussaint Click"))
             }
             if((current as! RecommendedUser).gamerTag == "fitboy_"){
                 cell.xBox.isHidden = true
-                AppEvents.logEvent(AppEvents.Name(rawValue: "GC-Connect Hodges Click"))
+                AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC-Connect Hodges Click"))
             }
             if((current as! RecommendedUser).gamerTag == "Kwatakye Raven"){
-                AppEvents.logEvent(AppEvents.Name(rawValue: "GC-Connect Mike Click"))
+                AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC-Connect Mike Click"))
             }
             
             
@@ -415,7 +415,7 @@ class FeedFeedCell : UITableViewCell, UICollectionViewDataSource, UICollectionVi
                     ignoreArray.append((current as! UpcomingGame).id)
                     defaults.set(ignoreArray, forKey: "ignoredUpcomingGames")
                     
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "Upcoming Game ignored" + (current as! UpcomingGame).game))
+                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Upcoming Game ignored" + (current as! UpcomingGame).game))
                     
                     self.secondaryPayload.remove(at: view!.tag)
                     self.feedCollection.reloadData()
@@ -454,7 +454,7 @@ class FeedFeedCell : UITableViewCell, UICollectionViewDataSource, UICollectionVi
                     ignoreArray.append((current as! EpisodeObj).mediaId)
                     defaults.set(ignoreArray, forKey: "ignoredEpisodes")
                     
-                    AppEvents.logEvent(AppEvents.Name(rawValue: "Episode ignored" + (current as! EpisodeObj).mediaId))
+                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Episode ignored" + (current as! EpisodeObj).mediaId))
                     
                     self.secondaryPayload.remove(at: view!.tag)
                     self.feedCollection.reloadData()

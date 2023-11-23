@@ -10,17 +10,19 @@ import UIKit
 import SwiftHTTP
 import Firebase
 import SwiftDate
-import VideoBackground
 import AdSupport
+import SwiftVideoBackground
 
 class PreSplashActivity: UIViewController, MediaCallbacks  {
     private var data: [NewsObject]!
     private var games: [GamerConnectGame]!
+    private let postsManager = PostsManager()
     
     @IBOutlet weak var adminBlur: UIView!
     @IBOutlet weak var splashLogo: UIImageView!
     @IBOutlet weak var videoBlur: UIVisualEffectView!
-    @IBOutlet weak var videoBack: VideoBackground!
+    @IBOutlet weak var videoBack: UIView!
+    
     struct Constants {
         static let secret = "uyvhqn68476njzzdvja9ulqsb8esn3"
         static let id = "aio1d4ucufi6bpzae0lxtndanh3nob"
@@ -28,7 +30,7 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        guard let videoPath = Bundle.main.path(forResource: "newSplash0421", ofType: "mov"),
+        /*guard let videoPath = Bundle.main.path(forResource: "newSplash0421", ofType: "mov"),
         let imagePath = Bundle.main.path(forResource: "null", ofType: "png") else{
             games = [GamerConnectGame]()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -38,29 +40,24 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
                 //manager.getOpions(url: "http://doublexpstorage.tech/app-json/champion.json")
             }
             return
-        }
+        }*/
+        let url = URL(string: "https://coolVids.com/coolVid.mp4")!
+        VideoBackground.shared.play(view: self.videoBack, url: url)
         
-        let options = VideoOptions(pathToVideo: videoPath,
-                                   pathToImage: imagePath,
-                                   isMuted: true,
-                                   shouldLoop: false)
-        let videoView = VideoBackground(frame: view.bounds, options: options)
-        videoView.layer.masksToBounds = true
-        videoView.alpha = 0.8
-        view.insertSubview(videoView, at: 0)
-        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.currentPreSplash = self
         games = [GamerConnectGame]()
 
+        self.getArticles()
+        self.getFeedExtras()
+        self.loadLanguages()
+        self.getGeneralLookingFor()
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.8) {
             UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
                 self.videoBlur.alpha = 1
                 //self.splashLogo.alpha = 0
             }, completion: { (finished: Bool) in
-                self.getArticles()
-                self.getFeedExtras()
-                self.loadLanguages()
-                self.getGeneralLookingFor()
             })
             //self.getArticles()
             //self.getFeedExtras()
@@ -125,6 +122,7 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
     func getAppConfig(){
         HTTP.GET("http://doublexpstorage.tech/app-json/tes.json") { response in
             if let err = response.error {
+                self.loadGCGames()
                 print("error: \(err.localizedDescription)")
                 return //also notify app of failure as needed
             }
@@ -380,6 +378,7 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
             let userLong = value?["userLong"] as? Double ?? 0.0
             let subscriptions = value?["subscriptions"] as? [String] ?? [String]()
             let viewedPosts = value?["viewedPosts"] as? [String] ?? [String]()
+        
             let competitions = value?["competitions"] as? [String] ?? [String]()
             let bio = value?["bio"] as? String ?? ""
             let blockList = value?["blockList"] as? [String: String] ?? [String: String]()
@@ -993,7 +992,7 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
                 }
             }
             
-            var receivedPosts = [PostObject]()
+            /*var receivedPosts = [PostObject]()
             if(snapshot.hasChild("receivedPosts")){
                 let posts = snapshot.childSnapshot(forPath: "receivedPosts")
                 for post in posts.children{
@@ -1010,7 +1009,28 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
                     let postConsole = dict?["postConsole"] as? String ?? ""
                     let title = dict?["title"] as? String ?? ""
                     
-                    receivedPosts.append(PostObject(title: title, videoOwnerGamerTag: videoOwnerGamerTag, videoOwnerUid: videoOwnerUid, publicPost: publicPost, date: date, youtubeId: youtubeId, imgUrl: youtubeImg, postConsole: postConsole, game: game))
+                    receivedPosts.append(PostObject(postId: postId, title: title, videoOwnerGamerTag: videoOwnerGamerTag, videoOwnerUid: videoOwnerUid, publicPost: publicPost, date: date, youtubeId: youtubeId, imgUrl: youtubeImg, postConsole: postConsole, game: game))
+                }
+            }*/
+            
+            var myPosts = [PostObject]()
+            if(snapshot.hasChild("myPosts")){
+                let posts = snapshot.childSnapshot(forPath: "myPosts")
+                for post in posts.children{
+                    let currentObj = post as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let date = dict?["date"] as? String ?? ""
+                    let postId = dict?["postId"] as? String ?? ""
+                    let videoOwnerGamerTag = dict?["videoOwnerGamerTag"] as? String ?? ""
+                    let game = dict?["game"] as? String ?? ""
+                    let videoOwnerUid = dict?["videoOwnerUid"] as? String ?? ""
+                    let youtubeId = dict?["youtubeId"] as? String ?? ""
+                    let youtubeImg = dict?["youtubeImg"] as? String ?? ""
+                    let publicPost = dict?["publicPost"] as? String ?? ""
+                    let postConsole = dict?["postConsole"] as? String ?? ""
+                    let title = dict?["title"] as? String ?? ""
+                    
+                    myPosts.append(PostObject(postId: postId, title: title, videoOwnerGamerTag: videoOwnerGamerTag, videoOwnerUid: videoOwnerUid, publicPost: publicPost, date: date, youtubeId: youtubeId, imgUrl: youtubeImg, postConsole: postConsole, game: game))
                 }
             }
             
@@ -1064,21 +1084,27 @@ class PreSplashActivity: UIViewController, MediaCallbacks  {
             user.following = following
             user.followers = followers
             user.followerAnnouncements = followerAnnouncements
-            user.receivedPosts = receivedPosts
+            //user.receivedPosts = receivedPosts
             user.viewedPosts = viewedPosts
+            user.myPosts = myPosts
             
             
             DispatchQueue.main.async {
                 let delegate = UIApplication.shared.delegate as! AppDelegate
                 delegate.currentUser = user
                 
+                self.postsManager.getUniversalPosts()
                 //self.performSegue(withIdentifier: "results", sender: nil) //results
-                self.performSegue(withIdentifier: "homeTransition", sender: nil)
+            
             }
             
             }) { (error) in
                 print(error.localizedDescription)
         }
+    }
+    
+    func transitionHome(){
+        self.performSegue(withIdentifier: "homeTransition", sender: nil)
     }
     
     private func convertFriends(list: [String], pathString: String, userUid: String){

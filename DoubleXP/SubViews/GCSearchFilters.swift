@@ -48,7 +48,7 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
         currentManager = delegate.searchManager
-        self.clear.alpha = 0.3
+        //self.clear.alpha = 0.3
         
         self.searchButton.addTarget(self, action: #selector(searchFromButton), for: .touchUpInside)
         
@@ -59,7 +59,7 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
         buildFilterList()
     }
     
-    private func checkClearButton(){
+    /*private func checkClearButton(){
         if(!currentManager.advancedFilters.isEmpty || !currentManager.ageFilters.isEmpty || !currentManager.langaugeFilters.isEmpty){
             self.clear.alpha = 1.0
             self.clear.isUserInteractionEnabled = true
@@ -68,17 +68,24 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
             self.clear.alpha = 0.3
             self.clear.isUserInteractionEnabled = false
         }
-    }
+    }*/
     
     private func buildFilterList(){
         self.basicFilterList = [filterCell]()
         
         var header = filterCell()
         header.header = true
-        header.title = "basic"
+        header.title = "basic filters"
         header.options = [["": ""]]
         header.choices = [String]()
         self.basicFilterList.append(header)
+        
+        var consoles = filterCell()
+        consoles.header = false
+        consoles.title = "consoles"
+        consoles.options = [["": ""]]
+        consoles.choices = [String]()
+        self.basicFilterList.append(consoles)
         
         locationCell = filterCell()
         locationCell?.header = true
@@ -157,18 +164,19 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
             if(self.basicFilterList[indexPath.section].header == true){
                 if(self.basicFilterList[indexPath.section].type == "activate"){
                     let cell = tableView.dequeueReusableCell(withIdentifier: "activate", for: indexPath) as! FilterActivateCell
-                    cell.actionButton.setTitle(self.basicFilterList[indexPath.section].title, for: .normal)
+                    cell.filterLabel.text = self.basicFilterList[indexPath.section].title
+                    //cell.actionButton.setTitle(self.basicFilterList[indexPath.section].title, for: .normal)
                     
                     if(self.basicFilterList[indexPath.section].title == "location"){
                         let delegate = UIApplication.shared.delegate as! AppDelegate
                         self.currentLocationActivationCell = cell
                         if(delegate.currentUser!.userLat != 0.0){
-                            cell.switch.isOn = true
+                            cell.filterSwitch.isOn = true
                         } else {
-                            cell.switch.isOn = false
+                            cell.filterSwitch.isOn = false
                         }
-                        cell.actionButton.addTarget(self, action: #selector(locationButtonTriggered), for: UIControl.Event.touchUpInside)
-                        cell.switch.addTarget(self, action: #selector(locationSwitchTriggered), for: UIControl.Event.valueChanged)
+                        //cell.actionButton.addTarget(self, action: #selector(locationButtonTriggered), for: UIControl.Event.touchUpInside)
+                        cell.filterSwitch.addTarget(self, action: #selector(locationSwitchTriggered), for: UIControl.Event.valueChanged)
                     }
                     return cell
                 } else {
@@ -178,11 +186,11 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
                 }
             } else {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "header", for: indexPath) as! FilterHeader
-                cell.headerAction.setTitle(self.basicFilterList[indexPath.section].title, for: .normal)
+                cell.headerLabel.text = self.basicFilterList[indexPath.section].title
                 
                 let headerTap = HeaderGesture(target: self, action: #selector(headerTriggered))
                 headerTap.payload = self.basicFilterList[indexPath.section].choices
-                cell.headerAction.addGestureRecognizer(headerTap)
+                cell.headerLabel.addGestureRecognizer(headerTap)
                 
                 return cell
             }
@@ -251,8 +259,101 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
                     let cell = tableView.dequeueReusableCell(withIdentifier: "empty", for: indexPath) as! EmptyCell
                     return cell
                 }
-            }
-            else {
+            } else if(self.basicFilterList[indexPath.section].title == "consoles"){
+                let cell = tableView.dequeueReusableCell(withIdentifier: "consoles", for: indexPath) as! FiltersConsoleCell
+                if(self.gcGame.availablebConsoles.contains("ps")){
+                    let consoleTap = ConsoleGesture(target: self, action: #selector(consoleTapped))
+                    consoleTap.tag = "ps"
+                    cell.psButton.isUserInteractionEnabled = true
+                    cell.psButton.addGestureRecognizer(consoleTap)
+                    if(self.currentManager.currentSelectedConsoles.contains("ps")){
+                        cell.psButton.image = UIImage(named: "playstation-logotype (1)")
+                    } else {
+                        cell.psButton.image = UIImage(named: "playstation-logotype")
+                    }
+                } else {
+                    cell.psButton.image = UIImage(named: "playstation-logotype")
+                    cell.psButton.alpha = 0.3
+                    cell.psButton.isUserInteractionEnabled = false
+                }
+                if(self.gcGame.availablebConsoles.contains("xbox")){
+                    let consoleTap = ConsoleGesture(target: self, action: #selector(consoleTapped))
+                    consoleTap.tag = "xbox"
+                    cell.xboxButton.isUserInteractionEnabled = true
+                    cell.xboxButton.addGestureRecognizer(consoleTap)
+                    if(self.currentManager.currentSelectedConsoles.contains("xbox")){
+                        cell.xboxButton.image = UIImage(named: "xbox-logo (1)")
+                    } else {
+                        cell.xboxButton.image = UIImage(named: "xbox-logo")
+                    }
+                } else {
+                    cell.xboxButton.image = UIImage(named: "xbox-logo")
+                    cell.xboxButton.alpha = 0.3
+                    cell.xboxButton.isUserInteractionEnabled = false
+                }
+                if(self.gcGame.availablebConsoles.contains("nintendo")){
+                    let consoleTap = ConsoleGesture(target: self, action: #selector(consoleTapped))
+                    consoleTap.tag = "nintendo"
+                    cell.nintendoButton.isUserInteractionEnabled = true
+                    cell.nintendoButton.addGestureRecognizer(consoleTap)
+                    if(self.currentManager.currentSelectedConsoles.contains("nintendo")){
+                        cell.nintendoButton.image = UIImage(named: "switch_logo")
+                    } else {
+                        cell.nintendoButton.image = UIImage(named: "switch_logo_dark")
+                    }
+                } else {
+                    cell.nintendoButton.image = UIImage(named: "switch_logo_dark")
+                    cell.nintendoButton.alpha = 0.3
+                    cell.nintendoButton.isUserInteractionEnabled = false
+                }
+                if(self.gcGame.availablebConsoles.contains("pc")){
+                    let consoleTap = ConsoleGesture(target: self, action: #selector(consoleTapped))
+                    consoleTap.tag = "pc"
+                    cell.pcButton.isUserInteractionEnabled = true
+                    cell.pcButton.addGestureRecognizer(consoleTap)
+                    if(self.currentManager.currentSelectedConsoles.contains("pc")){
+                        cell.pcButton.image = UIImage(named: "pc_logo")
+                    } else {
+                        cell.pcButton.image = UIImage(named: "pc_logo_dark")
+                    }
+                } else {
+                    cell.pcButton.image = UIImage(named: "pc_logo_dark")
+                    cell.pcButton.alpha = 0.3
+                    cell.pcButton.isUserInteractionEnabled = false
+                }
+                if(self.gcGame.availablebConsoles.contains("mobile")){
+                    let consoleTap = ConsoleGesture(target: self, action: #selector(consoleTapped))
+                    consoleTap.tag = "mobile"
+                    cell.mobileButton.isUserInteractionEnabled = true
+                    cell.mobileButton.addGestureRecognizer(consoleTap)
+                    if(self.currentManager.currentSelectedConsoles.contains("mobile")){
+                        cell.mobileButton.image = UIImage(named: "phone_white")
+                    } else {
+                        cell.mobileButton.image = UIImage(named: "mobile_logo")
+                    }
+                } else {
+                    cell.mobileButton.image = UIImage(named: "mobile_logo")
+                    cell.mobileButton.alpha = 0.3
+                    cell.mobileButton.isUserInteractionEnabled = false
+                }
+                if(self.gcGame.availablebConsoles.contains("tabletop")){
+                    let consoleTap = ConsoleGesture(target: self, action: #selector(consoleTapped))
+                    consoleTap.tag = "tabletop"
+                    cell.tableTopButton.isUserInteractionEnabled = true
+                    cell.tableTopButton.addGestureRecognizer(consoleTap)
+                    if(self.currentManager.currentSelectedConsoles.contains("tabletop")){
+                        cell.tableTopButton.image = UIImage(named: "dice (1)")
+                    } else {
+                        cell.tableTopButton.image = UIImage(named: "dice")
+                    }
+                } else {
+                    cell.tableTopButton.image = UIImage(named: "dice")
+                    cell.tableTopButton.alpha = 0.3
+                    cell.tableTopButton.isUserInteractionEnabled = false
+                }
+                
+                return cell
+            } else {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "option", for: indexPath) as! FilterOption
                 let current = self.basicFilterList[indexPath.section].options[indexPath.row - 1] as? [String: String]
                 let key = Array(current!.keys)[0]
@@ -327,7 +428,7 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
                         }
                     }
                 }
-                checkClearButton()
+                //checkClearButton()
                 self.table.reloadData()
             } else {
                 let current = self.basicFilterList[indexPath.section].options[indexPath.row - 1] as? [String: String]
@@ -348,7 +449,7 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
                     self.currentManager.advancedFilters.append(current!)
                 }
                 
-                checkClearButton()
+                //checkClearButton()
                 self.table.reloadData()
             }
         }
@@ -368,6 +469,8 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
                 } else{
                     return CGFloat(10)
                 }
+            } else if(self.basicFilterList[indexPath.section].title == "consoles"){
+                return CGFloat(200)
             }
             else {
                 return CGFloat(60)
@@ -377,17 +480,17 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
     
     @objc private func searchFromButton(){
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        delegate.currentGCSearchFrag?.dismissModal()
+        delegate.currentGCSearchFrag?.filterSearch()
         self.dismiss(animated: true, completion: nil)
     }
     
-    @objc private func clearFilters(){
+    /*@objc private func clearFilters(){
         self.currentManager.advancedFilters = [[String: String]]()
         self.currentManager.ageFilters = [String]()
         self.currentManager.langaugeFilters = [String]()
         self.table.reloadData()
         self.checkClearButton()
-    }
+    }*/
     
     @objc private func distanceChosen(sender: DistanceGesture){
         self.currentManager.locationFilter = sender.tag
@@ -398,16 +501,25 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
         
     }
     
+    @objc private func consoleTapped(sender: ConsoleGesture){
+        if(self.currentManager.currentSelectedConsoles.contains(sender.tag)){
+            self.currentManager.currentSelectedConsoles.remove(at: self.currentManager.currentSelectedConsoles.firstIndex(of: sender.tag)!)
+        } else {
+            self.currentManager.currentSelectedConsoles.append(sender.tag)
+        }
+        self.table.reloadData()
+    }
+    
     @objc private func locationButtonTriggered(){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         if(delegate.currentUser!.userLat != 0.0){
-            self.currentLocationActivationCell?.switch.setOn(false, animated: true)
+            self.currentLocationActivationCell?.filterSwitch.setOn(false, animated: true)
             delegate.currentUser!.userLat = 0.0
             delegate.currentUser!.userLong = 0.0
             self.sendLocationInfo()
             self.table.reloadData()
         } else {
-            self.currentLocationActivationCell?.switch.setOn(false, animated: true)
+            self.currentLocationActivationCell?.filterSwitch.setOn(false, animated: true)
             locationManager = CLLocationManager()
             locationManager?.delegate = self
             if #available(iOS 14.0, *) {
@@ -518,6 +630,10 @@ class GCSearchFilters: UIViewController, UITableViewDelegate, UITableViewDataSou
         popup!.addButtons([buttonOne, buttonTwo])//, buttonTwo, buttonThree])
         self.present(popup!, animated: true, completion: nil)
     }
+}
+
+class ConsoleGesture: UITapGestureRecognizer {
+    var tag: String!
 }
 
 class DistanceGesture: UITapGestureRecognizer {

@@ -14,7 +14,7 @@ import collection_view_layouts
 
 class PopularPage: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
     @IBOutlet weak var loadingScreen: UIVisualEffectView!
-    @IBOutlet weak var loadingAnimation: AnimationView!
+    @IBOutlet weak var loadingAnimation: LottieAnimationView!
     @IBOutlet weak var popularTable: UICollectionView!
     @IBOutlet weak var empty: UIView!
     var payload = [YoutubeVideoObj]()

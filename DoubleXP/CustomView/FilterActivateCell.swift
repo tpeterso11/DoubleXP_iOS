@@ -11,7 +11,8 @@ import UIKit
 
 class FilterActivateCell: UITableViewCell {
     
-    @IBOutlet weak var `switch`: UISwitch!
+    @IBOutlet weak var filterSwitch: UISwitch!
+    @IBOutlet weak var filterLabel: UILabel!
     @IBOutlet weak var actionButton: UIButton!
     
 }

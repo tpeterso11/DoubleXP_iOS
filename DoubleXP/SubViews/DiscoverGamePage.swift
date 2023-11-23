@@ -29,7 +29,7 @@ class DiscoverGamePage: UIViewController, UITableViewDelegate, UITableViewDataSo
     @IBOutlet weak var twitchButton: UIButton!
     @IBOutlet weak var connectButton: UIButton!
     @IBOutlet weak var loadingView: UIVisualEffectView!
-    @IBOutlet weak var loadingAnimation: AnimationView!
+    @IBOutlet weak var loadingAnimation: LottieAnimationView!
     
     var game: GamerConnectGame!
     var payload = [[String : Any]]()
@@ -265,7 +265,7 @@ class DiscoverGamePage: UIViewController, UITableViewDelegate, UITableViewDataSo
     }
     
     @objc private func twitchClicked(){
-        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "mediaFrag") as! MediaFrag
+        /*let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "mediaFrag") as! MediaFrag
         currentViewController.pageName = "Media"
         currentViewController.navDictionary = ["state": "backOnly"]
         currentViewController.discoverGameName = game.gameName
@@ -278,7 +278,7 @@ class DiscoverGamePage: UIViewController, UITableViewDelegate, UITableViewDataSo
         transitionDelegate.swipeToDismissEnabled = true
         transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
         transitionDelegate.storkDelegate = self
-        self.present(currentViewController, animated: true, completion: nil)
+        self.present(currentViewController, animated: true, completion: nil)*/
     }
     
     private func buildGamePayload(){

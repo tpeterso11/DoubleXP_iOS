@@ -33,14 +33,14 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @IBOutlet weak var search: UnderLineTextField!
     @IBOutlet weak var buildingBlur: UIVisualEffectView!
     @IBOutlet weak var buildingHeader: UILabel!
-    @IBOutlet weak var buildingAnimation: AnimationView!
+    @IBOutlet weak var buildingAnimation: LottieAnimationView!
     @IBOutlet weak var consoleTable: UITableView!
     @IBOutlet weak var gamerTagCover: UIView!
     @IBOutlet weak var consoleTag: UILabel!
     @IBOutlet weak var gamertagTag: UILabel!
     @IBOutlet weak var keyboardNext: UIButton!
     @IBOutlet weak var updateBlur: UIVisualEffectView!
-    @IBOutlet weak var updateAnimation: AnimationView!
+    @IBOutlet weak var updateAnimation: LottieAnimationView!
     @IBOutlet weak var allGamesButton: UIView!
     @IBOutlet weak var allGamesCover: UIView!
     @IBOutlet weak var popularButton: UIView!
@@ -517,6 +517,7 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
             self.dismiss(animated: true) {
                 let delegate = UIApplication.shared.delegate as! AppDelegate
                 delegate.currentFeedFrag?.checkOnlineAnnouncements()
+                delegate.currentFeedSearchModal?.onModalDismissed()
             }
         } else {
             self.proceedToLanding()
@@ -528,7 +529,7 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
         let manager = delegate.socialMediaManager
         manager.getTwitchAppToken(token: nil, uid: delegate.currentUser!.uId)
         
-        AppEvents.logEvent(AppEvents.Name(rawValue: "Register - GC"))
+        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Register - GC"))
         
         if(!self.returning && !delegate.currentUser!.gamerTag.isEmpty){
             self.proceedToResults()
