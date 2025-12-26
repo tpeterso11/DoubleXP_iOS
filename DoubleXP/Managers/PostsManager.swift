@@ -103,7 +103,7 @@ class PostsManager {
                     }
                 }
             }
-            appDelegate.currentPreSplash?.transitionHome()
+           //appDelegate.currentPreSplash?.transitionHome()
         })
     }
     

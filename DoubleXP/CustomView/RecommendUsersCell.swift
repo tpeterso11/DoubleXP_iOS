@@ -9,13 +9,13 @@
 import Foundation
 import UIKit
 
-class RecommendUsersCell: UITableViewCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+class RecommendUsersCell: UITableViewCell {
     @IBOutlet weak var usersCollection: UICollectionView!
     var payload: [Any]!
     var infoSet = false
-    var recommeded: Recommeded?
+        //var recommeded: Recommeded?
     
-    func setPayload(payload: [Any], recommeded: Recommeded){
+    /*func setPayload(payload: [Any], recommeded: Recommeded){
         self.payload = payload
         self.recommeded = recommeded
         
@@ -78,27 +78,20 @@ class RecommendUsersCell: UITableViewCell, UICollectionViewDelegate, UICollectio
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "game", for: indexPath) as! RecommendGameCell
             let currentGame = (current as! GamerConnectGame)
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            let cache = appDelegate.imageCache
             
             var url = ""
-            if(!currentGame.alternateImageUrl.isEmpty){
+            /*if(!currentGame.alternateImageUrl.isEmpty){
                 url = currentGame.alternateImageUrl
             } else {
                 url = currentGame.imageUrl
-            }
-            
-            if(cache.object(forKey: url as NSString) != nil){
-                cell.gameBack.image = cache.object(forKey: url as NSString)
-            } else {
-                cell.gameBack.image = Utility.Image.placeholder
-                cell.gameBack.moa.onSuccess = { image in
+            }*/
+            /*let url = URL(string: url)
+            if (url != nil) {
+                ImageLoader.shared.loadImage(from: currentObj.imageUrl) { [weak self] image in
+                    guard let self = self else { return }
                     cell.gameBack.image = image
-                    appDelegate.imageCache.setObject(image, forKey: url as NSString)
-                    return image
                 }
-                cell.gameBack.moa.url = url
-            }
+            }*/
             cell.gameBack.contentMode = .scaleAspectFill
             cell.gameName.text = currentGame.gameName
             
@@ -130,5 +123,5 @@ class RecommendUsersCell: UITableViewCell, UICollectionViewDelegate, UICollectio
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: CGFloat(250), height: CGFloat(350))
-    }
+    }*/
 }

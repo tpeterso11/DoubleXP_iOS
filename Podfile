@@ -9,15 +9,12 @@ target 'DoubleXP' do
   pod 'FirebaseMessaging'
   pod 'FirebaseAnalytics'
   pod 'FirebaseDatabase'
-  pod 'moa'
-  pod 'MSPeekCollectionViewDelegateImplementation'
   pod 'SwiftNotificationCenter'
   pod 'lottie-ios'
   pod 'PINRemoteImage'
   pod 'AIFlatSwitch'
   pod 'SwiftRichString'
   pod 'PopupDialog'
-  pod 'FBSDKLoginKit'
   pod 'ValidationComponents'
   pod 'UnderLineTextField'
   pod 'SwiftVideoBackground'
@@ -26,7 +23,6 @@ target 'DoubleXP' do
   pod 'Swifter', :git => 'https://github.com/mattdonnelly/Swifter.git'
   pod 'CollectionPickerView'
   pod 'SPStorkController'
-  pod 'Google-Mobile-Ads-SDK'
   pod 'GeoFire', '~> 4.0'
   pod 'SwiftLocation', '~> 4.0'
   pod "LinearProgressBar"
@@ -36,11 +32,11 @@ target 'DoubleXP' do
   pod 'YoutubePlayerView'
   pod 'YoutubeKit'
   pod 'youtube-ios-player-helper'
-  pod 'collection-view-layouts/InstagramLayout'
   pod 'FittedSheets'
-  pod 'EMPageViewController'
   pod 'RAMPaperSwitch'
   pod 'ExpyTableView'
+  pod 'UITextView+Placeholder'
+  pod 'AnimatedCollectionViewLayout'
   
   # Pods for DoubleXP
 

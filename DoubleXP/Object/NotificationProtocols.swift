@@ -115,7 +115,7 @@ protocol SocialMediaManagerCallback: class {
     func onChannelsLoaded(channels: [Any])
     func onYoutubeSuccessful(videos: [YoutubeVideoObj])
     func onYoutubeFail()
-    func onMutliYoutube(channels: [YoutubeMultiChannelSelection])
+    //func onMutliYoutube(channels: [YoutubeMultiChannelSelection])
 }
 
 protocol LandingMenuCallbacks: class{

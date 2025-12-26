@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import Firebase
+import FirebaseDatabaseInternal
 
 class FriendsManager{
     func isInFriendList(user: User, currentUser: User) -> Bool{
@@ -934,8 +935,9 @@ class FriendsManager{
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
                         let id = dict?["id"] as? String ?? ""
+                        let durationMin = dict?["durationMin"] as? Int ?? 0
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
+                        //let request = RivalObj(id: <#T##String#>, gamerTag: <#T##String#>, senderPokoId: <#T##String#>, getterPokoId: <#T##String#>, game: <#T##String#>, gameImageUrl: <#T##String#>, type: <#T##String#>, date: <#T##String#>, uid: <#T##String#>, durationMin: <#T##Int#>, customMessage: <#T##String#>, customResponse: <#T##String#>, rivalStatus: <#T##String#>, createdAtMs: <#T##Int64#>, expiresAtMs: <#T##Int64#>)
                         
                         let dbDate = self.stringToDate(date)
                         
@@ -947,11 +949,11 @@ class FriendsManager{
                             let future = formatter.string(from: now as Date)
                             let dbFuture = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
                             
-                            let validRival = dbDate.compare(.isEarlier(than: dbFuture))
+                            let validRival = true//dbDate.compare(.isEarlier(than: dbFuture))
                             
                             if(dbFuture != nil){
                                 if(validRival){
-                                    rivals.append(request)
+                                    //rivals.append(request)
                                 }
                             }
                         }
@@ -975,9 +977,9 @@ class FriendsManager{
                     formatter.timeZone = TimeZone(abbreviation: "UTC")
                     let result = formatter.string(from: date)
                     
-                    let currentRival = RivalObj(gamerTag: currentUser!.gamerTag, date: result, game: game, uid: currentUser!.uId, type: type, id: self.createTempId())
+                    //let currentRival = RivalObj(gamerTag: currentUser!.gamerTag, date: result, game: game, uid: currentUser!.uId, type: type, id: self.createTempId(), durationMin: 0)
                     
-                    rivals.append(currentRival)
+                    //rivals.append(currentRival)
                     
                     var sendList = [[String: Any]]()
                     for rival in rivals{
@@ -1053,7 +1055,7 @@ class FriendsManager{
                             let future = formatter.string(from: now as Date)
                             let dbFuture = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
                             
-                            let validAnnouncement = dbDate.compare(.isEarlier(than: dbFuture))
+                            let validAnnouncement = true//dbDate.compare(.isEarlier(than: dbFuture))
                             
                             if(dbFuture != nil){
                                 if(validAnnouncement){
@@ -1141,7 +1143,7 @@ class FriendsManager{
                             let future = formatter.string(from: now as Date)
                             let dbFuture = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
                             
-                            let validAnnouncement = dbDate.compare(.isEarlier(than: dbFuture))
+                            let validAnnouncement = true//dbDate.compare(.isEarlier(than: dbFuture))
                             
                             if(dbFuture != nil){
                                 if(validAnnouncement){
@@ -1185,8 +1187,8 @@ class FriendsManager{
                 let delegate = UIApplication.shared.delegate as! AppDelegate
                 let currentUser = delegate.currentUser
                 
-                let newRival = RivalObj(gamerTag: currentUser!.gamerTag, date: dateString, game: game, uid: otherUser.uId, type: type, id: self.createTempId())
-                currentUser!.currentTempRivals.append(newRival)
+                //let newRival = RivalObj(gamerTag: currentUser!.gamerTag, date: dateString, game: game, uid: otherUser.uId, type: type, id: self.createTempId(), durationMin: 0)
+                //currentUser!.currentTempRivals.append(newRival)
                 
                 var rivals = [RivalObj]()
                 if(snapshot.hasChild("currentTempRivals")){
@@ -1200,8 +1202,9 @@ class FriendsManager{
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
                         let id = dict?["id"] as? String ?? ""
+                        let durationMin = dict?["durationMin"] as? Int ?? 0
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
+                        //let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id, durationMin: durationMin)
                         
                         let dbDate = self.stringToDate(date)
                         if(dbDate != nil){
@@ -1212,11 +1215,11 @@ class FriendsManager{
                             let future = formatter.string(from: now as Date)
                             let dbFuture = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
                             
-                            let validRival = dbDate.compare(.isEarlier(than: dbFuture))
+                            let validRival = true//dbDate.compare(.isEarlier(than: dbFuture))
                             
                             if(dbFuture != nil){
                                 if(validRival){
-                                    rivals.append(request)
+                                    //rivals.append(request)
                                 }
                             }
                         }
@@ -1232,7 +1235,7 @@ class FriendsManager{
                 }
                 
                 if(!contained){
-                    rivals.append(newRival)
+                    //rivals.append(newRival)
                     
                     var sendList = [[String: Any]]()
                     for rival in rivals{
@@ -1273,9 +1276,10 @@ class FriendsManager{
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
                         let id = dict?["id"] as? String ?? ""
+                        let durationMin = dict?["durationMin"] as? Int ?? 0
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
-                        tempRivals.append(request)
+                        //let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id, durationMin: durationMin)
+                        //tempRivals.append(request)
                     }
                 }
                 
@@ -1311,14 +1315,15 @@ class FriendsManager{
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
                         let id = dict?["id"] as? String ?? ""
+                        let durationMin = dict?["durationMin"] as? Int ?? 0
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
-                        rivals.append(request)
+                        //let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id, durationMin: durationMin)
+                        //rivals.append(request)
                     }
                 }
                 
-                let newRival = RivalObj(gamerTag: tag, date: rival.date, game: rival.game, uid: currentUser!.uId, type: rival.type, id: self.createTempId())
-                rivals.append(newRival)
+                //let newRival = RivalObj(gamerTag: tag, date: rival.date, game: rival.game, uid: currentUser!.uId, type: rival.type, id: self.createTempId(), durationMin: 0)
+                //rivals.append(newRival)
                     
                 var sendList = [[String: Any]]()
                 for rival in rivals{
@@ -1358,9 +1363,10 @@ class FriendsManager{
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
                         let id = dict?["id"] as? String ?? ""
+                        let durationMin = dict?["durationMin"] as? Int ?? 0
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
-                        rivals.append(request)
+                        //let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id, durationMin: durationMin)
+                        //rivals.append(request)
                     }
                 }
                 
@@ -1376,9 +1382,10 @@ class FriendsManager{
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
                         let id = dict?["id"] as? String ?? ""
+                        let durationMin = dict?["durationMin"] as? Int ?? 0
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
-                        tempRivals.append(request)
+                        //let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id, durationMin: durationMin)
+                        //tempRivals.append(request)
                     }
                 }
                 
@@ -1402,8 +1409,8 @@ class FriendsManager{
                 }
                 ref.child("tempRivals").setValue(sendArray)
                 
-                let newRival = RivalObj(gamerTag: tag, date: rival.date, game: rival.game, uid: currentUser!.uId, type: rival.type, id: self.createTempId())
-                rivals.append(newRival)
+                //let newRival = RivalObj(gamerTag: tag, date: rival.date, game: rival.game, uid: currentUser!.uId, type: rival.type, id: self.createTempId(), durationMin: 0)
+                //rivals.append(newRival)
                     
                 var sendList = [[String: Any]]()
                 for rival in rivals{
@@ -1441,9 +1448,10 @@ class FriendsManager{
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
                         let id = dict?["id"] as? String ?? ""
+                        let durationMin = dict?["durationMin"] as? Int ?? 0
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
-                        currentTempRivals.append(request)
+                        //let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id, durationMin: durationMin)
+                        //currentTempRivals.append(request)
                     }
                 }
                 
@@ -1482,9 +1490,10 @@ class FriendsManager{
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
                         let id = dict?["id"] as? String ?? ""
+                        let durationMin = dict?["durationMin"] as? Int ?? 0
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
-                        tempRivals.append(request)
+                        //let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id, durationMin: durationMin)
+                        //tempRivals.append(request)
                     }
                 }
                 
@@ -1750,7 +1759,7 @@ class FriendsManager{
                                 let future = formatter.string(from: dbDate as Date)
                                 let dbTimeOut = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
                                 
-                                let validAnnounments = (now as Date).compare(.isEarlier(than: dbTimeOut))
+                                let validAnnounments = true//(now as Date).compare(.isEarlier(than: dbTimeOut))
                                 
                                 if(dbTimeOut != nil){
                                     if(!validAnnounments){

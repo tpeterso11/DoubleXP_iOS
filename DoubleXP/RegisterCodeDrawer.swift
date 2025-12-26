@@ -12,7 +12,6 @@ import Firebase
 import FirebaseAuth
 import Lottie
 import FirebaseDatabase
-import PopupDialog
 
 class RegisterCodeDrawer: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var submitCode: UIButton!
@@ -51,7 +50,7 @@ class RegisterCodeDrawer: UIViewController, UITextFieldDelegate {
                 Auth.auth().signIn(with: credential) { (authResult, error) in
                   if let error = error {
                     let authError = error as NSError
-                    var buttons = [PopupDialogButton]()
+                    /*var buttons = [PopupDialogButton]()
                     let title = "code error"
                     let message = "sorry, there was a problem with your code."
                     
@@ -64,7 +63,7 @@ class RegisterCodeDrawer: UIViewController, UITextFieldDelegate {
                     popup.addButtons(buttons)
 
                     // Present dialog
-                    self.present(popup, animated: true, completion: nil)
+                    self.present(popup, animated: true, completion: nil)*/
                       
                     // ...
                     return
@@ -75,8 +74,6 @@ class RegisterCodeDrawer: UIViewController, UITextFieldDelegate {
                         DispatchQueue.main.async {
                             self.dismiss(animated: true) {
                                 let delegate = UIApplication.shared.delegate as! AppDelegate
-                                delegate.currentLoginActivity?.transitionAfterPhoneRegistration(uid: authResult!.user.uid)
-                                delegate.currentRegisterActivity?.transitionAfterPhoneRegistration(uid: authResult!.user.uid)
                             }
                         }
                     }

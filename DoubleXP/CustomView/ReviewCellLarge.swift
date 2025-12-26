@@ -8,13 +8,13 @@
 
 import Foundation
 import UIKit
-import Cosmos
+//import Cosmos
 
 class ReviewCellLarge : UICollectionViewCell {
     
     @IBOutlet weak var author: UILabel!
     @IBOutlet weak var review: UILabel!
     @IBOutlet weak var ratingDesc: UILabel!
-    @IBOutlet weak var ratingBar: CosmosView!
+    //@IBOutlet weak var ratingBar: CosmosView!
     @IBOutlet weak var ratingView: UIView!
 }

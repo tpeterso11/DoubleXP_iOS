@@ -7,16 +7,9 @@
 //
 
 import UIKit
-import SwiftHTTP
-import SwiftNotificationCenter
-import FBSDKCoreKit
-import moa
 import Firebase
 import Lottie
-import PopupDialog
-//import GiphyUISDK
-//import GiphyCoreSDK
-import SPStorkController
+import FirebaseDatabaseInternal
 
 typealias Runnable = () -> ()
 
@@ -24,7 +17,7 @@ protocol Profile {
     func goToProfile()
 }
 
-class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, LandingMenuCallbacks, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, SPStorkControllerDelegate, TodayCallbacks {
+class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, LandingMenuCallbacks, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, TodayCallbacks {
     
     @IBOutlet weak var deleteAccount: UIButton!
     @IBOutlet weak var moreClickArea: UIView!
@@ -127,7 +120,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
         bottomNavHeight = self.bottomNav.bounds.height
         
         logOut.addTarget(self, action: #selector(logout), for: .touchUpInside)
-        deleteAccount.addTarget(self, action: #selector(deleteAccountClicked), for: .touchUpInside)
+        //deleteAccount.addTarget(self, action: #selector(deleteAccountClicked), for: .touchUpInside)
         
         NotificationCenter.default.addObserver(
             self,
@@ -143,7 +136,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
         self.bottomNav.layer.masksToBounds = false
         self.bottomNav.layer.shadowPath = UIBezierPath(roundedRect: self.bottomNav.bounds, cornerRadius: self.bottomNav.layer.cornerRadius).cgPath
     
-        Broadcaster.register(LandingMenuCallbacks.self, observer: self)
+        //roadcaster.register(LandingMenuCallbacks.self, observer: self)
         
         addFriendsRef()
         addPendingFriendsRef()
@@ -158,9 +151,9 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
     
         appDelegate.handleToken()
         
-        setupScoob()
+        //setupScoob()
         
-        let ref = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId)
+        /*let ref = Database.database().reference().child("Users").child(appDelegate.currentUser!.uId)
         if(!appDelegate.currentUser!.dailyCheck.isEmpty){
             let currentCheck = self.stringToDate(appDelegate.currentUser!.dailyCheck)
             var dayComponent    = DateComponents()
@@ -192,7 +185,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
             ref.child("dailyCheck").setValue(result)
         
             appDelegate.recommendedUsersManager.getRecommendedUsers(cachedViewedUids: appDelegate.currentUser!.cachedRecommendedUids, callbacks: self)
-        }
+        }*/
     }
     
     func onSuccess() {
@@ -202,8 +195,8 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
     }
     
     func onRecommendedUsersLoaded() {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        appDelegate.currentFeedFrag?.todayRecommendedUsersLoaded()
+        //let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        //appDelegate.currentFeedFrag?.todayRecommendedUsersLoaded()
     }
     
     func playSimpleLandingAnimation(){
@@ -353,7 +346,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
                     let user = appDelegate.currentUser
                     if(games.count > appDelegate.currentUser!.games.count){
                         appDelegate.currentUser!.games = games
-                        appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
+                        //appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
                     }
                 }
             })
@@ -419,11 +412,11 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
                             releaseDateProper = current.childSnapshot(forPath: "releaseDateProp").value as! String
                         }
                         
-                        if(!game.isEmpty && !gameImageUrl.isEmpty && !developer.isEmpty){
+                        /*if(!game.isEmpty && !gameImageUrl.isEmpty && !developer.isEmpty){
                             let upcomingGame = UpcomingGame(id: id, game: game, blurb: blurb, releaseDateMillis: releaseDateMillis, releaseDate: releaseDate, trailerUrls: trailerUrls, gameImageUrl: gameImageUrl, gameDesc: description, releaseDateProper: releaseDateProper)
                             
                             upcoming.append(upcomingGame)
-                        }
+                        }*/
                     }
                     
                     if(!upcoming.isEmpty){
@@ -431,7 +424,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
                         delegate.upcomingGames.append(contentsOf: upcoming)
                         
                         if(upcoming.count > delegate.upcomingGames.count){
-                            delegate.currentFeedFrag?.checkOnlineAnnouncements()
+                            //delegate.currentFeedFrag?.checkOnlineAnnouncements()
                         }
                     }
                 }
@@ -455,8 +448,9 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
                     let uid = dict?["uid"] as? String ?? ""
                     let dbType = dict?["type"] as? String ?? ""
                     let id = dict?["id"] as? String ?? ""
+                    let durationMin = dict?["durationMin"] as? Int ?? 0
                     
-                    let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
+                    //let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id, durationMin: durationMin)
                     
                     let calendar = Calendar.current
                     if(!date.isEmpty){
@@ -470,11 +464,11 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
                             let future = formatter.string(from: dbDate as Date)
                             let dbTimeOut = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
                             
-                            let validRival = (now as Date).compare(.isEarlier(than: dbTimeOut))
+                            let validRival = true//(now as Date).compare(.isEarlier(than: dbTimeOut))
                             
                             if(dbTimeOut != nil){
                                 if(validRival){
-                                    tempArray.append(request)
+                                    //tempArray.append(request)
                                 }
                             }
                         }
@@ -505,7 +499,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
                     appDelegate.currentUser!.tempRivals = tempArray
                     let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.requestButtonClicked))
                     self.showAlert(alertText: "someone wants to play with you.", tap: drawerTap)
-                    appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
+                    //appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
                 }
             })
         }
@@ -527,15 +521,16 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
                     let uid = dict?["uid"] as? String ?? ""
                     let dbType = dict?["type"] as? String ?? ""
                     let id = dict?["id"] as? String ?? ""
+                    let durationMin = dict?["durationMin"] as? Int ?? 0
                     
-                    let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
-                    tempArray.append(request)
+                    //let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id, durationMin: durationMin)
+                    //tempArray.append(request)
                 }
                 
                 if(tempArray.count > appDelegate.currentUser!.acceptedTempRivals.count){
                     appDelegate.currentUser!.acceptedTempRivals = tempArray
                     self.showAlert(alertText: "play request accepted! go play!", tap: nil)
-                    appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
+                    //appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
                 }
             })
         }
@@ -570,7 +565,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
                 if(followers.count > appDelegate.currentUser!.followers.count){
                     appDelegate.currentUser!.followers = followers
                     appDelegate.currentUser!.followerAnnouncements = followers
-                    appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
+                    //appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
                 }
             })
         }
@@ -871,9 +866,9 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
                             appDelegate.currentUser!.receivedAnnouncements = received
                             let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.showAlertsDrawer))
                             self.showAlert(alertText: "one of your friends is jumping online right NOW!", tap: drawerTap)
-                            appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
+                            //appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
                         }
-                        appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
+                        //appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
                     }
                 }
             })
@@ -881,8 +876,8 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
     }
     
     @objc private func showAlertsDrawer(){
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        appDelegate.currentFeedFrag?.alertsClicked()
+        //let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        //appDelegate.currentFeedFrag?.alertsClicked()
     }
     
     private func addRejectedRivalsRef(){
@@ -901,16 +896,17 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
                     let uid = dict?["uid"] as? String ?? ""
                     let dbType = dict?["type"] as? String ?? ""
                     let id = dict?["id"] as? String ?? ""
+                    let durationMin = dict?["durationMin"] as? Int ?? 0
                     
-                    let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
-                    tempArray.append(request)
+                    //let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id, durationMin: durationMin)
+                    //tempArray.append(request)
                 }
                 
                 if(tempArray.count > appDelegate.currentUser!.rejectedTempRivals.count){
                     appDelegate.currentUser!.rejectedTempRivals = tempArray
                     let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.requestButtonClicked))
                     self.showAlert(alertText: "your friend is not available to play.", tap: drawerTap)
-                    appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
+                    //appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
                 }
             })
         }
@@ -964,7 +960,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
                     if(!friends.isEmpty){
                         self.newFriend = friends[0]
                         self.launchAlertBar(view: "friend", friend: self.newFriend)
-                        appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
+                        //appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
                     }
                 }
             })
@@ -1293,7 +1289,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
                     
                     let drawerTap = UITapGestureRecognizer(target: self, action: #selector(self.requestButtonClicked))
                     self.showAlert(alertText: "you have a new friend request!", tap: drawerTap)
-                    appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
+                    //appDelegate.currentFeedFrag?.checkOnlineAnnouncements()
                 }
             })
         }
@@ -1303,7 +1299,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.cachedTest = uid
         
-        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "playerProfile") as! PlayerProfile
+        /*let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "playerProfile") as! PlayerProfile
         let transitionDelegate = SPStorkTransitioningDelegate()
         currentViewController.transitioningDelegate = transitionDelegate
         currentViewController.modalPresentationStyle = .custom
@@ -1313,48 +1309,36 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
         transitionDelegate.swipeToDismissEnabled = true
         transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
         transitionDelegate.storkDelegate = self
-        self.present(currentViewController, animated: true, completion: nil)
+        self.present(currentViewController, animated: true, completion: nil)*/
     }
     
     func navigateToSponsor() {
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Sponsor"))
-        Broadcaster.notify(NavigateToProfile.self) {
+        /*Broadcaster.notify(NavigateToProfile.self) {
             $0.navigateToSponsor()
-        }
+        }*/
     }
     
     @objc func navigateToRequests(){
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Requests"))
-        Broadcaster.notify(NavigateToProfile.self) {
-            $0.navigateToRequests()
-        }
+        
     }
     
     func navigateToHome(){
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To GamerConnect"))
-        Broadcaster.notify(NavigateToProfile.self) {
-            $0.navigateToHome()
-        }
+        
     }
     
     @objc func navigateToTeams() {
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Teams"))
     }
     
     func navigateToInvite() {
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Invite"))
-        Broadcaster.notify(NavigateToProfile.self) {
-            $0.navigateToInvite()
-        }
+        
     }
     
     func navigateToSearch(game: GamerConnectGame){
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Search"))
         
-        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "gamerConnectSearch") as! GamerConnectSearch
-        currentViewController.game = game
+        //let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "gamerConnectSearch") as! GamerConnectSearch
+        //currentViewController.game = game
         
-        let transitionDelegate = SPStorkTransitioningDelegate()
+        /*let transitionDelegate = SPStorkTransitioningDelegate()
         currentViewController.transitioningDelegate = transitionDelegate
         currentViewController.modalPresentationStyle = .custom
         currentViewController.modalPresentationCapturesStatusBarAppearance = true
@@ -1362,7 +1346,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
         transitionDelegate.swipeToDismissEnabled = true
         transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
         transitionDelegate.storkDelegate = self
-        self.present(currentViewController, animated: true, completion: nil)
+        self.present(currentViewController, animated: true, completion: nil)*/
         //Broadcaster.notify(NavigateToProfile.self) {
         //    $0.navigateToSearch(game: game)
         //}
@@ -1372,27 +1356,24 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
         //delay for modal dismiss
         let delegate = UIApplication.shared.delegate as! AppDelegate
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            if(delegate.currentDiscoverCat != nil){
+            /*if(delegate.currentDiscoverCat != nil){
                 delegate.currentDiscoverCat!.dismiss(animated: true, completion: nil)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     delegate.currentDiscoverFrag!.dismiss(animated: true, completion: nil)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Search"))
-                        Broadcaster.notify(NavigateToProfile.self) {
-                            $0.navigateToSearch(game: game)
-                        }
+                        
                     }
                 }
-            }
+            }*/
         }
     }
     
     @objc func launchVideoMessage(){
-        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "videoMessage") as! VideoMessage
+        //let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "videoMessage") as! VideoMessage
         //currentViewController.newsObj = newsObj
         //currentViewController.selectedImage = image
         
-        let transitionDelegate = SPStorkTransitioningDelegate()
+        /*let transitionDelegate = SPStorkTransitioningDelegate()
         currentViewController.transitioningDelegate = transitionDelegate
         currentViewController.modalPresentationStyle = .custom
         currentViewController.modalPresentationCapturesStatusBarAppearance = true
@@ -1400,18 +1381,14 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
         transitionDelegate.swipeToDismissEnabled = true
         transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
         transitionDelegate.storkDelegate = self
-        self.present(currentViewController, animated: true, completion: nil)
+        self.present(currentViewController, animated: true, completion: nil)*/
     }
     
     func navigateToCompetition(competition: CompetitionObj) {
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Competition"))
-        Broadcaster.notify(NavigateToProfile.self) {
-            $0.navigateToCompetition(competition: competition)
-        }
+        
     }
     
     @objc func navigateToCurrentUserProfile() {
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Current User Profile"))
         self.menuShowing = false
         let top = CGAffineTransform(translationX: -320, y: 0)
         UIView.animate(withDuration: 0.4, delay: 0.0, options:[], animations: {
@@ -1421,7 +1398,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
             UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
                 self.newMenuBlur.alpha = 0.0
             }, completion: { (finished: Bool) in
-                let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "playerProfile") as! PlayerProfile
+                /*let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "playerProfile") as! PlayerProfile
                 let transitionDelegate = SPStorkTransitioningDelegate()
                 currentViewController.transitioningDelegate = transitionDelegate
                 currentViewController.modalPresentationStyle = .custom
@@ -1430,13 +1407,12 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
                 transitionDelegate.swipeToDismissEnabled = true
                 transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
                 transitionDelegate.storkDelegate = self
-                self.present(currentViewController, animated: true, completion: nil)
+                self.present(currentViewController, animated: true, completion: nil)*/
             })
         })
     }
     
     func navigateToCreateFrag() {
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Create Team"))
     }
     
     @objc func navigateToSettings() {
@@ -1452,15 +1428,14 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
                 UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
                 }, completion: { (finished: Bool) in
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Settings"))
-                        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "settings") as! SettingsFrag
+                        //let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "settings") as! SettingsFrag
                         let delegate = UIApplication.shared.delegate as! AppDelegate
                         
                         guard delegate.currentUser != nil else{
                             return
                         }
                         
-                        let transitionDelegate = SPStorkTransitioningDelegate()
+                        /*let transitionDelegate = SPStorkTransitioningDelegate()
                         currentViewController.transitioningDelegate = transitionDelegate
                         currentViewController.modalPresentationStyle = .custom
                         currentViewController.modalPresentationCapturesStatusBarAppearance = true
@@ -1470,7 +1445,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
                         transitionDelegate.swipeToDismissEnabled = true
                         transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
                         transitionDelegate.storkDelegate = self
-                        self.present(currentViewController, animated: true, completion: nil)
+                        self.present(currentViewController, animated: true, completion: nil)*/
                     }
                 })
             })
@@ -1487,12 +1462,11 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
     
     @objc func navigateToTeamDashboard(team: TeamObject?, teamInvite: TeamInviteObject?, newTeam: Bool) {
         if(team != nil){
-            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Dashboard"))
         }
     }
     
     func navigateToAlerts(){
-        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "alerts") as! AlertsDrawer
+        /*let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "alerts") as! AlertsDrawer
         let transitionDelegate = SPStorkTransitioningDelegate()
         currentViewController.transitioningDelegate = transitionDelegate
         currentViewController.modalPresentationStyle = .custom
@@ -1503,7 +1477,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
         transitionDelegate.swipeToDismissEnabled = true
         transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
         transitionDelegate.storkDelegate = self
-        self.present(currentViewController, animated: true, completion: nil)
+        self.present(currentViewController, animated: true, completion: nil)*/
     }
     
     private func loadTeam(teamName: String?, newTeam: Bool) {
@@ -1571,55 +1545,53 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
     }
     
     func navigateToTeamNeeds(team: TeamObject) {
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Needs"))
+        //AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Needs"))
         
     }
     
     func navigateToTeamBuild(team: TeamObject) {
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Build"))
+        //AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Team Build"))
         
     }
     
     func navigateToMedia() {
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Media"))
-        Broadcaster.notify(NavigateToProfile.self) {
-            $0.navigateToMedia()
-        }
+        //AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Media"))
+        
     }
     
     func navigateToTeamFreeAgentSearch(team: TeamObject){
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Search"))
+        //AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Search"))
         
     }
     
     func navigateToTeamFreeAgentResults(team: TeamObject){
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Results"))
+        //AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Results"))
         
     }
     
     func navigateToTeamFreeAgentDash(){
         
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Dash"))
+        //AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Dash"))
        
     }
     
     func navigateToTeamFreeAgentFront(){
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Quiz Front"))
+        //AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Quiz Front"))
        
     }
     
     func navigateToFreeAgentQuiz(user: User!, team: TeamObject?, game: GamerConnectGame!) {
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Quiz - " + game.gameName))
-        Broadcaster.notify(NavigateToProfile.self) {
-            $0.navigateToFreeAgentQuiz(team: team, gcGame: game, currentUser: user)
-        }
+        //AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Quiz - " + game.gameName))
+        //Broadcaster.notify(NavigateToProfile.self) {
+        //    $0.navigateToFreeAgentQuiz(team: team, gcGame: game, currentUser: user)
+        //}
     }
     
     func navigateToFreeAgentQuiz(team: TeamObject?, gcGame: GamerConnectGame, currentUser: User){
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Quiz - " + (team?.teamName ?? "")))
-          Broadcaster.notify(NavigateToProfile.self) {
-            $0.navigateToFreeAgentQuiz(team: team, gcGame: gcGame, currentUser: currentUser)
-          }
+        //AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Free Agent Quiz - " + (team?.teamName ?? "")))
+        //  Broadcaster.notify(NavigateToProfile.self) {
+        //    $0.navigateToFreeAgentQuiz(team: team, gcGame: gcGame, currentUser: currentUser)
+         // }
     }
     
     @objc func navigateToMessaging(groupChannelUrl: String?, otherUserId: String?){
@@ -1644,10 +1616,10 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
         }
         
         if(chatUrl != nil){
-            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Messaging Team"))
+            //AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Messaging Team"))
         }
         else if(chatOtherId != nil){
-            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Messaging User"))
+            
         }
     
         if(chatUrl != nil || chatOtherId != nil){
@@ -1661,7 +1633,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
         delegate.cachedUidForMessaging = uId
         self.bottomNavHeight = self.bottomNav.bounds.height + 60
         
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing Menu - Messaging User"))
         self.menuShowing = false
         
         let top = CGAffineTransform(translationX: -320, y: 0)
@@ -1683,7 +1654,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
     }
     
     func menuNavigateToProfile(uId: String){
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing Menu - Friend Profile"))
         self.menuShowing = false
         
         let top = CGAffineTransform(translationX: -320, y: 0)
@@ -1703,7 +1673,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
     
     func navigateToViewTeams(){
         
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - View Teams"))
        
     }
     
@@ -1711,106 +1680,8 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
     }
     
     func goBack(){
-        Broadcaster.notify(NavigateToProfile.self) {
-            $0.goBack()
-        }
-    }
-    
-    func showScoob(cancelableWV: WKWebView?){
-        resetDismissScoob()
-        setupScoobCancel(cancelableWV: cancelableWV)
         
-        let top = CGAffineTransform(translationX: 0, y: 40)
-        UIView.animate(withDuration: 0.5, animations: {
-            self.universalLoading.alpha = 1
-            self.scoobSub.transform = top
-            self.scoobSub.alpha = 1
-        
-            DispatchQueue.main.asyncAfter(deadline: .now() + 30.0) {
-                self.showDismissScoob()
-            }
-        }, completion: nil)
-        
-        scoob.loopMode = .loop
-        scoob.play()
     }
-    
-    func setupScoobCancel(cancelableWV: WKWebView?) {
-        if(cancelableWV != nil){
-            cancelableWV?.stopLoading()
-            cancelableWV?.loadHTMLString("", baseURL: nil)
-        } else {
-            hideScoob()
-        }
-    }
-    
-    func showDismissScoob(){
-        let top3 = CGAffineTransform(translationX: 0, y: -40)
-        UIView.animate(withDuration: 0.5, animations: {
-            self.scoobCancel.transform = top3
-            self.dismissHead.transform = top3
-            self.dismissBody.transform = top3
-            self.scoobCancel.alpha = 1
-            self.dismissHead.alpha = 1
-            self.dismissBody.alpha = 1
-        }, completion: nil)
-    }
-    
-    func resetDismissScoob(){
-        let top3 = CGAffineTransform(translationX: 0, y: 0)
-        UIView.animate(withDuration: 0.01, animations: {
-            self.scoobCancel.transform = top3
-            self.dismissHead.transform = top3
-            self.dismissBody.transform = top3
-            self.scoobCancel.alpha = 0
-            self.dismissHead.alpha = 0
-            self.dismissBody.alpha = 0
-        }, completion: nil)
-    }
-    
-    func setupScoob(){
-        scoobSub.layer.cornerRadius = 10.0
-        scoobSub.layer.borderWidth = 1.0
-        scoobSub.layer.borderColor = UIColor.clear.cgColor
-        scoobSub.layer.masksToBounds = true
-        
-        scoobSub.layer.shadowColor = UIColor.black.cgColor
-        scoobSub.layer.shadowOffset = CGSize(width: 0, height: 2.0)
-        scoobSub.layer.shadowRadius = 2.0
-        scoobSub.layer.shadowOpacity = 0.5
-        scoobSub.layer.masksToBounds = false
-        scoobSub.layer.shadowPath = UIBezierPath(roundedRect: scoobSub.layer.bounds, cornerRadius: scoobSub.layer.cornerRadius).cgPath
-        
-        scoobCancel.layer.shadowColor = UIColor.black.cgColor
-        scoobCancel.layer.shadowOffset = CGSize(width: 0, height: 2.0)
-        scoobCancel.layer.shadowRadius = 2.0
-        scoobCancel.layer.shadowOpacity = 0.5
-        scoobCancel.layer.masksToBounds = false
-        scoobCancel.layer.shadowPath = UIBezierPath(roundedRect: scoobCancel.bounds, cornerRadius: scoobCancel.layer.cornerRadius).cgPath
-        //add more scoob layouts
-        // -- like one that is like  (ACTUAL CONTROLLER SYMBOLS ->) " triangle triangle back forward" and then below have "Sub Zero's ice move" somethin like that. We can create a small library of these to pop up throughout the app whenever the loading screen shows.
-   
-        scoobCancel.addTarget(self, action: #selector(hideScoob), for: .touchUpInside)
-    }
-    
-    
-    @objc func hideScoob(){
-        if(self.universalLoading.alpha == 1){
-            let top = CGAffineTransform(translationX: 0, y: 0)
-            UIView.animate(withDuration: 0.5, animations: {
-                self.universalLoading.alpha = 0
-            }, completion: { (finished: Bool) in
-                UIView.animate(withDuration: 0.5, delay: 0.8, options: [], animations: {
-                    self.scoobSub.transform = top
-                    self.scoobSub.alpha = 0
-                    self.resetDismissScoob()
-                    
-                    self.scoob.stop()
-                }, completion: nil)
-            })
-        }
-    }
-    
     
     
     func programmaticallyLoad(vc: UIViewController, fragName: String) {
@@ -1889,7 +1760,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
     }
     
     @objc func popularButtonClicked(_ sender: AnyObject?) {
-        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "popular") as! PopularPage
+        /*let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "popular") as! PopularPage
         let transitionDelegate = SPStorkTransitioningDelegate()
         currentViewController.transitioningDelegate = transitionDelegate
         currentViewController.modalPresentationStyle = .custom
@@ -1898,7 +1769,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
         transitionDelegate.swipeToDismissEnabled = true
         transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
         transitionDelegate.storkDelegate = self
-        self.present(currentViewController, animated: true, completion: nil)
+        self.present(currentViewController, animated: true, completion: nil)*/
     }
     
     @objc func profileButtonClicked(){
@@ -1908,10 +1779,10 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
     }
     
     @objc func searchButtonClicked(){
-        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "feedSearch") as! FeedSearchModal
+        //let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "feedSearch") as! FeedSearchModal
         //currentViewController.currentFeed = self
         
-        let transitionDelegate = SPStorkTransitioningDelegate()
+        /*let transitionDelegate = SPStorkTransitioningDelegate()
         currentViewController.transitioningDelegate = transitionDelegate
         currentViewController.modalPresentationStyle = .custom
         currentViewController.modalPresentationCapturesStatusBarAppearance = true
@@ -1919,7 +1790,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
         transitionDelegate.swipeToDismissEnabled = true
         transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
         transitionDelegate.storkDelegate = self
-        self.present(currentViewController, animated: true, completion: nil)
+        self.present(currentViewController, animated: true, completion: nil)*/
     }
     
     @objc func homeButtonClicked(_ sender: AnyObject?) {
@@ -1959,7 +1830,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
     }
     
     @objc func requestButtonClicked(_ sender: AnyObject?) {
-        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "requests") as! Requests
+        /*let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "requests") as! Requests
         let transitionDelegate = SPStorkTransitioningDelegate()
         currentViewController.transitioningDelegate = transitionDelegate
         currentViewController.modalPresentationStyle = .custom
@@ -1969,12 +1840,12 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
         transitionDelegate.swipeToDismissEnabled = true
         transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
         transitionDelegate.storkDelegate = self
-        self.present(currentViewController, animated: true, completion: nil)
+        self.present(currentViewController, animated: true, completion: nil)*/
         //self.performSegue(withIdentifier: "requests", sender: nil)
     }
     
     @objc func playButtonClicked(_ sender: AnyObject?) {
-        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "playModal") as! PlayModal
+        /*let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "playModal") as! PlayModal
         let transitionDelegate = SPStorkTransitioningDelegate()
         currentViewController.transitioningDelegate = transitionDelegate
         currentViewController.modalPresentationStyle = .custom
@@ -1983,7 +1854,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
         transitionDelegate.swipeToDismissEnabled = true
         transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
         transitionDelegate.storkDelegate = self
-        self.present(currentViewController, animated: true, completion: nil)
+        self.present(currentViewController, animated: true, completion: nil)*/
         //self.performSegue(withIdentifier: "requests", sender: nil)
     }
     
@@ -2118,7 +1989,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
         appDelegate.cachedUidForMessaging = uId
         self.bottomNavHeight = self.bottomNav.bounds.height + 60
         
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing - Navigate To Current User Profile"))
         self.menuShowing = false
         let top = CGAffineTransform(translationX: -320, y: 0)
         UIView.animate(withDuration: 0.4, delay: 0.0, options:[], animations: {
@@ -2258,7 +2128,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
                     UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
                         self.newMenuBlur.alpha = 0.0
                     }, completion: { (finished: Bool) in
-                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing Menu - Messaging User"))
                     
                         let delegate = UIApplication.shared.delegate as! AppDelegate
                         self.navigateToProfile(uid: delegate.currentUser!.uId)
@@ -2275,7 +2144,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
                     UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
                         self.newMenuBlur.alpha = 0.0
                     }, completion: { (finished: Bool) in
-                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing Menu - Upgrade"))
                     
                         self.performSegue(withIdentifier: "upgrade", sender: nil)
                     })
@@ -2292,13 +2160,12 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
                     UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
                         self.newMenuBlur.alpha = 0.0
                     }, completion: { (finished: Bool) in
-                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing Menu - Upgrade"))
                         
-                        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "follower") as! MenuFollowerDrawer
+                        /*let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "follower") as! MenuFollowerDrawer
                         currentViewController.payload = delegate.currentUser!.followers
                         currentViewController.type = "followers"
-                        currentViewController.userUid = delegate.currentUser!.uId
-                        let transitionDelegate = SPStorkTransitioningDelegate()
+                        currentViewController.userUid = delegate.currentUser!.uId*/
+                        /*let transitionDelegate = SPStorkTransitioningDelegate()
                         currentViewController.transitioningDelegate = transitionDelegate
                         currentViewController.modalPresentationStyle = .custom
                         currentViewController.modalPresentationCapturesStatusBarAppearance = true
@@ -2307,7 +2174,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
                         transitionDelegate.swipeToDismissEnabled = true
                         transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
                         transitionDelegate.storkDelegate = self
-                        self.present(currentViewController, animated: true, completion: nil)
+                        self.present(currentViewController, animated: true, completion: nil)*/
                     })
                 })
             }
@@ -2322,13 +2189,12 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
                     UIView.animate(withDuration: 0.3, delay: 0.0, options: [], animations: {
                         self.newMenuBlur.alpha = 0.0
                     }, completion: { (finished: Bool) in
-                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Landing Menu - Upgrade"))
                         
-                        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "follower") as! MenuFollowerDrawer
+                        /*let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "follower") as! MenuFollowerDrawer
                         currentViewController.payload = delegate.currentUser!.following
                         currentViewController.type = "following"
-                        currentViewController.userUid = delegate.currentUser!.uId
-                        let transitionDelegate = SPStorkTransitioningDelegate()
+                        currentViewController.userUid = delegate.currentUser!.uId*/
+                        /*let transitionDelegate = SPStorkTransitioningDelegate()
                         currentViewController.transitioningDelegate = transitionDelegate
                         currentViewController.modalPresentationStyle = .custom
                         currentViewController.modalPresentationCapturesStatusBarAppearance = true
@@ -2337,7 +2203,7 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
                         transitionDelegate.swipeToDismissEnabled = true
                         transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
                         transitionDelegate.storkDelegate = self
-                        self.present(currentViewController, animated: true, completion: nil)
+                        self.present(currentViewController, animated: true, completion: nil)*/
                     })
                 })
             }
@@ -2354,51 +2220,6 @@ class LandingActivity: ParentVC, EMPageViewControllerDelegate, SearchCallbacks, 
         UserDefaults.standard.removeObject(forKey: "userId")
         
         self.performSegue(withIdentifier: "logout", sender: nil)
-    }
-    
-    
-    @objc func deleteAccountClicked(){
-        var buttons = [PopupDialogButton]()
-        let title = "delete your account."
-        let message = "we really hate to see you go, are you sure you want to delete your account?"
-        
-        let button = DefaultButton(title: "delete my account.") { [weak self] in
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-                    
-            let ref = Database.database().reference().child("Users")
-            ref.observeSingleEvent(of: .value, with: { (snapshot) in
-                if(snapshot.hasChild(delegate.currentUser!.uId)) {
-                    ref.child(delegate.currentUser!.uId).removeValue()
-                    delegate.currentUser = nil
-                    UserDefaults.standard.removeObject(forKey: "userId")
-                    
-                    let user = Auth.auth().currentUser
-
-                    user?.delete { error in
-                      if let error = error {
-                        // An error happened.
-                      } else {
-                        // Account deleted.
-                      }
-                    }
-                }
-                self!.performSegue(withIdentifier: "logout", sender: nil)
-            }) { (error) in
-                print(error.localizedDescription)
-            }
-        }
-        buttons.append(button)
-        
-        let buttonOne = CancelButton(title: "nevermind") { [weak self] in
-            
-        }
-        buttons.append(buttonOne)
-        
-        let popup = PopupDialog(title: title, message: message)
-        popup.addButtons(buttons)
-
-        // Present dialog
-        self.present(popup, animated: true, completion: nil)
     }
     
 }

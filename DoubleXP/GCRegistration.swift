@@ -9,8 +9,6 @@
 import Foundation
 import UIKit
 import Lottie
-import UnderLineTextField
-import SPStorkController
 import FirebaseDatabase
 import CoreLocation
 import GeoFire
@@ -67,6 +65,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     @IBOutlet weak var celebrateAnimation: LottieAnimationView!
     @IBOutlet weak var gcContinueButton: UIButton!
     @IBOutlet weak var skipCover: UIView!
+    @IBOutlet weak var profileSkip: UIButton!
     var consoles = [String]()
     var constraint : NSLayoutConstraint?
     var selectedAge = ""
@@ -84,7 +83,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     var locationLat = 0.0
     var locationLong = 0.0
     var experienceVal = 0.0
-    var req: LocationRequest?
+    private let player = DoubleXPVideoPlayer()
     
     //location
     var locationManager: CLLocationManager?
@@ -92,13 +91,17 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.celebrateAnimation.animationSpeed = 0.6
-            self.celebrateAnimation.loopMode = .playOnce
-            self.celebrateAnimation.play()
+        self.startLayout.alpha = 1
+        self.startProfileButton.addTarget(self, action: #selector(self.startButtonClicked), for: .touchUpInside)
+        self.profileSkip.addTarget(self, action: #selector(self.advanceToHome), for: .touchUpInside)
+        let regisrationVideoUrl = "https://firebasestorage.googleapis.com/v0/b/gameterminal-767f7.appspot.com/o/testRegVideo2.mov?alt=media&token=477651a6-1826-4827-9dc6-6ea93cba05e5"
+        Task {
+            await player.playCachedVideo(from: URL(string: regisrationVideoUrl)!,
+                                         into: self.startLayout,
+                                         loop: true,
+                                         videoGravity: .resizeAspect,
+                                         delayBeforePlay: 1)
         }
-        
-        self.startProfileButton.addTarget(self, action: #selector(startButtonClicked), for: .touchUpInside)
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
         var list = [GamerConnectGame]()
@@ -108,15 +111,8 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             }
         }
         
-        
-        self.languageList.append("english")
-        let sortedList = delegate.languageList.sorted(by: <)
-        for language in sortedList {
-            if(!self.languageList.contains(language.value)){
-                self.languageList.append(language.key.lowercased())
-            }
-        }
-        
+        let downloadedLanguages = LanguageProvider.shared.getLanguageNames()
+        self.languageList.append(contentsOf: downloadedLanguages)
         primaryPicker.delegate = self
         primaryPicker.dataSource = self
         
@@ -174,7 +170,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         self.experienceOption.text = "no experience"
         self.experienceSub.text = "all of this is new to me. i am NOT a gamer. lol"
         self.experienceSlider.value = 0
-        self.one.alpha = 0.05
+        self.one.alpha = 0.3
         
         self.experienceSlider.addTarget(self, action: #selector(onExperienceChange), for: UIControl.Event.valueChanged)
     
@@ -188,7 +184,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             self.experienceSub.text = "all of this is new to me. i am NOT a gamer. lol"
             UIView.animate(withDuration: 0.3, animations: {
                 self.zero.alpha = 0
-                self.one.alpha = 0.05
+                self.one.alpha = 0.2
                 self.two.alpha = 0
                 self.three.alpha = 0
                 self.four.alpha = 0
@@ -200,7 +196,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             UIView.animate(withDuration: 0.3, animations: {
                 self.zero.alpha = 0
                 self.one.alpha = 0
-                self.two.alpha = 0.05
+                self.two.alpha = 0.2
                 self.three.alpha = 0
                 self.four.alpha = 0
                 self.five.alpha = 0
@@ -212,7 +208,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
                 self.zero.alpha = 0
                 self.one.alpha = 0
                 self.two.alpha = 0
-                self.three.alpha = 0.05
+                self.three.alpha = 0.2
                 self.four.alpha = 0
                 self.five.alpha = 0
             }, completion: nil)
@@ -224,7 +220,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
                 self.one.alpha = 0
                 self.two.alpha = 0
                 self.three.alpha = 0
-                self.four.alpha = 0.05
+                self.four.alpha = 0.2
                 self.five.alpha = 0
             }, completion: nil)
         } else {
@@ -236,7 +232,7 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
                 self.two.alpha = 0
                 self.three.alpha = 0
                 self.four.alpha = 0
-                self.five.alpha = 0.05
+                self.five.alpha = 0.2
             }, completion: nil)
         }
     }
@@ -618,14 +614,6 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         }
     }
     
-    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        if(pickerView == self.primaryPicker){
-            return languageList[row]
-        } else {
-            return self.secondLanguage[row]
-        }
-    }
-    
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         if(pickerView == self.primaryPicker){
             let current = languageList[row]
@@ -639,10 +627,16 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     }
     
     func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
-        if(pickerView == self.primaryPicker){
-            return NSAttributedString(string: languageList[row], attributes: [NSAttributedString.Key.foregroundColor: UIColor.init(named: "darkToWhite")!])
+        let font = UIFont(name: "Moon-Light", size: 24) ?? UIFont.systemFont(ofSize: 18)
+        let attributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor(named: "darkToWhite")!,
+            .font: font
+        ]
+
+        if pickerView == self.primaryPicker {
+            return NSAttributedString(string: languageList[row], attributes: attributes)
         } else {
-            return NSAttributedString(string: secondLanguage[row], attributes: [NSAttributedString.Key.foregroundColor: UIColor.init(named: "darkToWhite")!])
+            return NSAttributedString(string: secondLanguage[row], attributes: attributes)
         }
     }
     
@@ -672,6 +666,9 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     @objc private func advanceToSecondary(){
         self.secondLanguage = [String]()
         self.secondLanguage.append("none")
+        if(self.selectedPrimaryLanguage == "english" && self.languageList.contains("English")){
+            self.languageList.remove(at: self.languageList.firstIndex(of: "English")!)
+        }
         self.secondLanguage.append(contentsOf: languageList)
         if(secondLanguage.contains(self.selectedPrimaryLanguage)){
             self.secondLanguage.remove(at: self.secondLanguage.index(of: self.selectedPrimaryLanguage)!)
@@ -715,16 +712,8 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
                self.locationLayout.alpha = 1
                 self.languageLayout.isUserInteractionEnabled = false
                 self.locationLayout.isUserInteractionEnabled = true
-                
-                if self.traitCollection.userInterfaceStyle == .dark {
-                    self.locationAnimation.alpha = 1
-                    self.locationAnimationLight.alpha = 0
-                    self.locationAnimation.play()
-                } else {
-                    self.locationAnimation.alpha = 0
-                    self.locationAnimationLight.alpha = 1
-                    self.locationAnimationLight.play()           // User Interface is Light
-                }
+                self.locationAnimation.loopMode = .loop
+                self.locationAnimation.play()
                 
                 self.allowLocation.addTarget(self, action: #selector(self.requestLocation), for: .touchUpInside)
                 self.refuseLocation.addTarget(self, action: #selector(self.advanceToGames), for: .touchUpInside)
@@ -733,7 +722,39 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     }
     
     @objc private func advanceToGames(){
-        self.req?.stop()
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let currentUser = delegate.currentUser
+        /*let ref = Database.database().reference().child("Users").child(currentUser!.uId)
+        ref.child("primaryLanguage").setValue(self.selectedPrimaryLanguage)
+        ref.child("secondaryLanguage").setValue(self.selectedSecondaryLanguage)
+        ref.child("selectedAge").setValue(self.selectedAge)
+        ref.child("gender").setValue(self.currendSelectedGender)
+        ref.child("gamingExperience").setValue(String(Int(self.experienceVal)))
+        
+        if(self.locationLat != 0.0){
+            currentUser!.userLat = self.locationLat
+            currentUser!.userLong = self.locationLong
+            
+            var localTimeZoneAbbreviation: String { return TimeZone.current.abbreviation() ?? "" }
+            currentUser!.timezone = localTimeZoneAbbreviation
+            ref.child("timezone").setValue(currentUser!.timezone)
+            
+            let geofireRef = Database.database().reference().child("geofire")
+            let geoFire = GeoFire(firebaseRef: geofireRef)
+            geoFire.setLocation(CLLocation(latitude: self.locationLat, longitude: self.locationLong), forKey: currentUser!.uId)
+        }*/
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+            UIApplication.switchRoot(
+                to: GameSelection.self,
+              storyboardId: "gameSelection",
+              animationType: .push,
+              animationSubtype: .fromRight
+            )
+        }
+    }
+    
+    @objc private func advanceToHome(){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let currentUser = delegate.currentUser
         let ref = Database.database().reference().child("Users").child(currentUser!.uId)
@@ -756,26 +777,33 @@ class GCRegistration: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             geoFire.setLocation(CLLocation(latitude: self.locationLat, longitude: self.locationLong), forKey: currentUser!.uId)
         }
         
-        self.performSegue(withIdentifier: "games", sender: nil)
+        self.performSegue(withIdentifier: "skip", sender: nil)
     }
     //speed up animations between sets
     //location transition broken
     //test all UX, then test data.
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == .authorizedWhenInUse {
-            //manager.startUpdatingLocation()
-            self.req = LocationManager.shared.locateFromGPS(.continous, accuracy: .city) { result in
-              switch result {
-                case .failure(let error):
-                  debugPrint("Received error: \(error)")
-                case .success(let location):
-                    self.locationLat = (manager.location?.coordinate.latitude)!
-                    self.locationLong = (manager.location?.coordinate.longitude)!
-                    self.advanceToGames()
-                    debugPrint("Location received: \(location)")
-              }
+            manager.startUpdatingLocation()
+            Task {
+                do {
+                    let locationService = Location()
+                    let event = try await locationService.requestLocation(
+                        accuracy: [.horizontal(1000)], // 1000 meters = .kilometer
+                        timeout: 10
+                    )
+
+                    if case let .didUpdateLocations(locations) = event,
+                       let location = locations.first {
+                        self.locationLat = location.coordinate.latitude
+                        self.locationLong = location.coordinate.longitude
+                        debugPrint("📍 Location received:", location.coordinate)
+                        self.advanceToGames()
+                    }
+                } catch {
+                    debugPrint("❌ Location error:", error)
+                }
             }
-            self.req!.start()
         } else {
             advanceToGames()
         }

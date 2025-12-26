@@ -11,6 +11,7 @@ import UIKit
 
 class EditProfileBioCell: UITableViewCell {
     
+    @IBOutlet weak var saveBlur: UIVisualEffectView!
     @IBOutlet weak var bioCover: UIView!
     @IBOutlet weak var saveButton: UIView!
     @IBOutlet weak var bioTV: UITextView!

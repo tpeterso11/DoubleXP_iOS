@@ -7,12 +7,11 @@
 //
 
 import Foundation
-import SwiftHTTP
 
 class DiscoverManager {
     
     func getDiscoverHomeInfo(callbacks: DiscoverCallbacks){
-        HTTP.GET("http://doublexpstorage.tech/app-json/discover_home.json") { response in
+        /*HTTPClient.get("http://doublexpstorage.tech/app-json/discover_home.json") { response in
             if let err = response.error {
                 print("error: \(err.localizedDescription)")
                 callbacks.onFailure()
@@ -140,6 +139,6 @@ class DiscoverManager {
                     callbacks.onFailure()
                 }
             }
-        }
+        }*/
     }
 }

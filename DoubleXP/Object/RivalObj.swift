@@ -9,96 +9,29 @@
 import Foundation
 import CoreData
 
-class RivalObj: NSObject, NSCoding {
-    var _gamerTag = ""
-    var gamerTag:String {
-        get {
-            return (_gamerTag)
-        }
-        set (newVal) {
-            _gamerTag = newVal
-        }
+struct RivalObj: Codable, Hashable {
+    let id: String
+    let gamerTag: String
+    let senderPokoId: String
+    let getterPokoId: String
+    let game: String
+    let gameImageUrl: String
+    let type: String
+    let date: String
+    let uid: String
+    let durationMin: Int
+    let customMessage: String
+    let customResponse: String
+    let rivalStatus: String       // "accepted", "rejected", "proposed"
+    let createdAtMs: Int64
+    let expiresAtMs: Int64
+
+    // MARK: - Hashable
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
-    
-    var _game = ""
-    var game:String {
-        get {
-            return (_game)
-        }
-        set (newVal) {
-            _game = newVal
-        }
+
+    static func == (lhs: RivalObj, rhs: RivalObj) -> Bool {
+        lhs.id == rhs.id
     }
-    
-    var _type = "" //use for time-frame until I feel like fixing.
-    var type:String {
-        get {
-            return (_type)
-        }
-        set (newVal) {
-            _type = newVal
-        }
-    }
-    
-    var _date = ""
-    var date: String {
-        get {
-            return (_date)
-        }
-        set (newVal) {
-            _date = newVal
-        }
-    }
-    
-    var _uid = ""
-    var uid: String {
-        get {
-            return (_uid)
-        }
-        set (newVal) {
-            _uid = newVal
-        }
-    }
-    
-    var _id = ""
-    var id: String {
-        get {
-            return (_id)
-        }
-        set (newVal) {
-            _id = newVal
-        }
-    }
-    
-    init(gamerTag: String, date: String, game: String, uid: String, type: String, id: String)
-    {
-        super.init()
-        self.gamerTag = gamerTag
-        self.date = date
-        self.game = game
-        self.uid = uid
-        self.type = type
-        self.id = id
-    }
-    
-    required init(coder decoder: NSCoder)
-    {
-        super.init()
-        self.gamerTag = (decoder.decodeObject(forKey: "gamerTag") as! String)
-        self.date = (decoder.decodeObject(forKey: "date") as! String)
-        self.game = (decoder.decodeObject(forKey: "game") as! String)
-        self.uid = (decoder.decodeObject(forKey: "uid") as! String)
-        self.type = (decoder.decodeObject(forKey: "type") as! String)
-        self.id = (decoder.decodeObject(forKey: "id") as! String)
-    }
-    
-    func encode(with coder: NSCoder) {
-        coder.encode(self.gamerTag, forKey: "gamerTag")
-        coder.encode(self.date, forKey: "date")
-        coder.encode(self.uid, forKey: "uid")
-        coder.encode(self.game, forKey: "game")
-        coder.encode(self.type, forKey: "type")
-        coder.encode(self.id, forKey: "id")
-    }
-    
 }

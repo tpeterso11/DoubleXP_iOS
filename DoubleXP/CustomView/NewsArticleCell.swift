@@ -11,6 +11,7 @@ import WebKit
 
 class NewsArticleCell: UICollectionViewCell{
     
+    @IBOutlet weak var videoIcon: UIImageView!
     @IBOutlet weak var sourceImage: UIImageView!
     @IBOutlet weak var authorLabel: UILabel!
     @IBOutlet weak var articleBack: UIImageView!

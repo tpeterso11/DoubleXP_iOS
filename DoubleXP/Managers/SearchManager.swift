@@ -98,9 +98,10 @@ class SearchManager {
                         let currentGame = dict?["game"] as? String ?? ""
                         let console = dict?["console"] as? String ?? ""
                         let quizTaken = dict?["quizTaken"] as? String ?? ""
+                        let gameId = dict?["gameId"] as? String ?? ""
                         
                         if(currentTag != "" && currentGame != "" && console != ""){
-                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
+                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken, gameId: gameId)
                             gamerTags.append(currentGamerTagObj)
                         }
                     }
@@ -244,8 +245,9 @@ class SearchManager {
                                 let currentGame = dict?["game"] as? String ?? ""
                                 let console = dict?["console"] as? String ?? ""
                                 let quizTaken = dict?["quizTaken"] as? String ?? ""
+                                let gameId = dict?["gameId"] as? String ?? ""
                                 
-                                let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
+                                let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken, gameId: gameId)
                                 gamerTags.append(currentGamerTagObj)
                             }
                             
@@ -305,9 +307,10 @@ class SearchManager {
                         let currentGame = dict?["game"] as? String ?? ""
                         let console = dict?["console"] as? String ?? ""
                         let quizTaken = dict?["quizTaken"] as? String ?? ""
+                        let gameId = dict?["gameId"] as? String ?? ""
                         
                         if(currentTag != "" && currentGame != "" && console != ""){
-                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
+                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken, gameId: gameId)
                             gamerTags.append(currentGamerTagObj)
                         }
                     }
@@ -460,7 +463,7 @@ class SearchManager {
                                             let future = formatter.string(from: dbDate as Date)
                                             let dbTimeOut = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
                                             
-                                            let validAnnounments = (now as Date).compare(.isEarlier(than: dbTimeOut))
+                                            let validAnnounments = true//(now as Date).compare(.isEarlier(than: dbTimeOut))
                                             
                                             if(dbTimeOut != nil){
                                                 if(!validAnnounments){
@@ -504,8 +507,9 @@ class SearchManager {
                             let currentGame = dict?["game"] as? String ?? ""
                             let console = dict?["console"] as? String ?? ""
                             let quizTaken = dict?["quizTaken"] as? String ?? ""
+                            let gameId = dict?["gameId"] as? String ?? ""
                             
-                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
+                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken, gameId: gameId)
                             gamerTags.append(currentGamerTagObj)
                         }
                         
@@ -570,9 +574,10 @@ class SearchManager {
                         let currentGame = dict?["game"] as? String ?? ""
                         let console = dict?["console"] as? String ?? ""
                         let quizTaken = dict?["quizTaken"] as? String ?? ""
+                        let gameId = dict?["gameId"] as? String ?? ""
                         
                         if(currentTag != "" && currentGame != "" && console != ""){
-                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
+                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken, gameId: gameId)
                             gamerTags.append(currentGamerTagObj)
                         }
                     }
@@ -607,7 +612,7 @@ class SearchManager {
                                         let future = formatter.string(from: dbDate as Date)
                                         let dbTimeOut = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
                                         
-                                        let validAnnounments = (now as Date).compare(.isEarlier(than: dbTimeOut))
+                                        let validAnnounments = true//(now as Date).compare(.isEarlier(than: dbTimeOut))
                                         
                                         if(dbTimeOut != nil){
                                             if(!validAnnounments){
@@ -651,8 +656,9 @@ class SearchManager {
                         let currentGame = dict?["game"] as? String ?? ""
                         let console = dict?["console"] as? String ?? ""
                         let quizTaken = dict?["quizTaken"] as? String ?? ""
+                        let gameId = dict?["gameId"] as? String ?? ""
                         
-                        let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
+                        let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken, gameId: gameId)
                         gamerTags.append(currentGamerTagObj)
                     }
                     

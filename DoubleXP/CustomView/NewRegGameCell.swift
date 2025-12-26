@@ -9,19 +9,15 @@
 import Foundation
 import UIKit
 import Lottie
-import UnderLineTextField
-import CollectionPickerView
 
 class NewRegGameCell: UITableViewCell/*, UICollectionViewDataSource, UICollectionViewDelegate*/ {
     @IBOutlet weak var gameBack: UIImageView!
     @IBOutlet weak var gameName: UILabel!
     @IBOutlet weak var cover: UIView!
     @IBOutlet weak var backConsole: UIView!
-    @IBOutlet weak var gamerTagField: UnderLineTextField!
     @IBOutlet weak var gamerTagContinue: UIButton!
     @IBOutlet weak var gamerTagCancel: UIButton!
     @IBOutlet weak var consoleBack: UIView!
-    @IBOutlet weak var consolePicker: CollectionPickerView!
     
     var open = false
     var view: NewRegGameCell?
@@ -34,7 +30,7 @@ class NewRegGameCell: UITableViewCell/*, UICollectionViewDataSource, UICollectio
         self.game = game
         self.consoles = consoles
         self.selectedGameNames = selectedGameNames
-        gamerTagField.addTarget(self, action: #selector(self.textFieldDidChange(_:)), for: .editingChanged)
+        //gamerTagField.addTarget(self, action: #selector(self.textFieldDidChange(_:)), for: .editingChanged)
         
         if(selectedCell){
             showSelected()
@@ -54,7 +50,7 @@ class NewRegGameCell: UITableViewCell/*, UICollectionViewDataSource, UICollectio
             return
         }
         self.selectedCell = false
-        gamerTagField.text = ""
+        //gamerTagField.text = ""
         self.gamerTagContinue.alpha = 0.5
         self.gamerTagContinue.isUserInteractionEnabled = false
     }

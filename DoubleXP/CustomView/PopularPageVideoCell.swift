@@ -8,8 +8,6 @@
 
 import Foundation
 import UIKit
-import YoutubePlayerView
-import YoutubeKit
 
 class PopularPageVideoCell: UICollectionViewCell {
     

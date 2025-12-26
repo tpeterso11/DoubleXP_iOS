@@ -8,10 +8,7 @@
 
 import Foundation
 import UIKit
-import SwiftHTTP
 import Firebase
-import SwiftNotificationCenter
-import moa
 
 class InterviewManager{
     var questions = [FAQuestion]()
@@ -36,35 +33,35 @@ class InterviewManager{
     }
     
     func showConsoles(){
-        Broadcaster.notify(FreeAgentQuizNav.self) {
-            $0.showConsoles()
-        }
+        //Broadcaster.notify(FreeAgentQuizNav.self) {
+        //    $0.showConsoles()
+        //}
     }
     
     func showConfirmation(){
-        Broadcaster.notify(FreeAgentQuizNav.self) {
-            $0.showComplete()
-        }
+        //Broadcaster.notify(FreeAgentQuizNav.self) {
+        //    $0.showComplete()
+        //}
     }
     
     func showComplete(){
-        Broadcaster.notify(FreeAgentQuizNav.self) {
-            $0.showSubmitted()
-        }
+        //Broadcaster.notify(FreeAgentQuizNav.self) {
+        //    $0.showSubmitted()
+        //}
     }
     
     func showFirstQuestion(){
-        Broadcaster.notify(FreeAgentQuizNav.self) {
-            $0.addQuestion(question: questions[0], interviewManager: self)
-        }
+        //Broadcaster.notify(FreeAgentQuizNav.self) {
+        //    $0.addQuestion(question: questions[0], interviewManager: self)
+       // }
     }
     
     func showNextQuestion(){
         currentQuestionIndex += 1
         if(questions.count + 1 != (currentQuestionIndex + 1)){
-            Broadcaster.notify(FreeAgentQuizNav.self) {
-                $0.addQuestion(question: questions[currentQuestionIndex], interviewManager: self)
-            }
+            //Broadcaster.notify(FreeAgentQuizNav.self) {
+            //    $0.addQuestion(question: questions[currentQuestionIndex], interviewManager: self)
+            //}
         }
     }
     
@@ -86,10 +83,10 @@ class InterviewManager{
                     showNextQuestion()
                 }
                 else{
-                    if(currentGCGame.availablebConsoles.count == 1){
+                    /*if(currentGCGame.availablebConsoles.count == 1){
                         setConsoles(console: currentGCGame.availablebConsoles[0])
                         return
-                    }
+                    }*/
                     
                     let delegate = UIApplication.shared.delegate as! AppDelegate
                     let currentUser = delegate.currentUser!
@@ -129,7 +126,7 @@ class InterviewManager{
     }
     
     func getQuiz(url: String, secondary: Bool, gameName: String, callbacks: FreeAgentQuizNav?){
-        HTTP.GET(url) { response in
+        /*HTTPClient.get(url) { response in
             if let err = response.error {
                 print("error: \(err.localizedDescription)")
                 return //also notify app of failure as needed
@@ -359,11 +356,11 @@ class InterviewManager{
                     }
                 }
             }
-        }
+        }*/
     }
     
     func getOptions(url: String, gameName: String){
-        HTTP.GET(url) { response in
+        /*HTTPClient.get(url) { response in
             if let err = response.error {
                 print("error: \(err.localizedDescription)")
                 return //also notify app of failure as needed
@@ -386,40 +383,14 @@ class InterviewManager{
                                 }
                             }
                             
-                            if(gameName == "League of Legends"){
-                                let imageUrl = self.convertLoLImageUrl(imageName: image)
-                                let moa = Moa()
-                                moa.onSuccess = { image in
-                                  // image is loaded
-                                    self.imageCache.setObject(image, forKey: imageUrl as NSString)
-                                    return image
-                                }
-                                moa.url = imageUrl
-                                
-                                let optionObj = OptionObj(optionLabel: label, imageUrl: imageUrl, sortingTags: tags)
-                                                           optionObj.title = title
-                                                           options.append(optionObj)
-                            } else {
-                                let imageUrl = image
-                                let moa = Moa()
-                                moa.onSuccess = { image in
-                                  // image is loaded
-                                    self.imageCache.setObject(image, forKey: imageUrl as NSString)
-                                    return image
-                                }
-                                moa.url = imageUrl
-                                
-                                let optionObj = OptionObj(optionLabel: label, imageUrl: imageUrl, sortingTags: tags)
-                                                           optionObj.title = title
-                                                           options.append(optionObj)
-                            }
+                           
                         }
                         
                         self.optionCache = options.sorted { $0.optionLabel < $1.optionLabel }
                     }
                 }
             }
-        }
+        }*/
     }
     
     private func checkProfileExists(multiStep : Bool, callbacks: FreeAgentQuizNav) {

@@ -8,13 +8,7 @@
 
 import UIKit
 import Firebase
-import SwiftHTTP
-import moa
-import FBSDKCoreKit
-import UnderLineTextField
 import Lottie
-import MSPeekCollectionViewDelegateImplementation
-import AIFlatSwitch
 
 
 class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate {
@@ -38,7 +32,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
     @IBOutlet weak var importButtonImage: UIImageView!
     @IBOutlet weak var allConsolesButton: UIButton!
     @IBOutlet weak var allConsolesCover: UIImageView!
-    @IBOutlet weak var gcDrawerGamertag: UnderLineTextField!
+    //@IBOutlet weak var gcDrawerGamertag: UnderLineTextField!
     @IBOutlet weak var allConsolesLabel: UILabel!
     @IBOutlet weak var psSwitch: UISwitch!
     @IBOutlet weak var xboxSwitch: UISwitch!
@@ -50,7 +44,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
     @IBOutlet weak var continueButton: UIButton!
     @IBOutlet weak var clickArea: UIView!
     @IBOutlet weak var gcDrawerGamenam: UILabel!
-    @IBOutlet weak var statsSwitch: AIFlatSwitch!
+    //@IBOutlet weak var statsSwitch: AIFlatSwitch!
     @IBOutlet weak var buildingAnimation: LottieAnimationView!
     @IBOutlet weak var buildingHeader: UIView!
     @IBOutlet weak var creationView: UIView!
@@ -72,7 +66,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
     var sendUpArray = [[String: String]]()
     var stats = [[String: Any]]()
     
-    var behavior: MSCollectionViewPeekingBehavior!
+    //var behavior: MSCollectionViewPeekingBehavior!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -135,8 +129,8 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
             }
         }
 
-        gcDrawerGamertag.returnKeyType = .done
-        gcDrawerGamertag.delegate = self
+        //gcDrawerGamertag.returnKeyType = .done
+        //gcDrawerGamertag.delegate = self
         
         psSwitch.addTarget(self, action: #selector(psSwitchChanged), for: UIControl.Event.valueChanged)
         xboxSwitch.addTarget(self, action: #selector(xboxSwitchChanged), for: UIControl.Event.valueChanged)
@@ -155,7 +149,6 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         continueButton.addTarget(self, action: #selector(continuePressed), for: .touchUpInside)
         finishButton.addTarget(self, action: #selector(finishPressed), for: .touchUpInside)
         gotItButton.addTarget(self, action: #selector(gotItPressed), for: .touchUpInside)
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register"))
 
         //put disabling stats and deleting stats in settings
         //gameCollection.configureForPeekingDelegate()
@@ -295,7 +288,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
     }
     
     @objc func allConsolesClicked(){
-        if(!(gcDrawerGamertag.text!.isEmpty) && self.savedTag.isEmpty){
+        /*if(!(gcDrawerGamertag.text!.isEmpty) && self.savedTag.isEmpty){
             self.allGamesChecked = true
             //save
             self.savedTag = gcDrawerGamertag.text!
@@ -363,7 +356,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                     self.gcDrawerGamertag.isUserInteractionEnabled = true
                 }, completion: nil)
             }, completion: nil)
-        }
+        }*/
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -373,21 +366,10 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! GCElongCell
         let current = self.availableGames[indexPath.item]
-        
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let cache = appDelegate.imageCache
-        if(cache.object(forKey: current.imageUrl as NSString) != nil){
-            cell.backgroundImage.image = cache.object(forKey: current.imageUrl as NSString)
-        } else {
-            cell.backgroundImage.image = Utility.Image.placeholder
-            cell.backgroundImage.moa.onSuccess = { image in
-                cell.backgroundImage.image = image
-                appDelegate.imageCache.setObject(image, forKey: current.imageUrl as NSString)
-                return image
-            }
-            cell.backgroundImage.moa.url = current.imageUrl
+        let url = URL(string: current.imageUrl ?? "")
+        if (url != nil) {
+            cell.backgroundImage.loadImage(from: url)
         }
-        
         cell.backgroundImage.contentMode = .scaleAspectFill
         cell.backgroundImage.clipsToBounds = true
         
@@ -463,7 +445,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                 seeStatsHeader.isHidden = true
             }
             
-            if(!self.savedTag.isEmpty){
+            /*if(!self.savedTag.isEmpty){
                 self.gcDrawerGamertag.text = self.savedTag
                 
                 self.allConsolesButton.backgroundColor = UIColor(named: "redToDark")
@@ -480,7 +462,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                 self.allConsolesLabel.text = "use for"
                 self.gcDrawerGamertag.alpha = 1
                 self.gcDrawerGamertag.text = ""
-            }
+            }*/
             
             if(highlightCount > 1){
                 for consoleSwitch in switches{
@@ -488,11 +470,11 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                 }
             }
             
-            self.statsSwitch.setSelected(false, animated: false)
+            //self.statsSwitch.setSelected(false, animated: false)
             
-            self.gcDrawerGamertag.addTarget(self, action: #selector(self.textFieldDidChange(_:)), for: UIControl.Event.editingChanged)
+            //self.gcDrawerGamertag.addTarget(self, action: #selector(self.textFieldDidChange(_:)), for: UIControl.Event.editingChanged)
             self.gcDrawerGamenam.text = current.gameName
-            self.statsSwitch.setSelected(false, animated: false)
+            //self.statsSwitch.setSelected(false, animated: false)
             
             
             if(!current.statsAvailable){
@@ -617,11 +599,11 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                         gamerTag = self.savedTag
                     }
                     else{
-                        gamerTag = self.gcDrawerGamertag.text!
+                        //gamerTag = self.gcDrawerGamertag.text!
                     }
                     
                     if(!gamerTag.isEmpty && !self.getConsole().isEmpty){
-                        let currentTemp = GCRegisterTemp(gameName: currentGame.gameName, gamerTag: gamerTag, console: self.getConsole(), importStats: self.statsSwitch.isSelected)
+                        let currentTemp = GCRegisterTemp(gameName: currentGame.gameName, gamerTag: gamerTag, console: self.getConsole(), importStats: true)
                         
                         self.selectedGames.append(currentTemp)
                         
@@ -701,7 +683,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let user = delegate.currentUser
         
-        let gamerProfile = GamerProfile(gamerTag: gamerTag, game: gameName, console: console, quizTaken: "")
+        let gamerProfile = GamerProfile(gamerTag: gamerTag, game: gameName, console: console, quizTaken: "", gameId: "")
         user?.gamerTags.append(gamerProfile)
         
         let sendUp = ["gamerTag": gamerTag, "game": gameName, "console": console]
@@ -773,7 +755,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
     }
     
     private func getApexLegendsProfileStats(url: String){
-        HTTP.GET(url, headers: ["TRN-Api-Key": "7fa6a9d9-6fbc-4350-adf3-79bfe45a303c"]) { response in
+        /*HTTP.GET(url, headers: ["TRN-Api-Key": "7fa6a9d9-6fbc-4350-adf3-79bfe45a303c"]) { response in
             if let err = response.error {
                 self.finishAndMoveToNext()
                 print("error: \(err.localizedDescription)")
@@ -823,7 +805,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                     self.finishAndMoveToNext()
                 }
             }
-        }
+        }*/
     }
     
     private func getDivisionStats(gamerTag: String, console: String){
@@ -888,7 +870,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
     }
     
     private func getDivisionPlayerId(url: String){
-        HTTP.GET(url) { response in
+        /*HTTP.GET(url) { response in
             if let err = response.error {
                 print("error: \(err.localizedDescription)")
                 AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Division PlayerID Error" + url))
@@ -940,11 +922,11 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                     self.finishAndMoveToNext()
                 }
             }
-        }
+        }*/
     }
     
     private func getSiegePlayerId(url: String){
-        HTTP.GET(url) { response in
+        /*HTTP.GET(url) { response in
             if let err = response.error {
                 print("error: \(err.localizedDescription)")
                 self.finishAndMoveToNext()
@@ -989,13 +971,13 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                     self.finishAndMoveToNext()
                 }
             }
-        }
+        }*/
     }
     
     private func getDivisionExtendedStats(pid: String, statObj: StatObject){
         let url = "https://thedivisiontab.com/api/player.php?pid="+pid
         
-        HTTP.GET(url) { response in
+        /*HTTP.GET(url) { response in
             if let err = response.error {
                 print("error: \(err.localizedDescription)")
                 AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Division Extended Stats Failed"))
@@ -1029,13 +1011,13 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                     self.finishAndMoveToNext()
                 }
             }
-        }
+        }*/
     }
     
     private func getSiegeExtendedStats(pid: String, statObj: StatObject){
         let url = "https://r6tab.com/api/player.php?p_id="+pid
         
-        HTTP.GET(url) { response in
+        /*HTTP.GET(url) { response in
             if let err = response.error {
                 print("error: \(err.localizedDescription)")
                 AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Siege Extended Stats Failed"))
@@ -1068,7 +1050,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                     self.finishAndMoveToNext()
                 }
             }
-        }
+        }*/
     }
     
     private func getCODStats(gamerTag: String, console: String){
@@ -1082,7 +1064,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
         if(console == "pc"){
             userConsole = "uplay"
         }
-        HTTP.GET("https://my.callofduty.com/api/papi-client/stats/cod/v1/title/mw/platform/" + userConsole + "/gamer/" + gamerTag + "/profile/type/mp") { response in
+        /*HTTP.GET("https://my.callofduty.com/api/papi-client/stats/cod/v1/title/mw/platform/" + userConsole + "/gamer/" + gamerTag + "/profile/type/mp") { response in
             if let err = response.error {
                 print("error: \(err.localizedDescription)")
                 self.finishAndMoveToNext()
@@ -1133,11 +1115,11 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                     self.finishAndMoveToNext()
                 }
             }
-        }
+        }*/
     }
     
     private func getFortnitePlayerId(gamertag: String){
-        HTTP.GET("https://fortniteapi.io/lookup?username="+gamertag, headers: ["authorization": "2192fa37-951e6ed9-15f5d6d5-f1080fcf"]) { response in
+        /*HTTP.GET("https://fortniteapi.io/lookup?username="+gamertag, headers: ["authorization": "2192fa37-951e6ed9-15f5d6d5-f1080fcf"]) { response in
             if let err = response.error {
                 self.finishAndMoveToNext()
                 print("error: \(err.localizedDescription)")
@@ -1167,12 +1149,12 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                     self.finishAndMoveToNext()
                 }
             }
-        }
+        }*/
     }
     
     private func getFortniteStats(playerId: String){
         let url = "https://fortniteapi.io/stats?account="+playerId
-        HTTP.GET(url, headers: ["authorization": "2192fa37-951e6ed9-15f5d6d5-f1080fcf"]) { response in
+        /*HTTP.GET(url, headers: ["authorization": "2192fa37-951e6ed9-15f5d6d5-f1080fcf"]) { response in
             if let err = response.error {
                 AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Fortnite Stats Error"))
                 self.finishAndMoveToNext()
@@ -1236,7 +1218,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                     self.finishAndMoveToNext()
                 }
             }
-        }
+        }*/
     }
     
     private func convertToUsableString(float: Double) -> String{
@@ -1253,7 +1235,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
     }
     
     private func getOverwatchProfileStats(url: String){
-        HTTP.GET(url, headers: ["TRN-Api-Key": "7fa6a9d9-6fbc-4350-adf3-79bfe45a303c"]) { response in
+        /*HTTP.GET(url, headers: ["TRN-Api-Key": "7fa6a9d9-6fbc-4350-adf3-79bfe45a303c"]) { response in
             if let err = response.error {
                 AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Overwatch Profile Stats Error"))
                 self.finishAndMoveToNext()
@@ -1473,7 +1455,7 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                     self.finishAndMoveToNext()
                 }
             }
-        }
+        }*/
     }
     
     
@@ -1538,7 +1520,6 @@ class GamerConnectRegisterActivity: UIViewController, UICollectionViewDataSource
                         self.performSegue(withIdentifier: "gcSkip", sender: nil)
                     }
                     
-                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC Register - Successful Registration"))
                 })
             })
         }

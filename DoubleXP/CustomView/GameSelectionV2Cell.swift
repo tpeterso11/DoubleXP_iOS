@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 
 class GameSelectionV2Cell: UICollectionViewCell {
+    @IBOutlet weak var card: UIView!
     @IBOutlet weak var gameback: UIImageView!
     @IBOutlet weak var developer: UILabel!
     @IBOutlet weak var gamename: UILabel!

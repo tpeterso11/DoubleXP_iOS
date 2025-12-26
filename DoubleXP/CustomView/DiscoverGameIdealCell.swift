@@ -8,15 +8,12 @@
 
 import Foundation
 import UIKit
-import LinearProgressBar
 
 class DiscoverGameIdealCell: UITableViewCell {
     
     @IBOutlet weak var gameDescription: UILabel!
     @IBOutlet weak var timeCommitment: UILabel!
-    @IBOutlet weak var complexityBar: LinearProgressBar!
     @IBOutlet weak var complexityDesc: UILabel!
-    @IBOutlet weak var testBar: LinearProgressBar!
     @IBOutlet weak var emoji: UIImageView!
     @IBOutlet weak var condition: UILabel!
 }

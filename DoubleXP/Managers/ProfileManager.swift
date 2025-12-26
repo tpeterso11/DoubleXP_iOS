@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import Firebase
+import FirebaseDatabaseInternal
 
 class ProfileManage {
     var wannaPlayCachedUser: User?
@@ -18,7 +19,7 @@ class ProfileManage {
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let user = delegate.currentUser!
         
-        let ref = Database.database().reference().child("Users").child(user.uId)
+        /*let ref = Database.database().reference().child("Users").child(user.uId)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             var rivals = [RivalObj]()
             if(snapshot.hasChild("currentTempRivals")){
@@ -47,7 +48,7 @@ class ProfileManage {
                             let future = formatter.string(from: dbDate as Date)
                             let dbTimeOut = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
                             
-                            let validRival = (now as Date).compare(.isEarlier(than: dbTimeOut))
+                            let validRival = true//(now as Date).compare(.isEarlier(than: dbTimeOut))
                             
                             if(dbTimeOut != nil){
                                 if(validRival){
@@ -71,7 +72,7 @@ class ProfileManage {
             
         }) { (error) in
             print(error.localizedDescription)
-        }
+        }*/
     }
     
     func saveChanges(bio: String, gamertag: String?){

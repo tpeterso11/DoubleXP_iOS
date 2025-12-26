@@ -104,9 +104,10 @@ class RecommnededUsersManager {
                     let currentGame = dict?["game"] as? String ?? ""
                     let console = dict?["console"] as? String ?? ""
                     let quizTaken = dict?["quizTaken"] as? String ?? ""
+                    let gameId = dict?["gameId"] as? String ?? ""
                     
                     if(currentTag != "" && currentGame != "" && console != ""){
-                        let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
+                        let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken, gameId: gameId)
                         gamerTags.append(currentGamerTagObj)
                     }
                 }
@@ -271,6 +272,7 @@ class RecommnededUsersManager {
         }
     }
     
+    //fix
     private func buildRandomUsers(snapshot: DataSnapshot, randoms: [Int], cache: [String], callbacks: TodayCallbacks) {
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let currentUser = delegate.currentUser!
@@ -638,7 +640,7 @@ class RecommnededUsersManager {
             }
         }
         
-        return GamerConnectGame(imageUrl: "", gameName: "", developer: "", hook: "", statsAvailable: false, teamNeeds: [String](), twitterHandle: "", twitchHandle: "", available: "")
+        return GamerConnectGame(id: "", imageUrl: "", gameName: "", developer: "", hook: "", statsAvailable: false, teamNeeds: [String](), twitterHandle: "", twitchHandle: "", available: "")
     }
     
     func getRecommendedGame() -> GamerConnectGame {
@@ -674,6 +676,6 @@ class RecommnededUsersManager {
             }
         }
         
-        return GamerConnectGame(imageUrl: "", gameName: "", developer: "", hook: "", statsAvailable: false, teamNeeds: [String](), twitterHandle: "", twitchHandle: "", available: "")
+        return GamerConnectGame(id: "", imageUrl: "", gameName: "", developer: "", hook: "", statsAvailable: false, teamNeeds: [String](), twitterHandle: "", twitchHandle: "", available: "")
     }
 }

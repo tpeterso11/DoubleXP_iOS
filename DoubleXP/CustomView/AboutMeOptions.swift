@@ -10,15 +10,13 @@ import Foundation
 import UIKit
 //import collection_view_layouts
 
-class AboutMeOptions: UITableViewCell, UICollectionViewDelegate, UICollectionViewDataSource {
+class AboutMeOptions: UITableViewCell {
     
     @IBOutlet weak var lookingForOptionCollection: UICollectionView!
     var payload = [String]()
-    var currentSelection: LookingForSelection?
-    var aboutDrawer: AboutYouDrawer?
     var set = false
     
-    func setLayout(list: [String], selection: LookingForSelection, aboutDrawer: AboutYouDrawer){
+    /*func setLayout(list: [String], selection: LookingForSelection, aboutDrawer: AboutYouDrawer){
         payload = list
         self.currentSelection = selection
         self.aboutDrawer = aboutDrawer
@@ -64,6 +62,6 @@ class AboutMeOptions: UITableViewCell, UICollectionViewDelegate, UICollectionVie
             self.contentView.layoutIfNeeded()
             // Returns `collectionView.contentSize` in order to set the UITableVieweCell height a value greater than 0.
         return CGSize(width: self.lookingForOptionCollection.contentSize.width, height: self.lookingForOptionCollection.contentSize.height + 80)
-    }
+    }*/
 }
 

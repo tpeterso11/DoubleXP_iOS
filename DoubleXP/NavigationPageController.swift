@@ -7,10 +7,8 @@
 //
 
 import UIKit
-import EMPageViewController
-import SwiftNotificationCenter
 
-class NavigationPageController: EMPageViewController, EMPageViewControllerDataSource, NavigateToProfile {
+class NavigationPageController: UIViewController {//EMPageViewController, EMPageViewControllerDataSource, NavigateToProfile {
     
     func navigateToMessaging(groupChannelUrl: String?, otherUserId: String?) {
         
@@ -30,9 +28,9 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        dataSource = self
+        //dataSource = self
         
-        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "gamerConnectFrag") as! Feed
+        /*let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "gamerConnectFrag") as! Feed
 
         selectViewController(currentViewController, direction: .forward, animated: false, completion: nil)
         
@@ -40,27 +38,27 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         currentViewController.pageName = "Home"
         currentViewController.navDictionary = ["state": "original"]
         appDelegate.clearAndAddToNavStack(vc: currentViewController)
-        appDelegate.currentFrag = currentViewController.pageName ?? "Home"
+        appDelegate.currentFrag = currentViewController.pageName ?? "Home"*/
         
-        Broadcaster.register(NavigateToProfile.self, observer: self)
+        //Broadcaster.register(NavigateToProfile.self, observer: self)
     }
     
     fileprivate func populateItems() {
-         let c = Feed()
+         //let c = Feed()
     
-        items.append(c)
+        //items.append(c)
     }
     
     func programmaticallyLoad(vc: ParentVC, fragName: String){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.currentFrag = fragName
         
-        selectViewController(vc, direction: .reverse, animated: true, completion: nil)
+        //selectViewController(vc, direction: .reverse, animated: true, completion: nil)
         
         vc.reloadView()
     }
     
-    func navigateToProfile(uid: String){
+    /*func navigateToProfile(uid: String){
         let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "playerProfile") as! PlayerProfile
         currentViewController.pageName = "Profile"
         currentViewController.navDictionary = ["state": "backOnly"]
@@ -181,7 +179,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
     }
     
     func navigateToHome(){
-        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "gamerConnectFrag") as! Feed
+        /*let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "gamerConnectFrag") as! Feed
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.currentLanding!.checkRivals()
@@ -190,7 +188,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         appDelegate.clearAndAddToNavStack(vc: currentViewController)
         appDelegate.currentFrag = currentViewController.pageName ?? "Home"
         
-        selectViewController(currentViewController, direction: .reverse, animated: true, completion: nil)
+        selectViewController(currentViewController, direction: .reverse, animated: true, completion: nil)*/
     }
     
     func navigateToFreeAgentQuiz(team: TeamObject?, gcGame: GamerConnectGame, currentUser: User) {
@@ -233,7 +231,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
         }
         
         selectViewController(currentViewController, direction: .forward, animated: true, completion: nil)
-    }
+    }*/
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
         guard let viewControllerIndex = items.index(of: viewController) else {
@@ -271,7 +269,7 @@ class NavigationPageController: EMPageViewController, EMPageViewControllerDataSo
     }
     
     func goBack() {
-        self.scrollReverse(animated: true, completion: nil)
+        //self.scrollReverse(animated: true, completion: nil)
     }
     
      func removeBottomNav(showNewNav: Bool, hideSearch: Bool, searchHint: String?, searchButtonText: String?, isMessaging: Bool) {

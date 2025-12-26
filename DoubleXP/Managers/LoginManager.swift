@@ -238,11 +238,11 @@ class LoginHelper{
                         duration = current.childSnapshot(forPath: "duration").value as! String
                     }
                     
-                    if(!games.isEmpty && active == "true" && !title.isEmpty && !message.isEmpty){
+                    /*if(!games.isEmpty && active == "true" && !title.isEmpty && !message.isEmpty){
                         let newAnnouncement = AnnouncementObj(announcementId: id, announcementTitle: title, announcementMessage: message, announcementActive: active, announcementGames: games, announcementDuration: duration, announcementAudience: audience, announcementSender: sender, announcementDetails: details)
                         
                         announcements.append(newAnnouncement)
-                    }
+                    }*/
                 }
                 
                 let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -290,17 +290,17 @@ class LoginHelper{
                 let delegate = UIApplication.shared.delegate as! AppDelegate
                 delegate.episodes = displayEpisodes
                 
-                activity.onFeedCompleted(uid: uid ?? "")
+                //activity.onFeedCompleted(uid: uid ?? "")
             } else {
                 let delegate = UIApplication.shared.delegate as! AppDelegate
                 let displayEpisodes = [EpisodeObj]()
                 delegate.episodes = displayEpisodes
                 
-                activity.onFeedCompleted(uid: uid ?? "")
+                //activity.onFeedCompleted(uid: uid ?? "")
             }
         }) { (error) in
             print(error.localizedDescription)
-            activity.onFeedCompleted(uid: uid ?? "")
+            //activity.onFeedCompleted(uid: uid ?? "")
         }
     }
     
@@ -365,12 +365,12 @@ class LoginHelper{
                         consoles = current.childSnapshot(forPath: "consoles").value as? [String] ?? [String]()
                     }
                     
-                    if(!game.isEmpty && !gameImageUrl.isEmpty && !developer.isEmpty){
+                    /*if(!game.isEmpty && !gameImageUrl.isEmpty && !developer.isEmpty){
                         let upcomingGame = UpcomingGame(id: id, game: game, blurb: blurb, releaseDateMillis: releaseDateMillis, releaseDate: releaseDate, trailerUrls: trailerUrls, gameImageUrl: gameImageUrl, gameDesc: description, releaseDateProper: releaseDateProper)
                         upcomingGame.consoles = consoles
                         upcomingGame.developer = developer
                         upcoming.append(upcomingGame)
-                    }
+                    }*/
                 }
                 
                 let delegate = UIApplication.shared.delegate as! AppDelegate

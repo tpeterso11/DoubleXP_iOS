@@ -11,6 +11,7 @@ import UIKit
 
 class SearchGameCell: UITableViewCell {
     
+    @IBOutlet weak var popularTag: UILabel!
     @IBOutlet weak var launchClickArea: UIView!
     @IBOutlet weak var quickAdd: UIImageView!
     @IBOutlet weak var developer: UILabel!

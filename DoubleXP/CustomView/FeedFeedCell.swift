@@ -9,10 +9,9 @@
 import Foundation
 import UIKit
 import FirebaseDatabase
-import FBSDKCoreKit
 
-class FeedFeedCell : UITableViewCell, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
-    @IBOutlet weak var feedCollection: UICollectionView!
+class FeedFeedCell : UITableViewCell {// , UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+    /*@IBOutlet weak var feedCollection: UICollectionView!
     var secondaryPayload = [Any]()
     var feedFrag: Feed!
     var dataSet = false
@@ -103,14 +102,11 @@ class FeedFeedCell : UITableViewCell, UICollectionViewDataSource, UICollectionVi
             
             if((current as! RecommendedUser).gamerTag == "allthesaints011"){
                 cell.xBox.isHidden = true
-                AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC-Connect Toussaint Click"))
             }
             if((current as! RecommendedUser).gamerTag == "fitboy_"){
                 cell.xBox.isHidden = true
-                AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC-Connect Hodges Click"))
             }
             if((current as! RecommendedUser).gamerTag == "Kwatakye Raven"){
-                AppEvents.shared.logEvent(AppEvents.Name(rawValue: "GC-Connect Mike Click"))
             }
             
             
@@ -131,9 +127,9 @@ class FeedFeedCell : UITableViewCell, UICollectionViewDataSource, UICollectionVi
             cell.title.text = (current as! NewsObject).title
             
             if((current as! NewsObject).videoUrl.isEmpty){
-                cell.contents.text = "READ"
+                cell.videoIcon.isHidden = true
             } else {
-                cell.contents.text = "READ - WATCH"
+                cell.videoIcon.isHidden = false
             }
             
             if((current as! NewsObject).source == "gs"){
@@ -144,47 +140,17 @@ class FeedFeedCell : UITableViewCell, UICollectionViewDataSource, UICollectionVi
                 cell.authorLabel.text = (current as! NewsObject).author
             }
             
-            cell.articleBack.image = #imageLiteral(resourceName: "new_logo3.png")
+            //cell.articleBack.image = #imageLiteral(resourceName: "new_logo3.png")
             cell.closeX.alpha = 0
-            
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            let cache = appDelegate.imageCache
-            if(cache.object(forKey: (current as! NewsObject).imageUrl as NSString) != nil){
-                cell.articleBack.image = cache.object(forKey: (current as! NewsObject).imageUrl as NSString)
-            } else {
-                cell.articleBack.image = Utility.Image.placeholder
-                cell.articleBack.moa.onSuccess = { image in
+            let url = URL(string: (current as! NewsObject).imageUrl)
+            /*if (url != nil) {
+                ImageLoader.shared.loadImage(from: current.imageUrl) { [weak self] image in
+                    guard let self = self else { return }
                     cell.articleBack.image = image
-                    cell.articleBack.alpha = 0.6
-                    cell.articleBack.contentMode = .scaleAspectFill
-                    cell.articleBack.clipsToBounds = true
-                    
-                    appDelegate.imageCache.setObject(image, forKey: (current as! NewsObject).imageUrl as NSString)
-                    return image
                 }
-                cell.articleBack.moa.url = (current as! NewsObject).imageUrl
-            }
-            
+            }*/
             cell.tag = indexPath.item
             
-            return cell
-        }
-        else if(current is AdObject){
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ad", for: indexPath) as! AdCell
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            cell.setAd(landingController: appDelegate.currentLanding!)
-            
-            cell.contentView.layer.cornerRadius = 10.0
-            cell.contentView.layer.borderWidth = 1.0
-            cell.contentView.layer.borderColor = UIColor.clear.cgColor
-            cell.contentView.layer.masksToBounds = true
-            
-            cell.layer.shadowColor = UIColor.black.cgColor
-            cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
-            cell.layer.shadowRadius = 2.0
-            cell.layer.shadowOpacity = 0.5
-            cell.layer.masksToBounds = false
-            cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
             return cell
         }
         else if(current is AnnouncementObj){
@@ -211,21 +177,13 @@ class FeedFeedCell : UITableViewCell, UICollectionViewDataSource, UICollectionVi
         else if(current is UpcomingGame){
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "upcoming", for: indexPath) as! UpcomingGameCell
             let currentObj = current as! UpcomingGame
-            
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            let cache = appDelegate.imageCache
-            if(cache.object(forKey: currentObj.gameImageUrl as NSString) != nil){
-                cell.gameBack.image = cache.object(forKey: currentObj.gameImageUrl as NSString)
-            } else {
-                cell.gameBack.image = Utility.Image.placeholder
-                cell.gameBack.moa.onSuccess = { image in
+            let url = URL(string: currentObj.gameImageUrl)
+            /*if (url != nil) {
+                ImageLoader.shared.loadImage(from: current.imageUrl) { [weak self] image in
+                    guard let self = self else { return }
                     cell.gameBack.image = image
-                    appDelegate.imageCache.setObject(image, forKey: currentObj.gameImageUrl as NSString)
-                    return image
                 }
-                cell.gameBack.moa.url = currentObj.gameImageUrl
-            }
-            
+            }*/
             cell.gameBack.contentMode = .scaleAspectFill
             cell.gameBack.clipsToBounds = true
             
@@ -248,21 +206,13 @@ class FeedFeedCell : UITableViewCell, UICollectionViewDataSource, UICollectionVi
         } else if(current is EpisodeObj){
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "episode", for: indexPath) as! EpisodeCell
             let currentObj = current as! EpisodeObj
-            
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            let cache = appDelegate.imageCache
-            if(cache.object(forKey: currentObj.imageUrl as NSString) != nil){
-                cell.background.image = cache.object(forKey: currentObj.imageUrl as NSString)
-            } else {
-                cell.background.image = Utility.Image.placeholder
-                cell.background.moa.onSuccess = { image in
+            /*let url = URL(string: currentObj.gameImageUrl)
+            if (url != nil) {
+                ImageLoader.shared.loadImage(from: currentObj.imageUrl) { [weak self] image in
+                    guard let self = self else { return }
                     cell.background.image = image
-                    appDelegate.imageCache.setObject(image, forKey: currentObj.imageUrl as NSString)
-                    return image
                 }
-                cell.background.moa.url = currentObj.imageUrl
-            }
-            
+            }*/
             cell.background.contentMode = .scaleAspectFill
             cell.background.clipsToBounds = true
             
@@ -342,7 +292,7 @@ class FeedFeedCell : UITableViewCell, UICollectionViewDataSource, UICollectionVi
             return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(170))
         }
         else if(current is NewsObject){
-            return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(250))
+            return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(280))
         }
         else{
             return CGSize(width: collectionView.bounds.size.width - 20, height: CGFloat(100))
@@ -381,9 +331,6 @@ class FeedFeedCell : UITableViewCell, UICollectionViewDataSource, UICollectionVi
                 self.feedFrag.showArticle(newsObj: current, image: image!)
             }
         }
-        else if(cell is AdCell){
-            //do nothing
-        }
         else{
             //self.feedFrag.clearSearch()
             //self.feedFrag.resetSearchList()
@@ -414,8 +361,6 @@ class FeedFeedCell : UITableViewCell, UICollectionViewDataSource, UICollectionVi
                 if(!(current as! UpcomingGame).id.isEmpty){
                     ignoreArray.append((current as! UpcomingGame).id)
                     defaults.set(ignoreArray, forKey: "ignoredUpcomingGames")
-                    
-                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Upcoming Game ignored" + (current as! UpcomingGame).game))
                     
                     self.secondaryPayload.remove(at: view!.tag)
                     self.feedCollection.reloadData()
@@ -454,7 +399,6 @@ class FeedFeedCell : UITableViewCell, UICollectionViewDataSource, UICollectionVi
                     ignoreArray.append((current as! EpisodeObj).mediaId)
                     defaults.set(ignoreArray, forKey: "ignoredEpisodes")
                     
-                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Episode ignored" + (current as! EpisodeObj).mediaId))
                     
                     self.secondaryPayload.remove(at: view!.tag)
                     self.feedCollection.reloadData()
@@ -500,6 +444,6 @@ class FeedFeedCell : UITableViewCell, UICollectionViewDataSource, UICollectionVi
             let indexSet = IndexSet(integer: 0)
             self.feedCollection.reloadSections(indexSet)
         }, completion: nil)
-    }
+    }*/
     
 }

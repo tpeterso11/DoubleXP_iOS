@@ -8,7 +8,6 @@
 
 import Foundation
 import UIKit
-import collection_view_layouts
 
 class PopularPageListCell: UITableViewCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     @IBOutlet weak var emptyView: UIView!
@@ -22,7 +21,7 @@ class PopularPageListCell: UITableViewCell, UICollectionViewDelegate, UICollecti
         
         if(!dataSet){
             self.dataSet = true
-            self.videoCollection.collectionViewLayout = InstagramLayout()
+            //self.videoCollection.collectionViewLayout = InstagramLayout()
             self.videoCollection.delegate = self
             self.videoCollection.dataSource = self
         } else {
@@ -37,20 +36,13 @@ class PopularPageListCell: UITableViewCell, UICollectionViewDelegate, UICollecti
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let current = payload[indexPath.item]
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "basic", for: indexPath) as! PopularPageBasicCell
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let cache = appDelegate.imageCache
-        
-        if(cache.object(forKey: current.youtubeImg as NSString) != nil){
-            cell.youtubeImg.image = cache.object(forKey: current.youtubeImg as NSString)
-        } else {
-            cell.youtubeImg.image = Utility.Image.placeholder
-            cell.youtubeImg.moa.onSuccess = { image in
+        /*let url = URL(string: url)
+        if (url != nil) {
+            ImageLoader.shared.loadImage(from: current.youtubeImg) { [weak self] image in
+                guard let self = self else { return }
                 cell.youtubeImg.image = image
-                appDelegate.imageCache.setObject(image, forKey: current.youtubeImg as NSString)
-                return image
             }
-            cell.youtubeImg.moa.url = current.youtubeImg
-        }
+        }*/
         return cell
     }
     

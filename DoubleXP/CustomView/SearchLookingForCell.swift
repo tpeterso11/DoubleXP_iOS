@@ -8,17 +8,14 @@
 
 import Foundation
 import UIKit
-import PopupDialog
-import SPStorkController
 
-class SearchLookingForCell: UITableViewCell, UICollectionViewDelegate, UICollectionViewDataSource {
+class SearchLookingForCell: UITableViewCell {
     @IBOutlet weak var lookingForCells: UICollectionView!
     @IBOutlet weak var lookingForDialogClickArea: UIView!
     var payload = [String]()
     var dataSet = false
-    var search: GamerConnectSearch?
     
-    func setPayload(payload: [String], search: GamerConnectSearch){
+    /*func setPayload(payload: [String], search: GamerConnectSearch){
         self.payload = payload
         self.search = search
         
@@ -75,11 +72,11 @@ class SearchLookingForCell: UITableViewCell, UICollectionViewDelegate, UICollect
     }
     
     @objc func showLookingForDialog(){
-        var buttons = [PopupDialogButton]()
+        //var buttons = [PopupDialogButton]()
         let title = "what is this?"
         let message = "we search through gamer profiles to see who matches what you are looking for. by setting this in your gamer profile, we can help find your best match!"
         
-        let button = DefaultButton(title: "setup MY gamer profile") { [weak self] in
+        /*let button = DefaultButton(title: "setup MY gamer profile") { [weak self] in
             self?.showUpgradeFrag()
         }
         buttons.append(button)
@@ -93,14 +90,14 @@ class SearchLookingForCell: UITableViewCell, UICollectionViewDelegate, UICollect
         popup.addButtons(buttons)
 
         // Present dialog
-        search!.present(popup, animated: true, completion: nil)
+        search!.present(popup, animated: true, completion: nil)*/
     }
     
     private func showUpgradeFrag(){
         let currentViewController = self.search?.storyboard!.instantiateViewController(withIdentifier: "upgrade") as! Upgrade
         currentViewController.extra = "quiz"
         
-        let transitionDelegate = SPStorkTransitioningDelegate()
+        /*let transitionDelegate = SPStorkTransitioningDelegate()
         currentViewController.transitioningDelegate = transitionDelegate
         currentViewController.modalPresentationStyle = .custom
         currentViewController.modalPresentationCapturesStatusBarAppearance = true
@@ -108,6 +105,6 @@ class SearchLookingForCell: UITableViewCell, UICollectionViewDelegate, UICollect
         transitionDelegate.swipeToDismissEnabled = true
         transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
         transitionDelegate.storkDelegate = self.search
-        self.search?.present(currentViewController, animated: true, completion: nil)
-    }
+        self.search?.present(currentViewController, animated: true, completion: nil)*/
+    }*/
 }

@@ -9,13 +9,12 @@
 import Foundation
 import UIKit
 
-class EditProfileTagCell: UICollectionViewCell, UITableViewDelegate, UITableViewDataSource {
+class EditProfileTagCell: UICollectionViewCell {
     
     @IBOutlet weak var tagTable: UITableView!
     var payload = [String]()
-    var modal: ProfileFrag?
     
-    func setTable(list: [String], modal: ProfileFrag){
+    /*func setTable(list: [String], modal: ProfileFrag){
         self.payload = list
         self.modal = modal
         self.tagTable.dataSource = self
@@ -50,5 +49,5 @@ class EditProfileTagCell: UICollectionViewCell, UITableViewDelegate, UITableView
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return CGFloat(40)
-    }
+    }*/
 }

@@ -8,199 +8,65 @@
 
 import UIKit
 import Firebase
-import UnderLineTextField
-import FBSDKLoginKit
+import FirebaseAuth
 import GoogleSignIn
-import PopupDialog
-import SwiftDate
 import CryptoKit
 import AuthenticationServices
-import FlagPhoneNumber
-import SPStorkController
 import AVKit
+import SwiftEntryKit
+import FirebaseDatabaseInternal
 
 
-class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding, UITextFieldDelegate, FPNTextFieldDelegate, SPStorkControllerDelegate {
+class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding, UITextFieldDelegate {
     private var data: [NewsObject]!
     private var games: [GamerConnectGame]!
     var handle: AuthStateDidChangeListenerHandle?
-    @IBOutlet weak var emailField: UITextField!
-    @IBOutlet weak var passwordFieild: UITextField!
+    @IBOutlet weak var emailField: DefaultTextField!
+    @IBOutlet weak var passwordField: DefaultTextField!
+    @IBOutlet weak var loginButton: DefaultButton!
     @IBOutlet weak var registerText: UILabel!
-    @IBOutlet weak var loginButton: UIButton!
     @IBOutlet weak var facebookLogin: UIImageView!
     @IBOutlet weak var googleSignIn: UIView!
     @IBOutlet weak var workOverlay: UIView!
     @IBOutlet weak var workSpinner: UIActivityIndicatorView!
     @IBOutlet weak var appleLogin: UIImageView!
-    @IBOutlet weak var phoneLayout: UIView!
     @IBOutlet weak var emailLayout: UIView!
-    @IBOutlet weak var phoneNumberSwitch: UILabel!
-    @IBOutlet weak var emailSwitch: UILabel!
-    @IBOutlet weak var phoneEntry: FPNTextField!
-    @IBOutlet weak var phoneLogin: UIButton!
     @IBOutlet weak var loginVideo: UIView!
+    @IBOutlet weak var transitionBlur: UIVisualEffectView!
     private var validPhone = false
     private var loginPlayer: AVPlayer?
     
     var socialRegisteredUid = ""
     var selectedSocial = ""
     
-    func loginManagerDidComplete(_ result: LoginManagerLoginResult?, _ error: Error?) {
-        if let result = result, result.isCancelled {
-            hideWork()
-            
-            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login Canceled"))
-            
-            var buttons = [PopupDialogButton]()
-            let title = "your login attempt was canceled."
-            let message = "login attempt was canceled.."
-            
-            let button = DefaultButton(title: "try again.") { [weak self] in
-                self?.loginWithReadPermissions()
-                
-            }
-            buttons.append(button)
-            
-            let buttonOne = CancelButton(title: "i know") { [weak self] in
-                //do nothing
-            }
-            buttons.append(buttonOne)
-            
-            let popup = PopupDialog(title: title, message: message)
-            popup.addButtons(buttons)
-            
-            // Present dialog
-            self.present(popup, animated: true, completion: nil)
-        } else {
-            if let tokenString = result?.token?.tokenString {
-                let credential = FacebookAuthProvider.credential(withAccessToken: tokenString)
-                Auth.auth().signIn(with: credential) { (authResult, error) in
-                    if let error = error {
-                        let authError = error as NSError
-                        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Register - Facebook Login Fail Firebase - " + authError.localizedDescription))
-                    }
-                    else{
-                        let uId = authResult?.user.uid ?? ""
-                        if(!uId.isEmpty){
-                            if(authResult != nil){
-                                self.downloadDBRef(uid: uId, registrationType: "facebook", accessToken: nil, userId: nil)
-                            }
-                            else{
-                                let checkRef = Database.database().reference().child("Users").child(uId)
-                                let user = User(uId: uId)
-                                checkRef.child("platform").setValue("ios")
-                                checkRef.child("search").setValue("true")
-                                checkRef.child("registrationType").setValue("facebook")
-                                checkRef.child("model").setValue(UIDevice.modelName)
-                                checkRef.child("notifications").setValue("true")
-                                
-                                DispatchQueue.main.async {
-                                    let delegate = UIApplication.shared.delegate as! AppDelegate
-                                    delegate.currentUser = user
-                                    self.performSegue(withIdentifier: "newReg", sender: nil)
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                hideWork()
-                
-                AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login Fail - " + "\(error?.localizedDescription ?? "")"))
-                
-                var buttons = [PopupDialogButton]()
-                let title = "facebook login error."
-                let message = "there was an error getting you logged into facebook. try again, or try registering using your email."
-                
-                let button = DefaultButton(title: "try again.") { [weak self] in
-                    self?.loginWithReadPermissions()
-                    
-                }
-                buttons.append(button)
-                
-                let buttonOne = CancelButton(title: "nevermind") { [weak self] in
-                    self?.hideWork()
-                }
-                buttons.append(buttonOne)
-                
-                let popup = PopupDialog(title: title, message: message)
-                popup.addButtons(buttons)
-                
-                // Present dialog
-                self.present(popup, animated: true, completion: nil)
-            }
-        }
-    }
-    
-    @objc private func emailSwitchAction(){
-        if(phoneLayout.alpha == 1){ //if phone layout is showing, make email bold, show email layout
-            self.emailSwitch.font = UIFont.boldSystemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
-            self.emailSwitch.backgroundColor = UIColor(named: "greenToDarker")
-            self.phoneNumberSwitch.font = UIFont.systemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
-            self.phoneNumberSwitch.backgroundColor = UIColor(named: "darkAlpha")
-            UIView.animate(withDuration: 0.5, animations: {
-                self.phoneLayout.alpha = 0
-            }, completion: { (finished: Bool) in
-                UIView.animate(withDuration: 0.3, delay: 0.3, options: [], animations: {
-                    self.emailLayout.alpha = 1
-                }, completion: nil)
-            })
-        } else {
-            self.emailSwitch.font = UIFont.boldSystemFont(ofSize: self.emailSwitch.font.pointSize)
-            self.phoneNumberSwitch.backgroundColor = UIColor(named: "darkAlpha")
-            self.phoneNumberSwitch.font = UIFont.systemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
-            self.emailSwitch.backgroundColor = UIColor(named: "greenToDarker")
-        }
-    }
-    
-    @objc private func phoneSwitchAction(){
-        if(phoneLayout.alpha == 0){
-            self.phoneNumberSwitch.font = UIFont.boldSystemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
-            self.phoneNumberSwitch.backgroundColor = UIColor(named: "greenToDarker")
-            self.emailSwitch.font = UIFont.systemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
-            self.emailSwitch.backgroundColor = UIColor(named: "darkAlpha")
-            UIView.animate(withDuration: 0.5, animations: {
-                self.emailLayout.alpha = 0
-            }, completion: { (finished: Bool) in
-                UIView.animate(withDuration: 0.3, delay: 0.3, options: [], animations: {
-                    self.phoneLayout.alpha = 1
-                }, completion: nil)
-            })
-            
-        } else {
-            self.phoneNumberSwitch.font = UIFont.boldSystemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
-            self.phoneNumberSwitch.backgroundColor = UIColor(named: "greenToDarker")
-            self.emailSwitch.font = UIFont.systemFont(ofSize: self.phoneNumberSwitch.font.pointSize)
-            self.emailSwitch.backgroundColor = UIColor(named: "darkAlpha")
-        }
-    }
-    
     @IBAction private func loginWithReadPermissions() {
-        let loginManager = LoginManager()
-        loginManager.logIn(permissions: ["public_profile", "email"], from: self) { [weak self] (result, error) in
-            self?.loginManagerDidComplete(result, error)
-        }
+        //let loginManager = LoginManager()
+        //loginManager.logIn(permissions: ["public_profile", "email"], from: self) { [weak self] (result, error) in
+        //    self?.loginManagerDidComplete(result, error)
+        //}
     }
     
     @IBAction private func logOut() {
-        let loginManager = LoginManager()
-        loginManager.logOut()
+        //let loginManager = LoginManager()
+        //loginManager.logOut()
         
-        let alertController = UIAlertController(
-            title: "Logout",
-            message: "Logged out.", preferredStyle: .alert
-        )
-        present(alertController, animated: true, completion: nil)
+        //let alertController = UIAlertController(
+        //    title: "Logout",
+        //    message: "Logged out.", preferredStyle: .alert
+       // )
+       // present(alertController, animated: true, completion: nil)
     }
     
     func transitionNewRegistration(){
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        if(delegate.currentUser != nil){
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                self.performSegue(withIdentifier: "newReg", sender: nil)
-            }
-        }
+        //if(delegate.currentUser != nil){
+            UIApplication.switchRoot(
+                to: GCRegistration.self,
+              storyboardId: "newReg",
+              animationType: .push,
+              animationSubtype: .fromRight
+            )
+        //}
     }
     
     @available(iOS 13.0, *)
@@ -216,11 +82,6 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
         delegate.currentLoginActivity = self
         
         loginButton.addTarget(self, action: #selector(loginButtonClicked), for: .touchUpInside)
-        
-        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: self.loginPlayer?.currentItem, queue: .main) { [weak self] _ in
-            self?.loginPlayer?.seek(to: CMTime.zero)
-            self?.loginPlayer?.play()
-        }
         
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(registerClicked))
         registerText.isUserInteractionEnabled = true
@@ -244,41 +105,11 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
             appleLogin.alpha = 0.3
             appleLogin.isUserInteractionEnabled = false
         }
-        //todo IMPLEMET APPLE LOGIN~!!!!
-        
-        addDoneButtonOnKeyboard()
-        
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Login"))
         
         emailField.returnKeyType = .done
         emailField.delegate = self
-        passwordFieild.returnKeyType = .done
-        passwordFieild.delegate = self
-        
-        self.phoneEntry.addTarget(self, action: #selector(textFieldDidChange), for: UIControl.Event.editingChanged)
-        self.phoneEntry.delegate = self
-        self.phoneEntry.returnKeyType = .done
-        self.phoneLogin.addTarget(self, action: #selector(continueClickedPhone), for: .touchUpInside)
-        
-        let phoneTap = UITapGestureRecognizer(target: self, action: #selector(phoneSwitchAction))
-        self.phoneNumberSwitch.isUserInteractionEnabled = true
-        self.phoneNumberSwitch.addGestureRecognizer(phoneTap)
-        
-        let emailTap = UITapGestureRecognizer(target: self, action: #selector(emailSwitchAction))
-        self.emailSwitch.isUserInteractionEnabled = true
-        self.emailSwitch.addGestureRecognizer(emailTap)
-        
-        let videoURL = delegate.loginVideoUrl
-        if(!videoURL.isEmpty){
-            self.loginPlayer = AVPlayer(url: URL(string: videoURL)!)
-            let playerLayer = AVPlayerLayer(player: self.loginPlayer)
-            //playerLayer.frame = self.loginVideo.bounds
-            playerLayer.frame = CGRect(x: 0, y: 0, width: self.loginVideo.bounds.width + 20, height: self.loginVideo.bounds.height + 20)
-            playerLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
-            self.loginPlayer?.isMuted = true
-            self.loginVideo.layer.addSublayer(playerLayer)
-            self.loginPlayer?.play()
-        }
+        passwordField.returnKeyType = .done
+        passwordField.delegate = self
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool
@@ -288,16 +119,18 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
     }
     
     @objc func textFieldDidChange(_ textField: UITextField) {
-        if(textField == self.phoneEntry && self.phoneEntry.text!.count > 4){
-            self.checkNextButton()
+        if(textField == self.emailField || textField == self.passwordField){
+            self.checkLoginButton()
         }
     }
     
-    private func checkNextButton(){
-        if(validPhone){
-            self.phoneLogin.alpha = 1
+    private func checkLoginButton(){
+        if(!self.emailField.text!.isEmpty && (!self.passwordField.text!.isEmpty && self.passwordField.text!.count > 4)){
+            self.loginButton.alpha = 1
+            self.loginButton.isUserInteractionEnabled = true
         } else {
-            self.phoneLogin.alpha = 0.3
+            self.loginButton.alpha = 0.3
+            self.loginButton.isUserInteractionEnabled = false
         }
     }
     
@@ -305,7 +138,7 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
         self.showWork()
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            guard let email = self.emailField.text, let password = self.passwordFieild.text else { return }
+            guard let email = self.emailField.text, let password = self.passwordField.text else { return }
             let manager = FirebaseAuthManager()
             manager.signIn(email: email, pass: password) {[weak self] (error, success) in
                 guard let `self` = self else { return }
@@ -342,7 +175,6 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
     }
     
     @objc func facebookLoginClicked(_ sender: AnyObject?) {
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login"))
         showWork()
         
         self.selectedSocial = "facebook"
@@ -352,7 +184,6 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
     }
     
     @objc func googleLoginClicked(_ sender: AnyObject?) {
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Login - Google Login"))
         showWork()
         
         self.selectedSocial = "google"
@@ -374,8 +205,6 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
     
     @available(iOS 13, *)
     @objc func appleLoginClicked(_ sender: AnyObject?) {
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Login - Apple Login"))
-        
         self.selectedSocial = "apple"
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             self.startSignInWithAppleFlow()
@@ -383,20 +212,38 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
     }
     
     @objc func registerClicked(_ sender: AnyObject?) {
-        /*let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "register") as! RegisterActivity
-         let transitionDelegate = SPStorkTransitioningDelegate()
-         currentViewController.transitioningDelegate = transitionDelegate
-         currentViewController.modalPresentationStyle = .custom
-         currentViewController.modalPresentationCapturesStatusBarAppearance = true
-         transitionDelegate.showIndicator = true
-         transitionDelegate.swipeToDismissEnabled = true
-         transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
-         transitionDelegate.storkDelegate = self
-         self.present(currentViewController, animated: true, completion: nil)*/
+        ModalPresenter.presentFullPageModal(
+            RegisterActivity.self,
+            from: self,
+            storyboardId: "register",
+            hapticMoments: [.willPresent, .willDismiss],
+            willDismiss: {
+                //print("Drawer will dismiss")
+            },
+            didDismiss: {
+                //do nothing
+            }
+        )
         
-        //self.performSegue(withIdentifier: "register", sender: nil) // noraml
+        /*testing*/
+        /*DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+            UIApplication.switchRoot(
+                to: GCRegistration.self,
+              storyboardId: "newReg",
+              animationType: .push,
+              animationSubtype: .fromRight
+            )
+        }*/ //registration
+        /*DispatchQueue.main.asyncAfter(deadline: .now()) {
+            UIApplication.switchRoot(
+                to: GameSelection.self,
+              storyboardId: "gameSelection",
+              animationType: .push,
+              animationSubtype: .fromRight
+            )
+        }*/
         //self.performSegue(withIdentifier: "test", sender: nil) // game selection
-        self.performSegue(withIdentifier: "newReg", sender: nil) //registration
+        //self.performSegue(withIdentifier: "results", sender: nil) // results
         
     }
     
@@ -446,7 +293,6 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
                     // Error. If error.code == .MissingOrInvalidNonce, make sure
                     // you're sending the SHA256-hashed nonce as a hex string with
                     // your request to Apple.
-                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Register - Apple Login Fail Firebase"))
                 }
                 else{
                     if(authResult != nil){
@@ -531,40 +377,30 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
                 var sentRequests = [FriendRequestObject]()
                 
                 //if sent requests have not been converted, we convert NOW.
-                if(value?["sent_requests"] is [String]){
-                    self.convertRequests(list: value?["sent_requests"] as! [String], pathString: "sent_requests", userUid: uId)
+                let friendsArray = snapshot.childSnapshot(forPath: "sent_requests")
+                for friend in friendsArray.children{
+                    let currentObj = friend as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    
+                    let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
+                    sentRequests.append(newFriend)
                 }
-                else{
-                    let friendsArray = snapshot.childSnapshot(forPath: "sent_requests")
-                    for friend in friendsArray.children{
-                        let currentObj = friend as! DataSnapshot
-                        let dict = currentObj.value as? [String: Any]
-                        let gamerTag = dict?["gamerTag"] as? String ?? ""
-                        let date = dict?["date"] as? String ?? ""
-                        let uid = dict?["uid"] as? String ?? ""
-                        
-                        let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
-                        sentRequests.append(newFriend)
-                    }
-                }
-                
+            
                 //if pending requests have not been converted, we convert NOW.
                 var pendingRequests = [FriendRequestObject]()
-                if(value?["pending_friends"] is [String]){
-                    self.convertRequests(list: value?["pending_friends"] as! [String], pathString: "pending_friends", userUid: uId)
-                }
-                else{
-                    let friendsArray = snapshot.childSnapshot(forPath: "pending_friends")
-                    for friend in friendsArray.children{
-                        let currentObj = friend as! DataSnapshot
-                        let dict = currentObj.value as? [String: Any]
-                        let gamerTag = dict?["gamerTag"] as? String ?? ""
-                        let date = dict?["date"] as? String ?? ""
-                        let uid = dict?["uid"] as? String ?? ""
-                        
-                        let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
-                        pendingRequests.append(newFriend)
-                    }
+                let pendingFriendsArray = snapshot.childSnapshot(forPath: "pending_friends")
+                for friend in pendingFriendsArray.children{
+                    let currentObj = friend as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    
+                    let newFriend = FriendRequestObject(gamerTag: gamerTag, date: date, uid: uid)
+                    pendingRequests.append(newFriend)
                 }
                 
                 var badges = [BadgeObj]()
@@ -799,21 +635,16 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
                 }
                 
                 var friends = [FriendObject]()
-                if(value?["friends"] is [String]){
-                    self.convertFriends(list: value?["friends"] as! [String], pathString: "friends", userUid: uId)
-                }
-                else{
-                    let friendsArray = snapshot.childSnapshot(forPath: "friends")
-                    for friend in friendsArray.children{
-                        let currentObj = friend as! DataSnapshot
-                        let dict = currentObj.value as? [String: Any]
-                        let gamerTag = dict?["gamerTag"] as? String ?? ""
-                        let date = dict?["date"] as? String ?? ""
-                        let uid = dict?["uid"] as? String ?? ""
-                        
-                        let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
-                        friends.append(newFriend)
-                    }
+                let friendArray = snapshot.childSnapshot(forPath: "friends")
+                for friend in friendArray.children{
+                    let currentObj = friend as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let gamerTag = dict?["gamerTag"] as? String ?? ""
+                    let date = dict?["date"] as? String ?? ""
+                    let uid = dict?["uid"] as? String ?? ""
+                    
+                    let newFriend = FriendObject(gamerTag: gamerTag, date: date, uid: uid)
+                    friends.append(newFriend)
                 }
                 
                 let games = value?["games"] as? [String] ?? [String]()
@@ -826,8 +657,9 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
                     let currentGame = dict?["game"] as? String ?? ""
                     let console = dict?["console"] as? String ?? ""
                     let quizTaken = dict?["quizTaken"] as? String ?? ""
+                    let gameId = dict?["gameId"] as? String ?? ""
                     
-                    let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
+                    let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken, gameId: gameId)
                     gamerTags.append(currentGamerTagObj)
                 }
                 let messagingNotifications = value?["messagingNotifications"] as? Bool ?? false
@@ -940,8 +772,9 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
                         let id = dict?["id"] as? String ?? ""
+                        let durationMin = dict?["durationMin"] as? Int ?? 0
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
+                        //let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id, durationMin: durationMin)
                         
                         let calendar = Calendar.current
                         if(!date.isEmpty){
@@ -955,11 +788,11 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
                                 let future = formatter.string(from: dbDate as Date)
                                 let dbTimeOut = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
                                 
-                                let validRival = (now as Date).compare(.isEarlier(than: dbTimeOut))
+                                let validRival = true//(now as Date).compare(.isEarlier(than: dbTimeOut))
                                 
                                 if(dbTimeOut != nil){
                                     if(validRival){
-                                        rivals.append(request)
+                                        //rivals.append(request)
                                     }
                                     else{
                                         ref.child("tempRivals").child(currentObj.key).removeValue()
@@ -984,8 +817,9 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
                         let id = dict?["id"] as? String ?? ""
+                        let durationMin = dict?["durationMin"] as? Int ?? 0
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
+                        //let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id, durationMin: durationMin)
                         
                         if(!date.isEmpty){
                             let dbDate = self.stringToDate(date)
@@ -998,11 +832,11 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
                                 let future = formatter.string(from: dbDate as Date)
                                 let dbTimeOut = self.stringToDate(future).addingTimeInterval(20.0 * 60.0)
                                 
-                                let validRival = (now as Date).compare(.isEarlier(than: dbTimeOut))
+                                let validRival = true//(now as Date).compare(.isEarlier(than: dbTimeOut))
                                 
                                 if(dbTimeOut != nil){
                                     if(validRival){
-                                        tempRivals.append(request)
+                                        //tempRivals.append(request)
                                     }
                                     else{
                                         ref.child("tempRivals").child(currentObj.key).removeValue()
@@ -1025,9 +859,10 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
                         let id = dict?["id"] as? String ?? ""
+                        let durationMin = dict?["durationMin"] as? Int ?? 0
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
-                        acceptedRivals.append(request)
+                        //let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id, durationMin: durationMin)
+                       // acceptedRivals.append(request)
                     }
                 }
                 
@@ -1043,9 +878,10 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
                         let uid = dict?["uid"] as? String ?? ""
                         let dbType = dict?["type"] as? String ?? ""
                         let id = dict?["id"] as? String ?? ""
+                        let durationMin = dict?["durationMin"] as? Int ?? 0
                         
-                        let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id)
-                        rejectedRivals.append(request)
+                        //let request = RivalObj(gamerTag: tag, date: date, game: game, uid: uid, type: dbType, id: id, durationMin: durationMin)
+                        //rejectedRivals.append(request)
                     }
                 }
                 
@@ -1095,7 +931,6 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
                     let delegate = UIApplication.shared.delegate as! AppDelegate
                     delegate.currentUser = user
                     
-                    AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Successful Login"))
                     //self.performSegue(withIdentifier: "results", sender: nil) //results
                     self.performSegue(withIdentifier: "loginSuccessful", sender: nil)
                 }
@@ -1117,7 +952,6 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
             }
             
         }) { (error) in
-            AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Login Error"))
             print(error.localizedDescription)
         }
     }
@@ -1129,65 +963,6 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
         return formatter.date(from: str)!
     }
     
-    private func convertFriends(list: [String], pathString: String, userUid: String){
-        let currentFriends = list
-        var friends = [[String: String]]()
-        
-        if(!currentFriends.isEmpty){
-            let ref = Database.database().reference().child("Users")
-            ref.observeSingleEvent(of: .value, with: { (snapshot) in
-                // Get user value
-                for _ in currentFriends{
-                    for user in snapshot.children{
-                        var contained = false
-                        
-                        let current = (user as! DataSnapshot)
-                        let uId = current.key
-                        var gamerTags = [GamerProfile]()
-                        let gamerTagsArray = current.childSnapshot(forPath: "gamerTags")
-                        for gamerTagObj in gamerTagsArray.children {
-                            let currentObj = gamerTagObj as! DataSnapshot
-                            let dict = currentObj.value as? [String: Any]
-                            let currentTag = dict?["gamerTag"] as? String ?? ""
-                            let currentGame = dict?["game"] as? String ?? ""
-                            let console = dict?["console"] as? String ?? ""
-                            let quizTaken = dict?["quizTaken"] as? String ?? ""
-                            
-                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
-                            gamerTags.append(currentGamerTagObj)
-                        }
-                        
-                        for tag in gamerTags{
-                            if(list.contains(tag.gamerTag)){
-                                let date = Date()
-                                let formatter = DateFormatter()
-                                formatter.dateFormat = "MMMM.dd.yyyy"
-                                let result = formatter.string(from: date)
-                                
-                                let newFriend = ["gamerTag": tag.gamerTag, "date": result, "uid": uId]
-                                friends.append(newFriend)
-                                
-                                contained = true
-                                
-                                break
-                            }
-                        }
-                        
-                        if(contained){
-                            break
-                        }
-                    }
-                }
-                
-                if(!friends.isEmpty){
-                    ref.child(userUid).child(pathString).setValue(friends)
-                }
-                
-            }) { (error) in
-                print(error.localizedDescription)
-            }
-        }
-    }
     
     fileprivate var currentNonce: String?
     @available(iOS 13, *)
@@ -1248,168 +1023,12 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
         return result
     }
     
-    private func convertRequests(list: [String], pathString: String, userUid: String){
-        var newArray = [FriendRequestObject]()
-        let tempRequests = list
-        if(!tempRequests.isEmpty){
-            let ref = Database.database().reference().child("Users")
-            ref.observeSingleEvent(of: .value, with: { (snapshot) in
-                // Get user value
-                for _ in tempRequests{
-                    for user in snapshot.children{
-                        var contained = false
-                        
-                        let current = (user as! DataSnapshot)
-                        let uId = current.key
-                        var gamerTags = [GamerProfile]()
-                        let gamerTagsArray = current.childSnapshot(forPath: "gamerTags")
-                        for gamerTagObj in gamerTagsArray.children {
-                            let currentObj = gamerTagObj as! DataSnapshot
-                            let dict = currentObj.value as? [String: Any]
-                            let currentTag = dict?["gamerTag"] as? String ?? ""
-                            let currentGame = dict?["game"] as? String ?? ""
-                            let console = dict?["console"] as? String ?? ""
-                            let quizTaken = dict?["quizTaken"] as? String ?? ""
-                            
-                            let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
-                            gamerTags.append(currentGamerTagObj)
-                        }
-                        
-                        for tag in gamerTags{
-                            if(list.contains(tag.gamerTag)){
-                                let date = Date()
-                                let formatter = DateFormatter()
-                                formatter.dateFormat = "MMMM.dd.yyyy"
-                                let result = formatter.string(from: date)
-                                
-                                let newRequest = FriendRequestObject(gamerTag: tag.gamerTag, date: result, uid: uId)
-                                newArray.append(newRequest)
-                                
-                                contained = true
-                                break
-                            }
-                        }
-                        if(contained){
-                            break
-                        }
-                    }
-                }
-                
-                var requests = [Dictionary<String, String>]()
-                for request in newArray{
-                    let current = ["gamerTag": request.gamerTag, "date": request.date, "uid": request.uid]
-                    requests.append(current)
-                }
-                
-                if(!requests.isEmpty){
-                    ref.child(userUid).child(pathString).setValue(requests)
-                }
-                
-            }) { (error) in
-                print(error.localizedDescription)
-            }
-        }
-    }
-    
-    @objc private func continueClickedPhone(){
-        self.view.endEditing(true)
-        let phoneNumber = self.phoneEntry.getFormattedPhoneNumber(format: .E164)
-        if(phoneNumber != nil){
-            PhoneAuthProvider.provider().verifyPhoneNumber(phoneNumber!, uiDelegate: nil) { (verificationID, error) in
-                if let error = error {
-                    var buttons = [PopupDialogButton]()
-                    let title = "phone number signup error"
-                    let message = "there was an error signing you up. make sure your phone number is correct and try again."
-                    
-                    let button = DefaultButton(title: "try again.") { [weak self] in
-                        self?.continueClickedPhone()
-                        
-                    }
-                    buttons.append(button)
-                    
-                    let buttonOne = CancelButton(title: "nevermind") { [weak self] in
-                        //do nothing
-                    }
-                    buttons.append(buttonOne)
-                    
-                    let popup = PopupDialog(title: title, message: message)
-                    popup.addButtons(buttons)
-                    
-                    // Present dialog
-                    self.present(popup, animated: true, completion: nil)
-                    return
-                }
-                UserDefaults.standard.set(verificationID, forKey: "authVerificationID")
-                self.showCode()
-            }
-        }
-    }
-    
-    func addDoneButtonOnKeyboard() {
-        let doneToolbar: UIToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: 320, height: 50))
-        doneToolbar.barStyle       = UIBarStyle.default
-        let flexSpace              = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
-        let done: UIBarButtonItem  = UIBarButtonItem(title: "Done", style: UIBarButtonItem.Style.done, target: self, action: #selector(doneButtonAction))
-        
-        var items = [UIBarButtonItem]()
-        items.append(flexSpace)
-        items.append(done)
-        
-        doneToolbar.items = items
-        doneToolbar.sizeToFit()
-        
-        self.phoneEntry.inputAccessoryView = doneToolbar
-    }
-    
-    @objc func doneButtonAction() {
-        self.phoneEntry.resignFirstResponder()
-    }
-    
-    private func showCode(){
-        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "code") as! RegisterCodeDrawer
-        
-        let transitionDelegate = SPStorkTransitioningDelegate()
-        currentViewController.transitioningDelegate = transitionDelegate
-        currentViewController.modalPresentationStyle = .custom
-        currentViewController.modalPresentationCapturesStatusBarAppearance = true
-        transitionDelegate.showIndicator = false
-        transitionDelegate.customHeight = 550
-        transitionDelegate.showCloseButton = true
-        transitionDelegate.swipeToDismissEnabled = true
-        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
-        transitionDelegate.storkDelegate = self
-        self.present(currentViewController, animated: true, completion: nil)
-    }
-    
-    func transitionAfterPhoneRegistration(uid: String){
-        let checkRef = Database.database().reference().child("Users").child((uid))
-        checkRef.observeSingleEvent(of: .value, with: { (snapshot) in
-            if(snapshot.exists()){
-                self.downloadDBRef(uid: uid, registrationType: "phone", accessToken: nil, userId: nil)
-            }
-            else{
-                let user = User(uId: uid)
-                checkRef.child("platform").setValue("ios")
-                checkRef.child("search").setValue("true")
-                checkRef.child("registrationType").setValue("google")
-                checkRef.child("model").setValue(UIDevice.modelName)
-                checkRef.child("notifications").setValue("true")
-                DispatchQueue.main.async {
-                    let delegate = UIApplication.shared.delegate as! AppDelegate
-                    delegate.currentUser = user
-                    self.performSegue(withIdentifier: "newReg", sender: nil)
-                }
-            }
-        }) { (error) in
-            print(error.localizedDescription)
-        }
-    }
-    
     func onSignInComplete(result: GIDSignInResult?, didSignInFor user: GIDGoogleUser!, withError error: Error?){
         if let error = error {
             // ...AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login Fail - " + error.localizedDescription))
             
-            var buttons = [PopupDialogButton]()
+            
+            /*var buttons = [PopupDialogButton]()
             let title = "google login error."
             let message = "there was an error getting you logged into google. try again, or try registering using your email."
             
@@ -1428,7 +1047,7 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
             popup.addButtons(buttons)
             
             // Present dialog
-            self.present(popup, animated: true, completion: nil)
+            self.present(popup, animated: true, completion: nil)*/
             return
         }
         
@@ -1438,7 +1057,6 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
         
         Auth.auth().signIn(with: credential) { authResult, error in
             if error != nil {
-                AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Register - Google Login Fail Firebase"))
                 print(error)
             } else {
                 if(authResult != nil){
@@ -1483,28 +1101,21 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
     func sign(_ signIn: GIDSignIn, didSignInFor user: GIDGoogleUser!, withError error: Error?) {
       // ...
       /*if let error = error {
-        // ...AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Login - Facebook Login Fail - " + error.localizedDescription))
-        
-        var buttons = [PopupDialogButton]()
-        let title = "google login error."
-        let message = "there was an error getting you logged into google. try again, or try registering using your email."
-        
-        let button = DefaultButton(title: "try again.") { [weak self] in
-            self?.loginWithReadPermissions()
-            
-        }
-        buttons.append(button)
-        
-        let buttonOne = CancelButton(title: "nevermind") { [weak self] in
-            self?.hideWork()
-        }
-        buttons.append(buttonOne)
-        
-        let popup = PopupDialog(title: title, message: message)
-        popup.addButtons(buttons)
-
-        // Present dialog
-        self.present(popup, animated: true, completion: nil)
+          PopupManager.show(
+              title: "Google Login Error.",
+              message: "There was an error getting you logged into Google. Try again, or try registering using your email.",
+              okButtonText: "Try again",
+              cancelButtonText: "Nevermind",
+              popupType: .error,
+              okAction: {
+                  self.loginWithReadPermissions()
+                  SwiftEntryKit.dismiss()
+              },
+              cancelAction: {
+                  SwiftEntryKit.dismiss()
+                  self.hideWork()
+              }
+          )
         return
       }
 
@@ -1515,20 +1126,20 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
         Auth.auth().signIn(with: credential) { (authResult, error) in
                if let error = error {
                    let authError = error as NSError
-                   AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Register - Google Login Fail Firebase - " + authError.localizedDescription))
+                   
                }
                else{
                    if(authResult != nil){
                        let uId = authResult?.user.uid ?? ""
                     UserDefaults.standard.set(uId, forKey: "userId")
                     var userId = ""
-                    if(user.userID != nil && !user.userID.isEmpty){
-                        userId = user.userID
+                    if(user.userID != nil && !user.userID!.isEmpty){
+                        userId = user.userID!
                     }
-                    if (GIDSignIn.sharedInstance().currentUser != nil) {
-                        let accessToken = GIDSignIn.sharedInstance().currentUser.authentication.accessToken
+                       if (GIDSignIn.sharedInstance.currentUser != nil) {
+                        //let accessToken = GIDSignIn.sharedInstance.currentUser.authentication.accessToken
                         // Use accessToken in your URL Requests Header
-                        self.downloadDBRef(uid: uId, registrationType: "google", accessToken: accessToken, userId: userId)
+                        //self.downloadDBRef(uid: uId, registrationType: "google", accessToken: accessToken, userId: userId)
                     }
                 }
                else{
@@ -1571,21 +1182,6 @@ class LoginController: UIViewController, ASAuthorizationControllerDelegate, ASAu
                 destination.socialRegisteredUid = self.socialRegisteredUid
             }
         }
-    }
-    
-    func fpnDidSelectCountry(name: String, dialCode: String, code: String) {
-    }
-    
-    func fpnDidValidatePhoneNumber(textField: FPNTextField, isValid: Bool) {
-          if isValid {
-            self.validPhone = true
-          } else {
-            self.validPhone = false
-          }
-       }
-    
-    func fpnDisplayCountryList() {
-    
     }
     
 }

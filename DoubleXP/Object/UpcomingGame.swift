@@ -7,162 +7,204 @@
 //
 
 import Foundation
-import CoreData
 
-class UpcomingGame: NSObject, NSCoding {
-    var _game = ""
-    var game:String {
-        get {
-            return (_game)
-        }
-        set (newVal) {
-            _game = newVal
-        }
-    }
-    
-    var _trailerUrls = [String: String]()
-    var trailerUrls : [String: String] {
-        get {
-            return (_trailerUrls)
-        }
-        set (newVal) {
-            _trailerUrls = newVal
-        }
-    }
-    
-    var _blurb = ""
-    var blurb:String {
-        get {
-            return (_blurb)
-        }
-        set (newVal) {
-            _blurb = newVal
-        }
-    }
-    
-    var _releaseDateMillis = ""
-    var releaseDateMillis: String {
-        get {
-            return (_releaseDateMillis)
-        }
-        set (newVal) {
-            _releaseDateMillis = newVal
-        }
-    }
-    
-    var _releaseDate = ""
-    var releaseDate:String {
-        get {
-            return (_releaseDate)
-        }
-        set (newVal) {
-            _releaseDate = newVal
-        }
-    }
-    
-    var _releaseDateProper = ""
-       var releaseDateProper:String {
-           get {
-               return (_releaseDateProper)
-           }
-           set (newVal) {
-               _releaseDateProper = newVal
-           }
-    }
-    
-    var _id = ""
-    var id:String {
-        get {
-            return (_id)
-        }
-        set (newVal) {
-            _id = newVal
-        }
-    }
-    
-    var _gameImageUrl = ""
-    var gameImageUrl:String {
-        get {
-            return (_gameImageUrl)
-        }
-        set (newVal) {
-            _gameImageUrl = newVal
-        }
-    }
-    
-    var _gameDesc = ""
-    var gameDesc:String {
-        get {
-            return (_gameDesc)
-        }
-        set (newVal) {
-            _gameDesc = newVal
-        }
-    }
-    
-    var _developer = ""
-    var developer: String {
-        get {
-            return (_developer)
-        }
-        set (newVal) {
-            _developer = newVal
-        }
-    }
-    
-    var _consoles = [String]()
-       var consoles: [String] {
-           get {
-               return (_consoles)
-           }
-           set (newVal) {
-               _consoles = newVal
-           }
-    }
-    
-    init(id: String, game: String, blurb: String, releaseDateMillis: String, releaseDate: String, trailerUrls: [String: String],
-         gameImageUrl: String, gameDesc: String, releaseDateProper: String)
-    {
-        super.init()
+/// Immutable, codable, diffable.
+struct UpcomingGame: Codable, Hashable, Identifiable, Sendable {
+    // Core identity
+    let id: String
+
+    // Required fields
+    let game: String
+    let developer: String
+    let gameImageUrl: String?
+
+    // Optional/aux fields
+    let blurb: String?
+    let trailerUrls: [String: String]?
+    let releaseDateMillis: String?
+    let releaseDate: String?
+    let releaseDateProper: String?
+    let gameDesc: String?
+    let consoles: [String]?
+    let genre: [String]?
+    let slug: String
+
+    // MARK: - Explicit designated initializer (replaces lost memberwise init)
+    init(
+        id: String,
+        game: String,
+        developer: String,
+        gameImageUrl: String,
+        blurb: String? = nil,
+        trailerUrls: [String: String]? = nil,
+        releaseDateMillis: String? = nil,
+        releaseDate: String? = nil,
+        releaseDateProper: String? = nil,
+        gameDesc: String? = nil,
+        consoles: [String]? = nil,
+        genre: [String]? = nil,
+        slug: String? = nil
+    ) {
         self.id = id
         self.game = game
-        self.blurb = blurb
-        self.releaseDateMillis = releaseDateMillis
-        self.releaseDate = releaseDate
-        self.trailerUrls = trailerUrls
+        self.developer = developer
         self.gameImageUrl = gameImageUrl
-        self.gameDesc = gameDesc
+        self.blurb = blurb
+        self.trailerUrls = trailerUrls
+        self.releaseDate = releaseDate
+        self.releaseDateMillis = releaseDateMillis
         self.releaseDateProper = releaseDateProper
+        self.gameDesc = gameDesc
+        self.consoles = consoles
+        self.genre = genre
+        self.slug = slug ?? ""
+    }
+
+    // MARK: - Computed helpers
+
+    var countdownText: String? {
+        guard let msStr = releaseDateMillis, let ms = Int64(msStr) else { return nil }
+        return countdownLabel(from: ms)
+    }
+
+    var monthYearText: String? {
+        guard let msStr = releaseDateMillis, let ms = Int64(msStr) else { return nil }
+        return releaseMonthYear(from: ms)
+    }
+
+    var releaseDateMsDate: Date? {
+        guard let msStr = releaseDateMillis, let ms = Double(msStr) else { return nil }
+        return Date(timeIntervalSince1970: ms / 1000.0)
+    }
+
+    var releaseDisplay: String? {
+        if let d = releaseDateMsDate {
+            let fmt = DateFormatter()
+            fmt.dateStyle = .medium
+            return fmt.string(from: d)
+        }
+        if let prop = releaseDateProper, !prop.isEmpty { return prop }
+        if let plain = releaseDate, !plain.isEmpty { return plain }
+        return nil
+    }
+
+    var primaryTrailerURL: URL? {
+        guard let trailers = trailerUrls else { return nil }
+        if let s = trailers["official"], let u = URL(string: s) { return u }
+        if let s = trailers["youtube"], let u = URL(string: s) { return u }
+        if let s = trailers.values.first, let u = URL(string: s) { return u }
+        return nil
+    }
+
+    // MARK: - Firebase dict initializer
+
+    init?(id: String, dict: [String: Any]) {
+        guard
+            let game = dict["game"] as? String, !game.isEmpty,
+            let developer = dict["developer"] as? String, !developer.isEmpty,
+            let gameImageUrl = (dict["gameImageXXHDPI"] as? String) ?? (dict["gameImageUrl"] as? String),
+            !gameImageUrl.isEmpty
+        else { return nil }
+
+        self.id = id
+        self.game = game
+        self.developer = developer
+        self.gameImageUrl = gameImageUrl
+
+        self.blurb = dict["blurb"] as? String
+        self.trailerUrls = dict["trailerUrls"] as? [String: String]
+        self.releaseDateMillis = dict["releaseDateMillis"] as? String
+        self.releaseDate = dict["releaseDate"] as? String
+        self.releaseDateProper = dict["releaseDateProp"] as? String
+        self.gameDesc = (dict["description"] as? String) ?? (dict["gameDesc"] as? String)
+        self.consoles = dict["consoles"] as? [String]
+        self.genre = dict["genre"] as? [String]
+        self.slug = dict["slug"] as? String ?? ""
+    }
+
+    // MARK: - Formatting helpers
+
+    func countdownLabel(from releaseDateMs: Int64, now: Date = Date()) -> String? {
+        let releaseDate = Date(timeIntervalSince1970: TimeInterval(releaseDateMs) / 1000.0)
+        let remaining = Int(releaseDate.timeIntervalSince(now)) // seconds
+        if remaining <= 0 { return "Out now" }
+
+        let day  = 86_400
+        let hour = 3_600
+        let min  = 60
+
+        let days    = remaining / day
+        let hours   = (remaining % day) / hour
+        let minutes = (remaining % hour) / min
+
+        if days >= 1 {
+            if days > 15 { return nil }
+            return days == 1 ? "1 day" : "\(days) days"
+        }
+        if hours >= 1 {
+            if hours > 11 { return "1 day" }
+            return hours == 1 ? "1 hr" : "\(hours) hr"
+        }
+        if minutes >= 30 { return "\(minutes) min" }
+        return "Soon"
+    }
+
+    func releaseMonthYear(from releaseDateMs: Int64) -> String? {
+        let d = Date(timeIntervalSince1970: TimeInterval(releaseDateMs) / 1000.0)
+        let fmt = DateFormatter()
+        fmt.dateFormat = "MMM yyyy"
+        fmt.locale = Locale(identifier: "en_US_POSIX")
+        return fmt.string(from: d).uppercased()
+    }
+}
+
+extension UpcomingGame {
+    init(gc: GamerConnectGame, releaseDateMillis: String?) {
+        self.init(
+            id: gc.id,
+            game: gc.gameName,
+            developer: gc.developer ?? "",
+            gameImageUrl: gc.imageUrl ?? "",
+            blurb: gc.hook,
+            trailerUrls: nil,
+            releaseDateMillis: releaseDateMillis,
+            releaseDate: gc.releaseDate,
+            releaseDateProper: nil,
+            gameDesc: gc.gameDescription,
+            consoles: gc.availableConsoles,
+            genre: gc.categoryFilters,
+            slug: gc.slug
+        )
+    }
+}
+
+extension Array where Element == GamerConnectGame {
+    func asUpcomingGames(prefetchImages: Bool = true) -> [UpcomingGame] {
+        let ups = map { UpcomingGame(gc: $0, releaseDateMillis: dateStringToMillis($0.releaseDate)) }
+        
+        if prefetchImages {
+            let urls = ups.compactMap { URL(string: $0.gameImageUrl ?? "") }
+            
+            // ✅ Wrap the call to the actor in a Task
+            Task {
+                await ImageCache.shared.preload(urls: urls)
+            }
+        }
+        
+        return ups
     }
     
-    required init(coder decoder: NSCoder)
-    {
-        super.init()
-        self.id = (decoder.decodeObject(forKey: "id") as! String)
-        self.game = (decoder.decodeObject(forKey: "game") as! String)
-        self.blurb = (decoder.decodeObject(forKey: "blurb") as! String)
-        self.releaseDateMillis = (decoder.decodeObject(forKey: "releaseDateMillis") as! String)
-        self.releaseDate = (decoder.decodeObject(forKey: "releaseDate") as! String)
-        self.trailerUrls = (decoder.decodeObject(forKey: "trailerUrls") as! [String: String])
-        self.gameImageUrl = (decoder.decodeObject(forKey: "gameImageUrl") as! String)
-        self.gameDesc = (decoder.decodeObject(forKey: "gameDesc") as! String)
-        self.releaseDateProper = (decoder.decodeObject(forKey: "releaseDateProper") as! String)
-        self.consoles = (decoder.decodeObject(forKey: "consoles") as! [String])
-        self.developer = (decoder.decodeObject(forKey: "developer") as! String)
+    func dateStringToMillis(_ dateStr: String?) -> String? {
+        if(dateStr == nil){
+            return nil
+        }
+        let fmt = DateFormatter()
+        fmt.locale = Locale(identifier: "en_US_POSIX")
+        fmt.timeZone = TimeZone(secondsFromGMT: 0)  // ensure consistency
+        fmt.dateFormat = "yyyy-MM-dd"
+
+        guard let date = fmt.date(from: dateStr!) else { return nil }
+        let ms = Int64(date.timeIntervalSince1970 * 1000)
+        return String(ms)
     }
-    
-    func encode(with coder: NSCoder) {
-        coder.encode(self.id, forKey: "id")
-        coder.encode(self.game, forKey: "game")
-        coder.encode(self.blurb, forKey: "blurb")
-        coder.encode(self.releaseDateMillis, forKey: "releaseDateMillis")
-        coder.encode(self.releaseDate, forKey: "releaseDate")
-        coder.encode(self.trailerUrls, forKey: "trailerUrls")
-        coder.encode(self.gameImageUrl, forKey: "gameImageUrl")
-        coder.encode(self.gameDesc, forKey: "gameDesc")
-        coder.encode(self.releaseDateProper, forKey: "releaseDateProper")
-        coder.encode(self.consoles, forKey: "consoles")
-        coder.encode(self.developer, forKey: "developer")
-    }
-    
 }

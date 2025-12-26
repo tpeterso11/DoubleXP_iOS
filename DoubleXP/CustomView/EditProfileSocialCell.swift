@@ -11,6 +11,7 @@ import UIKit
 
 class EditProfileSocialCell: UITableViewCell {
     
+    @IBOutlet weak var savingBlur: UIVisualEffectView!
     @IBOutlet weak var twitchSave: UIView!
     @IBOutlet weak var twitchField: UITextField!
     @IBOutlet weak var instagramSave: UIView!

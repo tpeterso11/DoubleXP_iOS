@@ -8,38 +8,25 @@
 
 import Foundation
 import UIKit
-import ExpyTableView
-import SwiftNotificationCenter
 
-class MenuFriendsList: UICollectionViewCell, ExpyTableViewDelegate, ExpyTableViewDataSource, LandingMenuCallbacks{
-    @IBOutlet weak var friendsList: ExpyTableView!
+class MenuFriendsList: UICollectionViewCell, LandingMenuCallbacks{
+    //@IBOutlet weak var friendsList: ExpyTableView!
     
     var expandedCells = [Int]()
     
     func loadContent(){
-        friendsList.delegate = self
+        /*friendsList.delegate = self
         friendsList.dataSource = self
         
         friendsList.rowHeight = UITableView.automaticDimension
-        friendsList.estimatedRowHeight = 200
+        friendsList.estimatedRowHeight = 200*/
         
-        Broadcaster.register(LandingMenuCallbacks.self, observer: self)
+        //Broadcaster.register(LandingMenuCallbacks.self, observer: self)
     }
     
-    func tableView(_ tableView: ExpyTableView, expandableCellForSection section: Int) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as! MenuFriendsListCell
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let current = appDelegate.currentUser!.friends[section]
-        cell.friendName.text = current.gamerTag
-        
-        return cell
-    }
     
-    func tableView(_ tableView: ExpyTableView, canExpandSection section: Int) -> Bool {
-      return true //Return false if you want your section not to be expandable
-    }
     
-    func numberOfSections(in tableView: UITableView) -> Int {
+    /*func numberOfSections(in tableView: UITableView) -> Int {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         return appDelegate.currentUser!.friends.count
     }
@@ -119,7 +106,7 @@ class MenuFriendsList: UICollectionViewCell, ExpyTableViewDelegate, ExpyTableVie
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return CGFloat(50)
-    }
+    }*/
     
     func menuNavigateToMessaging(uId: String) {
     }

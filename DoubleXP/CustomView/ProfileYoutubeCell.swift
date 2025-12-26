@@ -8,17 +8,16 @@
 
 import Foundation
 import UIKit
-import moa
 
-class ProfileYoutubeCell : UITableViewCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+class ProfileYoutubeCell : UITableViewCell {
     @IBOutlet weak var videoList: UICollectionView!
     @IBOutlet weak var expand: UIImageView!
     @IBOutlet weak var videoDrawer: UIView!
     var videoPayload = [YoutubeVideoObj]()
     var infoSet = false
-    var currentProfile: PlayerProfile?
+    //var currentProfile: PlayerProfile?
     
-    func setVideos(payload: [YoutubeVideoObj], currentProfile: PlayerProfile?){
+    /*func setVideos(payload: [YoutubeVideoObj], currentProfile: PlayerProfile?){
         self.videoPayload = payload
         self.currentProfile = currentProfile
         if(!infoSet){
@@ -36,21 +35,14 @@ class ProfileYoutubeCell : UITableViewCell, UICollectionViewDelegate, UICollecti
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let current = self.videoPayload[indexPath.item]
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let cache = appDelegate.imageCache
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "video", for: indexPath) as! ProfileYoutubeVideoCell
-        if(cache.object(forKey: current.youtubeImg as NSString) != nil){
-            cell.videoImg.image = cache.object(forKey: current.youtubeImg as NSString)
-        } else {
-            cell.videoImg.image = Utility.Image.placeholder
-            cell.videoImg.moa.onSuccess = { image in
+        /*let url = URL(string: url)
+        if (url != nil) {
+            ImageLoader.shared.loadImage(from: current.youtubeImg) { [weak self] image in
+                guard let self = self else { return }
                 cell.videoImg.image = image
-                appDelegate.imageCache.setObject(image, forKey: current.youtubeImg as NSString)
-                return image
             }
-            cell.videoImg.moa.url = current.youtubeImg
-        }
-        
+        }*/
         if(self.currentProfile != nil && self.currentProfile!.currentVideoPlaying != nil){
             if(self.currentProfile!.currentVideoPlaying!.youtubeId == current.youtubeId){
                 cell.playingAnimation.alpha = 1
@@ -93,5 +85,5 @@ class ProfileYoutubeCell : UITableViewCell, UICollectionViewDelegate, UICollecti
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         
         return CGSize(width: CGFloat(80), height: CGFloat(80))
-    }
+    }*/
 }

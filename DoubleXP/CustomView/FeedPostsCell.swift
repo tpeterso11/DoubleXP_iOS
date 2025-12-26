@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 class FeedPostsCell: UITableViewCell {
-    @IBOutlet weak var postsCollection: UICollectionView!
+    /*@IBOutlet weak var postsCollection: UICollectionView!
     @IBOutlet weak var cellHeightConstraint: NSLayoutConstraint!
     var payload = [Any]()
     var dataSet = false
@@ -32,5 +32,5 @@ class FeedPostsCell: UITableViewCell {
     
     @objc func test(){
         self.currentFeed!.launchVideoMessage()
-    }
+    }*/
 }

@@ -30,6 +30,16 @@ class GamerProfile: NSObject, NSCoding {
         }
     }
     
+    var _gameId:String = ""
+    var gameId:String {
+        get {
+            return (_gameId)
+        }
+        set (newVal) {
+            _gameId = newVal
+        }
+    }
+    
     var _console:String = ""
     var console:String {
         get {
@@ -60,13 +70,14 @@ class GamerProfile: NSObject, NSCoding {
         }
     }
     
-    init(gamerTag: String, game: String, console: String, quizTaken: String)
+    init(gamerTag: String, game: String, console: String, quizTaken: String, gameId: String)
     {
         super.init()
         self.gamerTag = gamerTag
         self.game = game
         self.console = console
         self.quizTaken = quizTaken
+        self.gameId = gameId
     }
     
     required init(coder decoder: NSCoder)
@@ -76,6 +87,7 @@ class GamerProfile: NSObject, NSCoding {
         self.game = (decoder.decodeObject(forKey: "game") as! String)
         self.console = (decoder.decodeObject(forKey: "console") as! String)
         self.quizTaken = (decoder.decodeObject(forKey: "quizTaken") as! String)
+        self.gameId = (decoder.decodeObject(forKey: "gameId") as! String)
     }
     
     func encode(with coder: NSCoder) {
@@ -83,6 +95,7 @@ class GamerProfile: NSObject, NSCoding {
         coder.encode(self.game, forKey: "game")
         coder.encode(self.console, forKey: "console")
         coder.encode(self.quizTaken, forKey: "quizTaken")
+        coder.encode(self.gameId, forKey: "gameId")
         /*coder.encode(self.soundUrl, forKey: "soundUrl")
          coder.encode(self.soundName, forKey: "soundName")
          coder.encode(self.active, forKey: "active")

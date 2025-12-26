@@ -31,7 +31,7 @@ class DiscoverGameQuickReviewsCell: UITableViewCell, UICollectionViewDelegate, U
         if(current.storyText == "none"){
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "rating", for: indexPath) as! ReviewCellLarge
             cell.author.text = current.author
-            cell.ratingBar.rating = Double(current.imageUrl) ?? 0.0
+            //cell.ratingBar.rating = Double(current.imageUrl) ?? 0.0
             cell.ratingDesc.text = mapRatingToDesc(value: Double(current.imageUrl)  ?? 0.0 )
             
             cell.contentView.layer.cornerRadius = 10.0

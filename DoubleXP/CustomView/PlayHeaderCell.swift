@@ -9,16 +9,16 @@
 import Foundation
 import UIKit
 
-class PlayHeaderCell: UITableViewCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+class PlayHeaderCell: UITableViewCell {
     var payload = [CompetitionObj]()
     var dataSet = false
     @IBOutlet weak var playCollection: UICollectionView!
     @IBOutlet weak var compBg: UIImageView!
     @IBOutlet weak var emptyView: UIView!
-    var playModal: PlayModal?
+    //var playModal: PlayModal?
     
     
-    func setList(list: [CompetitionObj], modal: PlayModal){
+    /*func setList(list: [CompetitionObj], modal: PlayModal){
         self.payload = list
         self.playModal = modal
         
@@ -46,20 +46,13 @@ class PlayHeaderCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "comp", for: indexPath) as! PlayCompCell
         
         let currentComp = payload[indexPath.item]
-        
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let cache = appDelegate.imageCache
-        if(cache.object(forKey: currentComp.headerImgUrl as NSString) != nil){
-            cell.compBg.image = cache.object(forKey: currentComp.headerImgUrl as NSString)
-        } else {
-            cell.compBg.image = Utility.Image.placeholder
-            cell.compBg.moa.onSuccess = { image in
+        /*let url = URL(string: url)
+        if (url != nil) {
+            ImageLoader.shared.loadImage(from: currentComp.headerImgUrl) { [weak self] image in
+                guard let self = self else { return }
                 cell.compBg.image = image
-                appDelegate.imageCache.setObject(image, forKey: currentComp.headerImgUrl as NSString)
-                return image
             }
-            cell.compBg.moa.url = currentComp.headerImgUrl
-        }
+        }*/
         cell.compBg.contentMode = .scaleToFill
         cell.compBg.clipsToBounds = true
         
@@ -87,5 +80,5 @@ class PlayHeaderCell: UITableViewCell, UICollectionViewDelegate, UICollectionVie
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 360, height: CGFloat(140))
-    }
+    }*/
 }

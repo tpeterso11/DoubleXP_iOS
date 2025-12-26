@@ -8,7 +8,6 @@
 
 import Foundation
 import UIKit
-import SwiftHTTP
 
 class MediaManager {
     var gamespotReviews = [NewsObject]()
@@ -19,7 +18,7 @@ class MediaManager {
     
     
     func getReviews(callbacks: MediaCallbacks){
-        HTTP.GET("http://www.gamespot.com/api/reviews/?api_key=6e61e45d268953e5164c5c434c36ee6607b82f1c&format=json&limit=50&sort=publish_date:desc") { response in
+        /*HTTPClient.get("http://www.gamespot.com/api/reviews/?api_key=6e61e45d268953e5164c5c434c36ee6607b82f1c&format=json&limit=50&sort=publish_date:desc") { response in
         if let err = response.error {
             DispatchQueue.main.async {
                 callbacks.onMediaReceived(category: "error")
@@ -74,11 +73,12 @@ class MediaManager {
                     self.getDXPReviews(callbacks: callbacks)
                 }
             }
-        }
+        }*/
     }
     
     func getGameSpotNews(callbacks: MediaCallbacks){
-        HTTP.GET("http://www.gamespot.com/api/articles/?api_key=6e61e45d268953e5164c5c434c36ee6607b82f1c&format=json&limit=50&sort=publish_date:desc") { response in
+        
+        /*HTTPClient.get("http://www.gamespot.com/api/articles/?api_key=6e61e45d268953e5164c5c434c36ee6607b82f1c&format=json&limit=50&sort=publish_date:desc") { response in
         if let err = response.error {
             DispatchQueue.main.async {
                 callbacks.onMediaReceived(category: "error")
@@ -183,11 +183,11 @@ class MediaManager {
                     }
                 }
             }
-        }
+        }*/
     }
     
     func downloadVideo(title: String, url: String, callbacks: MediaCallbacks){
-       HTTP.GET(url) { response in
+        /*HTTPClient.get(url) { response in
         if let err = response.error {
             DispatchQueue.main.async {
                 callbacks.onMediaReceived(category: "error")
@@ -214,12 +214,12 @@ class MediaManager {
                 }
             }
         }
-    }
+    }*/
 }
     
     
     func getDXPReviews(callbacks: MediaCallbacks){
-    HTTP.GET("http://doublexpstorage.tech/app-json/dxp_reviews.json") { response in
+        /*HTTPClient.get("http://doublexpstorage.tech/app-json/dxp_reviews.json") { response in
     if let err = response.error {
         DispatchQueue.main.async {
             callbacks.onMediaReceived(category: "error")
@@ -275,7 +275,7 @@ class MediaManager {
             }
                 }
             }
-        }
+        }*/
     }
 }
 

@@ -8,7 +8,7 @@
 import Foundation
 import CoreData
 
-class User: NSObject, NSCoding {
+class User: NSObject, NSCoding, Identifiable {
     var displayName: String = "You"
     
     var _gamerTags = [GamerProfile]()
@@ -18,6 +18,16 @@ class User: NSObject, NSCoding {
         }
         set (newVal) {
             _gamerTags = newVal
+        }
+    }
+    
+    var _pokos = [String]()
+    var pokos:[String] {
+        get {
+            return (_pokos)
+        }
+        set (newVal) {
+            _pokos = newVal
         }
     }
     
@@ -38,6 +48,26 @@ class User: NSObject, NSCoding {
         }
         set (newVal) {
             _uId = newVal
+        }
+    }
+    
+    var _googleEmail = ""
+    var googleEmail: String {
+        get {
+            return (_googleEmail)
+        }
+        set (newVal) {
+            _googleEmail = newVal
+        }
+    }
+    
+    var _screenName = ""
+    var screenName: String {
+        get {
+            return (_screenName)
+        }
+        set (newVal) {
+            _screenName = newVal
         }
     }
     
@@ -118,6 +148,36 @@ class User: NSObject, NSCoding {
         }
         set (newVal) {
             _viewedAnnouncements = newVal
+        }
+    }
+    
+    var _highlightVideoId = ""
+    var highlightVideoId: String {
+        get {
+            return (_highlightVideoId)
+        }
+        set (newVal) {
+            _highlightVideoId = newVal
+        }
+    }
+    
+    var _spotlightVideoIds = [String]()
+    var spotlightVideoIds:[String] {
+        get {
+            return (_spotlightVideoIds)
+        }
+        set (newVal) {
+            _spotlightVideoIds = newVal
+        }
+    }
+    
+    var _communities = [String]()
+    var communities:[String] {
+        get {
+            return (_communities)
+        }
+        set (newVal) {
+            _communities = newVal
         }
     }
     
@@ -318,6 +378,16 @@ class User: NSObject, NSCoding {
         }
         set (newVal) {
             _googleUserId = newVal
+        }
+    }
+    
+    var _currentSelectedPokoId = ""
+    var currentSelectedPokoId: String {
+        get {
+            return (_currentSelectedPokoId)
+        }
+        set (newVal) {
+            _currentSelectedPokoId = newVal
         }
     }
     
@@ -704,6 +774,46 @@ class User: NSObject, NSCoding {
         return array
     }
     
+    var _tiktokConnect = ""
+    var tiktokConnect: String {
+        get {
+            return (_tiktokConnect)
+        }
+        set (newVal) {
+            _tiktokConnect = newVal
+        }
+    }
+    
+    var _twitterConnect = ""
+    var twitterConnect: String {
+        get {
+            return (_twitterConnect)
+        }
+        set (newVal) {
+            _twitterConnect = newVal
+        }
+    }
+    
+    var _tagline = ""
+    var tagline: String {
+        get {
+            return (_tagline)
+        }
+        set (newVal) {
+            _tagline = newVal
+        }
+    }
+    
+    var _joinedAt = 0.0
+    var joinedAt: TimeInterval {
+        get {
+            return (_joinedAt)
+        }
+        set (newVal) {
+            _joinedAt = newVal
+        }
+    }
+    
     func userCanSendInvites() -> Bool {
         var canSend = false
         if(!self.gamerTags.isEmpty){
@@ -783,6 +893,15 @@ class User: NSObject, NSCoding {
         self.receivedPosts = (decoder.decodeObject(forKey: "receivedPosts") as! [PostObject])
         self.myPosts = (decoder.decodeObject(forKey: "myPosts") as! [PostObject])
         self.viewedPosts = (decoder.decodeObject(forKey: "viewedPosts") as! [String])
+        self.screenName = (decoder.decodeObject(forKey: "screenName") as! String)
+        self.pokos = (decoder.decodeObject(forKey: "pokos") as! [String])
+        self.currentSelectedPokoId = (decoder.decodeObject(forKey: "currentSelectedPokoId") as! String)
+        self.tiktokConnect = (decoder.decodeObject(forKey: "tiktokConnect") as! String)
+        self.tagline = (decoder.decodeObject(forKey: "tagline") as! String)
+        self.twitterConnect = (decoder.decodeObject(forKey: "twitterConnect") as! String)
+        self.highlightVideoId = (decoder.decodeObject(forKey: "highlightVideoId") as! String)
+        self.spotlightVideoIds = (decoder.decodeObject(forKey: "spotlightVideoIds") as! [String])
+        self.communities = (decoder.decodeObject(forKey: "communities") as! [String])
     }
     
     func encode(with coder: NSCoder) {
@@ -836,6 +955,16 @@ class User: NSObject, NSCoding {
         coder.encode(self.receivedPosts, forKey: "receivedPosts")
         coder.encode(self.viewedPosts, forKey: "viewedPosts")
         coder.encode(self.myPosts, forKey: "myPosts")
+        coder.encode(self.screenName, forKey: "screenName")
+        coder.encode(self.pokos, forKey: "pokos")
+        coder.encode(self.twitterConnect, forKey: "twitterConnect")
+        coder.encode(self.tiktokConnect, forKey: "tiktokConnect")
+        coder.encode(self.tagline, forKey: "tagline")
+        coder.encode(self.joinedAt, forKey: "joinedAt")
+        coder.encode(self.googleEmail, forKey: "googleEmail")
+        coder.encode(self.highlightVideoId, forKey: "highlightVideoId")
+        coder.encode(self.spotlightVideoIds, forKey: "spotlightVideoIds")
+        coder.encode(self.communities, forKey: "communities")
     }
     
     struct Post: Hashable, Equatable {

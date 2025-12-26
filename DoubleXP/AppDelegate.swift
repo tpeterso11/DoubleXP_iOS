@@ -9,16 +9,12 @@
 import UIKit
 import CoreData
 import Firebase
-import FBSDKCoreKit
 import GoogleSignIn
 import FirebaseMessaging
-import GoogleMobileAds
-import SwiftNotificationCenter
 import AVKit
-import YoutubeKit
+import FirebaseDatabaseInternal
 
 
-@UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 
     var window: UIWindow?
@@ -27,14 +23,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var freeAgentProfiles: [FreeAgentObject]!
     var searchManager = SearchManager()
     var selectedGCGame: GamerConnectGame?
-    var currentGCSearchFrag: GamerConnectSearch?
     var currentUser: User?
     var currentLanding: LandingActivity?
-    var currentProfileFrag: PlayerProfile?
-    var currentDiscoverGamePage: DiscoverGamePage?
     var currentGameSelection: GameSelection?
-    var currentRequests: Requests?
-    var currentFeedFrag: Feed?
+    //var currentFeedFrag: Feed?
     var currentFrag: String = ""
     var currentCta: CTAObject?
     var feedFeaturedGame = ""
@@ -55,7 +47,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var registerUserCache = [User]()
     var cachedUserType = ""
     var cachedTest = ""
-    var languageList = [String: String]()
+    var languageList = [String]()
     var currentUpgradeController: Upgrade?
     var feedSub = "let's do this."
     var heroLightUrl = ""
@@ -66,16 +58,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     var currentLoginActivity: LoginController?
     var playHeaderUrl = ""
     var playHeaderCompId = ""
-    var currentEditProfile: ProfileFrag?
     var loginVideoUrl = ""
-    
-    var currentDiscoverFrag: DiscoverFrag?
-    var currentDiscoverCat: DiscoveryCategoryFrag?
-    var currentFeedSearchModal: FeedSearchModal?
-    var currentCompetitionPage: CompetitionPageV2?
     var currentPreSplash: PreSplashActivity?
     var currentResultsFrag: Results?
-    var youtubeCache = NSCache<NSString, YTSwiftyPlayer>()
+    //var youtubeCache = NSCache<NSString, YTSwiftyPlayer>()
     
     private var apnsToken: String = ""
     private var fcmToken: String = ""
@@ -88,13 +74,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         DispatchQueue.global(qos: .userInitiated).async {
             print("This is run on a background queue")
             
-            FirebaseApp.configure()
+            //FirebaseApp.configure()
             let gIdConfiguration = GIDConfiguration(clientID: FirebaseApp.app()?.options.clientID ?? "", serverClientID: FirebaseApp.app()?.options.clientID ?? "")
             GIDSignIn.sharedInstance.configuration = gIdConfiguration
             
             Messaging.messaging().delegate = self
             
-            GADMobileAds.sharedInstance().start(completionHandler: nil)
+            //GADMobileAds.sharedInstance().start(completionHandler: nil)
             
             TwitterHelper.shared.start(withConsumerKey: "sEWJZFZjZAIaxwZUrzdd2JPeI", consumerSecret: "K2yk5yy8AHmyC4mMFHecB1WBoowFnf4uMs4ET7zEjFe06hWmCm")
             
@@ -127,9 +113,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         
         self.getToken()
         
-        let notificationCenter = NotificationCenter.default
+        /*let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(self.appMovedToBackground), name: UIApplication.willResignActiveNotification, object: nil)
-        notificationCenter.addObserver(self, selector: #selector(self.appCameToForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(self.appCameToForeground), name: UIApplication.willEnterForegroundNotification, object: nil)*/
     
         return true
     }
@@ -151,9 +137,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
             ref.child("onlineStatus").setValue("online")
         }
         
-        if(currentFeedFrag != nil){
-            currentFeedFrag!.checkOnlineAnnouncements()
-        }
+        //if(currentFeedFrag != nil){
+            //currentFeedFrag!.checkOnlineAnnouncements()
+        //}
     }
     
     func registerUserOnlineStatus(){
@@ -185,7 +171,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         self.currentLanding?.stackDepth = self.navStack.count
     }
     
-    func resetStack(vc: ParentVC){
+    /*func resetStack(vc: ParentVC){
         let homeController = Feed()
         homeController.pageName = "Home"
         homeController.navDictionary = ["state": "original"]
@@ -210,7 +196,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
             print("none")
             //self.navStack = KeepOrderDictionary<String, ParentVC>()
         }
-    }
+    }*/
     
     func handleToken(){
         if(currentUser != nil){
@@ -245,8 +231,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
         
         UIApplication.shared.applicationIconBadgeNumber = 0
-        
-        AppEvents.shared.activateApp()
+        if let userId = currentUser?.uId {
+            Task { @MainActor in
+                ReactionsManager.shared.flushPendingLikes(for: userId)
+            }
+        }
     }
 
     func applicationWillTerminate(_ application: UIApplication) {

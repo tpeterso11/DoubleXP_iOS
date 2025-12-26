@@ -8,7 +8,6 @@
 
 import Foundation
 import UIKit
-import collection_view_layouts
 
 class ProfilePostsCell : UITableViewCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     @IBOutlet weak var cellHeight: NSLayoutConstraint!
@@ -16,7 +15,7 @@ class ProfilePostsCell : UITableViewCell, UICollectionViewDelegate, UICollection
     @IBOutlet weak var postsCollection: UICollectionView!
     var payload = [Any]()
     var dataSet = false
-    var currentProfile: PlayerProfile?
+    /*var currentProfile: PlayerProfile?
     
     func setPosts(list: [PostObject], currentProfile: PlayerProfile?){
         payload = list
@@ -45,7 +44,7 @@ class ProfilePostsCell : UITableViewCell, UICollectionViewDelegate, UICollection
                 self.postsCollection.reloadData()
             }
         }
-    }
+    }*/
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.payload.count
@@ -61,18 +60,13 @@ class ProfilePostsCell : UITableViewCell, UICollectionViewDelegate, UICollection
         } else {
             let currentPost = current as! PostObject
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "post", for: indexPath) as! ProfilePostCell
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            let cache = appDelegate.imageCache
-            if(cache.object(forKey: currentPost.youtubeImg as NSString) != nil){
-                cell.postImg.image = cache.object(forKey: currentPost.youtubeImg as NSString)
-            } else {
-                cell.postImg.moa.onSuccess = { image in
+            /*let url = URL(string: url)
+            if (url != nil) {
+                ImageLoader.shared.loadImage(from: currentPost.youtubeImg) { [weak self] image in
+                    guard let self = self else { return }
                     cell.postImg.image = image
-                    appDelegate.imageCache.setObject(image, forKey: currentPost.youtubeImg as NSString)
-                    return image
                 }
-                cell.postImg.moa.url = currentPost.youtubeImg
-            }
+            }*/
             cell.postImg.contentMode = .scaleToFill
             cell.postImg.layer.cornerRadius = 10
             cell.postImg.clipsToBounds = true
@@ -110,7 +104,7 @@ class ProfilePostsCell : UITableViewCell, UICollectionViewDelegate, UICollection
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let current = self.payload[indexPath.item]
         if(current is PostObject){
-            self.currentProfile!.launchPostView(currentPost: current as! PostObject)
+            //self.currentProfile!.launchPostView(currentPost: current as! PostObject)
         }
     }
     

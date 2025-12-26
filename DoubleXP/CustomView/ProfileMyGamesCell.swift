@@ -9,54 +9,51 @@
 import Foundation
 import UIKit
 
-class ProfileMyGamesCell: UITableViewCell {
-    @IBOutlet weak var tableHeight: NSLayoutConstraint!
+class ProfileMyGamesCell: UITableViewCell, UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var gamesCell: UITableView!
     @IBOutlet weak var noTagCover: UIView!
     var payload = [GamerConnectGame]()
     var userForProfile: User?
-    var cellHeights: [CGFloat] = []
-    enum Const {
-          static let closeCellHeight: CGFloat = 100
-          static let openCellHeight: CGFloat = 280
-          static let rowsCount = 1
-   }
     
     func setupGames(){
         payload = [GamerConnectGame]()
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        setup(gamesEmpty: delegate.currentProfileFrag!.userForProfile!.games.isEmpty)
+        //setup(gamesEmpty: delegate.currentProfileFrag!.userForProfile!.games.isEmpty)
     }
     
     private func setup(gamesEmpty: Bool) {
         if(!gamesEmpty){
             let delegate = UIApplication.shared.delegate as! AppDelegate
-            for game in delegate.currentProfileFrag!.userForProfile!.games{
+            /*for game in delegate.currentProfileFrag!.userForProfile!.games{
                 for gcGame in delegate.gcGames{
                     if(game == gcGame.gameName){
                         self.payload.append(gcGame)
                     }
                 }
-            }
-            cellHeights = Array(repeating: Const.closeCellHeight, count: self.payload.count)
-            self.gamesCell.estimatedRowHeight = Const.closeCellHeight
-            self.gamesCell.rowHeight = UITableView.automaticDimension
-            
-            if #available(iOS 10.0, *) {
-                self.gamesCell.refreshControl = UIRefreshControl()
-                self.gamesCell.refreshControl?.addTarget(self, action: #selector(refreshHandler), for: .valueChanged)
-            }
+            }*/
+            self.gamesCell.dataSource = self
+            self.gamesCell.delegate = self
             self.gamesCell.reloadData()
         }
     }
     
-    @objc func refreshHandler() {
-        let deadlineTime = DispatchTime.now() + .seconds(1)
-        DispatchQueue.main.asyncAfter(deadline: deadlineTime, execute: { [weak self] in
-            if #available(iOS 10.0, *) {
-                self?.gamesCell.refreshControl?.endRefreshing()
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return self.payload.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "game", for: indexPath) as! ProfileGameCell
+        let current = self.payload[indexPath.item]
+        /*let url = URL(string: url)
+        if (url != nil) {
+            ImageLoader.shared.loadImage(from: current.imageUrl) { [weak self] image in
+                guard let self = self else { return }
+                cell.gameBack.image = image
             }
-            self?.gamesCell.reloadData()
-        })
+        }*/
+        cell.gameBack.contentMode = .scaleAspectFill
+        cell.gameBack.clipsToBounds = true
+        cell.gameName.text = current.gameName
+        return cell
     }
 }

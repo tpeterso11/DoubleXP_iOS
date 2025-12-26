@@ -7,11 +7,10 @@
 //
 
 import UIKit
-import SwiftNotificationCenter
 
-class QuizNavigationController: EMPageViewController, EMPageViewControllerDataSource, FreeAgentQuizNav {
+class QuizNavigationController: UIViewController {
     
-    func em_pageViewController(_ pageViewController: EMPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
+    /*func em_pageViewController(_ pageViewController: EMPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
         return nil
     }
     
@@ -38,7 +37,7 @@ class QuizNavigationController: EMPageViewController, EMPageViewControllerDataSo
         
         selectViewController(currentViewController, direction: .forward, animated: false, completion: nil)
         
-        Broadcaster.register(FreeAgentQuizNav.self, observer: self)
+        //Broadcaster.register(FreeAgentQuizNav.self, observer: self)
     }
     
     func addQuestion(question: FAQuestion, interviewManager: InterviewManager) {
@@ -127,6 +126,6 @@ class QuizNavigationController: EMPageViewController, EMPageViewControllerDataSo
     }
     
     func updateAnswerArray(answerArray: [String], question: FAQuestion) {
-    }
+    }*/
 }
 

@@ -8,9 +8,7 @@
 
 import Foundation
 import UIKit
-import SwiftHTTP
 import Firebase
-import FBSDKLoginKit
 import GoogleSignIn
 
 class SocialMediaManager{
@@ -33,7 +31,7 @@ class SocialMediaManager{
     }
     
     private func getTwitchToken(uid: String){
-        HTTP.GET("https://us-central1-gameterminal-767f7.cloudfunctions.net/initTwitch") { response in
+        /*HTTPClient.get("https://us-central1-gameterminal-767f7.cloudfunctions.net/initTwitch") { response in
             if let err = response.error {
                 let appDelegate = UIApplication.shared.delegate as! AppDelegate
                 let manager = appDelegate.socialMediaManager
@@ -59,11 +57,11 @@ class SocialMediaManager{
                     manager.setToken(token: "")
                 }
             }
-        }
+        }*/
     }
     
     private func validateToken(token: String, uid: String){
-        HTTP.GET("https://us-central1-gameterminal-767f7.cloudfunctions.net/validateToken?token=" + token) { response in
+        /*HTTPClient.get("https://us-central1-gameterminal-767f7.cloudfunctions.net/validateToken?token=" + token) { response in
             if let err = response.error {
                 self.getTwitchToken(uid: uid)
                 return
@@ -94,11 +92,11 @@ class SocialMediaManager{
                     self.getTwitchToken(uid: uid)
                 }
             }
-        }
+        }*/
     }
     
     func getTwitchGames(callbacks: SocialMediaManagerCallback){
-        HTTP.GET("https://us-central1-gameterminal-767f7.cloudfunctions.net/getGames?token=" + token) { response in
+        /*HTTPClient.get("https://us-central1-gameterminal-767f7.cloudfunctions.net/getGames?token=" + token) { response in
             if let err = response.error {
                 var channels = [TwitchChannelObj]()
                 let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -151,11 +149,11 @@ class SocialMediaManager{
                     }
                 }
             }
-        }
+        }*/
     }
     
     func loadTwitchStreams2DotOhTeam(team: TeamObject, gcGame: GamerConnectGame, callbacks: SocialMediaManagerCallback){
-        HTTP.GET("https://us-central1-gameterminal-767f7.cloudfunctions.net/getStreamsTeam?token=" + token + "&game_id=" + gcGame.twitchHandle) { response in
+        /*HTTPClient.get("https://us-central1-gameterminal-767f7.cloudfunctions.net/getStreamsTeam?token=" + token + "&game_id=" + gcGame.twitchHandle) { response in
             if let err = response.error {
                 return
             }
@@ -202,11 +200,11 @@ class SocialMediaManager{
                     }
                 }
             }
-        }
+        }*/
     }
     
     func searchStreams(searchQuery: String, callbacks: SocialMediaManagerCallback){
-        HTTP.GET("https://us-central1-gameterminal-767f7.cloudfunctions.net/searchForStream?search_query=" + searchQuery + "&token=" + token) { response in
+       /* HTTPClient.get("https://us-central1-gameterminal-767f7.cloudfunctions.net/searchForStream?search_query=" + searchQuery + "&token=" + token) { response in
             if let err = response.error {
                 return
             }
@@ -258,12 +256,12 @@ class SocialMediaManager{
                     }
                 }
             }
-        }
+        }*/
     }
     
     
     func checkTwitchStream(twitchId: String, callbacks: SocialMediaManagerCallback){
-        HTTP.GET("https://us-central1-gameterminal-767f7.cloudfunctions.net/checkTwitchStream?token=" + token + "&twitch_login=" + twitchId) { response in
+        /*HTTPClient.get("https://us-central1-gameterminal-767f7.cloudfunctions.net/checkTwitchStream?token=" + token + "&twitch_login=" + twitchId) { response in
             if let err = response.error {
                 AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Check Stream - Error"))
                 callbacks.onStreamsLoaded(streams: [TwitchStreamObject]())
@@ -318,11 +316,11 @@ class SocialMediaManager{
                     callbacks.onStreamsLoaded(streams: [TwitchStreamObject]())
                 }
             }
-        }
+        }*/
     }
     
     func loadTwitchStreams2DotOhChannel(currentChannel: TwitchChannelObj, callbacks: SocialMediaManagerCallback){
-        HTTP.GET("https://us-central1-gameterminal-767f7.cloudfunctions.net/getStreamsChannel?game_id=" + currentChannel.twitchID + "&token=" + token) { response in
+        /*HTTPClient.get("https://us-central1-gameterminal-767f7.cloudfunctions.net/getStreamsChannel?game_id=" + currentChannel.twitchID + "&token=" + token) { response in
             if let err = response.error {
                 return
             }
@@ -365,7 +363,7 @@ class SocialMediaManager{
                     }
                 }
             }
-        }
+        }*/
     }
 
     
@@ -430,7 +428,7 @@ class SocialMediaManager{
     
     func loadTweets(team: TeamObject, gcGame: GamerConnectGame, callbacks: SocialMediaManagerCallback){
         var tweets = [TweetObject]()
-        TwitterHelper.shared.getTimeline(screenName: gcGame.twitterHandle) { (json) in
+        /*TwitterHelper.shared.getTimeline(screenName: gcGame.twitterHandle) { (json) in
             if let tweetJSONs = json?.array {
                 for tweetJSON in tweetJSONs {
                     var tweetText = ""
@@ -460,12 +458,12 @@ class SocialMediaManager{
             } else {
                 callbacks.onTweetsLoaded(tweets: [])
             }
-        }
+        }*/
     }
     
     func getYoutubeAccess(accessToken: String, callbacks: SocialMediaManagerCallback, currentUser: User, tryRefresh: Bool){
         let params = ["Authorization": "Bearer " + accessToken] as [String : Any]
-        HTTP.GET("https://www.googleapis.com/youtube/v3/channels?part=id&mine=true&max_results=5&key=AIzaSyAyjFRqU4u2fx7_Ik5dEiDuNbXb9F0Ykjc&access_token=" + accessToken, parameters: params) { response in
+        /*HTTPClient.get("https://www.googleapis.com/youtube/v3/channels?part=id&mine=true&max_results=5&key=AIzaSyAyjFRqU4u2fx7_Ik5dEiDuNbXb9F0Ykjc&access_token=" + accessToken, parameters: params) { response in
             if let err = response.error {
                 if(tryRefresh){
                     self.attemptTokenRefresh(refreshToken: currentUser.googleApiRefreshToken, accessToken: currentUser.googleApiAccessToken, callbacks: callbacks, currentUser: currentUser)
@@ -504,12 +502,12 @@ class SocialMediaManager{
                     }
                 }
             }
-        }
+        }*/
     }
     
     
     func attemptTokenRefresh(refreshToken: String, accessToken: String, callbacks: SocialMediaManagerCallback, currentUser: User){
-        HTTP.POST("https://oauth2.googleapis.com/token?client_id=582166005754-t8kcglj0t0oqgsr4p43052rpf00vnkvg.apps.googleusercontent.com&client_secret=&refresh_token=" + refreshToken + "&grant_type=refresh_token") { response in
+        /*HTTPClient.post("https://oauth2.googleapis.com/token?client_id=582166005754-t8kcglj0t0oqgsr4p43052rpf00vnkvg.apps.googleusercontent.com&client_secret=&refresh_token=" + refreshToken + "&grant_type=refresh_token") { response in
             if let err = response.error {
                print("error: \(err.localizedDescription)")
                callbacks.onYoutubeFail()
@@ -529,12 +527,12 @@ class SocialMediaManager{
                     callbacks.onYoutubeFail()
                 }
             }
-        }
+        }*/
     }
     
     func attemptYoutubeVideos(channelId: String, accessToken: String, callbacks: SocialMediaManagerCallback, currentUser: User){
         let params = ["Authorization": "Bearer " + accessToken] as [String : Any]
-        HTTP.GET("https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=" + channelId + "&key=AIzaSyAyjFRqU4u2fx7_Ik5dEiDuNbXb9F0Ykjc" + "&maxResults=50", parameters: params) { response in
+        /*HTTPClient.get("https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=" + channelId + "&key=AIzaSyAyjFRqU4u2fx7_Ik5dEiDuNbXb9F0Ykjc" + "&maxResults=50", parameters: params) { response in
             if let err = response.error {
                 print("error: \(err.localizedDescription)")
                 if(!currentUser.googleApiRefreshToken.isEmpty && accessToken != currentUser.googleApiRefreshToken){
@@ -586,7 +584,7 @@ class SocialMediaManager{
                     callbacks.onYoutubeFail()
                 }
             }
-        }
+        }*/
     }
     
     

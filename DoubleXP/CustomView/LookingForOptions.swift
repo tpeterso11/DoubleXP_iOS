@@ -9,9 +9,9 @@
 import Foundation
 import UIKit
 
-class LookingForOptions: UITableViewCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+class LookingForOptions: UIViewController {
     
-    @IBOutlet weak var lookingForOptionCollection: UICollectionView!
+    /*@IBOutlet weak var lookingForOptionCollection: UICollectionView!
     var payload = [String]()
     var currentSelection: LookingForSelection?
     var currentLookingFor: LookingFor?
@@ -92,5 +92,5 @@ class LookingForOptions: UITableViewCell, UICollectionViewDelegate, UICollection
             self.contentView.layoutIfNeeded()
             // Returns `collectionView.contentSize` in order to set the UITableVieweCell height a value greater than 0.
         return CGSize(width: self.lookingForOptionCollection.contentSize.width, height: self.lookingForOptionCollection.contentSize.height + 80)
-    }
+    }*/
 }

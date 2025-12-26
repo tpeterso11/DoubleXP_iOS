@@ -9,7 +9,6 @@
 import Foundation
 import UIKit
 import WebKit
-import youtube_ios_player_helper
 import Lottie
 
 class ProfileHeaderCell: UITableViewCell, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -99,16 +98,7 @@ class ProfileHeaderCell: UITableViewCell, UICollectionViewDelegate, UICollection
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "social", for: indexPath) as! ProfileSocialListItem
             let current = socialPayload[indexPath.item]
-            if(current is TwitchAddedObject){
-                cell.socialLabel.text = "@"+(current as! TwitchAddedObject).twitchId!
-                cell.socialIcon.image = #imageLiteral(resourceName: "twitch_logo_light.png")
-            } else if(current is DiscordAddedObject){
-                cell.socialLabel.text = "@"+(current as! DiscordAddedObject).handle!
-                cell.socialIcon.image = #imageLiteral(resourceName: "discord.png")
-            } else if(current is InstaAddedObject){
-                cell.socialLabel.text = "@"+(current as! InstaAddedObject).instaId!
-                cell.socialIcon.image = #imageLiteral(resourceName: "instagram.png")
-            }
+            
             return cell
         }
     }

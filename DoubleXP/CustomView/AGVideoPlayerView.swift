@@ -8,7 +8,6 @@
 import UIKit
 import AVKit
 import AVFoundation
-import PINRemoteImage
 
 extension Notification.Name {
     static let playerDidChangeFullscreenMode = Notification.Name("playerDidEnterFullscreenMode")
@@ -24,7 +23,7 @@ class AGVideoPlayerView: UIView {
     }
     var previewImageUrl: URL? {
         didSet {
-            previewImageView.pin_setImage(from: previewImageUrl, placeholderImage: UIImage())
+            //previewImageView.pin_setImage(from: previewImageUrl, placeholderImage: UIImage())
             previewImageView.isHidden = false
         }
     }

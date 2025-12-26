@@ -60,18 +60,13 @@ class OptionAnswerCell: UITableViewCell, UICollectionViewDelegate, UICollectionV
             } else {
                 cell.optionText.text = ""
             }*/
-            
-            if(self.imageCache.object(forKey: url as NSString) != nil){
-                cell.optionImage.image = imageCache.object(forKey: url as NSString)
-            } else {
-                cell.optionImage.image = Utility.Image.placeholder
-                cell.optionImage.moa.onSuccess = { image in
+            /*let url = URL(string: url)
+            if (url != nil) {
+                ImageLoader.shared.loadImage(from: url!) { [weak self] image in
+                    guard let self = self else { return }
                     cell.optionImage.image = image
-                    self.imageCache.setObject(image, forKey: url as NSString)
-                    return image
                 }
-                cell.optionImage.moa.url = String(url)
-            }
+            }*/
         }
         
         return cell

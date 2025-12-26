@@ -52,8 +52,6 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>MGLMapboxAccessToken</key>
-	<string>pk.eyJ1IjoidHBldGVyc28xMSIsImEiOiJjazkza3dzZDIwM2ZjM2RwaWJ4Mzg1bnhlIn0.HcG2NYBrB3nD62Cr6ozd_w</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -94,8 +92,6 @@
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
-	<key>UIMainStoryboardFile</key>
-	<string>Main</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>
@@ -115,5 +111,10 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Moon Bold.otf</string>
+		<string>Moon Light.otf</string>
+	</array>
 </dict>
 </plist>

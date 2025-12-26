@@ -85,7 +85,7 @@ class ResultsUserCell: UITableViewCell, UITableViewDelegate, UITableViewDataSour
     
     @objc private func navigateToProfile(sender: UIButton){
         let current = payload[sender.tag]
-        self.resultsController?.proceedToProfile(userUid: current.uId)
+        //self.resultsController?.proceedToProfile(userUid: current.uId)
     }
     
     func onFriendAdded() {

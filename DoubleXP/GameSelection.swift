@@ -8,31 +8,28 @@
 
 import Foundation
 import UIKit
-import UnderLineTextField
 import Lottie
-import FirebaseDatabase
+import Firebase
 import CoreLocation
 import GeoFire
-import SwiftNotificationCenter
-import FBSDKLoginKit
-import SPStorkController
+import Kingfisher
+import SwiftEntryKit
+import AlertKit
 
-class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSource, UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate, SPStorkControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+
+class GameSelection: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     @IBOutlet weak var continueButton: UIButton!
     var selectedGames = [String]()
     var originalList = [GamerConnectGame]()
     var gameList = [GamerConnectGame]()
     @IBOutlet weak var gameDrawerDev: UILabel!
     @IBOutlet weak var gameDrawerGame: UILabel!
-    @IBOutlet weak var gameDrawerTagEntry: UnderLineTextField!
     @IBOutlet weak var gameDrawerAdd: UIButton!
     @IBOutlet weak var gameDrawerNo: UIButton!
     @IBOutlet weak var gameDrawer: UIView!
     @IBOutlet weak var gameDrawerBlur: UIVisualEffectView!
     var availableConsoles = [String]()
-    @IBOutlet weak var search: UnderLineTextField!
     @IBOutlet weak var buildingBlur: UIVisualEffectView!
-    @IBOutlet weak var buildingHeader: UILabel!
     @IBOutlet weak var buildingAnimation: LottieAnimationView!
     @IBOutlet weak var consoleTable: UITableView!
     @IBOutlet weak var gamerTagCover: UIView!
@@ -43,19 +40,30 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @IBOutlet weak var updateAnimation: LottieAnimationView!
     @IBOutlet weak var allGamesButton: UIView!
     @IBOutlet weak var allGamesCover: UIView!
-    @IBOutlet weak var popularButton: UIView!
-    @IBOutlet weak var consoleButton: UIView!
-    @IBOutlet weak var consoleCover: UIView!
-    @IBOutlet weak var popularCover: UIView!
-    @IBOutlet weak var pcGamesButton: UIView!
-    @IBOutlet weak var pcCover: UIView!
-    @IBOutlet weak var mobileButton: UIView!
-    @IBOutlet weak var mobileCover: UIView!
-    @IBOutlet weak var tableButton: UIView!
-    @IBOutlet weak var tableCover: UIView!
+    @IBOutlet weak var casualButton: UIView!
+    @IBOutlet weak var casualCover: UIView!
+    @IBOutlet weak var shooterButton: UIView!
+    @IBOutlet weak var shooterCover: UIView!
+    @IBOutlet weak var sportsButton: UIView!
+    @IBOutlet weak var sportsCover: UIView!
+    @IBOutlet weak var actionButton: UIView!
+    @IBOutlet weak var actionCover: UIView!
+    @IBOutlet weak var multiButton: UIView!
+    @IBOutlet weak var multiCover: UIView!
+    
     @IBOutlet weak var gameCollection: UICollectionView!
     @IBOutlet weak var gameSelectionHeader: UILabel!
     @IBOutlet weak var gameSelectionSub: UILabel!
+    @IBOutlet weak var categoryBlur: UIVisualEffectView!
+    @IBOutlet weak var pokoCollection: UICollectionView!
+    @IBOutlet weak var pokoLayout: UIView!
+    @IBOutlet weak var search: UITextField!
+    @IBOutlet weak var pokoTitle: UILabel!
+    @IBOutlet weak var pokoSub: UILabel!
+    @IBOutlet weak var searchButton: UIView!
+    @IBOutlet weak var searchImage: UIImageView!
+    @IBOutlet weak var searchView: UIView!
+    @IBOutlet weak var pokoTooltip: UIImageView!
     var currentSelectedConsoles = [String]()
     var currentSelectedGamerTags = [String]()
     var currentSelectedGame = ""
@@ -74,15 +82,27 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
     var modalPopped = false
     var upgradeFrag: Upgrade?
     var currentGameGroup = "all"
+    var selectedGameProfile: GamerProfile?
+    private var pokoOverride = false
+    private var pokoList = [Poko]()
+    private var activeBorderLayer: CAShapeLayer?
+    private var selectedPokoId: String?
+    var newProfiles = [GamerProfile]()
+    var searchActive = false
+    private var gameApiService = GameAPIService.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.categoryBlur.alpha = 0
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.currentGameSelection = self
-        let list = delegate.gcGames
-        let sorted = list!.sorted(by: { $0.gameName < $1.gameName })
+        let list = gameApiService.allRegistrationGames
+        let sorted = list.sorted(by: { $0.gameName < $1.gameName })
         gameList = sorted
+        Task {
+            pokoList = await PokoProvider.shared.getPokos()
+        }
         
         if(returning){
             self.gameSelectionHeader.text = "what games do you play?"
@@ -93,179 +113,218 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
         } else {
             self.gameSelectionHeader.text = "add your first game"
             self.gameSelectionSub.text = "add your favorite game to complete your profile."
-            self.continueButton.setTitle("skip for now", for: .normal)
-            continueButton.addTarget(self, action: #selector(self.advanceToResults), for: .touchUpInside)
+            continueButton.addTarget(self, action: #selector(self.showPokoLayout), for: .touchUpInside)
         }
         
         let allTap = UITapGestureRecognizer(target: self, action: #selector(self.allClicked))
         self.allGamesButton.isUserInteractionEnabled = true
         self.allGamesButton.addGestureRecognizer(allTap)
         
-        let popularTap = UITapGestureRecognizer(target: self, action: #selector(self.popularClicked))
-        self.popularButton.isUserInteractionEnabled = true
-        self.popularButton.addGestureRecognizer(popularTap)
+        let actionTap = UITapGestureRecognizer(target: self, action: #selector(self.actionClicked))
+        self.actionButton.isUserInteractionEnabled = true
+        self.actionButton.addGestureRecognizer(actionTap)
         
-        let consoleTap = UITapGestureRecognizer(target: self, action: #selector(self.consoleClicked))
-        self.consoleButton.isUserInteractionEnabled = true
-        self.consoleButton.addGestureRecognizer(consoleTap)
+        let sportsTap = UITapGestureRecognizer(target: self, action: #selector(self.sportsClicked))
+        self.sportsButton.isUserInteractionEnabled = true
+        self.sportsButton.addGestureRecognizer(sportsTap)
         
-        let pcTap = UITapGestureRecognizer(target: self, action: #selector(self.pcClicked))
-        self.pcGamesButton.isUserInteractionEnabled = true
-        self.pcGamesButton.addGestureRecognizer(pcTap)
+        let shooterTap = UITapGestureRecognizer(target: self, action: #selector(self.shooterClicked))
+        self.shooterButton.isUserInteractionEnabled = true
+        self.shooterButton.addGestureRecognizer(shooterTap)
         
-        let tableTap = UITapGestureRecognizer(target: self, action: #selector(self.tabletopClicked))
-        self.tableButton.isUserInteractionEnabled = true
-        self.tableButton.addGestureRecognizer(tableTap)
+        let casualTap = UITapGestureRecognizer(target: self, action: #selector(self.casualClicked))
+        self.casualButton.isUserInteractionEnabled = true
+        self.casualButton.addGestureRecognizer(casualTap)
         
-        let mobileTap = UITapGestureRecognizer(target: self, action: #selector(self.mobileClicked))
-        self.mobileButton.isUserInteractionEnabled = true
-        self.mobileButton.addGestureRecognizer(mobileTap)
+        let multiTap = UITapGestureRecognizer(target: self, action: #selector(self.multiClicked))
+        self.multiButton.isUserInteractionEnabled = true
+        self.multiButton.addGestureRecognizer(multiTap)
+        
+        let toolTipTap = UITapGestureRecognizer(target: self, action: #selector(self.showPokoTooltip))
+        self.pokoTooltip.isUserInteractionEnabled = true
+        self.pokoTooltip.addGestureRecognizer(toolTipTap)
+        
+        /*let layout = AnimatedCollectionViewLayout()
+         layout.animator = LinearCardAttributesAnimator()
+         layout.scrollDirection = .horizontal*/
+        //gameCollection.collectionViewLayout = layout
         
         gameCollection.delegate = self
         gameCollection.dataSource = self
         
-        search.delegate = self
+        //search.delegate = self
         search.returnKeyType = UIReturnKeyType.done
-        
         search.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+        self.searchButton.alpha = 0.5
+        self.searchButton.isUserInteractionEnabled = false
     }
     
     @objc func allClicked(){
         self.currentGameGroup = "all"
         handleButtons(selected: self.currentGameGroup)
     }
-    @objc func pcClicked(){
-        self.currentGameGroup = "pc"
-        handleButtons(selected: "pc")
+    @objc func sportsClicked(){
+        self.currentGameGroup = "Sports"
+        handleButtons(selected: "Sports")
     }
-    @objc func mobileClicked(){
-        self.currentGameGroup = "mobile"
-        handleButtons(selected: "mobile")
+    @objc func shooterClicked(){
+        self.currentGameGroup = "Shooter"
+        handleButtons(selected: "Shooter")
     }
-    @objc func consoleClicked(){
-        self.currentGameGroup = "console"
-        handleButtons(selected: "console")
+    @objc func multiClicked(){
+        self.currentGameGroup = "Massively Multiplayer"
+        handleButtons(selected: "Massively Multiplayer")
     }
-    @objc func popularClicked(){
-        self.currentGameGroup = "popular"
-        handleButtons(selected: "popular")
+    @objc func actionClicked(){
+        self.currentGameGroup = "Action"
+        handleButtons(selected: "Action")
     }
-    @objc func tabletopClicked(){
-        self.currentGameGroup = "tabletop"
-        handleButtons(selected: "tabletop")
+    @objc func casualClicked(){
+        self.currentGameGroup = "Casual"
+        handleButtons(selected: "Casual")
     }
     
     private func handleButtons(selected: String){
+        UIView.animate(withDuration: 0.8, animations: {
+            self.categoryBlur.alpha = 1
+            if(self.searchActive){
+                self.searchActive = false
+                self.searchButton.backgroundColor = .systemGreen
+                self.searchImage.image = #imageLiteral(resourceName: "search.png")
+                self.search.text = ""
+            }
+        }, completion: { (finished: Bool) in
+            let searchTap = UITapGestureRecognizer(target: self, action: #selector(self.searchClicked))
+            self.searchButton.addGestureRecognizer(searchTap)
+            self.searchButton.isUserInteractionEnabled = false
+            
+            if(selected == "all"){
+                /*let list = RawgGameProvider.shared.getGamerConnectGames()
+                let sorted = list.sorted(by: { $0.gameName < $1.gameName })
+                self.gameList = sorted
+                
+                self.gameCollection.reloadData()
+                DispatchQueue.main.async {
+                    self.gameCollection.setContentOffset(.zero, animated: true)
+                }*/
+            } else if(selected == "Action"){
+                let list = RawgGameProvider.shared.getAllGames()
+                let sorted = list.sorted(by: { $0.gameName < $1.gameName })
+                self.gameList = sorted
+                
+                for game in self.gameList {
+                    if(!game.categoryFilters.contains("Action")){
+                        self.gameList.remove(at: self.gameList.index(of: game)!)
+                    }
+                }
+                self.gameCollection.reloadData()
+                DispatchQueue.main.async {
+                    self.gameCollection.setContentOffset(.zero, animated: true)
+                }
+            } else if(selected == "Casual"){
+                let list = RawgGameProvider.shared.getAllGames()
+                let sorted = list.sorted(by: { $0.gameName < $1.gameName })
+                self.gameList = sorted
+                
+                for game in self.gameList {
+                    if(!game.categoryFilters.contains("Casual")){
+                        self.gameList.remove(at: self.gameList.index(of: game)!)
+                    }
+                }
+                self.gameCollection.reloadData()
+                DispatchQueue.main.async {
+                    self.gameCollection.setContentOffset(.zero, animated: true)
+                }
+            } else if(selected == "Shooter"){
+                let list = RawgGameProvider.shared.getAllGames()
+                let sorted = list.sorted(by: { $0.gameName < $1.gameName })
+                self.gameList = sorted
+                
+                for game in self.gameList {
+                    if(!game.categoryFilters.contains("Shooter")){
+                        self.gameList.remove(at: self.gameList.index(of: game)!)
+                    }
+                }
+                self.gameCollection.reloadData()
+                DispatchQueue.main.async {
+                    self.gameCollection.setContentOffset(.zero, animated: true)
+                }
+            } else if(selected == "Sports"){
+                let list = RawgGameProvider.shared.getAllGames()
+                let sorted = list.sorted(by: { $0.gameName < $1.gameName })
+                self.gameList = sorted
+                
+                for game in self.gameList {
+                    if(!game.categoryFilters.contains("Sports")){
+                        self.gameList.remove(at: self.gameList.index(of: game)!)
+                    }
+                }
+                self.gameCollection.reloadData()
+                DispatchQueue.main.async {
+                    self.gameCollection.setContentOffset(.zero, animated: true)
+                }
+            } else if(selected == "Massively Multiplayer"){
+                let list = RawgGameProvider.shared.getAllGames()
+                let sorted = list.sorted(by: { $0.gameName < $1.gameName })
+                self.gameList = sorted
+                
+                for game in self.gameList {
+                    if(!game.categoryFilters.contains("Massively Multiplayer")){
+                        self.gameList.remove(at: self.gameList.index(of: game)!)
+                    }
+                }
+                self.gameCollection.reloadData()
+                DispatchQueue.main.async {
+                    self.gameCollection.setContentOffset(.zero, animated: true)
+                }
+            }
+            UIView.animate(withDuration: 0.8, delay: 0.8, options: [],animations: {
+                self.categoryBlur.alpha = 0
+            }, completion: nil)
+        })
+        
         if(selected == "all"){
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-            let list = delegate.gcGames
-            let sorted = list!.sorted(by: { $0.gameName < $1.gameName })
-            gameList = sorted
-            
-            self.gameCollection.reloadData()
-            
             self.allGamesCover.alpha = 1
-            self.popularCover.alpha = 0
-            self.pcCover.alpha = 0
-            self.tableCover.alpha = 0
-            self.mobileCover.alpha = 0
-            self.consoleCover.alpha = 0
-        } else if(selected == "pc"){
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-            let list = delegate.gcGames
-            let sorted = list!.sorted(by: { $0.gameName < $1.gameName })
-            gameList = sorted
-            
-            for game in gameList {
-                if(!game.availablebConsoles.contains("pc")){
-                    gameList.remove(at: gameList.index(of: game)!)
-                }
-            }
-            self.gameCollection.reloadData()
-            
+            self.actionCover.alpha = 0
+            self.sportsCover.alpha = 0
+            self.casualCover.alpha = 0
+            self.shooterCover.alpha = 0
+            self.multiCover.alpha = 0
+        } else if(selected == "Action"){
             self.allGamesCover.alpha = 0
-            self.popularCover.alpha = 0
-            self.pcCover.alpha = 1
-            self.tableCover.alpha = 0
-            self.mobileCover.alpha = 0
-            self.consoleCover.alpha = 0
-        } else if(selected == "mobile"){
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-            let list = delegate.gcGames
-            let sorted = list!.sorted(by: { $0.gameName < $1.gameName })
-            gameList = sorted
-            
-            for game in gameList {
-                if(game.mobileGame != "true"){
-                    gameList.remove(at: gameList.index(of: game)!)
-                }
-            }
-            self.gameCollection.reloadData()
-            
+            self.sportsCover.alpha = 0
+            self.actionCover.alpha = 1
+            self.casualCover.alpha = 0
+            self.shooterCover.alpha = 0
+            self.multiCover.alpha = 0
+        } else if(selected == "Sports"){
             self.allGamesCover.alpha = 0
-            self.popularCover.alpha = 0
-            self.pcCover.alpha = 0
-            self.tableCover.alpha = 0
-            self.mobileCover.alpha = 1
-            self.consoleCover.alpha = 0
-        } else if(selected == "console"){
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-            let list = delegate.gcGames
-            let sorted = list!.sorted(by: { $0.gameName < $1.gameName })
-            gameList = sorted
-            
-            for game in gameList {
-                if(!game.availablebConsoles.contains("ps") && !game.availablebConsoles.contains("xbox")
-                && !game.availablebConsoles.contains("nintendo")){
-                    gameList.remove(at: gameList.index(of: game)!)
-                }
-            }
-            self.gameCollection.reloadData()
-            
+            self.actionCover.alpha = 0
+            self.shooterCover.alpha = 0
+            self.multiCover.alpha = 0
+            self.sportsCover.alpha = 1
+            self.casualCover.alpha = 0
+        } else if(selected == "Casual"){
             self.allGamesCover.alpha = 0
-            self.popularCover.alpha = 0
-            self.pcCover.alpha = 0
-            self.tableCover.alpha = 0
-            self.mobileCover.alpha = 0
-            self.consoleCover.alpha = 1
-        } else if(selected == "tabletop"){
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-            let list = delegate.gcGames
-            let sorted = list!.sorted(by: { $0.gameName < $1.gameName })
-            gameList = sorted
-            
-            for game in gameList {
-                if(!game.availablebConsoles.contains("tabletop")){
-                    gameList.remove(at: gameList.index(of: game)!)
-                }
-            }
-            self.gameCollection.reloadData()
-            
+            self.actionCover.alpha = 0
+            self.sportsCover.alpha = 0
+            self.shooterCover.alpha = 0
+            self.multiCover.alpha = 0
+            self.casualCover.alpha = 1
+        } else if(selected == "Massively Multiplayer"){
             self.allGamesCover.alpha = 0
-            self.popularCover.alpha = 0
-            self.pcCover.alpha = 0
-            self.tableCover.alpha = 1
-            self.mobileCover.alpha = 0
-            self.consoleCover.alpha = 0
-        } else if(selected == "popular"){
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-            let list = delegate.gcGames
-            let sorted = list!.sorted(by: { $0.gameName < $1.gameName })
-            gameList = sorted
-            
-            for game in gameList {
-                if(!game.categoryFilters.contains("popular")){
-                    gameList.remove(at: gameList.index(of: game)!)
-                }
-            }
-            self.gameCollection.reloadData()
-            
+            self.actionCover.alpha = 0
+            self.sportsCover.alpha = 0
+            self.multiCover.alpha = 1
+            self.shooterCover.alpha = 0
+            self.casualCover.alpha = 0
+        } else if(selected == "Shooter"){
             self.allGamesCover.alpha = 0
-            self.popularCover.alpha = 1
-            self.pcCover.alpha = 0
-            self.tableCover.alpha = 0
-            self.mobileCover.alpha = 0
-            self.consoleCover.alpha = 0
+            self.shooterCover.alpha = 1
+            self.sportsCover.alpha = 0
+            self.casualCover.alpha = 0
+            self.multiCover.alpha = 0
+            self.actionCover.alpha = 0
         }
     }
     
@@ -274,186 +333,199 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
         return false
     }
     
-    func textFieldDidBeginEditing(_ textField: UITextField) { // became first responder
-
-        //move textfields up
-        let myScreenRect: CGRect = UIScreen.main.bounds
-        let keyboardHeight : CGFloat = 500
-
-        UIView.beginAnimations( "animateView", context: nil)
-        var movementDuration:TimeInterval = 0.35
-        var needToMove: CGFloat = 0
-
-        var frame : CGRect = self.view.frame
-        if (textField.frame.origin.y + textField.frame.size.height + /*self.navigationController.navigationBar.frame.size.height + */UIApplication.shared.statusBarFrame.size.height > (myScreenRect.size.height - keyboardHeight)) {
-            needToMove = (textField.frame.origin.y + textField.frame.size.height + /*self.navigationController.navigationBar.frame.size.height +*/ UIApplication.shared.statusBarFrame.size.height) - (myScreenRect.size.height - keyboardHeight);
-        }
-
-        frame.origin.y = -needToMove
-        self.view.frame = frame
-        UIView.commitAnimations()
-    }
-
-    func textFieldDidEndEditing(_ textField: UITextField) {
-            //move textfields back down
-            UIView.beginAnimations( "animateView", context: nil)
-        var movementDuration:TimeInterval = 0.35
-            var frame : CGRect = self.view.frame
-            frame.origin.y = 0
-            self.view.frame = frame
-            UIView.commitAnimations()
-    }
-    
-    func textFieldShouldClear(_ textField: UITextField) -> Bool {
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        gameList = delegate.gcGames
-        return true
-    }
-    
-    @objc override func dismissKeyboard() {
-        //Causes the view (or one of its embedded text fields) to resign the first responder status.
-        view.endEditing(true)
-    }
-    
     @objc func textFieldDidChange(_ textField: UITextField) {
         if(textField == search){
             if(textField.text?.count == 0){
-                let delegate = UIApplication.shared.delegate as! AppDelegate
-                gameList = delegate.gcGames
-            } else {
-                gameList = [GamerConnectGame]()
-                let delegate = UIApplication.shared.delegate as! AppDelegate
-                for game in delegate.gcGames {
-                    if(game.gameName.localizedCaseInsensitiveContains(textField.text!)){
-                        gameList.append(game)
-                    }
-                }
-            }
-            self.gameCollection.reloadData()
-        }
-    }
-    
-    /*func didDismissStorkBySwipe() {
-        if(returning){
-            DispatchQueue.main.async {
+                self.searchActive = false
+                gameList = RawgGameProvider.shared.getAllGames()
                 self.gameCollection.reloadData()
-                self.gameCollection.performBatchUpdates({ [weak self] in
-                        let visibleItems = self?.gameCollection.indexPathsForVisibleItems ?? []
-                        self?.gameCollection.reloadItems(at: visibleItems)
-                    }, completion: { (_) in
-                })
-                self.gameCollection.collectionViewLayout.invalidateLayout()
-                self.gameCollection.layoutSubviews()
+                DispatchQueue.main.async {
+                    self.gameCollection.setContentOffset(.zero, animated: true)
+                }
+                self.searchButton.isUserInteractionEnabled = false
+                
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.searchButton.backgroundColor = .systemGreen
+                    self.searchButton.alpha = 0.5
+                    self.searchImage.image = #imageLiteral(resourceName: "search.png")
+                }, completion: nil)
+            } else {
+                self.searchActive = true
+                self.searchButton.alpha = 1.0
+                let searchTap = UITapGestureRecognizer(target: self, action: #selector(self.searchClicked))
+                self.searchButton.addGestureRecognizer(searchTap)
+                self.searchButton.isUserInteractionEnabled = true
             }
-        } else {
-            DispatchQueue.main.async {
-                let appDelegate = UIApplication.shared.delegate as! AppDelegate
-                if(!appDelegate.currentUser!.games.isEmpty){
-                    self.advanceToResults()
+        }
+    }
+    
+    @objc private func searchClicked(){
+        UIView.animate(withDuration: 0.8, animations: {
+            self.categoryBlur.alpha = 1
+            self.searchButton.backgroundColor = .systemRed
+            self.searchImage.image = #imageLiteral(resourceName: "close_white.png")
+        }, completion: { (finished: Bool) in
+            let searchClearTap = UITapGestureRecognizer(target: self, action: #selector(self.clearSearch))
+            self.searchButton.isUserInteractionEnabled = true
+            self.searchButton.addGestureRecognizer(searchClearTap)
+            Task {
+                do {
+                    let games = try await RawgGameProvider.shared.searchGames(query: self.search.text!)
+                    DispatchQueue.main.async {
+                        self.gameList = games
+                        self.gameCollection.reloadData()
+                        DispatchQueue.main.async {
+                            self.gameCollection.setContentOffset(.zero, animated: true)
+                        }
+                        UIView.animate(withDuration: 0.8, delay: 0.8, options: [],animations: {
+                            self.categoryBlur.alpha = 0
+                        }, completion: nil)
+                    }
+                    print("✅ Found games: \(games.map { $0.gameName })")
+                } catch {
+                    print("❌ Error searching games:", error)
                 }
             }
-        }
-    }*/
-
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return availableConsoles.count
+        })
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "console", for: indexPath) as! ConsoleSelectionTableviewCell
-        let current = self.availableConsoles[indexPath.item]
-        
-        cell.console.text = self.mapConsoleForDisplay(console: current)
-        cell.coverConsole.text = self.mapConsoleForDisplay(console: current)
-        
-        if(self.currentSelectedConsoles.contains(current)){
-            cell.selectedCover.alpha = 1
-        } else {
-            cell.selectedCover.alpha = 0
-        }
-        return cell
+    @objc private func clearSearch(){
+        self.search.text = ""
+        UIView.animate(withDuration: 0.8,animations: {
+            self.categoryBlur.alpha = 1
+            self.searchButton.backgroundColor = .systemGreen
+            self.searchImage.image = #imageLiteral(resourceName: "search.png")
+        }, completion: { (finished: Bool) in
+            let searchTap = UITapGestureRecognizer(target: self, action: #selector(self.searchClicked))
+            self.searchButton.addGestureRecognizer(searchTap)
+            self.searchButton.isUserInteractionEnabled = true
+            
+            self.allClicked()
+            self.searchButton.isUserInteractionEnabled = false
+            UIView.animate(withDuration: 0.8, delay: 0.8, options: [],animations: {
+                self.categoryBlur.alpha = 0
+            }, completion: nil)
+        })
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let current = self.availableConsoles[indexPath.item]
-        if(self.currentSelectedConsoles.contains(current)){
-            self.currentSelectedConsoles.remove(at: self.currentSelectedConsoles.index(of: current)!)
-        } else {
-            self.currentSelectedConsoles.append(current)
-        }
-        self.consoleTable.reloadData()
-        //self.checkNextButton()
-    }
-    
-    private func showGameDrawer(gcGame: GamerConnectGame){
-        let currentViewController = self.storyboard!.instantiateViewController(withIdentifier: "quickAddGame") as! QuickAddGameDrawer
-        currentViewController.gameName = gcGame.gameName
-        currentViewController.currentGameSelectionModal = self
+    func createTwoByTwoGridLayout(in collectionView: UICollectionView) -> UICollectionViewFlowLayout {
+        let layout = UICollectionViewFlowLayout()
         
-        let transitionDelegate = SPStorkTransitioningDelegate()
-        currentViewController.transitioningDelegate = transitionDelegate
-        currentViewController.modalPresentationStyle = .custom
-        currentViewController.modalPresentationCapturesStatusBarAppearance = true
-        transitionDelegate.showIndicator = true
-        transitionDelegate.swipeToDismissEnabled = true
-        transitionDelegate.customHeight = 650
-        transitionDelegate.hapticMoments = [.willPresent, .willDismiss]
-        transitionDelegate.storkDelegate = self
-        self.present(currentViewController, animated: true, completion: nil)
-        //self.currentSelectedGame = gcGame.gameName
-        //self.performSegue(withIdentifier: "addGame", sender: nil)
+        let numberOfColumns: CGFloat = 2
+        let numberOfRows: CGFloat = 2
+        let spacing: CGFloat = 8
+        
+        let totalHorizontalSpacing = (numberOfColumns - 1) * spacing
+        let totalVerticalSpacing = (numberOfRows - 1) * spacing
+        
+        let itemWidth = (collectionView.bounds.width - totalHorizontalSpacing) / numberOfColumns
+        let itemHeight = (collectionView.bounds.height - totalVerticalSpacing) / numberOfRows
+        
+        layout.itemSize = CGSize(width: itemWidth, height: itemHeight)
+        layout.minimumInteritemSpacing = spacing
+        layout.minimumLineSpacing = spacing
+        
+        return layout
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "addGame" {
-            if let nextViewController = segue.destination as? QuickAddGameDrawer {
-                nextViewController.gameName = self.currentSelectedGame
-            }
+            
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.gameList.count
+        if(collectionView == self.gameCollection){
+            return self.gameList.count
+        } else {
+            return self.pokoList.count
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        showGameDrawer(gcGame: self.gameList[indexPath.item])
+        if(collectionView == self.gameCollection){
+            self.gameSelected(game: self.gameList[indexPath.item])
+            AlertKitAPI.present(
+                title: "I love that game too.",
+                icon: .done,
+                style: .iOS17AppleMusic,
+                haptic: .success
+            )
+        } else {
+            let cell = self.pokoCollection.cellForItem(at: indexPath) as! PokoCell
+            // Remove previous border
+            activeBorderLayer?.removeFromSuperlayer()
+            
+            // Create and animate new border
+            animateBorderTrace(around: cell.contentView) { [weak self] newLayer in
+                self?.activeBorderLayer = newLayer
+                cell.selectionLottie.shouldLoop = false
+                cell.selectionLottie.play()
+                let selectedPoko = self?.pokoList[indexPath.item].id
+                self?.selectedPokoId = selectedPoko
+                self?.continueButton.addTarget(self, action: #selector(self?.sendPayload), for: .touchUpInside)
+                UIView.animate(withDuration: 0.5, animations: {
+                    self?.continueButton.alpha = 1
+                }, completion: nil)
+            }
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! GameSelectionV2Cell
-        let current = gameList[indexPath.item]
-        cell.developer.text = current.developer
-        cell.gamename.text = current.gameName
-        
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let cache = appDelegate.imageCache
-        if(cache.object(forKey: current.imageUrl as NSString) != nil){
-            cell.gameback.image = cache.object(forKey: current.imageUrl as NSString)
-        } else {
-            cell.gameback.image = Utility.Image.placeholder
-            cell.gameback.moa.onSuccess = { image in
-                cell.gameback.image = image
-                appDelegate.imageCache.setObject(image, forKey: current.imageUrl as NSString)
-                return image
+        if(collectionView == self.gameCollection){
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! GameCell
+            let current = gameList[indexPath.item]
+            cell.configure(with: current)
+            if(self.selectedGameProfile != nil){
+                if(self.selectedGameProfile!.gameId == current.id){
+                    cell.selectedCover.alpha = 1
+                } else {
+                    cell.selectedCover.alpha = 0
+                }
+            } else {
+                cell.selectedCover.alpha = 0
             }
-            cell.gameback.moa.url = current.imageUrl
-        }
-        
-        cell.gameback.contentMode = .scaleAspectFill
-        cell.gameback.clipsToBounds = true
-        
-        if(appDelegate.currentUser!.games.contains(current.gameName)){
-            cell.testCheck.alpha = 1
+            return cell
         } else {
-            cell.testCheck.alpha = 0
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "poko", for: indexPath) as! PokoCell
+            let current = pokoList[indexPath.item]
+            cell.pokoName.text = current.name
+            cell.pokoType.text = current.type
+            if(current.specialEdition == "true"){
+                cell.specialEditionImg.isHidden = false
+            } else {
+                cell.specialEditionImg.isHidden = true
+            }
+            let url = URL(string: current.imageUrl)
+            if (url != nil) {
+                /*ImageLoader.shared.loadImage(from: url!) { [weak self] image in
+                    cell.pokoImg.image = image
+                }*/
+                //cell.pokoImg.kf.setImage(with: url)
+            }
+            return cell
         }
-        cell.selectedCover.alpha = 0
-        return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.bounds.size.width, height: CGFloat(120))
+        if(collectionView == self.gameCollection){
+            let spacing: CGFloat = 10
+            let totalSpacing = spacing * 3
+            let width = (collectionView.bounds.width - totalSpacing) / 2
+            return CGSize(width: width, height: 200)
+        } else {
+            let numberOfColumns: CGFloat = 2
+            let numberOfRows: CGFloat = 2
+            let spacing: CGFloat = 8
+            
+            let totalHorizontalSpacing = (numberOfColumns - 1) * spacing
+            let totalVerticalSpacing = (numberOfRows - 1) * spacing
+            
+            let itemWidth = (collectionView.bounds.width - totalHorizontalSpacing) / numberOfColumns
+            let itemHeight = (collectionView.bounds.height - totalVerticalSpacing) / numberOfRows
+            
+            return CGSize(width: itemWidth, height: itemHeight)
+        }
     }
     
     func onModalReturn(){
@@ -461,9 +533,9 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
             DispatchQueue.main.async {
                 self.gameCollection.reloadData()
                 self.gameCollection.performBatchUpdates({ [weak self] in
-                        let visibleItems = self?.gameCollection.indexPathsForVisibleItems ?? []
-                        self?.gameCollection.reloadItems(at: visibleItems)
-                    }, completion: { (_) in
+                    let visibleItems = self?.gameCollection.indexPathsForVisibleItems ?? []
+                    self?.gameCollection.reloadItems(at: visibleItems)
+                }, completion: { (_) in
                 })
                 self.gameCollection.collectionViewLayout.invalidateLayout()
                 self.gameCollection.layoutSubviews()
@@ -478,20 +550,24 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
         }
     }
     
+    private func gameSelected(game: GamerConnectGame){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        self.selectedGameProfile = GamerProfile(gamerTag: appDelegate.currentUser!.screenName, game: game.gameName, console: "", quizTaken: "false", gameId: game.id)
+        self.gameCollection.reloadData()
+        
+        self.continueButton.addTarget(self, action: #selector(self.showPokoLayout), for: .touchUpInside)
+        self.continueButton.alpha = 1
+        self.continueButton.isUserInteractionEnabled = true
+    }
+    
     @objc private func advanceToResults(){
+        self.buildingAnimation.play()
+        self.buildingAnimation.loopMode = .loop
         UIView.animate(withDuration: 0.8, animations: {
             self.buildingBlur.alpha = 1
             self.buildingAnimation.alpha = 1
         }, completion: { (finished: Bool) in
-            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                self.buildingHeader.alpha = 1
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                    self.buildingAnimation.loopMode = .loop
-                    self.buildingAnimation.play()
-                    self.sendPayload()
-                }
-            }, completion: nil)
+            self.sendPayload()
         })
     }
     
@@ -499,51 +575,47 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
         UIView.animate(withDuration: 0.8, animations: {
             self.updateBlur.alpha = 1
         }, completion: { (finished: Bool) in
-            UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
-                self.updateAnimation.alpha = 1
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                    self.updateAnimation.loopMode = .loop
-                    self.updateAnimation.play()
-                    self.updatePayload()
-                }
-            }, completion: nil)
+            /*UIView.animate(withDuration: 0.5, delay: 0.2, options: [], animations: {
+             self.updateAnimation.alpha = 1
+             
+             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+             self.updateAnimation.loopMode = .loop
+             self.updateAnimation.play()
+             self.updatePayload()
+             }
+             }, completion: nil)*/
         })
     }
     
     private func updatePayload(){
         if(self.modalPopped){
-            self.upgradeFrag?.dismissModal()
+            //self.upgradeFrag?.dismissModal()
             self.dismiss(animated: true) {
                 let delegate = UIApplication.shared.delegate as! AppDelegate
-                delegate.currentFeedFrag?.checkOnlineAnnouncements()
-                delegate.currentFeedSearchModal?.onModalDismissed()
+                
             }
         } else {
             self.proceedToLanding()
         }
     }
     
-    private func sendPayload(){
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        let manager = delegate.socialMediaManager
-        manager.getTwitchAppToken(token: nil, uid: delegate.currentUser!.uId)
-        
-        AppEvents.shared.logEvent(AppEvents.Name(rawValue: "Register - GC"))
-        
-        if(!self.returning && !delegate.currentUser!.gamerTag.isEmpty){
-            self.proceedToResults()
-        } else {
-            if(self.modalPopped){
-                upgradeFrag?.dismissModal()
-                self.dismiss(animated: true) {
-                    let delegate = UIApplication.shared.delegate as! AppDelegate
-                    delegate.currentFeedFrag?.checkOnlineAnnouncements()
-                }
-            } else {
+    @objc private func sendPayload(){
+        UIView.animate(withDuration: 0.8, animations: {
+            self.buildingBlur.alpha = 1
+            self.buildingAnimation.alpha = 1
+        }, completion: { (finished: Bool) in
+            self.buildingAnimation.loopMode = .loop
+            self.buildingAnimation.play()
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            let manager = delegate.socialMediaManager
+            manager.getTwitchAppToken(token: nil, uid: delegate.currentUser!.uId)
+            if(self.selectedPokoId != nil){
+                self.savePokos()
+            }
+            if(!delegate.currentUser!.screenName.isEmpty){
                 self.proceedToLanding()
             }
-        }
+        })
     }
     
     private func buildUserCache(){
@@ -565,7 +637,7 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
                 self.loadUsers(list: ids)
             }
         } else {
-            self.loadBackupUsersCache()
+            //self.loadBackupUsersCache()
         }
     }
     
@@ -574,13 +646,13 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
             var newList = [String]()
             newList.append(contentsOf: list!)
             newList.shuffle()
-            self.loadListUser(uid: list![0], currentList: newList)
+            //self.loadListUser(uid: list![0], currentList: newList)
         } else {
-            self.loadBackupUsersCache()
+            //self.loadBackupUsersCache()
         }
     }
     
-    private func loadListUser(uid: String, currentList: [String]?){
+    /*private func loadListUser(uid: String, currentList: [String]?){
         let ref = Database.database().reference().child("Users").child(uid)
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             if(snapshot.hasChild("games") && snapshot.hasChild("gamerTag") && snapshot.hasChild("gamerTags")){
@@ -596,9 +668,10 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
                     let currentGame = dict?["game"] as? String ?? ""
                     let console = dict?["console"] as? String ?? ""
                     let quizTaken = dict?["quizTaken"] as? String ?? ""
+                    let gameId = dict?["gameId"] as? String ?? ""
                     
                     if(currentTag != "" && currentGame != "" && console != ""){
-                        let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken)
+                        let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken, gameId: gameId)
                         gamerTags.append(currentGamerTagObj)
                     }
                 }
@@ -668,9 +741,9 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
                 }
             }
         })
-    }
+    }*/
     
-    private func loadBackupUsersCache(){
+    /*private func loadBackupUsersCache(){
         let ref = Database.database().reference().child("Users")
         ref.observeSingleEvent(of: .value, with: { (snapshot) in
             var perfectMatches = [User]()
@@ -709,15 +782,15 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
                             }
                         }
                         let tag = (user as! DataSnapshot).childSnapshot(forPath: "gamerTag").value as? String ?? ""
-                        if(gameMatch && languageMatch && !tag.isEmpty){
-                            perfectMatches.append(self.quickCreateUser(snapshot: user as! DataSnapshot))
-                        }
-                        if(gameMatch && !tag.isEmpty){
-                            gamesMatches.append(self.quickCreateUser(snapshot: user as! DataSnapshot))
-                        }
-                        if(languageMatch && !tag.isEmpty){
-                            languageMatches.append(self.quickCreateUser(snapshot: user as! DataSnapshot))
-                        }
+                        //if(gameMatch && languageMatch && !tag.isEmpty){
+                        //    perfectMatches.append(self.quickCreateUser(snapshot: user as! DataSnapshot))
+                        //}
+                        //if(gameMatch && !tag.isEmpty){
+                        //    gamesMatches.append(self.quickCreateUser(snapshot: user as! DataSnapshot))
+                        //}
+                        //if(languageMatch && !tag.isEmpty){
+                        //    languageMatches.append(self.quickCreateUser(snapshot: user as! DataSnapshot))
+                        //}
                         
                         if(perfectMatches.count == 3){
                             delegate.registerUserCache.append(contentsOf: perfectMatches)
@@ -763,16 +836,7 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
                 }
             }
         })
-    }
-    
-    private func quickCreateUser(snapshot: DataSnapshot) -> User{
-        let user = User(uId: snapshot.key)
-        if(snapshot.hasChild("gamerTag")){
-            let gamerTag = snapshot.childSnapshot(forPath: "gamerTag").value as? String ?? ""
-            user.gamerTag = gamerTag
-        }
-        return user
-    }
+    }*/
     
     private func proceedToLanding(){
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
@@ -847,5 +911,220 @@ class GameSelection: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
         return NSAttributedString(string: self.mappedConsoles[row], attributes: [NSAttributedString.Key.foregroundColor: UIColor.white])
+    }
+    
+    private func saveGames(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let ref = Database.database().reference().child("Users").child(delegate.currentUser!.uId)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            var gamerTags = [GamerProfile]()
+        
+            var consoles = [String]()
+            if(snapshot.hasChild("gamerTags")){
+                let gamerTagsArray = snapshot.childSnapshot(forPath: "gamerTags")
+                for gamerTagObj in gamerTagsArray.children {
+                    let currentObj = gamerTagObj as! DataSnapshot
+                    let dict = currentObj.value as? [String: Any]
+                    let currentTag = dict?["gamerTag"] as? String ?? ""
+                    let currentGame = dict?["game"] as? String ?? ""
+                    let console = dict?["console"] as? String ?? ""
+                    let quizTaken = dict?["quizTaken"] as? String ?? ""
+                    let gameId = dict?["gameId"] as? String ?? ""
+                    
+                    if(currentTag != "" && currentGame != "" && console != ""){
+                        consoles.append(console)
+                        let currentGamerTagObj = GamerProfile(gamerTag: currentTag, game: currentGame, console: console, quizTaken: quizTaken, gameId: gameId)
+                        gamerTags.append(currentGamerTagObj)
+                    }
+                }
+            }
+            gamerTags.append(contentsOf: self.newProfiles)
+            delegate.currentUser!.gamerTags = gamerTags
+            
+            var sendUp = [[String: String]]()
+            for profile in gamerTags {
+                let newProfile = ["gamerTag": profile.gamerTag, "game": profile.game, "console": profile.console, "quizTaken": profile.quizTaken]
+                sendUp.append(newProfile)
+            }
+            ref.child("gamerTags").setValue(sendUp)
+            
+            if(snapshot.hasChild("games")){
+                var games = snapshot.childSnapshot(forPath: "games").value as? [String] ?? [String]()
+                for gameProfile in self.newProfiles {
+                    if(!games.contains(gameProfile.game)){
+                        games.append(gameProfile.game)
+                    }
+                }
+                ref.child("games").setValue(games)
+                delegate.currentUser!.games = games
+            } else {
+                var games = [String]()
+                for gameProfile in self.newProfiles {
+                    if(!games.contains(gameProfile.game)){
+                        games.append(gameProfile.game)
+                    }
+                }
+                delegate.currentUser!.games = games
+            }
+        })
+    }
+    
+    private func savePokos(){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let dbRef = Database.database().reference()
+        dbRef.child("Pokos")
+            .queryOrdered(byChild: "id")
+            .queryEqual(toValue: self.selectedPokoId!)
+            .observeSingleEvent(of: .value) { snapshot in
+                guard snapshot.exists(), let pokoDict = snapshot.value as? [String: Any],
+                      let matchingKey = pokoDict.keys.first else {
+                    print("❌ No poko found matching id \(self.selectedPokoId!)")
+                    return
+                }
+                
+                // Step 2: Read current ownedPokos
+                let userRef = dbRef.child("Users/\(delegate.currentUser!.uId)")
+                userRef.child("ownedPokos").observeSingleEvent(of: .value) { ownedSnapshot in
+                    var currentOwned = ownedSnapshot.value as? [String] ?? []
+                    
+                    // Step 3: Append only if not already owned
+                    if !currentOwned.contains(self.selectedPokoId!) {
+                        currentOwned.append(self.selectedPokoId!)
+                    }
+                    
+                    // Step 4: Batch update: selectedPoko, ownedPokos, and downloadCount
+                    let updates: [String: Any] = [
+                        "/Users/\(delegate.currentUser!.uId)/selectedPoko": self.selectedPokoId!,
+                        "/Users/\(delegate.currentUser!.uId)/ownedPokos": currentOwned,
+                        "/Pokos/\(matchingKey)/downloadCount": ServerValue.increment(1)
+                    ]
+                    
+                    dbRef.updateChildValues(updates) { error, _ in
+                        if let err = error {
+                            print("⚠️ Update error:", err.localizedDescription)
+                        } else {
+                            print("🎉 Updated selected poko, owned list, and download count")
+                        }
+                    }
+                }
+            }
+    }
+    
+    @objc private func showPokoLayout(override: Bool){
+        self.saveGames()
+        if(self.selectedGameProfile == nil && !self.pokoOverride){
+            PopupManager.show(
+                title: "Pick a Game?",
+                message: "You don’t have to, but choosing one helps others connect with you!",
+                okButtonText: "Skip for now",
+                cancelButtonText: "Let me pick a game",
+                popupType: .normal,
+                okAction: {
+                    SwiftEntryKit.dismiss()
+                    self.pokoOverride = true
+                    self.showPokoLayout(override: true)
+                },
+                cancelAction: { SwiftEntryKit.dismiss() }
+            )
+            return
+        }
+        self.pokoCollection.collectionViewLayout = createTwoByTwoGridLayout(in: self.pokoCollection)
+        self.pokoCollection.contentInsetAdjustmentBehavior = .never
+        self.pokoCollection.delegate = self
+        self.pokoCollection.dataSource = self
+        
+        UIView.animate(withDuration: 0.8, animations: {
+            self.casualButton.alpha = 0
+            self.actionButton.alpha = 0
+            self.shooterButton.alpha = 0
+            self.multiButton.alpha = 0
+            self.sportsButton.alpha = 0
+            self.allGamesButton.alpha = 0
+            self.gameSelectionHeader.alpha = 0
+            self.gameSelectionSub.alpha = 0
+            self.gameCollection.alpha = 0
+            self.searchView.alpha = 0
+            self.continueButton.alpha = 0.5
+        }, completion: { (finished: Bool) in
+            UIView.animate(withDuration: 0.5, animations: {
+                self.pokoLayout.alpha = 1
+            }, completion: { (finished: Bool) in
+                UIView.animate(withDuration: 0.5, delay: 0.5, options: [], animations: {
+                    self.pokoTitle.alpha = 1
+                }, completion: { (finished: Bool) in
+                    UIView.animate(withDuration: 0.5, delay: 0.5, options: [], animations: {
+                        self.pokoSub.alpha = 1
+                    }, completion: { (finished: Bool) in
+                        UIView.animate(withDuration: 0.5, animations: {
+                            self.pokoCollection.alpha = 1
+                        }, completion: nil)
+                    })
+                })
+            })
+        })
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if(scrollView == self.gameCollection) {
+            let visibleIndexPaths = self.gameCollection.indexPathsForVisibleItems.sorted(by: { $0.item < $1.item })
+            // Example: Get next 10 index paths to prefetch
+            let upcomingIndexPaths = visibleIndexPaths.compactMap { IndexPath(item: $0.item + 1, section: $0.section) }
+            preloadUpcomingImages(from: upcomingIndexPaths)
+        }
+    }
+    
+    func preloadUpcomingImages(from indexPaths: [IndexPath]) {
+        let upcomingGames = indexPaths.compactMap { indexPath in
+            return gameList[safe: indexPath.item] // use a safe subscript if needed
+        }
+
+        let urls = upcomingGames.compactMap { URL(string: $0.imageUrl ?? "") }
+
+        let prefetcher = ImagePrefetcher(urls: urls)
+        prefetcher.start()
+    }
+    
+    func animateBorderTrace(
+        around view: UIView,
+        borderColor: UIColor = .systemGreen,
+        lineWidth: CGFloat = 4.0,
+        duration: CFTimeInterval = 0.5,
+        completion: ((CAShapeLayer) -> Void)? = nil
+    ) {
+        let shapeLayer = CAShapeLayer()
+        let path = UIBezierPath(roundedRect: view.bounds, cornerRadius: view.layer.cornerRadius)
+        shapeLayer.path = path.cgPath
+        shapeLayer.strokeColor = borderColor.cgColor
+        shapeLayer.fillColor = UIColor.clear.cgColor
+        shapeLayer.lineWidth = lineWidth
+        shapeLayer.strokeEnd = 0
+
+        view.layer.addSublayer(shapeLayer)
+
+        CATransaction.begin()
+        CATransaction.setCompletionBlock {
+            completion?(shapeLayer)
+        }
+
+        let animation = CABasicAnimation(keyPath: "strokeEnd")
+        animation.fromValue = 0
+        animation.toValue = 1
+        animation.duration = duration
+        animation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+        shapeLayer.add(animation, forKey: "traceBorder")
+
+        CATransaction.commit()
+
+        shapeLayer.strokeEnd = 1
+    }
+    
+    @objc private func showPokoTooltip() {
+        TooltipHelper.showTooltip(
+            title: "What is a Poko?",
+            message: "The Poko you choose is your in-app companion as well as your digital representation of 'you'.",
+            image: UIImage(named: "pinky")!,
+            imageOnRight: false,
+            duration: 5
+        )
     }
 }
